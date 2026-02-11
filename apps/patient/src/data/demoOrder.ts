@@ -65,7 +65,8 @@ export const demoOrder: Order = {
       state: 'NY',
       postalCode: '11211',
       country: 'US'
-    }
+    },
+    preferredPharmacies: []
   },
   fulfillment: undefined,
   exceptions: [],

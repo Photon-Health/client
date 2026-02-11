@@ -1,18 +1,9 @@
-import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@chakra-ui/react';
-import { FiStar } from 'react-icons/fi';
+import { Box, HStack, Image, Tag, TagLabel, Text, VStack } from '@chakra-ui/react';
 import { text as t } from '../../utils/text';
 
 import { formatPrice } from '../../utils/formatters';
 import { Offer } from '../pharmacy-card-list/BrandedOptions';
-
-const PreferredTag = () => {
-  return (
-    <Tag size="sm" colorScheme="blue">
-      <TagLeftIcon boxSize="12px" as={FiStar} />
-      <TagLabel>{t.preferred}</TagLabel>
-    </Tag>
-  );
-};
+import { PreferredTag } from '../PreferredTag';
 
 const CurrentPharmacyTag = () => {
   return (

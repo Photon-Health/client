@@ -103,6 +103,20 @@ export const Pharmacy = () => {
   // preferred pharmacy
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
+  useEffect(() => {
+    if (preferredPharmacyId) {
+      return;
+    }
+    const preferredPharmacies = order?.patient?.preferredPharmacies ?? [];
+    const nextPreferredId = preferredPharmacies[0]?.id ?? '';
+    if (nextPreferredId) {
+      setPreferredPharmacyId(nextPreferredId);
+    }
+  }, [order?.patient?.preferredPharmacies, preferredPharmacyId]);
+  const preferredPharmacyIds = useMemo(() => {
+    // we only have one preferred at a time right now since setting one replaces the existing one
+    return preferredPharmacyId ? [preferredPharmacyId] : [];
+  }, [preferredPharmacyId]);
 
   // top ranked pharmacies
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
@@ -166,12 +180,20 @@ export const Pharmacy = () => {
       ...pharmacyResults.filter((p) => !topRankedIds.includes(p.id))
     ];
 
-    if (isDemo) {
-      // demo pharmacies already are prepared
-      return combined;
+    const prepared = isDemo
+      ? combined
+      : combined.map((combinedItem) => preparePharmacy(combinedItem));
+    if (preferredPharmacyIds.length === 0) {
+      return prepared;
     }
-    return combined.map((combinedItem) => preparePharmacy(combinedItem));
-  }, [isDemo, pharmacyResults, topRankedPharmacies]);
+
+    const preferredSet = new Set(preferredPharmacyIds);
+    const preferred = preferredPharmacyIds
+      .map((id) => prepared.find((pharmacy) => pharmacy.id === id))
+      .filter(Boolean) as EnrichedPharmacy[];
+    const remaining = prepared.filter((pharmacy) => !preferredSet.has(pharmacy.id));
+    return [...preferred, ...remaining];
+  }, [isDemo, pharmacyResults, preferredPharmacyIds, topRankedPharmacies]);
 
   // Non-integrated patient mail order pharmacies
   const [patientMailOrderOptions, setPatientMailOrderOptions] = useState<
@@ -1047,7 +1069,7 @@ export const Pharmacy = () => {
     <PickupPharmacyCardList
       location={patientLocation}
       pharmacies={allPharmacies}
-      preferredPharmacy={preferredPharmacyId}
+      preferredPharmacyIds={preferredPharmacyIds}
       savingPreferred={savingPreferred}
       selectedId={selectedId}
       handleSelect={handleSelect}
@@ -1152,7 +1174,7 @@ export const Pharmacy = () => {
                         shouldTrackOfferImpressionsAndSelections
                       }
                       selectedPharmacyId={selectedId}
-                      preferredPharmacyId={preferredPharmacyId}
+                      preferredPharmacyIds={preferredPharmacyIds}
                       handleSelect={handleSelect}
                     />
                   )}

@@ -7,13 +7,13 @@ export const OffersList = ({
   offers,
   shouldTrackOfferImpressionsAndSelections,
   selectedPharmacyId,
-  preferredPharmacyId,
+  preferredPharmacyIds,
   handleSelect
 }: {
   offers: Offer[];
   shouldTrackOfferImpressionsAndSelections: boolean;
   selectedPharmacyId: string;
-  preferredPharmacyId: string;
+  preferredPharmacyIds: string[];
   handleSelect: (id: string) => void;
 }) => {
   return (
@@ -36,7 +36,7 @@ export const OffersList = ({
               offer={offer}
               isPharmacyFulfillingCurrentOrder={false}
               selected={selectedPharmacyId === offer.pharmacy.id}
-              isPreferred={preferredPharmacyId === offer.pharmacy.id}
+              isPreferred={preferredPharmacyIds.includes(offer.pharmacy.id)}
               handleSelect={handleSelect}
             />
           </OfferImpressionTracker>
