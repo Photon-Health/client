@@ -80,7 +80,9 @@ vi.mock('../components', async () => {
     PoweredBy: () => <div data-testid="powered-by">Powered By</div>,
     Nav: () => <div>Nav</div>,
     PrescriptionsList: () => <div>PrescriptionsList</div>,
-    PharmacyInfo: () => <div data-testid="pharmacy-info">Pharmacy Info</div>
+    PharmacyInfo: ({ pharmacy }: { pharmacy?: { name?: string } }) => (
+      <div data-testid="pharmacy-info">{pharmacy?.name}</div>
+    )
   };
 });
 
@@ -461,6 +463,54 @@ describe('Pharmacy page', () => {
       return options.includePrice;
     });
     expect(includePriceOptions).not.toContain(false);
+  }, 10_000);
+
+  test('puts preferred pharmacy at the top of the pickup list', async () => {
+    const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
+    const preferredId = 'phr_preferredId123';
+
+    const singlePrescriptionOrder = generateOrder({
+      id: 'ord_testId777',
+      state: 'ROUTING',
+      patient: generatePatient({
+        preferredPharmacies: [{ id: preferredId }]
+      }),
+      fills: [generateFill('test-treatment')],
+      address: {
+        street1: '123 Main St',
+        city: 'New York',
+        state: 'NY',
+        postalCode: '10001',
+        country: 'US'
+      }
+    });
+
+    const getOrderMock = vi.mocked(getOrder);
+    getOrderMock.mockResolvedValue(singlePrescriptionOrder);
+
+    const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+    getPharmaciesByLocationMock.mockResolvedValue({
+      pharmaciesByLocation: [
+        generatePharmacy({
+          id: 'phr_otherId999',
+          name: 'Other Pharmacy'
+        }),
+        generatePharmacy({
+          id: preferredId,
+          name: 'Preferred Pharmacy'
+        })
+      ]
+    });
+
+    const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+    setOrderPharmacyMock.mockResolvedValue(true);
+
+    renderApp();
+    await navigateToPharmacyScreen();
+
+    const pharmacyNames = await screen.findAllByTestId('pharmacy-info');
+    expect(pharmacyNames[0]).toHaveTextContent('Preferred Pharmacy');
+    expect(pharmacyNames[1]).toHaveTextContent('Other Pharmacy');
   }, 10_000);
 
   test('hides price toggle when order has 2+ prescriptions', async () => {
