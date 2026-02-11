@@ -1,10 +1,9 @@
-import { Box, HStack, Image, Tag, TagLabel, Text, VStack } from '@chakra-ui/react';
+import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@chakra-ui/react';
+import { FiStar } from 'react-icons/fi';
 import { text as t } from '../../utils/text';
 
 import { formatPrice } from '../../utils/formatters';
 import { Offer } from '../pharmacy-card-list/BrandedOptions';
-import { PreferredTag } from '../PreferredTag';
-
 const CurrentPharmacyTag = () => {
   return (
     <Tag
@@ -41,7 +40,12 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
   ].map((tag) => {
     switch (tag) {
       case t.preferred:
-        return <PreferredTag />;
+        return (
+          <Tag size="sm" colorScheme="blue">
+            <TagLeftIcon boxSize="12px" as={FiStar} />
+            <TagLabel>{t.preferred}</TagLabel>
+          </Tag>
+        );
       case 'current':
         return <CurrentPharmacyTag />;
       default:

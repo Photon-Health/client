@@ -7,12 +7,13 @@ import {
   Spacer,
   Tag,
   TagLabel,
+  TagLeftIcon,
   Text,
   VStack
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { FiMapPin } from 'react-icons/fi';
+import { FiMapPin, FiStar } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
 import { Address, EnrichedPharmacy, OrderFulfillment } from '../utils/models';
 import { text as t } from '../utils/text';
@@ -22,7 +23,6 @@ import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import { formatAddress, formatPrice, titleCase } from '../utils/formatters';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
 import { BrandedOptionOverrides } from './pharmacy-card-list';
-import { PreferredTag } from './PreferredTag';
 
 dayjs.extend(customParseFormat);
 
@@ -383,7 +383,12 @@ export const PharmacyInfo = ({
       showAvailableInYourAreaTag ||
       showFreeDeliveryTag ? (
         <HStack spacing={2} m={0} p={0} alignItems="start" w="full">
-          {showPreferredTag ? <PreferredTag /> : null}
+          {showPreferredTag ? (
+            <Tag size="sm" colorScheme="blue">
+              <TagLeftIcon boxSize="12px" as={FiStar} />
+              <TagLabel>{t.preferred}</TagLabel>
+            </Tag>
+          ) : null}
           {showReadyIn30MinTag ? (
             <Tag size="sm" bgColor="yellow.200">
               <TagLabel>Ready in 30 minutes</TagLabel>
