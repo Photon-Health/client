@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode, Ref, useCallback, useMemo, useRef } from 'react';
+import { ReactElement, useCallback, useMemo, useRef } from 'react';
 import {
   Alert,
   AlertIcon,
@@ -43,6 +43,9 @@ interface TablePageProps {
   ctaColor?: string;
   ctaRoute?: string;
   ctaOnClick?: () => void;
+  emptyStateTitle?: string;
+  emptyStateText?: string;
+
   filter?: Element | ReactElement;
   paginationIndicator?: Element | ReactElement;
   paginationActions?: Element | ReactElement;
@@ -71,7 +74,9 @@ export const TablePage = ({
   filterText,
   filter,
   ctaRight
-}: TablePageProps) => {
+}: // emptyStateTitle,
+// emptyStateText
+TablePageProps) => {
   const scrollableContainerRef = useRef(null);
   const handleInputChange = useCallback(
     (e: any) => {
@@ -96,11 +101,16 @@ export const TablePage = ({
   const canRenderCta = ctaRoute && ctaColor && ctaText;
 
   return (
-    <TablePageBox scrollableContainerRef={scrollableContainerRef}>
-      <Stack spacing="5">
+    <Box
+      w="full"
+      bg="white"
+      boxShadow={useColorModeValue('sm', 'sm-dark')}
+      borderRadius={useBreakpointValue({ base: 'lg', md: 'lg' })}
+      ref={scrollableContainerRef}
+    >
+      <Stack spacing="5" py="5">
         <Stack
           px={{ base: '4', md: '6' }}
-          pt="5"
           direction={{ base: 'column', md: `row${ctaRight ? '-reverse' : ''}` }}
           justify="space-between"
         >
@@ -226,11 +236,11 @@ export const TablePage = ({
             </Alert>
           )}
         </Box>
-        <HStack px={{ base: '4', md: '6' }} pb="5" spacing="3" justify="space-between">
+        <HStack px={{ base: '4', md: '6' }} spacing="3" justify="space-between">
           <>
             {!loading && !isMobile && (
               <Text color="muted" fontSize="sm">
-                Showing {data.length} results {total ? `(${total} total)` : null}
+                Showing {rows.length} results {total ? `(${total} total)` : null}
               </Text>
             )}
             {!isMobile && paginationIndicator}
@@ -239,26 +249,19 @@ export const TablePage = ({
         </HStack>
       </Stack>
       <Outlet />
-    </TablePageBox>
-  );
-};
-
-const TablePageBox = ({
-  children,
-  scrollableContainerRef
-}: {
-  children: ReactNode;
-  scrollableContainerRef: Ref<any>;
-}) => {
-  return (
-    <Box
-      w="full"
-      bg="white"
-      boxShadow={{ base: 'none', md: useColorModeValue('sm', 'sm-dark') }}
-      borderRadius={useBreakpointValue({ base: 'lg', md: 'lg' })}
-      ref={scrollableContainerRef}
-    >
-      {children}
     </Box>
   );
 };
+
+// const EmptyState = ({ title, text }: { title?: string; text?: string }) => {
+//   return (
+//     <Stack alignItems="center" p={{ base: '4', md: '6' }}>
+//       <Text fontSize="lg" fontWeight="medium">
+//         {title}
+//       </Text>
+//       <Text fontSize="sm" color="gray.600" pb="2">
+//         {text}
+//       </Text>
+//     </Stack>
+//   );
+// };
