@@ -66,7 +66,7 @@ describe('OffersList', () => {
     offers: mockOffers,
     shouldTrackOfferImpressionsAndSelections: true,
     selectedPharmacyId: '',
-    preferredPharmacyIds: [],
+    preferredPharmacyId: '',
     handleSelect: vi.fn()
   };
 
@@ -106,7 +106,7 @@ describe('OffersList', () => {
   });
 
   test('shows preferred state for preferred pharmacy', () => {
-    render(<OffersList {...defaultProps} preferredPharmacyIds={['novocare-pharmacy']} />);
+    render(<OffersList {...defaultProps} preferredPharmacyId="novocare-pharmacy" />);
 
     const amazonCard = screen.getByTestId('offer-card-amazon-pharmacy');
     const novocareCard = screen.getByTestId('offer-card-novocare-pharmacy');
@@ -152,7 +152,7 @@ describe('OffersList', () => {
       <OffersList
         {...defaultProps}
         selectedPharmacyId="amazon-pharmacy"
-        preferredPharmacyIds={['novocare-pharmacy']}
+        preferredPharmacyId="novocare-pharmacy"
         handleSelect={handleSelect}
       />
     );

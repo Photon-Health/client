@@ -104,19 +104,12 @@ export const Pharmacy = () => {
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
   useEffect(() => {
-    if (preferredPharmacyId) {
-      return;
-    }
-    const preferredPharmacies = order?.patient?.preferredPharmacies ?? [];
-    const nextPreferredId = preferredPharmacies[0]?.id ?? '';
-    if (nextPreferredId) {
-      setPreferredPharmacyId(nextPreferredId);
-    }
-  }, [order?.patient?.preferredPharmacies, preferredPharmacyId]);
-  const preferredPharmacyIds = useMemo(() => {
-    // we only have one preferred at a time right now since setting one replaces the existing one
-    return preferredPharmacyId ? [preferredPharmacyId] : [];
-  }, [preferredPharmacyId]);
+    const nextPreferredId = order?.patient?.preferredPharmacies?.[0]?.id ?? '';
+    if (!nextPreferredId) return;
+
+    // Only set from order if we haven't already chosen one.
+    setPreferredPharmacyId((current) => current || nextPreferredId);
+  }, [order?.patient?.preferredPharmacies]);
 
   // top ranked pharmacies
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
@@ -184,19 +177,19 @@ export const Pharmacy = () => {
     const prepared = isDemo
       ? combined
       : combined.map((combinedItem) => preparePharmacy(combinedItem));
-    if (preferredPharmacyIds.length === 0) {
+    if (!preferredPharmacyId) {
       // no preferred pharmacies: preserve existing ordering
       return prepared;
     }
 
-    // preferred pharmacies should appear first, in the order of preferredPharmacyIds
-    const preferredSet = new Set(preferredPharmacyIds);
-    const preferred = preferredPharmacyIds
-      .map((id) => prepared.find((pharmacy) => pharmacy.id === id))
-      .filter(Boolean) as EnrichedPharmacy[];
-    const remaining = prepared.filter((pharmacy) => !preferredSet.has(pharmacy.id));
-    return [...preferred, ...remaining];
-  }, [isDemo, pharmacyResults, preferredPharmacyIds, topRankedPharmacies]);
+    // preferred pharmacy should appear first
+    const preferred = prepared.find((pharmacy) => pharmacy.id === preferredPharmacyId);
+    if (!preferred) {
+      return prepared;
+    }
+    const remaining = prepared.filter((pharmacy) => pharmacy.id !== preferredPharmacyId);
+    return [preferred, ...remaining];
+  }, [isDemo, pharmacyResults, preferredPharmacyId, topRankedPharmacies]);
 
   // Non-integrated patient mail order pharmacies
   const [patientMailOrderOptions, setPatientMailOrderOptions] = useState<
@@ -1072,7 +1065,7 @@ export const Pharmacy = () => {
     <PickupPharmacyCardList
       location={patientLocation}
       pharmacies={allPharmacies}
-      preferredPharmacyIds={preferredPharmacyIds}
+      preferredPharmacy={preferredPharmacyId}
       savingPreferred={savingPreferred}
       selectedId={selectedId}
       handleSelect={handleSelect}
@@ -1177,7 +1170,7 @@ export const Pharmacy = () => {
                         shouldTrackOfferImpressionsAndSelections
                       }
                       selectedPharmacyId={selectedId}
-                      preferredPharmacyIds={preferredPharmacyIds}
+                      preferredPharmacyId={preferredPharmacyId}
                       handleSelect={handleSelect}
                     />
                   )}

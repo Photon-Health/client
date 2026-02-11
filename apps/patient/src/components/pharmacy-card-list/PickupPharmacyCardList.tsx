@@ -9,7 +9,7 @@ import { OfferImpressionTracker } from '../../utils/tracking/OfferImpressionTrac
 
 interface PickupPharmacyCardListProps {
   pharmacies: EnrichedPharmacy[];
-  preferredPharmacyIds: string[];
+  preferredPharmacy: string;
   savingPreferred: boolean;
   selectedId: string;
   handleSelect: (id: string) => void;
@@ -31,7 +31,7 @@ interface PickupPharmacyCardListProps {
 }
 
 export const PickupPharmacyCardList = ({
-  preferredPharmacyIds,
+  preferredPharmacy,
   savingPreferred,
   pharmacies,
   selectedId,
@@ -84,7 +84,7 @@ export const PickupPharmacyCardList = ({
             >
               <PharmacyCard
                 pharmacy={pharmacy}
-                preferred={preferredPharmacyIds.includes(pharmacy.id)}
+                preferred={pharmacy.id === preferredPharmacy}
                 savingPreferred={savingPreferred}
                 selected={selectedId === pharmacy.id}
                 onSelect={() => handleSelect(pharmacy.id)}
