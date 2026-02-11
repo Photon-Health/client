@@ -8,6 +8,7 @@ import {
   CircularProgress,
   HStack,
   Icon,
+  Image,
   Input,
   InputGroup,
   InputLeftElement,
@@ -26,6 +27,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { FiSearch } from 'react-icons/fi';
 import { Link as RouterLink, Outlet } from 'react-router-dom';
 import { Column, useSortBy, useTable } from 'react-table';
+import emptyStateSvg from './empty-state.svg';
 
 interface TablePageProps {
   loading?: boolean;
@@ -73,10 +75,10 @@ export const TablePage = ({
   setFilterText,
   filterText,
   filter,
-  ctaRight
-}: // emptyStateTitle,
-// emptyStateText
-TablePageProps) => {
+  ctaRight,
+  emptyStateTitle,
+  emptyStateText
+}: TablePageProps) => {
   const scrollableContainerRef = useRef(null);
   const handleInputChange = useCallback(
     (e: any) => {
@@ -99,169 +101,180 @@ TablePageProps) => {
   );
 
   const canRenderCta = ctaRoute && ctaColor && ctaText;
+  const hasResults = rows.length > 0;
 
   return (
-    <Box
-      w="full"
-      bg="white"
-      boxShadow={useColorModeValue('sm', 'sm-dark')}
-      borderRadius={useBreakpointValue({ base: 'lg', md: 'lg' })}
-      ref={scrollableContainerRef}
-    >
-      <Stack spacing="5" py="5">
-        <Stack
-          px={{ base: '4', md: '6' }}
-          direction={{ base: 'column', md: `row${ctaRight ? '-reverse' : ''}` }}
-          justify="space-between"
+    <>
+      <Box
+        w="full"
+        bg="white"
+        boxShadow={useColorModeValue('sm', 'sm-dark')}
+        borderRadius={useBreakpointValue({ base: 'lg', md: 'lg' })}
+        ref={scrollableContainerRef}
+      >
+        {/* Infinite scroll functionality breaks if we conditionally render this component
+        based on hasResults so had to move it higher up the tree */}
+        <InfiniteScroll
+          dataLength={rows.length}
+          scrollableTarget={scrollableContainerRef.current ?? undefined}
+          next={fetchMoreData}
+          hasMore={hasMore || false}
+          loader={
+            hasResults ? (
+              <Table>
+                <Thead>
+                  <Tr>
+                    <Td>
+                      <Center>
+                        <CircularProgress isIndeterminate color="green.300" />
+                      </Center>
+                    </Td>
+                  </Tr>
+                </Thead>
+              </Table>
+            ) : null
+          }
         >
-          {canRenderCta && (
-            <Button
-              as={ctaOnClick ? undefined : RouterLink}
-              to={ctaRoute || ''}
-              onClick={ctaOnClick}
-              colorScheme={ctaColor}
-              aria-label={ctaText}
+          <Stack spacing="5" py="5">
+            <Stack
+              px={{ base: '4', md: '6' }}
+              direction={{ base: 'column', md: `row${ctaRight ? '-reverse' : ''}` }}
+              justify="space-between"
             >
-              {ctaText}
-            </Button>
-          )}
-          <Stack direction={{ base: 'column', md: 'row' }}>
-            <>
-              {filter ? filter : null}
-              <InputGroup maxW={{ base: '100%', md: 'xs' }} minWidth={300}>
-                <InputLeftElement pointerEvents="none">
-                  <Icon as={FiSearch} color="muted" boxSize="5" />
-                </InputLeftElement>
-                <Input
-                  type="text"
-                  placeholder={searchPlaceholder}
-                  onChange={handleInputChange}
-                  value={filterText}
-                />
-              </InputGroup>
-            </>
-          </Stack>
-        </Stack>
-        <Box overflowX="auto">
-          <InfiniteScroll
-            dataLength={rows.length}
-            scrollableTarget={scrollableContainerRef.current ?? undefined}
-            next={fetchMoreData}
-            hasMore={hasMore || false}
-            loader={
-              rows.length > 0 ? (
-                <Table>
-                  <Thead>
-                    <Tr>
-                      <Td>
-                        <Center>
-                          <CircularProgress isIndeterminate color="green.300" />
-                        </Center>
-                      </Td>
-                    </Tr>
-                  </Thead>
-                </Table>
-              ) : null
-            }
-          >
-            <Table {...getTableProps()} ref={tableRef}>
-              <Thead hidden={hideHeaders}>
-                {
-                  // Loop over the header rows
-                  headerGroups.map((headerGroup) => (
-                    // Apply the header row props
-                    <Tr
-                      {...headerGroup.getHeaderGroupProps()}
-                      key={headerGroup.getHeaderGroupProps().key}
-                    >
+              {canRenderCta && (
+                <Button
+                  as={ctaOnClick ? undefined : RouterLink}
+                  to={ctaRoute || ''}
+                  onClick={ctaOnClick}
+                  colorScheme={ctaColor}
+                  aria-label={ctaText}
+                >
+                  {ctaText}
+                </Button>
+              )}
+              <Stack direction={{ base: 'column', md: 'row' }}>
+                <>
+                  {filter ? filter : null}
+                  <InputGroup maxW={{ base: '100%', md: 'xs' }} minWidth={300}>
+                    <InputLeftElement pointerEvents="none">
+                      <Icon as={FiSearch} color="muted" boxSize="5" />
+                    </InputLeftElement>
+                    <Input
+                      type="text"
+                      placeholder={searchPlaceholder}
+                      onChange={handleInputChange}
+                      value={filterText}
+                    />
+                  </InputGroup>
+                </>
+              </Stack>
+            </Stack>
+            {hasResults && (
+              <>
+                <Box overflowX="auto">
+                  <Table {...getTableProps()} ref={tableRef}>
+                    <Thead hidden={hideHeaders}>
                       {
-                        // Loop over the headers in each row
-                        headerGroup.headers.map((column) => (
-                          // Apply the header cell props
-                          <Th {...column.getHeaderProps()} key={column.id}>
+                        // Loop over the header rows
+                        headerGroups.map((headerGroup) => (
+                          // Apply the header row props
+                          <Tr
+                            {...headerGroup.getHeaderGroupProps()}
+                            key={headerGroup.getHeaderGroupProps().key}
+                          >
                             {
-                              // Render the header
-                              column.render('Header')
+                              // Loop over the headers in each row
+                              headerGroup.headers.map((column) => (
+                                // Apply the header cell props
+                                <Th {...column.getHeaderProps()} key={column.id}>
+                                  {
+                                    // Render the header
+                                    column.render('Header')
+                                  }
+                                </Th>
+                              ))
                             }
-                          </Th>
+                          </Tr>
                         ))
                       }
-                    </Tr>
-                  ))
-                }
-              </Thead>
-              <Tbody {...getTableBodyProps()}>
-                {
-                  // Loop over the table rows
-                  rows.map((row, idx) => {
-                    // Prepare the row for display
-                    prepareRow(row);
-                    return (
-                      // Apply the row props
-                      <Tr {...row.getRowProps()} key={`${row.id}-${idx}`}>
-                        {
-                          // Loop over the rows cells
-                          row.cells.map((cell) => {
-                            // Apply the cell props
-                            const { key, ...otherCellProps } = cell.getCellProps(
-                              cell.column.width === 'wrap'
-                                ? {
-                                    style: {
-                                      whiteSpace: 'pre-wrap'
-                                    }
-                                  }
-                                : {}
-                            );
-                            return (
-                              <Td key={key} {...otherCellProps}>
-                                {
-                                  // Render the cell contents
-                                  cell.render('Cell')
-                                }
-                              </Td>
-                            );
-                          })
-                        }
-                      </Tr>
-                    );
-                  })
-                }
-              </Tbody>
-            </Table>
-          </InfiniteScroll>
-          {error && (
-            <Alert status="error">
-              <AlertIcon />
-              {error.message}
-            </Alert>
-          )}
-        </Box>
-        <HStack px={{ base: '4', md: '6' }} spacing="3" justify="space-between">
-          <>
-            {!loading && !isMobile && (
-              <Text color="muted" fontSize="sm">
-                Showing {rows.length} results {total ? `(${total} total)` : null}
-              </Text>
+                    </Thead>
+                    <Tbody {...getTableBodyProps()}>
+                      {
+                        // Loop over the table rows
+                        rows.map((row, idx) => {
+                          // Prepare the row for display
+                          prepareRow(row);
+                          return (
+                            // Apply the row props
+                            <Tr {...row.getRowProps()} key={`${row.id}-${idx}`}>
+                              {
+                                // Loop over the rows cells
+                                row.cells.map((cell) => {
+                                  // Apply the cell props
+                                  const { key, ...otherCellProps } = cell.getCellProps(
+                                    cell.column.width === 'wrap'
+                                      ? {
+                                          style: {
+                                            whiteSpace: 'pre-wrap'
+                                          }
+                                        }
+                                      : {}
+                                  );
+                                  return (
+                                    <Td key={key} {...otherCellProps}>
+                                      {
+                                        // Render the cell contents
+                                        cell.render('Cell')
+                                      }
+                                    </Td>
+                                  );
+                                })
+                              }
+                            </Tr>
+                          );
+                        })
+                      }
+                    </Tbody>
+                  </Table>
+                  {error && (
+                    <Alert status="error">
+                      <AlertIcon />
+                      {error.message}
+                    </Alert>
+                  )}
+                </Box>
+                <HStack px={{ base: '4', md: '6' }} spacing="3" justify="space-between">
+                  <>
+                    {!loading && !isMobile && (
+                      <Text color="muted" fontSize="sm">
+                        Showing {rows.length} results {total ? `(${total} total)` : null}
+                      </Text>
+                    )}
+                    {!isMobile && paginationIndicator}
+                    {paginationActions}
+                  </>
+                </HStack>
+              </>
             )}
-            {!isMobile && paginationIndicator}
-            {paginationActions}
-          </>
-        </HStack>
-      </Stack>
-      <Outlet />
-    </Box>
+          </Stack>
+          <Outlet />
+        </InfiniteScroll>
+      </Box>
+      {!hasResults && <EmptyState title={emptyStateTitle} text={emptyStateText} />}
+    </>
   );
 };
 
-// const EmptyState = ({ title, text }: { title?: string; text?: string }) => {
-//   return (
-//     <Stack alignItems="center" p={{ base: '4', md: '6' }}>
-//       <Text fontSize="lg" fontWeight="medium">
-//         {title}
-//       </Text>
-//       <Text fontSize="sm" color="gray.600" pb="2">
-//         {text}
-//       </Text>
-//     </Stack>
-//   );
-// };
+const EmptyState = ({ title, text }: { title?: string; text?: string }) => {
+  return (
+    <Stack alignItems="center">
+      <Image src={emptyStateSvg} w="50%" maxW="176px" />
+      <Text fontSize="lg" fontWeight="medium" textAlign="center">
+        {title}
+      </Text>
+      <Text fontSize="sm" color="gray.600" textAlign="center">
+        {text}
+      </Text>
+    </Stack>
+  );
+};
