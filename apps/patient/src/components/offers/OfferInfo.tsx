@@ -50,9 +50,9 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
   ].map((tag) => {
     switch (tag) {
       case t.preferred:
-        return <PreferredTag key={tag} />;
+        return <PreferredTag />;
       case 'current':
-        return <CurrentPharmacyTag key={tag} />;
+        return <CurrentPharmacyTag />;
       default:
         return (
           <Tag key={tag} size="sm" colorScheme="blue">
