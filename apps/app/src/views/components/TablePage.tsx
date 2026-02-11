@@ -47,7 +47,6 @@ interface TablePageProps {
   paginationIndicator?: Element | ReactElement;
   paginationActions?: Element | ReactElement;
   total?: number;
-  useLoadingOverlay?: boolean;
   ctaRight?: boolean;
 }
 
@@ -66,7 +65,6 @@ export const TablePage = ({
   paginationIndicator = undefined,
   paginationActions = undefined,
   total = undefined,
-  useLoadingOverlay = false,
   data,
   columns,
   setFilterText,
@@ -182,30 +180,7 @@ export const TablePage = ({
                   ))
                 }
               </Thead>
-              <Tbody
-                {...getTableBodyProps()}
-                position={loading && useLoadingOverlay ? 'relative' : 'initial'}
-              >
-                {loading && useLoadingOverlay ? (
-                  <Tr
-                    position="absolute"
-                    height="100%"
-                    bg="gray.600"
-                    width={tableRef.current?.clientWidth || 'auto'}
-                    opacity="0.8"
-                    zIndex={2}
-                    display="flex"
-                    alignItems="flex-start"
-                    justifyContent="center"
-                    paddingTop={8}
-                  >
-                    <Td borderBottomWidth={0}>
-                      <Center>
-                        <CircularProgress isIndeterminate color="green.300" />
-                      </Center>
-                    </Td>
-                  </Tr>
-                ) : null}
+              <Tbody {...getTableBodyProps()}>
                 {
                   // Loop over the table rows
                   rows.map((row, idx) => {
