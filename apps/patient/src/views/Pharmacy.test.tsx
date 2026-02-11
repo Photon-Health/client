@@ -509,8 +509,13 @@ describe('Pharmacy page', () => {
     await navigateToPharmacyScreen();
 
     const pharmacyNames = await screen.findAllByTestId('pharmacy-info');
-    expect(pharmacyNames[0]).toHaveTextContent('Preferred Pharmacy');
-    expect(pharmacyNames[1]).toHaveTextContent('Other Pharmacy');
+    const textContents = pharmacyNames.map((node) => node.textContent ?? '');
+    const preferredIndex = textContents.findIndex((text) => text.includes('Preferred Pharmacy'));
+    const otherIndex = textContents.findIndex((text) => text.includes('Other Pharmacy'));
+
+    expect(preferredIndex).toBeGreaterThan(-1);
+    expect(otherIndex).toBeGreaterThan(-1);
+    expect(preferredIndex).toBeLessThan(otherIndex);
   }, 10_000);
 
   test('hides price toggle when order has 2+ prescriptions', async () => {

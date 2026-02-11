@@ -41,13 +41,13 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
     switch (tag) {
       case t.preferred:
         return (
-          <Tag size="sm" colorScheme="blue">
+          <Tag key={tag} size="sm" colorScheme="blue">
             <TagLeftIcon boxSize="12px" as={FiStar} />
             <TagLabel>{t.preferred}</TagLabel>
           </Tag>
         );
       case 'current':
-        return <CurrentPharmacyTag />;
+        return <CurrentPharmacyTag key={tag} />;
       default:
         return (
           <Tag key={tag} size="sm" colorScheme="blue">
