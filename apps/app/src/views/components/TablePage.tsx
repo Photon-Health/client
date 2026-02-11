@@ -1,4 +1,4 @@
-import { ReactElement, useCallback, useMemo, useRef } from 'react';
+import { ReactElement, ReactNode, Ref, useCallback, useMemo, useRef } from 'react';
 import {
   Alert,
   AlertIcon,
@@ -95,52 +95,45 @@ export const TablePage = ({
     useSortBy
   );
 
-  const ctaRouteColorTextUndefined =
-    ctaRoute === undefined || ctaColor === undefined || ctaText === undefined;
+  const canRenderCta = ctaRoute && ctaColor && ctaText;
 
   return (
-    <Box
-      w="full"
-      bg="white"
-      boxShadow={{ base: 'none', md: useColorModeValue('sm', 'sm-dark') }}
-      borderRadius={useBreakpointValue({ base: 'lg', md: 'lg' })}
-      ref={scrollableContainerRef}
-    >
+    <TablePageBox scrollableContainerRef={scrollableContainerRef}>
       <Stack spacing="5">
-        <Box px={{ base: '4', md: '6' }} pt="5">
-          <Stack
-            direction={{ base: 'column', md: `row${ctaRight ? '-reverse' : ''}` }}
-            justify="space-between"
-          >
-            {ctaRouteColorTextUndefined ? null : (
-              <Button
-                as={ctaOnClick ? undefined : RouterLink}
-                to={ctaRoute || ''}
-                onClick={ctaOnClick}
-                colorScheme={ctaColor}
-                aria-label={ctaText}
-              >
-                {ctaText}
-              </Button>
-            )}
-            <Stack direction={{ base: 'column', md: 'row' }}>
-              <>
-                {filter ? filter : null}
-                <InputGroup maxW={{ base: '100%', md: 'xs' }} minWidth={300}>
-                  <InputLeftElement pointerEvents="none">
-                    <Icon as={FiSearch} color="muted" boxSize="5" />
-                  </InputLeftElement>
-                  <Input
-                    type="text"
-                    placeholder={searchPlaceholder}
-                    onChange={handleInputChange}
-                    value={filterText}
-                  />
-                </InputGroup>
-              </>
-            </Stack>
+        <Stack
+          px={{ base: '4', md: '6' }}
+          pt="5"
+          direction={{ base: 'column', md: `row${ctaRight ? '-reverse' : ''}` }}
+          justify="space-between"
+        >
+          {canRenderCta && (
+            <Button
+              as={ctaOnClick ? undefined : RouterLink}
+              to={ctaRoute || ''}
+              onClick={ctaOnClick}
+              colorScheme={ctaColor}
+              aria-label={ctaText}
+            >
+              {ctaText}
+            </Button>
+          )}
+          <Stack direction={{ base: 'column', md: 'row' }}>
+            <>
+              {filter ? filter : null}
+              <InputGroup maxW={{ base: '100%', md: 'xs' }} minWidth={300}>
+                <InputLeftElement pointerEvents="none">
+                  <Icon as={FiSearch} color="muted" boxSize="5" />
+                </InputLeftElement>
+                <Input
+                  type="text"
+                  placeholder={searchPlaceholder}
+                  onChange={handleInputChange}
+                  value={filterText}
+                />
+              </InputGroup>
+            </>
           </Stack>
-        </Box>
+        </Stack>
         <Box overflowX="auto">
           <InfiniteScroll
             dataLength={rows.length}
@@ -258,25 +251,39 @@ export const TablePage = ({
             </Alert>
           )}
         </Box>
-        <Box px={{ base: '4', md: '6' }} pb="5">
-          <HStack spacing="3" justify="space-between">
-            <>
-              {loading ? (
-                <Text />
-              ) : (
-                !isMobile && (
-                  <Text color="muted" fontSize="sm">
-                    Showing {data.length} results {total ? `(${total} total)` : null}
-                  </Text>
-                )
-              )}
-              {!isMobile && paginationIndicator}
-              {paginationActions}
-            </>
-          </HStack>
-        </Box>
+        <HStack px={{ base: '4', md: '6' }} pb="5" spacing="3" justify="space-between">
+          <>
+            {!loading && !isMobile && (
+              <Text color="muted" fontSize="sm">
+                Showing {data.length} results {total ? `(${total} total)` : null}
+              </Text>
+            )}
+            {!isMobile && paginationIndicator}
+            {paginationActions}
+          </>
+        </HStack>
       </Stack>
       <Outlet />
+    </TablePageBox>
+  );
+};
+
+const TablePageBox = ({
+  children,
+  scrollableContainerRef
+}: {
+  children: ReactNode;
+  scrollableContainerRef: Ref<any>;
+}) => {
+  return (
+    <Box
+      w="full"
+      bg="white"
+      boxShadow={{ base: 'none', md: useColorModeValue('sm', 'sm-dark') }}
+      borderRadius={useBreakpointValue({ base: 'lg', md: 'lg' })}
+      ref={scrollableContainerRef}
+    >
+      {children}
     </Box>
   );
 };
