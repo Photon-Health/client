@@ -101,15 +101,11 @@ export const Pharmacy = () => {
   const phone = searchParams.get('phone');
 
   // preferred pharmacy
-  const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
+  const [newPreferredPharmacyId, setNewPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
-  useEffect(() => {
-    const nextPreferredId = order?.patient?.preferredPharmacies?.[0]?.id ?? '';
-    if (!nextPreferredId) return;
-
-    // Only set from order if we haven't already chosen one.
-    setPreferredPharmacyId((current) => current || nextPreferredId);
-  }, [order?.patient?.preferredPharmacies]);
+  const existingPreferredPharmacy = order?.patient?.preferredPharmacies?.[0];
+  const existingPreferredPharmacyId = existingPreferredPharmacy?.id || '';
+  const effectivePreferredPharmacyId = newPreferredPharmacyId || existingPreferredPharmacyId;
 
   // top ranked pharmacies
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
@@ -173,23 +169,35 @@ export const Pharmacy = () => {
       ...pharmacyResults.filter((p) => !topRankedIds.includes(p.id))
     ];
 
+    const combinedWithPreferred =
+      existingPreferredPharmacy &&
+      !combined.some((pharmacy) => pharmacy.id === existingPreferredPharmacy.id)
+        ? [existingPreferredPharmacy, ...combined]
+        : combined;
+
     // drop pharmacies already present in topRankedPharmacies to avoid duplicates
     const prepared = isDemo
-      ? combined
-      : combined.map((combinedItem) => preparePharmacy(combinedItem));
-    if (!preferredPharmacyId) {
+      ? combinedWithPreferred
+      : combinedWithPreferred.map((combinedItem) => preparePharmacy(combinedItem));
+    if (!effectivePreferredPharmacyId) {
       // no preferred pharmacies: preserve existing ordering
       return prepared;
     }
 
     // preferred pharmacy should appear first
-    const preferred = prepared.find((pharmacy) => pharmacy.id === preferredPharmacyId);
+    const preferred = prepared.find((pharmacy) => pharmacy.id === effectivePreferredPharmacyId);
     if (!preferred) {
       return prepared;
     }
-    const remaining = prepared.filter((pharmacy) => pharmacy.id !== preferredPharmacyId);
+    const remaining = prepared.filter((pharmacy) => pharmacy.id !== effectivePreferredPharmacyId);
     return [preferred, ...remaining];
-  }, [isDemo, pharmacyResults, preferredPharmacyId, topRankedPharmacies]);
+  }, [
+    isDemo,
+    pharmacyResults,
+    effectivePreferredPharmacyId,
+    existingPreferredPharmacy,
+    topRankedPharmacies
+  ]);
 
   // Non-integrated patient mail order pharmacies
   const [patientMailOrderOptions, setPatientMailOrderOptions] = useState<
@@ -835,7 +843,7 @@ export const Pharmacy = () => {
     // Handle stp demo
     if (isDemo) {
       setTimeout(() => {
-        setPreferredPharmacyId(pharmacyId);
+        setNewPreferredPharmacyId(pharmacyId);
         toast({ ...TOAST_CONFIG.SUCCESS, title: 'Set preferred pharmacy' });
         setSavingPreferred(false);
       }, 750);
@@ -846,7 +854,7 @@ export const Pharmacy = () => {
       const result: boolean = await setPreferredPharmacy(order.patient.id, pharmacyId);
       setTimeout(() => {
         if (result) {
-          setPreferredPharmacyId(pharmacyId);
+          setNewPreferredPharmacyId(pharmacyId);
           toast({ ...TOAST_CONFIG.SUCCESS, title: 'Set preferred pharmacy' });
         } else {
           toast({
@@ -1065,7 +1073,7 @@ export const Pharmacy = () => {
     <PickupPharmacyCardList
       location={patientLocation}
       pharmacies={allPharmacies}
-      preferredPharmacy={preferredPharmacyId}
+      preferredPharmacy={effectivePreferredPharmacyId}
       savingPreferred={savingPreferred}
       selectedId={selectedId}
       handleSelect={handleSelect}
@@ -1170,7 +1178,7 @@ export const Pharmacy = () => {
                         shouldTrackOfferImpressionsAndSelections
                       }
                       selectedPharmacyId={selectedId}
-                      preferredPharmacyId={preferredPharmacyId}
+                      preferredPharmacyId={effectivePreferredPharmacyId}
                       handleSelect={handleSelect}
                     />
                   )}
