@@ -58,7 +58,8 @@ describe('InfoPage', () => {
     },
     dateOfBirth: new Date('1990-01-01'),
     sex: 'MALE',
-    phone: '555-555-5555'
+    phone: '555-555-5555',
+    preferredPharmacies: []
   };
 
   const mockPharmacy: Pharmacy = generatePharmacy({
