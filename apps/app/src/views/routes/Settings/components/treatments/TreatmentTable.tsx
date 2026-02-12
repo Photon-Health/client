@@ -81,6 +81,8 @@ export const TreatmentTable = ({
       ctaText={isMobileAndTablet ? 'Add to catalog' : undefined}
       ctaColor={isMobileAndTablet ? 'blue' : undefined}
       ctaOnClick={isMobileAndTablet ? setShowModal.on : undefined}
+      emptyStateTitle="No medications in your catalog yet"
+      emptyStateText="Add medications so you can quickly find and select them when prescribing."
       loading={loading}
       paginationIndicator={
         <PaginationIndicator
