@@ -22,7 +22,7 @@ import {
 } from '@chakra-ui/react';
 import { ErrorMessage, Field, Formik } from 'formik';
 import { FaInfoCircle } from 'react-icons/fa';
-import { FormikStateSelect } from '../../Settings/components/utils/States';
+import { StateSelect } from '../components/StateSelect';
 import { SignupFormData, signupFormSchema } from './form';
 
 interface SignupFormProps {
@@ -45,15 +45,7 @@ export const SignupForm = ({
         validationSchema={signupFormSchema}
         onSubmit={onSubmit}
       >
-        {({
-          errors,
-          touched,
-          isSubmitting,
-          handleSubmit,
-          values,
-          setFieldValue,
-          setFieldTouched
-        }) => (
+        {({ errors, touched, isSubmitting, handleSubmit, values, setFieldValue }) => (
           <form onSubmit={handleSubmit}>
             <Stack spacing="8">
               <Stack spacing="4" textAlign="left">
@@ -179,15 +171,10 @@ export const SignupForm = ({
                   <ErrorMessage name="city" component={FormErrorMessage} />
                 </FormControl>
 
-                <FormControl isRequired isInvalid={!!errors.state?.value && touched.state?.value}>
+                <FormControl isRequired isInvalid={!!errors.state && touched.state}>
                   <FormLabel htmlFor="state">State</FormLabel>
-                  <FormikStateSelect
-                    value={values.state}
-                    setFieldValue={setFieldValue}
-                    setFieldTouched={setFieldTouched}
-                    fieldName="state"
-                  />
-                  <ErrorMessage name="state.value" component={FormErrorMessage} />
+                  <Field as={StateSelect} id="state" name="state" />
+                  <ErrorMessage name="state" component={FormErrorMessage} />
                 </FormControl>
 
                 <FormControl isRequired isInvalid={!!errors.postalCode && touched.postalCode}>
