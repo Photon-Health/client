@@ -494,10 +494,6 @@ describe('Pharmacy page', () => {
         generatePharmacy({
           id: 'phr_otherId999',
           name: 'Other Pharmacy'
-        }),
-        generatePharmacy({
-          id: preferredId,
-          name: 'Preferred Pharmacy'
         })
       ]
     });
@@ -513,6 +509,63 @@ describe('Pharmacy page', () => {
     const preferredIndex = textContents.findIndex((text) => text.includes('Preferred Pharmacy'));
     const otherIndex = textContents.findIndex((text) => text.includes('Other Pharmacy'));
 
+    expect(preferredIndex).toBeGreaterThan(-1);
+    expect(otherIndex).toBeGreaterThan(-1);
+    expect(preferredIndex).toBeLessThan(otherIndex);
+  }, 10_000);
+
+  test('does not duplicate preferred pharmacy when it is already in the location list', async () => {
+    const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
+    const preferredId = 'phr_preferredId123';
+
+    const singlePrescriptionOrder = generateOrder({
+      id: 'ord_testId777',
+      state: 'ROUTING',
+      patient: generatePatient({
+        preferredPharmacies: [{ id: preferredId, name: 'Preferred Pharmacy' }]
+      }),
+      fills: [generateFill('test-treatment')],
+      address: {
+        street1: '123 Main St',
+        city: 'New York',
+        state: 'NY',
+        postalCode: '10001',
+        country: 'US'
+      }
+    });
+
+    const getOrderMock = vi.mocked(getOrder);
+    getOrderMock.mockResolvedValue(singlePrescriptionOrder);
+
+    const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+    getPharmaciesByLocationMock.mockResolvedValue({
+      pharmaciesByLocation: [
+        generatePharmacy({
+          id: preferredId,
+          name: 'Preferred Pharmacy'
+        }),
+        generatePharmacy({
+          id: 'phr_otherId999',
+          name: 'Other Pharmacy'
+        })
+      ]
+    });
+
+    const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+    setOrderPharmacyMock.mockResolvedValue(true);
+
+    renderApp();
+    await navigateToPharmacyScreen();
+
+    const pharmacyNames = await screen.findAllByTestId('pharmacy-info');
+    const textContents = pharmacyNames.map((node) => node.textContent ?? '');
+    const preferredIndex = textContents.findIndex((text) => text.includes('Preferred Pharmacy'));
+    const otherIndex = textContents.findIndex((text) => text.includes('Other Pharmacy'));
+    const preferredCount = textContents.filter((text) =>
+      text.includes('Preferred Pharmacy')
+    ).length;
+
+    expect(preferredCount).toBe(1);
     expect(preferredIndex).toBeGreaterThan(-1);
     expect(otherIndex).toBeGreaterThan(-1);
     expect(preferredIndex).toBeLessThan(otherIndex);
