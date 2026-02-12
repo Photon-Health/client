@@ -100,7 +100,7 @@ export const TablePage = ({
     useSortBy
   );
 
-  const canRenderCta = ctaRoute && ctaColor && ctaText;
+  const canRenderCta = ctaColor && ctaText;
   const hasResults = rows.length > 0;
 
   return (
@@ -260,20 +260,40 @@ export const TablePage = ({
           <Outlet />
         </InfiniteScroll>
       </Box>
-      {!hasResults && <EmptyState title={emptyStateTitle} text={emptyStateText} />}
+      {!hasResults && (
+        <EmptyState title={emptyStateTitle} text={emptyStateText} hasSearch={!!filterText} />
+      )}
     </>
   );
 };
 
-const EmptyState = ({ title, text }: { title?: string; text?: string }) => {
+const EmptyState = ({
+  title,
+  text,
+  hasSearch
+}: {
+  title?: string;
+  text?: string;
+  hasSearch: boolean;
+}) => {
+  // Table may be empty because:
+  // - User has no entities to render as rows
+  //   > display bespoke emptyStateTitle and emptyStateText as
+  //     helpful prompts for what action to take
+  // - User has typed in a search term and filtered results are 0
+  //   > emptyStateTitle and emptyStateText are not applicable,
+  //     display more relevant text
+  const displayTitle = hasSearch ? 'No results found' : title;
+  const displayText = hasSearch ? '' : text;
+
   return (
     <Stack alignItems="center">
       <Image src={emptyStateSvg} w="50%" maxW="176px" />
       <Text fontSize="lg" fontWeight="medium" textAlign="center">
-        {title}
+        {displayTitle}
       </Text>
-      <Text fontSize="sm" color="gray.600" textAlign="center">
-        {text}
+      <Text fontSize="sm" color="gray.600" textAlign="center" maxW="400px">
+        {displayText}
       </Text>
     </Stack>
   );
