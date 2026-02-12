@@ -164,7 +164,6 @@ export const GET_ORDER = gql`
           dispenseAsWritten
           expirationDate
           fillsAllowed
-
           provider {
             id
             name {
@@ -189,6 +188,12 @@ export const GET_ORDER = gql`
           state
           postalCode
           country
+        }
+        preferredPharmacies {
+          id
+          name
+          logo
+          fulfillmentTypes
         }
       }
       fulfillments {

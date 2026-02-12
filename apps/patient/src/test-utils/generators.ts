@@ -41,6 +41,7 @@ export const generatePatient = (overrides: Partial<Order['patient']> = {}): Orde
     postalCode: '10001',
     country: 'US'
   },
+  preferredPharmacies: [],
   ...overrides
 });
 
