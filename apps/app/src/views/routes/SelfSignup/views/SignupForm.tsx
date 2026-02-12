@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Checkbox,
   Container,
@@ -23,6 +24,7 @@ import {
 import { ErrorMessage, Field, Formik, FormikHelpers } from 'formik';
 import { useRef } from 'react';
 import { FaInfoCircle } from 'react-icons/fa';
+import { AddressSuggestionList } from '../components/AddressSuggestionList';
 import { StateSelect } from '../components/StateSelect';
 import { useAddressAutocomplete } from '../components/useAddressAutocomplete';
 import { SignupFormData, signupFormSchema } from './form';
@@ -42,16 +44,17 @@ export const SignupForm = ({
 }: SignupFormProps) => {
   const setFieldValueRef = useRef<FormikHelpers<SignupFormData>['setFieldValue']>();
 
-  const { inputRef } = useAddressAutocomplete({
-    onSelect: (address) => {
-      const setFieldValue = setFieldValueRef.current;
-      if (!setFieldValue) return;
-      setFieldValue('street1', address.street1);
-      setFieldValue('city', address.city);
-      setFieldValue('state', address.state);
-      setFieldValue('postalCode', address.postalCode);
-    }
-  });
+  const { suggestions, fetchSuggestions, selectSuggestion, clearSuggestions } =
+    useAddressAutocomplete({
+      onSelect: (address) => {
+        const setFieldValue = setFieldValueRef.current;
+        if (!setFieldValue) return;
+        setFieldValue('street1', address.street1);
+        setFieldValue('city', address.city);
+        setFieldValue('state', address.state);
+        setFieldValue('postalCode', address.postalCode);
+      }
+    });
 
   return (
     <Container maxW="md" py={{ base: '6' }} bgColor="white">
@@ -178,15 +181,31 @@ export const SignupForm = ({
 
                   <FormControl isRequired isInvalid={!!errors.street1 && touched.street1}>
                     <FormLabel htmlFor="street1">Street 1</FormLabel>
-                    <Input
-                      ref={inputRef}
-                      id="street1"
-                      name="street1"
-                      data-1p-ignore
-                      value={values.street1}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                    />
+                    <Box position="relative">
+                      <Input
+                        id="street1"
+                        name="street1"
+                        role="combobox"
+                        aria-autocomplete="list"
+                        aria-expanded={suggestions.length > 0}
+                        data-1p-ignore
+                        autoComplete="street-search"
+                        value={values.street1}
+                        onChange={(e) => {
+                          handleChange(e);
+                          fetchSuggestions(e.target.value);
+                        }}
+                        onBlur={(e) => {
+                          handleBlur(e);
+                          // Delay clearing so a tap on a suggestion registers before the list unmounts
+                          setTimeout(clearSuggestions, 200);
+                        }}
+                      />
+                      <AddressSuggestionList
+                        suggestions={suggestions}
+                        onSelect={selectSuggestion}
+                      />
+                    </Box>
                     <ErrorMessage name="street1" component={FormErrorMessage} />
                   </FormControl>
 

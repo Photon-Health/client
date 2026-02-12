@@ -1,10 +1,84 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 
 export interface ParsedAddress {
   street1: string;
   city: string;
   state: string;
   postalCode: string;
+}
+
+export interface AddressSuggestion {
+  placeId: string;
+  description: string;
+}
+
+interface UseAddressAutocompleteOptions {
+  onSelect: (address: ParsedAddress) => void;
+}
+
+export function useAddressAutocomplete({ onSelect }: UseAddressAutocompleteOptions) {
+  const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
+  const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
+  const geocoder = useRef<google.maps.Geocoder | null>(null);
+  const onSelectRef = useRef(onSelect);
+  onSelectRef.current = onSelect;
+
+  const getService = () => {
+    if (!autocompleteService.current) {
+      autocompleteService.current = new google.maps.places.AutocompleteService();
+    }
+    return autocompleteService.current;
+  };
+
+  const getGeocoder = () => {
+    if (!geocoder.current) {
+      geocoder.current = new google.maps.Geocoder();
+    }
+    return geocoder.current;
+  };
+
+  const fetchSuggestions = useDebouncedCallback(async (input: string) => {
+    if (input.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+
+    try {
+      const response = await getService().getPlacePredictions({
+        input,
+        types: ['address'],
+        componentRestrictions: { country: 'us' }
+      });
+
+      setSuggestions(
+        (response.predictions ?? []).map((p) => ({
+          placeId: p.place_id,
+          description: p.description
+        }))
+      );
+    } catch {
+      setSuggestions([]);
+    }
+  }, 300);
+
+  const selectSuggestion = useCallback(async (suggestion: AddressSuggestion) => {
+    setSuggestions([]);
+
+    try {
+      const result = await getGeocoder().geocode({ placeId: suggestion.placeId });
+      const place = result.results[0];
+      if (place?.address_components) {
+        onSelectRef.current(parseAddressComponents(place.address_components));
+      }
+    } catch (err) {
+      console.error('Geocode failed', err);
+    }
+  }, []);
+
+  const clearSuggestions = useCallback(() => setSuggestions([]), []);
+
+  return { suggestions, fetchSuggestions, selectSuggestion, clearSuggestions };
 }
 
 // City-type components in priority order. Google returns multiple types per
@@ -19,8 +93,7 @@ const CITY_TYPES = [
   'administrative_area_level_2' // unincorporated county areas
 ] as const;
 
-function parseAddressComponents(place: google.maps.places.PlaceResult): ParsedAddress {
-  const components = place.address_components ?? [];
+function parseAddressComponents(components: google.maps.GeocoderAddressComponent[]): ParsedAddress {
   let streetNumber = '';
   let route = '';
   const cityByType: Partial<Record<(typeof CITY_TYPES)[number], string>> = {};
@@ -52,36 +125,4 @@ function parseAddressComponents(place: google.maps.places.PlaceResult): ParsedAd
 
   const street1 = streetNumber ? `${streetNumber} ${route}` : route;
   return { street1, city, state, postalCode };
-}
-
-interface UseAddressAutocompleteOptions {
-  onSelect: (address: ParsedAddress) => void;
-}
-
-export function useAddressAutocomplete({ onSelect }: UseAddressAutocompleteOptions) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-  const onSelectRef = useRef(onSelect);
-  onSelectRef.current = onSelect;
-
-  useEffect(() => {
-    if (!inputRef.current || autocompleteRef.current) return;
-
-    const autocomplete = new google.maps.places.Autocomplete(inputRef.current, {
-      types: ['address'],
-      componentRestrictions: { country: 'us' },
-      fields: ['address_components']
-    });
-
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
-      if (place.address_components) {
-        onSelectRef.current(parseAddressComponents(place));
-      }
-    });
-
-    autocompleteRef.current = autocomplete;
-  }, []);
-
-  return { inputRef };
 }
