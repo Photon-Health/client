@@ -104,6 +104,9 @@ export const Pharmacy = () => {
   const [newPreferredPharmacyId, setNewPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
   const existingPreferredPharmacy = order?.patient?.preferredPharmacies?.[0];
+  const existingPreferredPharmacyForList = existingPreferredPharmacy
+    ? ({ ...existingPreferredPharmacy } as EnrichedPharmacy)
+    : undefined;
   const existingPreferredPharmacyId = existingPreferredPharmacy?.id || '';
   const effectivePreferredPharmacyId = newPreferredPharmacyId || existingPreferredPharmacyId;
 
@@ -170,9 +173,9 @@ export const Pharmacy = () => {
     ];
 
     const combinedWithPreferred =
-      existingPreferredPharmacy &&
-      !combined.some((pharmacy) => pharmacy.id === existingPreferredPharmacy.id)
-        ? [existingPreferredPharmacy, ...combined]
+      existingPreferredPharmacyForList &&
+      !combined.some((pharmacy) => pharmacy.id === existingPreferredPharmacyForList.id)
+        ? [existingPreferredPharmacyForList, ...combined]
         : combined;
 
     // drop pharmacies already present in topRankedPharmacies to avoid duplicates
@@ -196,6 +199,7 @@ export const Pharmacy = () => {
     pharmacyResults,
     effectivePreferredPharmacyId,
     existingPreferredPharmacy,
+    existingPreferredPharmacyForList,
     topRankedPharmacies
   ]);
 

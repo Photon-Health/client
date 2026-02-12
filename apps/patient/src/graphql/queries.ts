@@ -190,10 +190,7 @@ export const GET_ORDER = gql`
           country
         }
         preferredPharmacies {
-          id
-          name
-          logo
-          fulfillmentTypes
+          ...PharmacyFields
         }
       }
       fulfillments {
