@@ -8,6 +8,7 @@ import { FixedFooter, PoweredBy, PrescriptionsList } from '../components';
 import { AddressForm, AddressFormHandle } from '../components/AddressForm';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
+import { patientAnalytics } from '..//configs/analytics';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 
 export const Review = () => {
@@ -47,6 +48,10 @@ export const Review = () => {
       // Address saved successfully
       setAddressSubmitted(true);
       await fetchOrder();
+    }
+
+    if (!isDemo) {
+      patientAnalytics.track('Search for Pharmacy Call To Action Clicked', order, { needsAddress });
     }
 
     // Proceed to pharmacy page
