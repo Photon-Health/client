@@ -148,15 +148,12 @@ export const TemplateTab = () => {
     }
   }, [debouncedFilterText]);
 
-  const typeFilter = useCallback(
-    (template: PrescriptionTemplate) =>
+  const formattedRows = useMemo(() => {
+    const typeFilter = (template: PrescriptionTemplate) =>
       filterType === 'ALL' ||
       (filterType === 'GLOBAL' && !template.isPrivate) ||
-      (filterType === 'INDIVIDUAL' && template.isPrivate),
-    [filterType]
-  );
+      (filterType === 'INDIVIDUAL' && template.isPrivate);
 
-  const formattedRows = useMemo(() => {
     const result = rows
       .filter(
         (x) =>
@@ -179,7 +176,7 @@ export const TemplateTab = () => {
       rows: result,
       pages: Math.ceil(result.length / pageSize)
     };
-  }, [debouncedFilterText, rows, pageSize, typeFilter]);
+  }, [debouncedFilterText, rows, pageSize, filterType]);
 
   const [doseCalcVis, setDoseCalcVis] = useState(false);
   const quantityRef = useRef<HTMLInputElement>(null);
@@ -190,13 +187,13 @@ export const TemplateTab = () => {
 
   const isLoading = catalogs.loading || (catalog.loading && !catalog.catalog) || childLoading;
 
-  const onFilterChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
+  const onFilterChange = (e: ChangeEvent<HTMLSelectElement>) => {
     // Change event triggered even if no change
     if (e.target.value !== filterType) {
       setCurrentPage(1);
       setFilterType(e.target.value as FilterTypes);
     }
-  }, []);
+  };
 
   if (!catalogId) {
     return null;

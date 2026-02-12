@@ -287,12 +287,14 @@ const EmptyState = ({
   const displayText = hasSearch ? '' : text;
 
   return (
-    <Stack alignItems="center">
+    // Stack itself needs a set width so the image width doesn't
+    // change based on text length
+    <Stack alignItems="center" w="100%" maxW="400px">
       <Image src={emptyStateSvg} w="50%" maxW="176px" />
       <Text fontSize="lg" fontWeight="medium" textAlign="center">
         {displayTitle}
       </Text>
-      <Text fontSize="sm" color="gray.600" textAlign="center" maxW="400px">
+      <Text fontSize="sm" color="gray.600" textAlign="center">
         {displayText}
       </Text>
     </Stack>
