@@ -38,7 +38,7 @@ export const SelfSignupPage = () => {
     street1: '',
     street2: '',
     city: '',
-    state: { value: '' },
+    state: '',
     postalCode: '',
     didAgreeToTerms: false
   };
@@ -169,7 +169,7 @@ const buildSignupContinueParams = (state: string, formData: SignupFormData): str
     phone: formData.phone,
     street1: formData.street1,
     city: formData.city,
-    state_address: formData.state.value,
+    state_address: formData.state,
     postal_code: formData.postalCode,
     did_accept_tos: formData.didAgreeToTerms.toString(),
     // these version numbers must match an entry in the attestations table
