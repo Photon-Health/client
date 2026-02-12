@@ -386,7 +386,7 @@ export const PharmacyInfo = ({
           {showPreferredTag ? (
             <Tag size="sm" colorScheme="blue">
               <TagLeftIcon boxSize="12px" as={FiStar} />
-              <TagLabel> {t.preferred}</TagLabel>
+              <TagLabel>{t.preferred}</TagLabel>
             </Tag>
           ) : null}
           {showReadyIn30MinTag ? (
