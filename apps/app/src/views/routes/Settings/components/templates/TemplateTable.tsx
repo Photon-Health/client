@@ -68,6 +68,7 @@ interface TemplateTableProps {
     on: () => void;
   };
   filterElement: JSX.Element;
+  hasSearch?: boolean;
 }
 
 export const TemplateTable = ({
@@ -80,7 +81,8 @@ export const TemplateTable = ({
   filterText,
   setFilterText,
   setShowModal,
-  filterElement
+  filterElement,
+  hasSearch
 }: TemplateTableProps) => {
   const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
   const showBadgeStacked = useBreakpointValue({ base: true, md: false });
@@ -105,6 +107,7 @@ export const TemplateTable = ({
       ctaOnClick={setShowModal.on}
       emptyStateTitle="No templates yet"
       emptyStateText="Add medications to your catalog first, then create prescription templates to save time on frequently prescribed meds."
+      hasSearch={hasSearch}
       filter={filterElement}
       ctaRight
       paginationIndicator={

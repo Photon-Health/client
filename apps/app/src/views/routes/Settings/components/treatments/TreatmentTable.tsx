@@ -53,6 +53,7 @@ interface TreatmentTableProps {
   setShowModal: {
     on: () => void;
   };
+  hasSearch?: boolean;
 }
 
 export const TreatmentTable = ({
@@ -64,7 +65,8 @@ export const TreatmentTable = ({
   pageSize,
   filterText,
   setFilterText,
-  setShowModal
+  setShowModal,
+  hasSearch
 }: TreatmentTableProps) => {
   const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
   const skeletonRows = new Array(isMobileAndTablet ? 3 : 10)
@@ -83,6 +85,7 @@ export const TreatmentTable = ({
       ctaOnClick={isMobileAndTablet ? setShowModal.on : undefined}
       emptyStateTitle="No medications in your catalog yet"
       emptyStateText="Add medications so you can quickly find and select them when prescribing."
+      hasSearch={hasSearch}
       loading={loading}
       paginationIndicator={
         <PaginationIndicator

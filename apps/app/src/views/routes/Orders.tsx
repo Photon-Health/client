@@ -253,6 +253,7 @@ export const Orders = () => {
         ctaRoute="/orders/new"
         emptyStateTitle="No orders yet"
         emptyStateText="Start a new order and it will show up here."
+        hasSearch={!!filterText}
         filterText={filterText}
         setFilterText={setFilterText}
         hasMore={rows.length % 25 === 0 && !finished}

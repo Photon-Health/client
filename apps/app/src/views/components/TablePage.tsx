@@ -47,7 +47,7 @@ interface TablePageProps {
   ctaOnClick?: () => void;
   emptyStateTitle?: string;
   emptyStateText?: string;
-
+  hasSearch?: boolean;
   filter?: Element | ReactElement;
   paginationIndicator?: Element | ReactElement;
   paginationActions?: Element | ReactElement;
@@ -77,7 +77,8 @@ export const TablePage = ({
   filter,
   ctaRight,
   emptyStateTitle,
-  emptyStateText
+  emptyStateText,
+  hasSearch
 }: TablePageProps) => {
   const scrollableContainerRef = useRef(null);
   const handleInputChange = useCallback(
@@ -112,65 +113,65 @@ export const TablePage = ({
         borderRadius={useBreakpointValue({ base: 'lg', md: 'lg' })}
         ref={scrollableContainerRef}
       >
-        {/* Infinite scroll functionality breaks if we conditionally render this component
-        based on hasResults so had to move it higher up the tree */}
-        <InfiniteScroll
-          dataLength={rows.length}
-          scrollableTarget={scrollableContainerRef.current ?? undefined}
-          next={fetchMoreData}
-          hasMore={hasMore || false}
-          loader={
-            hasResults ? (
-              <Table>
-                <Thead>
-                  <Tr>
-                    <Td>
-                      <Center>
-                        <CircularProgress isIndeterminate color="green.300" />
-                      </Center>
-                    </Td>
-                  </Tr>
-                </Thead>
-              </Table>
-            ) : null
-          }
-        >
-          <Stack spacing="5" py="5">
-            <Stack
-              px={{ base: '4', md: '6' }}
-              direction={{ base: 'column', md: `row${ctaRight ? '-reverse' : ''}` }}
-              justify="space-between"
-            >
-              {canRenderCta && (
-                <Button
-                  as={ctaOnClick ? undefined : RouterLink}
-                  to={ctaRoute || ''}
-                  onClick={ctaOnClick}
-                  colorScheme={ctaColor}
-                  aria-label={ctaText}
-                >
-                  {ctaText}
-                </Button>
-              )}
-              <Stack direction={{ base: 'column', md: 'row' }}>
-                <>
-                  {filter ? filter : null}
-                  <InputGroup maxW={{ base: '100%', md: 'xs' }} minWidth={300}>
-                    <InputLeftElement pointerEvents="none">
-                      <Icon as={FiSearch} color="muted" boxSize="5" />
-                    </InputLeftElement>
-                    <Input
-                      type="text"
-                      placeholder={searchPlaceholder}
-                      onChange={handleInputChange}
-                      value={filterText}
-                    />
-                  </InputGroup>
-                </>
-              </Stack>
-            </Stack>
-            {hasResults && (
+        <Stack py="5" gap="0">
+          <Stack
+            px={{ base: '4', md: '6' }}
+            direction={{ base: 'column', md: `row${ctaRight ? '-reverse' : ''}` }}
+            justify="space-between"
+          >
+            {canRenderCta && (
+              <Button
+                as={ctaOnClick ? undefined : RouterLink}
+                to={ctaRoute || ''}
+                onClick={ctaOnClick}
+                colorScheme={ctaColor}
+                aria-label={ctaText}
+              >
+                {ctaText}
+              </Button>
+            )}
+            <Stack direction={{ base: 'column', md: 'row' }}>
               <>
+                {filter ? filter : null}
+                <InputGroup maxW={{ base: '100%', md: 'xs' }} minWidth={300}>
+                  <InputLeftElement pointerEvents="none">
+                    <Icon as={FiSearch} color="muted" boxSize="5" />
+                  </InputLeftElement>
+                  <Input
+                    type="text"
+                    placeholder={searchPlaceholder}
+                    onChange={handleInputChange}
+                    value={filterText}
+                  />
+                </InputGroup>
+              </>
+            </Stack>
+          </Stack>
+          {/* Infinite scroll functionality breaks if we conditionally render this component
+          so it has to live outside the hasResults conditional */}
+          <Box pt={hasResults ? '5' : '0'}>
+            <InfiniteScroll
+              dataLength={rows.length}
+              scrollableTarget={scrollableContainerRef.current ?? undefined}
+              next={fetchMoreData}
+              hasMore={hasMore || false}
+              loader={
+                hasResults ? (
+                  <Table>
+                    <Thead>
+                      <Tr>
+                        <Td>
+                          <Center>
+                            <CircularProgress isIndeterminate color="green.300" />
+                          </Center>
+                        </Td>
+                      </Tr>
+                    </Thead>
+                  </Table>
+                ) : null
+              }
+            >
+              {hasResults && (
                 <Box overflowX="auto">
                   <Table {...getTableProps()} ref={tableRef}>
                     <Thead hidden={hideHeaders}>
@@ -243,25 +244,27 @@ export const TablePage = ({
                     </Alert>
                   )}
                 </Box>
-                <HStack px={{ base: '4', md: '6' }} spacing="3" justify="space-between">
-                  <>
-                    {!loading && !isMobile && (
-                      <Text color="muted" fontSize="sm">
-                        Showing {rows.length} results {total ? `(${total} total)` : null}
-                      </Text>
-                    )}
-                    {!isMobile && paginationIndicator}
-                    {paginationActions}
-                  </>
-                </HStack>
+              )}
+            </InfiniteScroll>
+          </Box>
+          {hasResults && (
+            <HStack pt="5" px={{ base: '4', md: '6' }} spacing="3" justify="space-between">
+              <>
+                {!loading && !isMobile && (
+                  <Text color="muted" fontSize="sm">
+                    Showing {rows.length} results {total ? `(${total} total)` : null}
+                  </Text>
+                )}
+                {!isMobile && paginationIndicator}
+                {paginationActions}
               </>
-            )}
-          </Stack>
-          <Outlet />
-        </InfiniteScroll>
+            </HStack>
+          )}
+        </Stack>
+        <Outlet />
       </Box>
       {!hasResults && (
-        <EmptyState title={emptyStateTitle} text={emptyStateText} hasSearch={!!filterText} />
+        <EmptyState title={emptyStateTitle} text={emptyStateText} hasSearch={hasSearch} />
       )}
     </>
   );
@@ -274,7 +277,7 @@ const EmptyState = ({
 }: {
   title?: string;
   text?: string;
-  hasSearch: boolean;
+  hasSearch?: boolean;
 }) => {
   // Table may be empty because:
   // - User has no entities to render as rows
@@ -289,14 +292,16 @@ const EmptyState = ({
   return (
     // Stack itself needs a set width so the image width doesn't
     // change based on text length
-    <Stack alignItems="center" w="100%" maxW="400px">
-      <Image src={emptyStateSvg} w="50%" maxW="176px" />
-      <Text fontSize="lg" fontWeight="medium" textAlign="center">
-        {displayTitle}
-      </Text>
-      <Text fontSize="sm" color="gray.600" textAlign="center">
-        {displayText}
-      </Text>
-    </Stack>
+    <HStack w="100%" justify="center">
+      <Stack alignItems="center" w="100%" maxW="400px">
+        <Image src={emptyStateSvg} w="50%" maxW="176px" />
+        <Text fontSize="lg" fontWeight="medium" textAlign="center">
+          {displayTitle}
+        </Text>
+        <Text fontSize="sm" color="gray.600" textAlign="center">
+          {displayText}
+        </Text>
+      </Stack>
+    </HStack>
   );
 };

@@ -427,6 +427,7 @@ export const Prescriptions = () => {
         ctaRoute="/prescriptions/new"
         emptyStateTitle="No prescriptions yet"
         emptyStateText="Create a prescription and it will show up here."
+        hasSearch={!!filterText || !!status}
         filterText={filterText}
         setFilterText={setFilterText}
         hasMore={rows.length % 25 === 0 && !finished}

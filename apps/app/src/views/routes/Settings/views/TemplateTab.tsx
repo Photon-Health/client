@@ -252,6 +252,7 @@ export const TemplateTab = () => {
               <option value="INDIVIDUAL">Personal Templates</option>
             </Select>
           }
+          hasSearch={filterType !== 'ALL' || !!filterText}
         />
       </VStack>
     </>

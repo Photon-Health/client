@@ -190,6 +190,7 @@ export const TreatmentTab = ({
           pages={formattedRows.pages}
           pageSize={pageSize}
           setShowModal={setShowModal}
+          hasSearch={!!filterText}
         />
         {!isMobileAndTablet ? (
           <AddTreatmentToCatalogForm
