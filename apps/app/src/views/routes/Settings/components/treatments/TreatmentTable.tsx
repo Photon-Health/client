@@ -42,9 +42,8 @@ const renderSkeletonRow = (isMobile: boolean | undefined) => {
 };
 
 interface TreatmentTableProps {
-  isLoading: boolean;
+  loading: boolean;
   rows: any[];
-  filteredRows: any[];
   pages: number;
   pageSize: number;
   currentPage: number;
@@ -57,33 +56,32 @@ interface TreatmentTableProps {
 }
 
 export const TreatmentTable = ({
-  isLoading,
+  loading,
   rows,
   pages,
   currentPage,
   setCurrentPage,
   pageSize,
-  filteredRows,
   filterText,
   setFilterText,
   setShowModal
 }: TreatmentTableProps) => {
   const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
-  const displayRows = isLoading
-    ? new Array(isMobileAndTablet ? 3 : 10).fill(0).map(() => renderSkeletonRow(isMobileAndTablet))
-    : filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const skeletonRows = new Array(isMobileAndTablet ? 3 : 10)
+    .fill(0)
+    .map(() => renderSkeletonRow(isMobileAndTablet));
+  const rowsForPage = rows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <TablePage
-      data={displayRows}
+      data={loading ? skeletonRows : rowsForPage}
       columns={TREATMENT_COLUMNS}
       filterText={filterText}
       setFilterText={setFilterText}
       ctaText={isMobileAndTablet ? 'Add to catalog' : undefined}
       ctaColor={isMobileAndTablet ? 'blue' : undefined}
-      ctaRoute=""
       ctaOnClick={isMobileAndTablet ? setShowModal.on : undefined}
-      loading={isLoading}
+      loading={loading}
       paginationIndicator={
         <PaginationIndicator
           pages={pages}

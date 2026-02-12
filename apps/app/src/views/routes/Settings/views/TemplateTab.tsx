@@ -129,17 +129,17 @@ export const TemplateTab = () => {
         fragment: CatalogTreatmentFieldsMap
       });
     }
-  }, [catalogs.loading, catalogs.catalogs.length, catalogs.catalogs[0]?.id]);
+  }, [catalogs.loading]);
 
   useEffect(() => {
-    if (!catalog.loading && catalog.catalog) {
+    if (!catalog.loading && catalog.catalog?.templates) {
       const preppedRows = catalog.catalog.templates
         .filter((x): x is PrescriptionTemplate => !!x)
         .sort((a, b) => (a.treatment.name.toLowerCase() > b.treatment.name.toLowerCase() ? 1 : -1));
       setRows(preppedRows);
       setCurrentPage(1);
     }
-  }, [catalog.loading, catalogId, catalog.catalog?.templates]);
+  }, [catalog.loading, catalog.catalog?.templates]);
 
   useEffect(() => {
     // Reset current page to first page on debounce
@@ -147,19 +147,6 @@ export const TemplateTab = () => {
       setCurrentPage(1);
     }
   }, [debouncedFilterText]);
-
-  const templateRowRender = useCallback(
-    (template: PrescriptionTemplate) =>
-      renderTemplateRow(
-        template,
-        setSingleView,
-        catalogId ?? '',
-        setChildLoading,
-        setTemplateToEdit,
-        setShowModal
-      ),
-    [setSingleView, catalogId, setChildLoading, setTemplateToEdit, setShowModal]
-  );
 
   const typeFilter = useCallback(
     (template: PrescriptionTemplate) =>
@@ -170,16 +157,27 @@ export const TemplateTab = () => {
   );
 
   const formattedRows = useMemo(() => {
-    const filteredRows = rows.filter(
-      (x) =>
-        (x.treatment.name.toLowerCase().includes(debouncedFilterText.toLowerCase()) ||
-          x.name?.toLowerCase().includes(debouncedFilterText.toLowerCase())) &&
-        typeFilter(x)
-    );
+    const result = rows
+      .filter(
+        (x) =>
+          (x.treatment.name.toLowerCase().includes(debouncedFilterText.toLowerCase()) ||
+            x.name?.toLowerCase().includes(debouncedFilterText.toLowerCase())) &&
+          typeFilter(x)
+      )
+      .map((template: PrescriptionTemplate) =>
+        renderTemplateRow(
+          template,
+          setSingleView,
+          catalogId ?? '',
+          setChildLoading,
+          setTemplateToEdit,
+          setShowModal
+        )
+      );
 
     return {
-      rows: filteredRows.map(templateRowRender),
-      pages: Math.ceil(filteredRows.length / pageSize)
+      rows: result,
+      pages: Math.ceil(result.length / pageSize)
     };
   }, [debouncedFilterText, rows, pageSize, typeFilter]);
 
