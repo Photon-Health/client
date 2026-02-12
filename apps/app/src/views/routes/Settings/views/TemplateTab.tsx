@@ -169,23 +169,19 @@ export const TemplateTab = () => {
     [filterType]
   );
 
-  const filteredRows = useMemo(
-    () =>
-      rows.filter(
-        (x) =>
-          (x.treatment.name.toLowerCase().includes(debouncedFilterText.toLowerCase()) ||
-            x.name?.toLowerCase().includes(debouncedFilterText.toLowerCase())) &&
-          typeFilter(x)
-      ),
-    [debouncedFilterText, rows, pageSize, typeFilter]
-  );
-
   const formattedRows = useMemo(() => {
+    const filteredRows = rows.filter(
+      (x) =>
+        (x.treatment.name.toLowerCase().includes(debouncedFilterText.toLowerCase()) ||
+          x.name?.toLowerCase().includes(debouncedFilterText.toLowerCase())) &&
+        typeFilter(x)
+    );
+
     return {
       rows: filteredRows.map(templateRowRender),
       pages: Math.ceil(filteredRows.length / pageSize)
     };
-  }, [filteredRows]);
+  }, [debouncedFilterText, rows, pageSize, typeFilter]);
 
   const [doseCalcVis, setDoseCalcVis] = useState(false);
   const quantityRef = useRef<HTMLInputElement>(null);
@@ -204,7 +200,7 @@ export const TemplateTab = () => {
     }
   }, []);
 
-  if (catalogs.loading || !catalogId) {
+  if (!catalogId) {
     return null;
   }
 
@@ -245,9 +241,8 @@ export const TemplateTab = () => {
       />
       <VStack w="full">
         <TemplateTable
-          isLoading={isLoading}
-          rows={filteredRows}
-          filteredRows={formattedRows.rows}
+          loading={isLoading}
+          rows={formattedRows.rows}
           pages={formattedRows.pages}
           pageSize={pageSize}
           currentPage={currentPage}
