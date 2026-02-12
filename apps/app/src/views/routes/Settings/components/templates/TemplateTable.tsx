@@ -103,6 +103,8 @@ export const TemplateTable = ({
       ctaText={'Create template'}
       ctaColor={'blue'}
       ctaOnClick={setShowModal.on}
+      emptyStateTitle="No templates yet"
+      emptyStateText="Add medications to your catalog first, then create prescription templates to save time on frequently prescribed meds."
       filter={filterElement}
       ctaRight
       paginationIndicator={
