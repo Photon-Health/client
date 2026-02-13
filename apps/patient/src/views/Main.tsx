@@ -23,6 +23,8 @@ import { patientAnalytics } from '../configs/analytics';
 import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
 import { preloadImage } from '../utils/preloadImage';
 
+import { StatsigWrapper } from '../components/StatsigWrapper';
+
 type FetchOrderOptions = {
   triggerNavigationAfterFetch: boolean;
 };
@@ -326,17 +328,31 @@ export const Main = () => {
 
   const isAutomatedOrder = order.organization.settings?.patientUx.enableAutomatedOps;
 
+  const statsigClientId = process.env.REACT_APP_STATSIG_CLIENT_ID;
+
+  const orderContent = (
+    <>
+      <ScrollRestoration />
+      <Nav />
+      <Outlet />
+      <FAQModal
+        isOpen={faqModalIsOpen}
+        onClose={() => setFaqModalIsOpen(false)}
+        allowMessageSupport={!isAutomatedOrder}
+      />
+    </>
+  );
+
   return (
     <ChakraProvider theme={theme({ accentColor: settings?.brandColor })}>
       <OrderContext.Provider value={orderContextValue}>
-        <ScrollRestoration />
-        <Nav />
-        <Outlet />
-        <FAQModal
-          isOpen={faqModalIsOpen}
-          onClose={() => setFaqModalIsOpen(false)}
-          allowMessageSupport={!isAutomatedOrder}
-        />
+        {statsigClientId ? (
+          <StatsigWrapper clientId={statsigClientId} userId={order.patient.id}>
+            {orderContent}
+          </StatsigWrapper>
+        ) : (
+          orderContent
+        )}
       </OrderContext.Provider>
     </ChakraProvider>
   );
