@@ -19,6 +19,7 @@ interface UseAddressAutocompleteOptions {
 
 export function useAddressAutocomplete({ onSelect }: UseAddressAutocompleteOptions) {
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
+  const cachedSuggestions = useRef<AddressSuggestion[]>([]);
   const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
   const geocoder = useRef<google.maps.Geocoder | null>(null);
   const onSelectRef = useRef(onSelect);
@@ -51,18 +52,19 @@ export function useAddressAutocomplete({ onSelect }: UseAddressAutocompleteOptio
         componentRestrictions: { country: 'us' }
       });
 
-      setSuggestions(
-        (response.predictions ?? []).map((p) => ({
-          placeId: p.place_id,
-          description: p.description
-        }))
-      );
+      const mapped = (response.predictions ?? []).map((p) => ({
+        placeId: p.place_id,
+        description: p.description
+      }));
+      cachedSuggestions.current = mapped;
+      setSuggestions(mapped);
     } catch {
       setSuggestions([]);
     }
   }, 300);
 
   const selectSuggestion = useCallback(async (suggestion: AddressSuggestion) => {
+    cachedSuggestions.current = [];
     setSuggestions([]);
 
     try {
@@ -76,12 +78,18 @@ export function useAddressAutocomplete({ onSelect }: UseAddressAutocompleteOptio
     }
   }, []);
 
-  const clearSuggestions = useCallback(() => {
+  const closeSuggestions = useCallback(() => {
     fetchSuggestions.cancel();
     setSuggestions([]);
   }, [fetchSuggestions]);
 
-  return { suggestions, fetchSuggestions, selectSuggestion, clearSuggestions };
+  const openSuggestions = useCallback(() => {
+    if (cachedSuggestions.current.length > 0) {
+      setSuggestions(cachedSuggestions.current);
+    }
+  }, []);
+
+  return { suggestions, fetchSuggestions, selectSuggestion, closeSuggestions, openSuggestions };
 }
 
 // City-type components in priority order. Google returns multiple types per

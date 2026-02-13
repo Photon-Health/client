@@ -44,7 +44,7 @@ export const SignupForm = ({
 }: SignupFormProps) => {
   const setFieldValueRef = useRef<FormikHelpers<SignupFormData>['setFieldValue']>();
 
-  const { suggestions, fetchSuggestions, selectSuggestion, clearSuggestions } =
+  const { suggestions, fetchSuggestions, selectSuggestion, closeSuggestions, openSuggestions } =
     useAddressAutocomplete({
       onSelect: (address) => {
         const setFieldValue = setFieldValueRef.current;
@@ -195,10 +195,11 @@ export const SignupForm = ({
                           handleChange(e);
                           fetchSuggestions(e.target.value);
                         }}
+                        onFocus={openSuggestions}
                         onBlur={(e) => {
                           handleBlur(e);
-                          // Delay clearing so a tap on a suggestion registers before the list unmounts
-                          setTimeout(clearSuggestions, 200);
+                          // Delay closing so a tap on a suggestion registers before the list unmounts
+                          setTimeout(closeSuggestions, 200);
                         }}
                       />
                       <AddressSuggestionList
