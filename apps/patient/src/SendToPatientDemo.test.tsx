@@ -39,10 +39,8 @@ describe('Send To Patient Demo', () => {
     await userEvent.click(screen.getByText('Central Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
 
-    await waitFor(() => screen.findByText('When do you need your order ready by?'), {
-      // wait for 2sec button animations to complete
-      timeout: 2100
-    });
+    // wait for 2sec button animations to complete
+    await screen.findByText('When do you need your order ready by?', {}, { timeout: 2100 });
 
     await userEvent.click(screen.getByText('Urgent'));
     await userEvent.click(screen.getByText('Next'));
