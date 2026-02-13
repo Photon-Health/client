@@ -217,6 +217,8 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
   const AddressFields = () => (
     <>
+      {/*Using !mt-8 because of tailwind issue in shadowDom elements */}
+      {/*when not using the !important modifier*/}
       <p class="font-sans text-lg mt-4 md:!mt-8">
         Address
         <Show when={props.optionalPatientAddress && !hasAnyAddressField()}>
