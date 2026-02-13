@@ -76,7 +76,10 @@ export function useAddressAutocomplete({ onSelect }: UseAddressAutocompleteOptio
     }
   }, []);
 
-  const clearSuggestions = useCallback(() => setSuggestions([]), []);
+  const clearSuggestions = useCallback(() => {
+    fetchSuggestions.cancel();
+    setSuggestions([]);
+  }, [fetchSuggestions]);
 
   return { suggestions, fetchSuggestions, selectSuggestion, clearSuggestions };
 }
