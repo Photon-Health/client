@@ -189,7 +189,7 @@ export const SignupForm = ({
                         aria-autocomplete="list"
                         aria-expanded={suggestions.length > 0}
                         data-1p-ignore
-                        autoComplete="street-search"
+                        autoComplete="invalid-so-that-autofill-doesnt-popup-over-dropdown"
                         value={values.street1}
                         onChange={(e) => {
                           handleChange(e);
@@ -216,14 +216,19 @@ export const SignupForm = ({
                       id="street2"
                       name="street2"
                       placeholder="Street 2 (optional)"
-                      autoComplete="address-line2"
+                      autoComplete="invalid-so-that-autofill-doesnt-popup-over-dropdown"
                     />
                     <ErrorMessage name="street2" component={FormErrorMessage} />
                   </FormControl>
 
                   <FormControl isRequired isInvalid={!!errors.city && touched.city}>
                     <FormLabel htmlFor="city">City</FormLabel>
-                    <Field as={Input} id="city" name="city" autoComplete="address-level2" />
+                    <Field
+                      as={Input}
+                      id="city"
+                      name="city"
+                      autoComplete="invalid-so-that-autofill-doesnt-popup-over-dropdown"
+                    />
                     <ErrorMessage name="city" component={FormErrorMessage} />
                   </FormControl>
 
@@ -239,7 +244,7 @@ export const SignupForm = ({
                       as={Input}
                       id="postalCode"
                       name="postalCode"
-                      autoComplete="postal-code"
+                      autoComplete="invalid-so-that-autofill-doesnt-popup-over-dropdown"
                     />
                     <ErrorMessage name="postalCode" component={FormErrorMessage} />
                   </FormControl>
