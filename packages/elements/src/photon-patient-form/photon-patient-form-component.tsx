@@ -215,10 +215,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
     return prefOption;
   });
 
-  const optionalFieldsButtonText = () =>
-    showOptionalFields() ? 'Hide optional fields' : 'Show optional fields';
-  const optionalFieldsChevron = () => (showOptionalFields() ? 'chevronUp' : 'chevronDown');
-
   const AddressFields = () => (
     <>
       <p class="font-sans text-lg mt-4 md:!mt-8">
@@ -410,8 +406,14 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                   class="mb-4 mt-8 flex items-center md:!hidden"
                   onClick={() => setShowOptionalFields((value) => !value)}
                 >
-                  <span class="font-sans text-lg">{optionalFieldsButtonText()}</span>
-                  <Icon name={optionalFieldsChevron()} size="md" class="inline-block ml-1 mt-1" />
+                  <span class="font-sans text-lg">
+                    {showOptionalFields() ? 'Hide optional fields' : 'Show optional fields'}
+                  </span>
+                  <Icon
+                    name={showOptionalFields() ? 'chevronUp' : 'chevronDown'}
+                    size="md"
+                    class="inline-block ml-1 mt-1"
+                  />
                 </button>
                 <div class={`mb-4 ${showOptionalFields() ? 'block' : 'hidden md:!block'}`}>
                   <Show when={props.optionalPatientAddress}>
