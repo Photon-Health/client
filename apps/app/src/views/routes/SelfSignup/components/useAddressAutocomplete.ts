@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 export interface ParsedAddress {
@@ -79,16 +79,16 @@ export function useAddressAutocomplete({ onSelect }: UseAddressAutocompleteOptio
     }
   };
 
-  const closeSuggestions = useCallback(() => {
+  const closeSuggestions = () => {
     fetchSuggestions.cancel();
     setSuggestions([]);
-  }, [fetchSuggestions]);
+  };
 
-  const openSuggestions = useCallback(() => {
+  const openSuggestions = () => {
     if (cachedSuggestions.current.length > 0) {
       setSuggestions(cachedSuggestions.current);
     }
-  }, []);
+  };
 
   return { suggestions, fetchSuggestions, selectSuggestion, closeSuggestions, openSuggestions };
 }
