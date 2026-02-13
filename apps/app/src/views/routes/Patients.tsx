@@ -199,6 +199,9 @@ export const Patients = () => {
         ctaText="Create patient"
         ctaColor="blue"
         ctaRoute="/patients/new"
+        emptyStateTitle="No patients yet"
+        emptyStateText="Create a patient to begin sending prescriptions."
+        hasSearch={!!filterText}
         filterText={filterText}
         setFilterText={setFilterText}
         searchPlaceholder="Search by patient name"
