@@ -23,8 +23,6 @@ export function useAddressAutocomplete({ onSelect }: UseAddressAutocompleteOptio
   const cachedSuggestions = useRef<AddressSuggestion[]>([]);
   const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
   const geocoder = useRef<google.maps.Geocoder | null>(null);
-  const onSelectRef = useRef(onSelect);
-  onSelectRef.current = onSelect;
 
   const getService = () => {
     if (!autocompleteService.current) {
@@ -66,7 +64,7 @@ export function useAddressAutocomplete({ onSelect }: UseAddressAutocompleteOptio
     }
   }, 300);
 
-  const selectSuggestion = useCallback(async (suggestion: AddressSuggestion) => {
+  const selectSuggestion = async (suggestion: AddressSuggestion) => {
     cachedSuggestions.current = [];
     setSuggestions([]);
 
@@ -74,12 +72,12 @@ export function useAddressAutocomplete({ onSelect }: UseAddressAutocompleteOptio
       const result = await getGeocoder().geocode({ placeId: suggestion.placeId });
       const place = result.results[0];
       if (place?.address_components) {
-        onSelectRef.current(parseAddressComponents(place.address_components));
+        onSelect(parseAddressComponents(place.address_components));
       }
     } catch (err) {
       console.error('Geocode failed', err);
     }
-  }, []);
+  };
 
   const closeSuggestions = useCallback(() => {
     fetchSuggestions.cancel();
