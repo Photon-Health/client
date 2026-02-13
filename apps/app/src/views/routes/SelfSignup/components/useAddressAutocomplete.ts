@@ -3,6 +3,7 @@ import { useDebouncedCallback } from 'use-debounce';
 
 export interface ParsedAddress {
   street1: string;
+  street2: string;
   city: string;
   state: string;
   postalCode: string;
@@ -107,13 +108,16 @@ const CITY_TYPES = [
 function parseAddressComponents(components: google.maps.GeocoderAddressComponent[]): ParsedAddress {
   let streetNumber = '';
   let route = '';
+  let subpremise = '';
   const cityByType: Partial<Record<(typeof CITY_TYPES)[number], string>> = {};
   let state = '';
   let postalCode = '';
 
   for (const component of components) {
     const types = component.types;
-    if (types.includes('street_number')) {
+    if (types.includes('subpremise')) {
+      subpremise = component.long_name;
+    } else if (types.includes('street_number')) {
       streetNumber = component.long_name;
     } else if (types.includes('route')) {
       route = component.long_name;
@@ -135,5 +139,6 @@ function parseAddressComponents(components: google.maps.GeocoderAddressComponent
   const city = CITY_TYPES.reduce<string>((found, type) => found || cityByType[type] || '', '');
 
   const street1 = streetNumber ? `${streetNumber} ${route}` : route;
-  return { street1, city, state, postalCode };
+  const street2 = subpremise ? `#${subpremise}` : '';
+  return { street1, street2, city, state, postalCode };
 }

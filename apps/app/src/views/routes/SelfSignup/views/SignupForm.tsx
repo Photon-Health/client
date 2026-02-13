@@ -50,6 +50,7 @@ export const SignupForm = ({
         const setFieldValue = setFieldValueRef.current;
         if (!setFieldValue) return;
         setFieldValue('street1', address.street1);
+        setFieldValue('street2', address.street2);
         setFieldValue('city', address.city);
         setFieldValue('state', address.state);
         setFieldValue('postalCode', address.postalCode);
