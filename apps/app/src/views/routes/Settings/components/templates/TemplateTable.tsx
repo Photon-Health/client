@@ -12,7 +12,6 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { TablePage } from '../../../../components/TablePage';
 
 import { PaginationIndicator } from '../PaginationIndicator';
-import { PrescriptionTemplate } from 'packages/sdk/dist/types';
 import { JSX } from 'react';
 
 const TEMPLATE_COLUMNS = [
@@ -57,9 +56,8 @@ const renderSkeletonRow = (isMobile: boolean | undefined) => {
 };
 
 interface TemplateTableProps {
-  isLoading: boolean;
-  rows: PrescriptionTemplate[];
-  filteredRows: { template: JSX.Element; actions: JSX.Element }[];
+  loading: boolean;
+  rows: { template: JSX.Element; actions: JSX.Element }[];
   pages: number;
   pageSize: number;
   currentPage: number;
@@ -70,12 +68,12 @@ interface TemplateTableProps {
     on: () => void;
   };
   filterElement: JSX.Element;
+  hasSearch?: boolean;
 }
 
 export const TemplateTable = ({
-  isLoading,
+  loading,
   rows,
-  filteredRows,
   pages,
   pageSize,
   currentPage,
@@ -83,13 +81,15 @@ export const TemplateTable = ({
   filterText,
   setFilterText,
   setShowModal,
-  filterElement
+  filterElement,
+  hasSearch
 }: TemplateTableProps) => {
   const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
   const showBadgeStacked = useBreakpointValue({ base: true, md: false });
-  const displayRows = isLoading
-    ? new Array(isMobileAndTablet ? 3 : 10).fill(0).map(() => renderSkeletonRow(isMobileAndTablet))
-    : filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const skeletonRows = new Array(isMobileAndTablet ? 3 : 10)
+    .fill(0)
+    .map(() => renderSkeletonRow(isMobileAndTablet));
+  const rowsForPage = rows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const columns = showBadgeStacked
     ? TEMPLATE_COLUMNS.filter(({ accessor }) => accessor !== 'badge')
@@ -97,15 +97,17 @@ export const TemplateTable = ({
 
   return (
     <TablePage
-      data={displayRows}
+      data={loading ? skeletonRows : rowsForPage}
       columns={columns}
       filterText={filterText}
       setFilterText={setFilterText}
-      loading={isLoading}
-      ctaText={'Create Template'}
+      loading={loading}
+      ctaText={'Create template'}
       ctaColor={'blue'}
-      ctaRoute=""
       ctaOnClick={setShowModal.on}
+      emptyStateTitle="No templates yet"
+      emptyStateText="Add medications to your catalog first, then create prescription templates to save time on frequently prescribed meds."
+      hasSearch={hasSearch}
       filter={filterElement}
       ctaRight
       paginationIndicator={
