@@ -7,6 +7,9 @@
   },
   "dependencies": {
     "@rudderstack/analytics-js": "^3.22.0",
+    "@statsig/react-bindings": "^3.31.2",
+    "@statsig/session-replay": "^3.31.2",
+    "@statsig/web-analytics": "^3.31.2",
     "chakra-react-select": "^4.6.0",
     "dayjs": "^1.11.7",
     "eslint-config-prettier": "^9.1.0",
