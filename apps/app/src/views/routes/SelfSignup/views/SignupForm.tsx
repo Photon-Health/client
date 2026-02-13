@@ -190,6 +190,7 @@ export const SignupForm = ({
                         id="street1"
                         name="street1"
                         role="combobox"
+                        placeholder="Enter your practice address"
                         aria-autocomplete="list"
                         aria-expanded={suggestions.length > 0}
                         data-1p-ignore

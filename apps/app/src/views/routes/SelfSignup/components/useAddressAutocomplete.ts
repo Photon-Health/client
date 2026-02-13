@@ -41,7 +41,9 @@ export function useAddressAutocomplete({ onSelect }: UseAddressAutocompleteOptio
   };
 
   const fetchSuggestions = useDebouncedCallback(async (input: string) => {
-    if (input.length < 3) {
+    const MINIMUM_CHARACTERS_TO_SEARCH = 3;
+    if (input.length < MINIMUM_CHARACTERS_TO_SEARCH) {
+      // clears dropdown when there are only a few characters
       setSuggestions([]);
       return;
     }
