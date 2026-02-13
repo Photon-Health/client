@@ -43,6 +43,7 @@ export const SignupForm = ({
   onSubmit
 }: SignupFormProps) => {
   const setFieldValueRef = useRef<FormikHelpers<SignupFormData>['setFieldValue']>();
+  const street1Ref = useRef<HTMLInputElement>(null);
 
   const { suggestions, fetchSuggestions, selectSuggestion, closeSuggestions, openSuggestions } =
     useAddressAutocomplete({
@@ -54,6 +55,7 @@ export const SignupForm = ({
         setFieldValue('city', address.city);
         setFieldValue('state', address.state);
         setFieldValue('postalCode', address.postalCode);
+        street1Ref.current?.blur();
       }
     });
 
@@ -184,6 +186,7 @@ export const SignupForm = ({
                     <FormLabel htmlFor="street1">Street 1</FormLabel>
                     <Box position="relative">
                       <Input
+                        ref={street1Ref}
                         id="street1"
                         name="street1"
                         role="combobox"
