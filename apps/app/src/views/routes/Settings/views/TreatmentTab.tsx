@@ -14,7 +14,7 @@ import {
   useToast
 } from '@chakra-ui/react';
 import { usePhoton } from '@photonhealth/react';
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
 import { FragmentType, useFragment } from 'apps/app/src/gql';
@@ -26,6 +26,7 @@ import { StyledToast } from '../../../components/StyledToast';
 import { TreatmentActions } from '../components/treatments/TreatmentActions';
 import { AddTreatmentToCatalogForm } from '../components/treatments/AddTreatmentToCatalogForm';
 import { TreatmentTable } from '../components/treatments/TreatmentTable';
+import { sortBy } from 'lodash';
 
 interface MedViewProps {
   name: string;
@@ -83,13 +84,11 @@ export const TreatmentTab = ({
   const submitRef: any = useRef();
 
   const [rows, setRows] = useState<any[]>([]);
-  const [filteredRows, setFilteredRows] = useState<any[]>([]);
   const [filterText, setFilterText] = useState('');
   const [debouncedFilterText] = useDebounce(filterText, 250);
-  const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 10;
   const [childLoading, setChildLoading] = useState(false);
+  const pageSize = 10;
 
   const [addToCatalog, { loading, error }] = useMutation(ADD_TO_CATALOG, {
     onCompleted: () => {
@@ -126,50 +125,29 @@ export const TreatmentTab = ({
 
   useEffect(() => {
     if (!catalog.loading && catalog.catalog?.treatments) {
-      const sorted = [...catalog.catalog.treatments].sort((a: any, b: any) =>
-        a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
-      );
-      const preppedRows = sorted;
+      const preppedRows = sortBy(catalog.catalog.treatments, 'name');
       setRows(preppedRows);
-      if (debouncedFilterText.length === 0 && filterText.length === 0) {
-        const fRows = preppedRows.map((y: any) =>
-          renderTreatmentRow(y, setChildLoading, y.id, catalogs.catalogs[0].id)
-        );
-        setFilteredRows(fRows);
-        setPages(Math.ceil(fRows.length / pageSize));
-        setCurrentPage(1);
-      } else {
-        const fRows = preppedRows
-          .filter((x: any) =>
-            x.name
-              .toLowerCase()
-              .includes(debouncedFilterText.toLowerCase() || filterText.toLowerCase())
-          )
-          .map((y: any) => renderTreatmentRow(y, setChildLoading, y.id, catalogs.catalogs[0].id));
-        setPages(Math.ceil(fRows.length / pageSize));
-        setCurrentPage(1);
-        setFilteredRows(fRows);
-      }
+      setCurrentPage(1);
     }
-  }, [catalog.loading, catalog.catalog?.treatments?.length]);
+  }, [catalog.loading, catalog.catalog?.treatments]);
 
   useEffect(() => {
-    if (debouncedFilterText.length === 0 && filterText.length === 0) {
-      const fRows = rows.map((y: any) =>
-        renderTreatmentRow(y, setChildLoading, y.id, catalogs.catalogs[0].id)
-      );
-      setPages(Math.ceil(fRows.length / pageSize));
+    // Reset current page to first page on debounce
+    if (currentPage !== 1) {
       setCurrentPage(1);
-      setFilteredRows(fRows);
-    } else {
-      const fRows = rows
-        .filter((x) => x.name.toLowerCase().includes(debouncedFilterText.toLowerCase()))
-        .map((y: any) => renderTreatmentRow(y, setChildLoading, y.id, catalogs.catalogs[0].id));
-      setPages(Math.ceil(fRows.length / pageSize));
-      setCurrentPage(1);
-      setFilteredRows(fRows);
     }
   }, [debouncedFilterText]);
+
+  const formattedRows = useMemo(() => {
+    const result = rows
+      .filter((x) => x.name.toLowerCase().includes(debouncedFilterText.toLowerCase()))
+      .map((y: any) => renderTreatmentRow(y, setChildLoading, y.id, catalogs.catalogs[0].id));
+
+    return {
+      rows: result,
+      pages: Math.ceil(result.length / pageSize)
+    };
+  }, [debouncedFilterText, rows, pageSize, catalogs.catalogs[0]?.id]);
 
   const isLoading = catalogs.loading || catalog.loading || loading || childLoading;
 
@@ -203,16 +181,16 @@ export const TreatmentTab = ({
       )}
       <SplitLayout>
         <TreatmentTable
-          rows={rows}
+          rows={formattedRows.rows}
           setCurrentPage={setCurrentPage}
-          isLoading={isLoading}
-          filteredRows={filteredRows}
+          loading={isLoading}
           filterText={filterText}
           setFilterText={setFilterText}
           currentPage={currentPage}
-          pages={pages}
+          pages={formattedRows.pages}
           pageSize={pageSize}
           setShowModal={setShowModal}
+          hasSearch={!!filterText}
         />
         {!isMobileAndTablet ? (
           <AddTreatmentToCatalogForm
