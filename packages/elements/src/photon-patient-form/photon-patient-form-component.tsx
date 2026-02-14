@@ -217,7 +217,9 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
   const AddressFields = () => (
     <>
-      <p class="font-sans text-lg mt-8">
+      {/*Using !mt-8 because of tailwind issue in shadowDom elements */}
+      {/*when not using the !important modifier*/}
+      <p class="font-sans text-lg mt-4 md:!mt-8">
         Address
         <Show when={props.optionalPatientAddress && !hasAnyAddressField()}>
           <span class="text-gray-500 text-sm font-normal"> (optional)</span>
@@ -403,10 +405,12 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                   <AddressFields />
                 </Show>
                 <button
-                  class="mb-4 flex items-center md:!hidden"
+                  class="mb-4 mt-8 flex items-center md:!hidden"
                   onClick={() => setShowOptionalFields((value) => !value)}
                 >
-                  <span class="font-sans text-lg">Show optional fields</span>
+                  <span class="font-sans text-lg">
+                    {showOptionalFields() ? 'Hide optional fields' : 'Show optional fields'}
+                  </span>
                   <Icon
                     name={showOptionalFields() ? 'chevronUp' : 'chevronDown'}
                     size="md"
