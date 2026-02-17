@@ -192,6 +192,7 @@ export const SignupForm = ({
                         role="combobox"
                         placeholder="Enter your practice address"
                         aria-autocomplete="list"
+                        aria-label="street1-arialabel"
                         aria-expanded={suggestions.length > 0}
                         data-1p-ignore
                         autoComplete="invalid-so-that-autofill-doesnt-popup-over-dropdown"

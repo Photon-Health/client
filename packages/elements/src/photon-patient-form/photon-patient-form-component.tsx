@@ -321,6 +321,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                 <div class="flex flex-col">
                   <photon-text-input
                     class="w-full"
+                    aria-label="firstName-ariaLabel"
                     debounce-time="0"
                     invalid={store['firstName']?.error}
                     help-text={store['firstName']?.error}
