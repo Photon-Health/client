@@ -240,6 +240,17 @@ export class PatientAnalytics {
       ...properties
     };
 
+    const isNonProductionEnvironment =
+      this.environment === 'boson' ||
+      this.environment === 'neutron' ||
+      this.environment === 'tau' ||
+      this.environment === 'local' ||
+      this.environment === 'development';
+
+    if (isNonProductionEnvironment) {
+      console.log(`📊 [Analytics] ${eventName}`, JSON.stringify(trackProperties, null, 2));
+    }
+
     this.rudderanalytics.track(eventName, trackProperties);
   }
 
