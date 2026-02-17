@@ -7,7 +7,6 @@ import { SelectOrg } from './SelectOrg';
 import { auth0Config } from '../../configs/auth';
 import useQueryParams from '../../hooks/useQueryParams';
 import { Env } from '@photonhealth/sdk';
-import { setInstrumentationUserContext } from '../../instrumentation/setInstrumentationUserContext';
 
 declare global {
   namespace JSX {
@@ -25,12 +24,6 @@ export const Main = () => {
   const { user, isAuthenticated, isLoading, error } = usePhoton();
   const location = useLocation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      setInstrumentationUserContext(user);
-    }
-  }, [isAuthenticated, isLoading]);
 
   useEffect(() => {
     if (!isLoading && error) {
