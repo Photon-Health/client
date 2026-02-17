@@ -735,6 +735,16 @@ export const Pharmacy = () => {
 
     const allPharmaciesIncludingOffers = [...pharmaciesFromOffers, ...allPharmacies];
 
+    // TODO: Remove this once we've got all pharmacies marked correctly in the db
+    // this historically was overriding pharmaicy type and presentation due to an inept datamodel
+    const override = getPharmacy(allPharmaciesIncludingOffers, selectedPharmacy.id);
+    const overridePharmacy = override.selectedPharmacy ?? selectedPharmacy;
+    const overrideType = override.selectedPharmacy
+      ? override.type
+      : selectedPharmacy.fulfillmentTypes?.[0];
+
+    handleSubmitSuccessAnalytics(overridePharmacy);
+
     // If it's a mail order pharmacy, submit the pharmacy to the order
     // Otherwise, just navigate to ready by selection
     if (isMailOrder || isReroute) {
@@ -753,22 +763,12 @@ export const Pharmacy = () => {
               patientSelectedPrice
             );
 
-        // TODO: Remove this once we've got all pharmacies marked correctly in the db
-        // this historically was overriding pharmaicy type and presentation due to an inept datamodel
-        const override = getPharmacy(allPharmaciesIncludingOffers, selectedPharmacy.id);
-        const overridePharmacy = override.selectedPharmacy ?? selectedPharmacy;
-        const overrideType = override.selectedPharmacy
-          ? override.type
-          : selectedPharmacy.fulfillmentTypes?.[0];
-
         await new Promise<void>((resolve) =>
           setTimeout(() => {
             if (result) {
               setSuccessfullySubmitted(true);
               setTimeout(async () => {
                 setShowFooter(false);
-
-                handleSubmitSuccessAnalytics(overridePharmacy);
 
                 // necessary to ensure the order is updated with the new coupon before navigating
                 const updatedOrder = await fetchOrder(overridePharmacy);
