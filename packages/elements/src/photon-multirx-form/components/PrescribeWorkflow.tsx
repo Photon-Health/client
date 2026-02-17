@@ -636,7 +636,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 </Show>
                 <SupervisorCard
                   onChange={(supervisor) => {
-                    console.log(props.formStore.supervisor?.value);
                     props.formActions.updateFormValue({
                       key: 'supervisor',
                       value: { ...(props.formStore.supervisor?.value || {}), ...supervisor }

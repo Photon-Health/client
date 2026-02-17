@@ -5,20 +5,45 @@ import InputGroup from '../particles/InputGroup';
 import Text from '../particles/Text';
 import * as zod from 'zod';
 import { validator } from '@felte/validator-zod';
+import { createEffect } from 'solid-js';
 
-const supervisorSchema = zod.object({
-  fullName: zod.string(),
-  npi: zod
-    .string()
-    .regex(/^[0-9]+$/)
-    .optional()
-});
+const supervisorSchema = zod
+  .object({
+    fullName: zod.string().optional(),
+    npi: zod
+      // When a text input is cleared, the value changes to an empty string
+      // which .optional() and .nullish() do not handle
+      // Need zod.literal('') to additionally allow empty strings
+      .union([zod.literal(''), zod.string().regex(/^[0-9]+$/, 'Enter a valid NPI')])
+      .optional()
+  })
+  .superRefine((data, ctx) => {
+    if (data.fullName && !data.npi) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'NPI is required when Full Name is filled out',
+        path: ['fullName']
+      });
+    }
+
+    if (!data.fullName && data.npi) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Full Name is required when NPI is filled out',
+        path: ['npi']
+      });
+    }
+  });
 
 type Supervisor = zod.infer<typeof supervisorSchema>;
 
 export const SupervisorCard = (props: { onChange: (value: Partial<Supervisor>) => void }) => {
   const { form, errors } = createForm({
     extend: validator({ schema: supervisorSchema })
+  });
+
+  createEffect(() => {
+    console.log(errors());
   });
 
   return (
