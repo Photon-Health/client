@@ -36,7 +36,7 @@ export default function Input(props: InputProps) {
     const error = nonNativeProps.error || state.error;
     const readonly = inputProps.readonly || inputProps.readOnly;
     return clsx(
-      'block w-full rounded-lg border-0 py-3 px-4 shadow-sm ring-1 ring-inset text-sm sm:text-base sm:leading-6 focus:outline-none',
+      'block w-full rounded-lg border-0 py-3 px-4 ring-1 ring-inset text-sm sm:text-base sm:leading-6 focus:outline-none',
       {
         'pl-10': inputProps.type === 'email',
         'ring-red-300 placeholder:text-red-300 focus:ring-inset focus:ring-red-500':
@@ -70,44 +70,42 @@ export default function Input(props: InputProps) {
   });
 
   return (
-    <>
-      <div class="relative rounded-lg shadow-sm">
-        <Show when={inputProps.type === 'email'}>
-          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Icon name="envelope" class="h-5 w-5 text-gray-400" size="sm" />
-          </div>
-        </Show>
-        <input
-          id={state?.id}
-          onInput={inputProps.type === 'number' ? handleInput : handler.onInput}
-          {...inputProps}
-          class={inputClass()}
-          autocomplete="off"
-        />
-        <Show when={state.loading || inputProps.loading}>
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1">
-            <Spinner size="sm" />
-          </div>
-        </Show>
-        <Show when={nonNativeProps.copy}>
-          <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(valueToString(inputProps?.value));
-                setCopied(true);
-              }}
-              aria-label="Drop Down for more options"
-            >
-              <Show when={copied()}>
-                <Icon name="check" class="h-5 w-5 text-gray-400" size="sm" />
-              </Show>
-              <Show when={!copied()}>
-                <Icon name="clipboard" class="h-5 w-5 text-gray-400" size="sm" />
-              </Show>
-            </button>
-          </div>
-        </Show>
-      </div>
-    </>
+    <div class="relative rounded-lg">
+      <Show when={inputProps.type === 'email'}>
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <Icon name="envelope" class="h-5 w-5 text-gray-400" size="sm" />
+        </div>
+      </Show>
+      <input
+        id={state?.id}
+        onInput={inputProps.type === 'number' ? handleInput : handler.onInput}
+        {...inputProps}
+        class={inputClass()}
+        autocomplete="off"
+      />
+      <Show when={state.loading || inputProps.loading}>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1">
+          <Spinner size="sm" />
+        </div>
+      </Show>
+      <Show when={nonNativeProps.copy}>
+        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(valueToString(inputProps?.value));
+              setCopied(true);
+            }}
+            aria-label="Drop Down for more options"
+          >
+            <Show when={copied()}>
+              <Icon name="check" class="h-5 w-5 text-gray-400" size="sm" />
+            </Show>
+            <Show when={!copied()}>
+              <Icon name="clipboard" class="h-5 w-5 text-gray-400" size="sm" />
+            </Show>
+          </button>
+        </div>
+      </Show>
+    </div>
   );
 }
