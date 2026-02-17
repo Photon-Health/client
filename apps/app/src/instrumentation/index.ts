@@ -25,7 +25,6 @@ export const initializeInstrumentation = () => {
   const mixpanelToken = process.env.REACT_APP_MIXPANEL_PROJECT_TOKEN;
   if (mixpanelToken) {
     mixpanel.init(mixpanelToken, {
-      debug: true,
       autocapture: {
         pageview: 'full-url',
         click: true,

@@ -26,8 +26,6 @@ export function setInstrumentationUserContext(user: {
     customerId: user.customer_id
   });
 
-  console.trace('indetifier', { user });
-
   // Restore isSelfSignup flag that was persisted before the Auth0 redirect
   if (sessionStorage.getItem(SELF_SIGNUP_STORAGE_KEY)) {
     datadogRum.setGlobalContextProperty('session', {
@@ -46,5 +44,11 @@ export function setInstrumentationSelfSignupUserContext(user: { email: string; n
   datadogRum.setUser({
     email: user.email,
     name: user.name
+  });
+
+  mixpanel.identify(user.email);
+  mixpanel.people.set({
+    $email: user.email,
+    $name: user.name
   });
 }
