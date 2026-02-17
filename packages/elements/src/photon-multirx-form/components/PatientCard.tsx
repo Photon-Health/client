@@ -6,10 +6,10 @@ import {
   PatientInfo,
   PatientMedHistory,
   PhotonClientStore,
-  Text
+  Text,
+  message
 } from '@photonhealth/components';
 import { Treatment } from '@photonhealth/sdk/dist/types';
-import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
 import type { Address } from './PrescribeWorkflow';
 const hasUsableAddress = (address?: {

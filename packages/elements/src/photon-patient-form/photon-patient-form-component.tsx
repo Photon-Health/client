@@ -1,12 +1,20 @@
 import { customElement } from 'solid-element';
 import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
-import { enums, size, string, union } from 'superstruct';
-import { Card, Icon, PharmacySearch, Spinner, usePhoton } from '@photonhealth/components';
+import { enums, nonempty, nullable, optional, pattern, size, string } from 'superstruct';
+import {
+  Card,
+  Icon,
+  PharmacySearch,
+  Spinner,
+  usePhoton,
+  email,
+  message,
+  notFutureDate
+} from '@photonhealth/components';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { email, empty, message, notFutureDate, zipString } from '../validators';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
@@ -59,15 +67,15 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   });
   actions.registerValidator({
     key: 'firstName',
-    validator: message(size(string(), 1, Infinity), 'Please enter a first name.')
+    validator: message(nonempty(string()), 'Please enter a first name.')
   });
   actions.registerValidator({
     key: 'lastName',
-    validator: message(size(string(), 1, Infinity), 'Please enter a last name.')
+    validator: message(nonempty(string()), 'Please enter a last name.')
   });
   actions.registerValidator({
     key: 'dateOfBirth',
-    validator: message(union([notFutureDate, empty()]), 'Please enter a valid date of birth.')
+    validator: message(notFutureDate, 'Please enter a valid date of birth.')
   });
   actions.registerValidator({
     key: 'sex',
@@ -79,17 +87,17 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   });
   actions.registerValidator({
     key: 'email',
-    validator: message(union([email(), empty()]), 'Please enter a valid email.')
+    validator: message(optional(nullable(email())), 'Please enter a valid email.')
   });
 
   // Address validators - only run when address is required.
   actions.registerValidator({
     key: 'address_street1',
-    validator: message(size(string(), 1, Infinity), 'Please enter a valid Street 1.')
+    validator: message(nonempty(string()), 'Please enter a valid Street 1.')
   });
   actions.registerValidator({
     key: 'address_city',
-    validator: message(size(string(), 1, Infinity), 'Please enter a valid City.')
+    validator: message(nonempty(string()), 'Please enter a valid City.')
   });
   actions.registerValidator({
     key: 'address_state',
@@ -97,7 +105,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   });
   actions.registerValidator({
     key: 'address_zip',
-    validator: message(zipString(), 'Please enter a valid zip code.')
+    validator: message(pattern(string(), /^\d{5}(-\d{4})?$/), 'Please enter a valid zip code.')
   });
 
   onMount(() => {

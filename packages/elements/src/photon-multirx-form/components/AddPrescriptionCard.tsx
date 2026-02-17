@@ -10,11 +10,23 @@ import {
   triggerToast,
   usePrescribeEventDispatch,
   TryCreatePrescriptionTemplateOptions,
-  useDraftPrescriptions
+  useDraftPrescriptions,
+  afterDate,
+  message
 } from '@photonhealth/components';
 import { DispenseUnit, Medication, Prescription } from '@photonhealth/sdk/dist/types';
-import { any, min, number, optional, record, refine, size, string } from 'superstruct';
-import { afterDate, between, message } from '../../validators';
+import {
+  any,
+  intersection,
+  max,
+  min,
+  nonempty,
+  number,
+  optional,
+  record,
+  refine,
+  string
+} from 'superstruct';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -36,8 +48,11 @@ const validators = {
     'Please select a dispensing unit'
   ),
   daysSupply: message(min(number(), 0), 'Days Supply must be at least 0'),
-  refillsInput: message(between(0, 11), 'Refills must be 0 to 11'),
-  instructions: message(size(string(), 1, Infinity), 'Please enter instructions for the patient'),
+  refillsInput: message(
+    intersection([min(number(), 0), max(number(), 11)]),
+    'Refills must be 0 to 11'
+  ),
+  instructions: message(nonempty(string()), 'Please enter instructions for the patient'),
   doNotFillBeforeDate: message(
     optional(afterDate(new Date())),
     "Please choose a date that isn't in the past"

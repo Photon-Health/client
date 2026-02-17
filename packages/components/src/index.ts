@@ -47,6 +47,7 @@ import {
   usePrescribeEventDispatch
 } from './systems/PrescribeEventDispatchProvider';
 import { SupervisorCard } from './systems/SupervisorCard';
+import { message, notFutureDate, afterDate, email } from './utils/validators';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
 
@@ -91,7 +92,11 @@ export {
   CALENDAR_DATE_FORMAT,
   PrescribeEventDispatchProvider,
   usePrescribeEventDispatch,
-  SupervisorCard
+  SupervisorCard,
+  message,
+  notFutureDate,
+  afterDate,
+  email
 };
 
 // Export types
