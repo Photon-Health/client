@@ -1,4 +1,5 @@
 import { datadogRum } from '@datadog/browser-rum';
+import mixpanel from 'mixpanel-browser';
 import { beforeSendHandler } from './beforeSendHandler';
 import pkg from '../../package.json';
 
@@ -20,4 +21,21 @@ export const initializeInstrumentation = () => {
   });
 
   datadogRum.startSessionReplayRecording();
+
+  const mixpanelToken = process.env.REACT_APP_MIXPANEL_PROJECT_TOKEN;
+  if (mixpanelToken) {
+    mixpanel.init(mixpanelToken, {
+      debug: true,
+      autocapture: {
+        pageview: 'full-url',
+        click: true,
+        dead_click: true,
+        input: true,
+        rage_click: true,
+        scroll: true,
+        submit: true,
+        capture_text_content: false
+      }
+    });
+  }
 };

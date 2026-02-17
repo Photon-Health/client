@@ -1,4 +1,5 @@
 import { datadogRum } from '@datadog/browser-rum';
+import mixpanel from 'mixpanel-browser';
 
 const SELF_SIGNUP_STORAGE_KEY = 'dd_rum_is_self_signup';
 
@@ -16,6 +17,16 @@ export function setInstrumentationUserContext(user: {
     email: user.email,
     name: user.name
   });
+
+  mixpanel.identify(user.email);
+  mixpanel.people.set({
+    $email: user.email,
+    $name: user.name,
+    org_id: user.org_id,
+    customerId: user.customer_id
+  });
+
+  console.trace('indetifier', { user });
 
   // Restore isSelfSignup flag that was persisted before the Auth0 redirect
   if (sessionStorage.getItem(SELF_SIGNUP_STORAGE_KEY)) {
