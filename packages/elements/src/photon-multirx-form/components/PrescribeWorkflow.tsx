@@ -24,7 +24,8 @@ import {
   usePhoton,
   usePrescribe,
   useRecentOrders,
-  usePrescribeEventDispatch
+  usePrescribeEventDispatch,
+  SupervisorCard
 } from '@photonhealth/components';
 import { types } from '@photonhealth/sdk';
 import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
@@ -633,6 +634,15 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     />
                   </div>
                 </Show>
+                <SupervisorCard
+                  onChange={(supervisor) => {
+                    console.log(props.formStore.supervisor?.value);
+                    props.formActions.updateFormValue({
+                      key: 'supervisor',
+                      value: { ...(props.formStore.supervisor?.value || {}), ...supervisor }
+                    });
+                  }}
+                />
                 <DraftPrescriptionCard
                   prescriptionRef={prescriptionRef}
                   actions={props.formActions}

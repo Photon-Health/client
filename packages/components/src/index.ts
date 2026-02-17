@@ -32,28 +32,23 @@ import {
   ScreeningAlertType
 } from './systems/ScreeningAlerts';
 import { RoutingConstraint } from './systems/RoutingConstraints';
-
 import triggerToast from './utils/toastTriggers';
 import generateString from './utils/generateString';
 import { createQuery } from './utils/createQuery';
 import formatDate, { CALENDAR_DATE_FORMAT } from './utils/formatDate';
 import { formatPrescriptionDetails } from './utils/formatPrescriptionDetail';
-
 import { SignatureAttestationModal } from './systems/SignatureAttestation';
-
 import { PhotonContext, usePhoton } from './context';
 import { PhotonClientStore } from './store';
-
-export { usePhoton, PhotonClientStore, PhotonContext };
-
 import { CoverageOption, PrescribeProvider, usePrescribe } from './systems/PrescribeProvider';
-
 import { GoogleServiceProvider, useGoogleService } from './systems/GoogleServiceProvider';
-
 import {
   PrescribeEventDispatchProvider,
   usePrescribeEventDispatch
 } from './systems/PrescribeEventDispatchProvider';
+import { SupervisorCard } from './systems/SupervisorCard';
+
+export { usePhoton, PhotonClientStore, PhotonContext };
 
 export {
   AddressForm,
@@ -95,7 +90,8 @@ export {
   useGoogleService,
   CALENDAR_DATE_FORMAT,
   PrescribeEventDispatchProvider,
-  usePrescribeEventDispatch
+  usePrescribeEventDispatch,
+  SupervisorCard
 };
 
 // Export types
