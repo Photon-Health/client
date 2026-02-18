@@ -630,7 +630,7 @@ export const Pharmacy = () => {
 
     setLoadingPharmacies(false);
 
-    patientAnalytics.track('Patient Clickced Show More Pharmacy', order, {
+    patientAnalytics.track('Patient Clicked Show More Pharmacies', order, {
       latitude,
       longitude,
       pageOffset
