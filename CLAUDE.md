@@ -164,6 +164,17 @@ const mailOrderProviders = getOrgMailOrderPharms(user?.org_id)?.provider;
 
 Environment is selected via `env-cmd -f .env.<name>` in Nx targets.
 
+### Backend APIs
+
+The platform has two backend API layers. The SDK (`packages/sdk`) maintains separate Apollo clients for each:
+
+| API | Base URL | Protocol | Purpose |
+|-----|----------|----------|---------|
+| **Services** | `clinical-api.{env}.health` | GraphQL + REST | Newer API — the consolidation target |
+| **Lambdas** | `api.{env}.health` | GraphQL (AppSync) | Legacy API — being migrated to services |
+
+The team is actively consolidating all APIs to **services**. The patient API is already fully on services. New features should target the services API. The SDK exposes both clients (`apollo` for lambdas, `apolloClinical` for services) and uses different auth header patterns for each (`authorization` for lambdas, `x-photon-auth-token` for services).
+
 ### Routing
 
 - **Clinical app** routes: `/patients`, `/prescriptions`, `/orders`, `/support`, `/settings/*`, `/login`, `/logout`
@@ -245,7 +256,7 @@ declare global {
 
 ### Analytics
 
-Both apps use **RudderStack** for product analytics and **Datadog RUM** for monitoring/session replay. The two systems serve different purposes and are set up differently per app.
+Analytics applies only to the clinical and patient apps — **not** to `packages/elements` published to npm. Adding analytics to elements is not feasible because it can conflict with customer web applications (e.g. Datadog RUM uses a singleton pattern). Both apps use **RudderStack** for product analytics and **Datadog RUM** for monitoring/session replay. The two systems serve different purposes and are set up differently per app.
 
 #### Clinical App (`apps/app`)
 
