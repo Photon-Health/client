@@ -248,7 +248,7 @@ export class PatientAnalytics {
       this.environment === 'development';
 
     if (isNonProductionEnvironment) {
-      console.log(`📊 [Analytics] ${eventName}`, JSON.stringify(trackProperties, null, 2));
+      console.log(`📊 [Analytics] ${eventName}`, trackProperties);
     }
 
     this.rudderanalytics.track(eventName, trackProperties);
