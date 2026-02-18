@@ -72,6 +72,10 @@ export const createFormStore = (initalValue?: Record<string, any>) => {
           validators[k].forEach((validator) => {
             try {
               assert(v?.value, validator);
+              setStore(k, {
+                value: v?.value,
+                error: undefined
+              });
             } catch (err) {
               for (const failure of (err as StructError).failures()) {
                 setStore(k, {

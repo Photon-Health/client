@@ -31,6 +31,7 @@ import { types } from '@photonhealth/sdk';
 import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
+import { compact } from 'lodash';
 
 const hasUsableAddress = (address?: {
   street1?: string;
@@ -357,7 +358,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       setErrors([
         {
           key: 'address',
-          error: 'Please enter an address for patient...'
+          error: 'Please enter an address for patient'
         }
       ]);
       return;
@@ -365,7 +366,13 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
     const requiresAddress =
       enableOrder && (!props.optionalPatientAddress || hasPreferredPharmacy());
-    const keys = requiresAddress ? ['patient', 'address'] : ['patient'];
+    const keys = compact([
+      'patient',
+      'supervisorFullName',
+      'supervisorNpi',
+      requiresAddress ? 'address' : null
+    ]);
+
     props.formActions.validate(keys);
     const errors = props.formActions.getErrors(keys);
     if (errors.length === 0) {
@@ -384,7 +391,13 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       // this reflects the prescription state changing from 'draft' to 'active'
       dispatchPrescriptionsCreated(draftPrescriptions());
     } else {
+      triggerToast({
+        status: 'error',
+        header: 'Error creating order',
+        body: 'Please review your order details'
+      });
       setErrors(errors);
+      dispatchOrderError(errors);
     }
   };
 
@@ -474,7 +487,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       setIsLoading(false);
       triggerToast({
         status: 'error',
-        header: 'Error Creating Order',
+        header: 'Error creating order',
         body: (err as GraphQLFormattedError)?.message
       });
     }
@@ -634,14 +647,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     />
                   </div>
                 </Show>
-                <SupervisorCard
-                  onChange={(supervisor) => {
-                    props.formActions.updateFormValue({
-                      key: 'supervisor',
-                      value: { ...(props.formStore.supervisor?.value || {}), ...supervisor }
-                    });
-                  }}
-                />
+                <SupervisorCard actions={props.formActions} store={props.formStore} />
                 <DraftPrescriptionCard
                   prescriptionRef={prescriptionRef}
                   actions={props.formActions}

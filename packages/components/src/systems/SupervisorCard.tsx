@@ -1,74 +1,113 @@
-import { createForm } from '@felte/solid';
 import Card from '../particles/Card';
 import Input from '../particles/Input';
 import InputGroup from '../particles/InputGroup';
 import Text from '../particles/Text';
+import { refine, string, optional } from 'superstruct';
+import { onMount } from 'solid-js';
 import * as zod from 'zod';
-import { validator } from '@felte/validator-zod';
-import { createEffect } from 'solid-js';
 
 const supervisorSchema = zod
   .object({
-    fullName: zod.string().optional(),
-    npi: zod
-      // When a text input is cleared, the value changes to an empty string
-      // which .optional() and .nullish() do not handle
-      // Need zod.literal('') to additionally allow empty strings
+    supervisorFullName: zod.string().optional(),
+    supervisorNpi: zod
       .union([zod.literal(''), zod.string().regex(/^[0-9]+$/, 'Enter a valid NPI')])
       .optional()
   })
   .superRefine((data, ctx) => {
-    if (data.fullName && !data.npi) {
+    if (!!data.supervisorFullName && !data.supervisorNpi) {
       ctx.addIssue({
         code: 'custom',
         message: 'NPI is required when Full Name is filled out',
-        path: ['fullName']
+        path: ['supervisorNpi']
       });
     }
 
-    if (!data.fullName && data.npi) {
+    if (!data.supervisorFullName && !!data.supervisorNpi) {
       ctx.addIssue({
         code: 'custom',
         message: 'Full Name is required when NPI is filled out',
-        path: ['npi']
+        path: ['supervisorFullName']
       });
     }
   });
 
-type Supervisor = zod.infer<typeof supervisorSchema>;
+export const SupervisorCard = (props: {
+  actions: Record<string, (...args: any) => any>;
+  store: Record<string, any>;
+}) => {
+  const validateFields = () => {
+    const result = supervisorSchema.safeParse({
+      supervisorFullName: props.store.supervisorFullName?.value,
+      supervisorNpi: props.store.supervisorNpi?.value
+    });
+    if (result.success) {
+      return {};
+    }
+    const errors = result.error.flatten().fieldErrors;
+    const validationErrors = {
+      supervisorFullName: errors.supervisorFullName?.[0],
+      supervisorNpi: errors.supervisorNpi?.[0]
+    };
+    return { errors: validationErrors };
+  };
 
-export const SupervisorCard = (props: { onChange: (value: Partial<Supervisor>) => void }) => {
-  const { form, errors } = createForm({
-    extend: validator({ schema: supervisorSchema })
+  onMount(() => {
+    // This component is part of PrescribeWorkflow, which uses superstruct for validation
+    // but superstruct doesn't have the ability to validate based on other schema fields.
+    // We can use superstruct `refine` as an escape hatch to zod-based validation.
+    const validators = {
+      supervisorFullName: refine(optional(string()), 'fullNameValidation', () => {
+        const result = validateFields();
+        const error = result.errors?.supervisorFullName;
+        return error ? error : true;
+      }),
+      supervisorNpi: refine(optional(string()), 'npiValidation', () => {
+        const result = validateFields();
+        const error = result.errors?.supervisorNpi;
+        return error ? error : true;
+      })
+    };
+
+    for (const [k, v] of Object.entries(validators)) {
+      props.actions.registerValidator({
+        key: k,
+        validator: v
+      });
+    }
   });
 
-  createEffect(() => {
-    console.log(errors());
-  });
+  const handleInput = (key: string, value: string) => {
+    props.actions.updateFormValue({
+      key,
+      value
+    });
+  };
 
   return (
     <Card addChildrenDivider={true}>
       <Text color="gray">Supervising Physician</Text>
-      <form ref={form} class="flex flex-col gap-y-[21px]">
+      <div class="flex flex-col gap-y-[21px]">
         <Text size="sm" color="black">
           Some pharmacies require supervising physician information for this prescription. Adding it
           here can help avoid callbacks and delays.
         </Text>
-        <InputGroup label="Full Name" error={errors().fullName?.[0]}>
+        <InputGroup label="Full Name" error={props.store.supervisorFullName?.error}>
           <Input
             type="text"
-            name="fullName"
-            onInput={(e) => props.onChange({ fullName: e.currentTarget?.value })}
+            name="supervisorFullName"
+            value={props.store.supervisorFullName?.value}
+            onInput={(e) => handleInput('supervisorFullName', e.currentTarget?.value)}
           />
         </InputGroup>
-        <InputGroup label="NPI" error={errors().npi?.[0]}>
+        <InputGroup label="NPI" error={props.store.supervisorNpi?.error}>
           <Input
             type="text"
-            name="npi"
-            onInput={(e) => props.onChange({ npi: e.currentTarget?.value })}
+            name="supervisorNpi"
+            value={props.store.supervisorNpi?.value}
+            onInput={(e) => handleInput('supervisorNpi', e.currentTarget?.value)}
           />
         </InputGroup>
-      </form>
+      </div>
     </Card>
   );
 };

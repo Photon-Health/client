@@ -296,7 +296,6 @@ const Component = (props: {
               pharmacy-id={props.pharmacyId}
               mail-order-ids={props.mailOrderIds}
               trigger-submit={triggerSubmit()}
-              set-trigger-submit={setTriggerSubmit}
               toast-buffer={props?.toastBuffer || 0}
               on:photon-form-validate={(e: any) => {
                 setCanSubmit(e.detail.canSubmit);

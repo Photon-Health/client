@@ -38,7 +38,9 @@ const Component = (props: PrescribeWorkflowComponentProps) => {
     treatment: undefined,
     pharmacy: undefined,
     errors: [],
-    address: undefined
+    address: undefined,
+    supervisorFullName: undefined,
+    supervisorNpi: undefined
   });
 
   onCleanup(() => {
