@@ -16,6 +16,7 @@ npm run app             # Run clinical app (boson env, with codegen watch)
 npm run app:tau          # Run clinical app (local tau env)
 npm run patient          # Run patient app (boson env, with codegen watch)
 npm run patient:tau      # Run patient app (local tau env)
+npx nx run elements:start  # Elements dev server at localhost:3000 (no hot reload)
 ```
 
 ### Linting
@@ -25,6 +26,7 @@ npm run lint             # Lint all projects
 npm run lint:fix         # Fix lint + prettier issues across all projects
 npx nx run app:lint      # Lint clinical app only
 npx nx run patient:lint  # Lint patient app only
+npx nx run elements:lint # Lint elements only
 ```
 
 ### Testing
@@ -42,6 +44,9 @@ npx nx run patient:test:ui               # Run tests with Vitest UI
 # Components (Vitest)
 npx nx run components:test
 
+# Elements (Vitest)
+npx nx run elements:test
+
 # E2E (Playwright, clinical app)
 npx nx run app:e2e                       # Headless
 npx nx run app:e2e:ui                    # Interactive UI mode
@@ -52,6 +57,7 @@ npx nx run app:e2e:ui                    # Interactive UI mode
 ```bash
 npx nx run app:build:boson               # Build clinical app (dev)
 npx nx run patient:build:boson           # Build patient app (dev)
+npx nx run elements:build                # Build elements library
 npx nx run app:tsc:boson                 # Type check clinical app
 npx nx run patient:tsc:boson             # Type check patient app
 ```
@@ -136,13 +142,15 @@ const mailOrderProviders = getOrgMailOrderPharms(user?.org_id)?.provider;
 ### Key Technology Choices
 
 - **React 18** with **React Router v6** for both apps
+- **Solid.js** with **solid-element** for `packages/components` (UI library) and `packages/elements` (web components). These packages are pure Solid.js — do not use React patterns here.
+- **Web Components** — `packages/elements` exports prescribe functionality as framework-agnostic custom elements, allowing external customers to embed them in any app regardless of framework (React, Vue, Angular, plain HTML, etc.).
 - **Apollo Client** for GraphQL state management and caching
 - **Nanostores** for lightweight shared state (`@nanostores/persistent` for persistence)
 - **Chakra UI v2** as the primary UI framework (clinical app)
 - **Tailwind CSS** used in components package and patient app
 - **Auth0** (`@auth0/auth0-react`) for authentication
 - **GraphQL Code Generator** with client preset for type-safe operations — generated types live in `gql/` or `graphql/` directories. Queries are co-located in the component file by default using `graphql()` tagged template literals; extract to a shared file only when multiple components use the same query.
-- **Formik + Yup** for forms in the clinical app; **Felte + Zod** in the patient app
+- **Formik + Yup** for forms in the clinical app; **Felte + Zod** in the patient app. In `packages/elements`, forms use a custom `createFormStore` (Solid.js `createStore`) with **Superstruct** for validation — see `packages/elements/src/stores/form.ts`. In `packages/components`, prop validation uses a simple `validateProps` utility for required-prop checks. The team is consolidating on **Yup** and **Zod** for validation going forward — prefer these over Superstruct or ad-hoc validation for new code.
 - **Styling**: Clinical app uses both Chakra UI and Tailwind CSS — match the surrounding code. Patient app and `packages/components` use Tailwind only.
 
 ### Environments
@@ -180,17 +188,17 @@ New web components should only be created for substantial functionality intended
 - `src/index.ts` imports all elements as side effects, so `import '@photonhealth/elements'` registers every custom element
 - Built with Vite as a library (`photon-webcomponents`), outputting ES and CJS bundles
 - Depends on `@photonhealth/components` (Solid.js UI primitives + Tailwind) and `@photonhealth/sdk` (PhotonClient)
-- Uses Shoelace web components for some UI primitives (alerts, icons, switches)
+- Uses Shoelace web components for some UI primitives (alerts, icons, switches) — **Shoelace is deprecated**; prefer Tailwind-based components in `packages/components` for new code
 - Styles are inlined via CSS module imports (`?inline`) since web components use Shadow DOM
 
 **Key elements:**
 
-| Element | External | Purpose |
+| Element | Consumer | Purpose |
 |---------|----------|---------|
-| `<photon-client>` | Required wrapper | Root wrapper — initializes `PhotonClient` SDK, Auth0 auth, and provides context to all child elements |
-| `<photon-prescribe-workflow>` | Yes | Core prescribe form — the main customer-facing element |
+| `<photon-client>` | External | Root wrapper — initializes `PhotonClient` SDK, Auth0 auth, and provides context to all child elements |
+| `<photon-prescribe-workflow>` | External | Core prescribe form — the main customer-facing element |
 | `<photon-multirx-form-wrapper>` | Internal | Wraps `<photon-prescribe-workflow>` with dialog/order UI for the clinical app |
-| `<photon-med-history>` | Yes | Patient medication history |
+| `<photon-med-history>` | External | Patient medication history |
 | `<photon-patient-dialog>` | Deprecated | Create/edit patient dialog (internal use only) |
 | `<photon-patient-select>`, `<photon-text-input>`, etc. | Deprecated | Generic primitives (internal use only, not for external customers) |
 
@@ -234,15 +242,6 @@ declare global {
 
 - `stores/` directory contains Solid.js stores (`createStore`) for cross-element shared state: `PatientStore` (singleton), `createFormStore` (per-instance factory using `superstruct` for validation), `CatalogStore`, `DispenseUnitStore`
 - The `<photon-client>` element provides `PhotonContext` (Solid context) with the SDK client to all child elements via `usePhoton()`
-
-**Dev commands:**
-
-```bash
-npx nx run elements:start       # Dev server at localhost:3000 (no hot reload)
-npx nx run elements:build       # Build library
-npx nx run elements:test        # Run Vitest tests
-npx nx run elements:lint        # Lint
-```
 
 ### Analytics
 
@@ -341,31 +340,16 @@ All new utility functions, views, and components must include tests. Match the t
 
 ### Test Conventions
 
+- Keep tests **brief and focused**. For unit tests of pure functions, prefer single-assertion, bite-sized tests. For page-level and integration tests that interact with rendered UI, longer tests with multiple assertions are fine.
+- Use **fuzzy matching** assertions where possible (e.g. `toHaveTextContent`, `toMatch`, `expect.objectContaining`) to avoid brittle tests that break on insignificant changes.
+- Prefer **`@testing-library`** (`@testing-library/react`, `@solidjs/testing-library`) for unit and component tests — query by role/text, not implementation details.
+- **Mocking**: Avoid mocks when possible. Use mocks only when a third-party library makes it difficult to render a component, or to harness legacy code that was never originally tested just to get a component/page to render without refactoring. MSW is the desired direction for API mocking but no reusable pattern has been established yet — for now, `jest.mock`/`vi.mock` is acceptable.
+- **Component vs. page-level tests**: When adding tests for a component, ask the engineer whether the component is complex enough to warrant isolated component tests, or if it can be implicitly covered by a page-level test that exercises it in context.
 - Test files use `.test.ts` or `.test.tsx` extension and live alongside source files
 - Test files are excluded from ESLint (configured in `.eslintrc.json` ignorePatterns)
 - Patient app has a shared `setupTests.ts` that globally mocks `react-ga4`, `@datadog/browser-rum`, `@client/settings`, and polyfills `IntersectionObserver`
 - Patient app tests use `vi.mock()` to stub API modules, analytics, and heavy components before rendering
 - Test data generators (`apps/patient/src/test-utils/generators.ts`) use a factory pattern: `generateOrder({ state: 'ROUTING' })` creates a full order with defaults, overridden by the partial you pass in
-
-### Running Tests
-
-```bash
-# Run all tests for a project
-npx nx run app:test
-npx nx run patient:test
-npx nx run components:test
-
-# Run a single test file
-npx nx run app:test -- --testPathPattern="App.test"        # Jest (clinical app)
-npx nx run patient:test -- shouldShowPriceToggle            # Vitest (patient app)
-
-# Watch mode (patient app only)
-npx nx run patient:test:watch
-
-# E2E
-npx nx run app:e2e          # Headless Playwright
-npx nx run app:e2e:ui        # Interactive Playwright UI
-```
 
 ## Code Conventions
 
