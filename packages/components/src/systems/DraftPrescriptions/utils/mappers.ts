@@ -1,6 +1,5 @@
 import { Prescription } from '@photonhealth/sdk/dist/types';
-import { PrescriptionFormData } from '../../PrescribeProvider';
-import { format } from 'date-fns';
+import { PrescriptionFormData } from '../DraftPrescriptionsProvider';
 
 export function toPrescriptionFormData(
   prescription: Prescription,
@@ -8,7 +7,7 @@ export function toPrescriptionFormData(
 ): PrescriptionFormData {
   return {
     id: prescription.id,
-    effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+    doNotFillBeforeDate: prescription.doNotFillBeforeDate,
     dispenseAsWritten: prescription.dispenseAsWritten || false,
     dispenseQuantity: prescription.dispenseQuantity,
     dispenseUnit: prescription.dispenseUnit,

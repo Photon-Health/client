@@ -1,16 +1,14 @@
 import { customElement } from 'solid-element';
 import { createSignal, Show } from 'solid-js';
-import { size, string } from 'superstruct';
-import { Button } from '@photonhealth/components';
-import { usePhoton } from '@photonhealth/components';
+import { Button, usePhoton } from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
-import { message } from '../validators';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 type PatientDialogProps = {
   patientId: string;
   open: boolean;
   hideCreatePrescription: boolean;
+  optionalPatientAddress: boolean;
 };
 
 const Component = (props: PatientDialogProps) => {
@@ -22,6 +20,7 @@ const Component = (props: PatientDialogProps) => {
   const [selectedStore, setSelectedStore] = createSignal<any>(undefined);
   const [actions, setActions] = createSignal<any>(undefined);
   const [globalError, setGlobalError] = createSignal<string | undefined>(undefined);
+  const [hasAnyAddressField, setHasAnyAddressField] = createSignal<boolean>(false);
 
   const dispatchUpdate = (patientId: string, createPrescription = false) => {
     const event = new CustomEvent('photon-patient-updated', {
@@ -60,33 +59,16 @@ const Component = (props: PatientDialogProps) => {
     setGlobalError(undefined);
     setIsCreatePrescription(createPrescription);
     setLoading(true);
-    let keys: string[] = ['firstName', 'lastName', 'dateOfBirth', 'phone', 'sex', 'email'];
 
-    if (
-      store['address_street1']?.value !== undefined ||
-      store['address_city']?.value !== undefined ||
-      store['address_state']?.value !== undefined ||
-      store['address_zip']?.value !== undefined
-    ) {
-      actions.registerValidator({
-        key: 'address_street1',
-        validator: message(size(string(), 1, Infinity), 'Please enter a valid Street 1..')
-      });
-      actions.registerValidator({
-        key: 'address_city',
-        validator: message(size(string(), 1, Infinity), 'Please enter a valid City..')
-      });
-      actions.registerValidator({
-        key: 'address_state',
-        validator: message(size(string(), 2, 2), 'Please enter a valid State..')
-      });
-      keys = [...keys, 'address_zip', 'address_street1', 'address_city', 'address_state'];
-    } else {
-      const keysToRemove = ['address_street1', 'address_city', 'address_state'];
-      for (const key of keysToRemove) {
-        actions.unRegisterValidator(key);
-      }
-    }
+    // Base keys that are always required
+    const baseKeys = ['firstName', 'lastName', 'dateOfBirth', 'phone', 'sex', 'email'];
+
+    // Address keys - only validate if address is required OR if any address field has been filled
+    const addressKeys = ['address_street1', 'address_city', 'address_state', 'address_zip'];
+
+    // If address is optional and no address fields are filled, skip address validation
+    const shouldValidateAddress = !props.optionalPatientAddress || hasAnyAddressField();
+    const keys = shouldValidateAddress ? [...baseKeys, ...addressKeys] : baseKeys;
 
     actions.validate(keys);
     if (actions.hasErrors(keys)) {
@@ -116,6 +98,7 @@ const Component = (props: PatientDialogProps) => {
       });
     }
 
+    const includeAddress = shouldValidateAddress;
     const patientData = {
       ...(props?.patientId ? { id: props.patientId } : {}),
       name: {
@@ -123,21 +106,20 @@ const Component = (props: PatientDialogProps) => {
         last: store['lastName']!.value
       },
       gender: store['gender']!.value,
-      email: store['email']!.value,
+      email: store['email']!.value ? store['email']!.value : undefined,
       phone: store['phone']!.value,
       dateOfBirth: store['dateOfBirth']!.value,
       sex: store['sex']!.value,
-      address:
-        store['address_street1']!.value !== undefined
-          ? {
-              street1: store['address_street1']!.value,
-              street2: store['address_street2']!.value,
-              city: store['address_city']!.value,
-              state: store['address_state']!.value,
-              postalCode: store['address_zip']!.value,
-              country: 'US'
-            }
-          : undefined,
+      address: includeAddress
+        ? {
+            street1: store['address_street1']!.value,
+            street2: store['address_street2']!.value,
+            city: store['address_city']!.value,
+            state: store['address_state']!.value,
+            postalCode: store['address_zip']!.value,
+            country: 'US'
+          }
+        : undefined,
       preferredPharmacies: store['preferredPharmacy']!.value
         ? [store['preferredPharmacy']!.value]
         : []
@@ -176,30 +158,32 @@ const Component = (props: PatientDialogProps) => {
             actions().resetStores();
             props.open = false;
           }}
-          title={props?.patientId ? 'Update Patient' : 'Create Patient'}
+          title={props?.patientId ? 'Edit patient' : 'New patient'}
           titleIconName={props?.patientId ? 'pencil-square' : 'person-plus'}
-          headerRight={
-            <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
+          footer={
+            <>
               <Show when={!props?.hideCreatePrescription}>
                 <Button
-                  size="sm"
-                  variant="secondary"
+                  class="w-full xs:w-fit"
+                  size="lg"
                   disabled={loading()}
                   loading={loading() && isCreatePrescription()}
                   onClick={() => submitForm(formStore(), actions(), selectedStore(), true)}
                 >
-                  Save and Create Prescription
+                  {props?.patientId ? 'Save' : 'Create'} and start prescription
                 </Button>
               </Show>
               <Button
-                size="sm"
+                class="w-full xs:w-fit"
+                size="lg"
+                variant={props?.hideCreatePrescription ? 'primary' : 'secondary'}
                 disabled={loading()}
                 loading={loading() && !isCreatePrescription()}
                 onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
               >
-                Save
+                {props?.patientId ? 'Save' : 'Create'}
               </Button>
-            </div>
+            </>
           }
           form={
             <>
@@ -217,8 +201,20 @@ const Component = (props: PatientDialogProps) => {
                   setFormStore(e.detail.form);
                   setActions(Object.assign({}, e.detail.actions, { resetStores: e.detail.reset }));
                   setSelectedStore(e.detail.selected);
+                  // Check if any address field has a value
+                  const form = e.detail.form;
+                  setHasAnyAddressField(
+                    !!(
+                      form['address_street1']?.value ||
+                      form['address_street2']?.value ||
+                      form['address_city']?.value ||
+                      form['address_state']?.value ||
+                      form['address_zip']?.value
+                    )
+                  );
                 }}
                 patient-id={props.patientId}
+                optional-patient-address={props.optionalPatientAddress}
               />
             </>
           }
@@ -232,7 +228,8 @@ customElement(
   {
     patientId: '',
     hideCreatePrescription: false,
-    open: false
+    open: false,
+    optionalPatientAddress: false
   },
   Component
 );

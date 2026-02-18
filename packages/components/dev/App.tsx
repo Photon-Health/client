@@ -4,13 +4,14 @@ import {
   DraftPrescriptionList,
   DraftPrescriptionsProvider,
   PharmacySelect,
+  PrescribeEventDispatchProvider,
   PrescribeProvider,
   RecentOrders,
   triggerToast,
   useDraftPrescriptions
 } from '../src';
 import PatientInfo from '../src/systems/PatientInfo';
-import PharmacySearch from '../src/systems/PharmacySearch';
+import PickupPharmacySearch from '../src/systems/PharmacySearch';
 import DoseCalculator from '../src/systems/DoseCalculator';
 import Button from '../src/particles/Button';
 import Icon from '../src/particles/Icon';
@@ -44,6 +45,9 @@ const App = () => {
           return person.name.toLowerCase().includes(query().toLowerCase());
         });
   });
+  const [selectedPerson, setSelectedPerson] = createSignal<
+    { id: string; name: string } | undefined
+  >();
 
   createEffect(() => {
     setTimeout(() => {
@@ -78,42 +82,45 @@ const App = () => {
             enableRefillButton={true}
           />
         </div>
-        <DraftPrescriptionsProvider>
+        <PrescribeEventDispatchProvider>
           <RecentOrders patientId={patientId}>
-            <PrescribeProvider
+            <DraftPrescriptionsProvider
+              patientId={patientId}
               templateIdsPrefill={[]}
               templateOverrides={{}}
               prescriptionIdsPrefill={prescriptionIds()}
-              patientId={patientId}
               enableCombineAndDuplicate={true}
-              enableCoverageCheck={true}
             >
-              <div class="mb-10">
-                <h2>Patient Info</h2>
-                <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
-              </div>
+              <PrescribeProvider patientId={patientId} enableCoverageCheck={true}>
+                <div class="mb-10">
+                  <h2>Patient Info</h2>
+                  <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
+                </div>
 
-              <div class="mb-10">
-                <h2>Draft Prescriptions</h2>
-              </div>
-              <DraftPrescriptionList
-                handleDelete={(id) => setPrescriptionIds(prescriptionIds().filter((p) => p !== id))}
-                handleEdit={(rx) =>
-                  setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))
-                }
-                handleSwapToOtherPrescription={(_) => _}
-                screeningAlerts={[]}
-                routingConstraints={[]}
-              />
-            </PrescribeProvider>
+                <div class="mb-10">
+                  <h2>Draft Prescriptions</h2>
+                </div>
+                <DraftPrescriptionList
+                  handleDelete={(id) =>
+                    setPrescriptionIds(prescriptionIds().filter((p) => p !== id))
+                  }
+                  handleEdit={(rx) =>
+                    setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))
+                  }
+                  handleSwapToOtherPrescription={(_) => _}
+                  screeningAlerts={[]}
+                  routingConstraints={[]}
+                />
+              </PrescribeProvider>
+            </DraftPrescriptionsProvider>
           </RecentOrders>
-        </DraftPrescriptionsProvider>
+        </PrescribeEventDispatchProvider>
 
         <div class="mb-10">
           <div>
             <h2>ComboBox</h2>
 
-            <ComboBox>
+            <ComboBox value={selectedPerson()} setSelected={setSelectedPerson}>
               <ComboBox.Input
                 onInput={(e) => setQuery(e.currentTarget.value)}
                 displayValue={(person) => person.name}
@@ -134,11 +141,11 @@ const App = () => {
         <div class="mb-10">
           <div>
             <h2>Pharmacy Search</h2>
-            <PharmacySearch setPharmacy={setPharmacy} />
+            <PickupPharmacySearch setPharmacy={setPharmacy} />
             <h2>Pharmacy Search Initialized with Address</h2>
-            <PharmacySearch setPharmacy={setPharmacy} address="11221" />
+            <PickupPharmacySearch setPharmacy={setPharmacy} address="11221" />
             <h2>Pharmacy Search set with Address after 2 seconds</h2>
-            <PharmacySearch setPharmacy={setPharmacy} address={timedAddress()} />
+            <PickupPharmacySearch setPharmacy={setPharmacy} address={timedAddress()} />
           </div>
         </div>
 

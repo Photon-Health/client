@@ -5,6 +5,7 @@ import { MutableRefObject, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
 import { getOrgMailOrderPharms } from '@client/settings';
+import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 
 declare global {
   namespace JSX {
@@ -26,6 +27,7 @@ const orgSettingsQuery = graphql(/* GraphQL */ `
           enablePatientRouting
           enablePickupPharmacies
           enableDeliveryPharmacies
+          optionalPatientAddress
         }
       }
     }
@@ -35,6 +37,7 @@ const orgSettingsQuery = graphql(/* GraphQL */ `
 export const PrescriptionForm = () => {
   const ref: MutableRefObject<any> = useRef();
   const { user, clinicalClient } = usePhoton();
+  const { track } = useProviderAnalytics();
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
   const pharmacyId = params.get('pharmacyId') || '';
@@ -49,6 +52,7 @@ export const PrescriptionForm = () => {
   const enablePrescribeToOrder = orgSettings?.providerUx?.enablePrescribeToOrder ?? true;
   const enableTreatmentHistory = orgSettings?.providerUx?.enableTreatmentHistory ?? false;
   const enablePickupPharmacies = orgSettings?.providerUx?.enablePickupPharmacies ?? true;
+  const optionalPatientAddress = orgSettings?.providerUx?.optionalPatientAddress ?? false;
   const enableDeliveryPharmacies = orgSettings?.providerUx?.enableDeliveryPharmacies ?? false;
   const enablePatientRouting = orgSettings?.providerUx?.enablePatientRouting ?? true;
   const enableDuplicateRxWarnings = orgSettings?.providerUx?.enableDuplicateRxWarnings ?? true;
@@ -62,7 +66,15 @@ export const PrescriptionForm = () => {
 
   useEffect(() => {
     if (ref.current) {
+      track('prescription_form_opened', { patientId: patientId || undefined });
+
       ref.current.addEventListener('photon-prescriptions-created', (e: any) => {
+        track('prescription_form_created', {
+          patientId: e.detail.patientId,
+          prescriptionIds: e.detail.prescriptionIds,
+          createOrder: e.detail.createOrder
+        });
+
         if (!e.detail.createOrder) {
           onClose();
         }
@@ -117,13 +129,13 @@ export const PrescriptionForm = () => {
         datadogRum.addAction('photon-medication-search-open', { user });
       });
     }
-  }, [ref.current]);
+  }, [navigate, track, patientId, user, onClose]);
 
   useEffect(() => {
     if (patientId && ref.current) {
       ref.current.patientId = patientId;
     }
-  }, [ref.current, patientId]);
+  }, [patientId]);
 
   const enableCoverageCheck = useMemo(() => {
     if (user) {
@@ -146,8 +158,7 @@ export const PrescriptionForm = () => {
         top: 0,
         left: 0,
         backgroundColor: 'white',
-        width: '100%',
-        zIndex: 15
+        width: '100%'
       }}
     >
       {user?.org_id ? (
@@ -169,6 +180,7 @@ export const PrescriptionForm = () => {
           enable-combine-and-duplicate={enableDuplicateRxWarnings}
           enable-coverage-check={enableCoverageCheck}
           enable-new-medication-search={true}
+          optional-patient-address={optionalPatientAddress}
           mail-order-ids={mailOrderProviders?.join(',') ?? ''}
           toast-buffer={70}
           hide-templates={!enableRxTemplates}

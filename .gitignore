@@ -42,6 +42,7 @@ build-storybook.log
 
 .nx/cache/
 .nx/workspace-data/
+apps/app/src/gql
 __generated__
 
 vite.config.ts.timestamp-*

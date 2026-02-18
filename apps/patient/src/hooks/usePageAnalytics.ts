@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { patientAnalytics } from '../configs/analytics';
 import { ApiObject } from '@rudderstack/analytics-js';
@@ -13,21 +13,16 @@ export const usePageAnalytics = ({ pageName, properties }: UsePageAnalyticsProps
   const location = useLocation();
   const { order } = useOrderContext();
 
+  const onLoadProperties = useRef(properties);
+
   useEffect(() => {
     if (order?.id) {
       patientAnalytics.page(location.pathname, pageName, {
-        ...properties,
+        ...onLoadProperties.current,
         orderId: order.id,
         organizationId: order.organization.id,
         organizationName: order.organization.name
       });
     }
-  }, [
-    location.pathname,
-    pageName,
-    properties,
-    order?.id,
-    order?.organization.id,
-    order?.organization.name
-  ]);
+  }, [location.pathname, pageName, order?.id, order?.organization.id, order?.organization.name]);
 };

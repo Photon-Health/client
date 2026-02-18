@@ -64,7 +64,7 @@ export const AddTreatmentToCatalogForm = ({
                         isLoading={loading}
                         loadingText="Adding to catalog"
                       >
-                        Add To Catalog
+                        Add to catalog
                       </Button>
                     </HStack>
                   </ModalFooter>
@@ -78,7 +78,7 @@ export const AddTreatmentToCatalogForm = ({
                     loadingText="Adding to catalog"
                     mr="1"
                   >
-                    Add To Catalog
+                    Add to catalog
                   </Button>
                 )}
               </VStack>

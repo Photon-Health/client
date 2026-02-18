@@ -1,7 +1,7 @@
 //Solid
 import { debounce } from '@solid-primitives/scheduled';
 import { Dynamic } from 'solid-js/web';
-import { createMemo, For, JSXElement, onMount, Show } from 'solid-js';
+import { createEffect, createMemo, For, JSXElement, onCleanup, onMount, Show } from 'solid-js';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/dropdown/dropdown';
@@ -11,9 +11,6 @@ import '@shoelace-style/shoelace/dist/components/menu-item/menu-item';
 import '@shoelace-style/shoelace/dist/components/menu/menu';
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
-
 //Styles
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
@@ -21,10 +18,12 @@ import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
 
 //Types
-import { Treatment, PrescriptionTemplate, TreatmentOption } from '@photonhealth/sdk/dist/types';
+import { PrescriptionTemplate, Treatment, TreatmentOption } from '@photonhealth/sdk/dist/types';
 
 //Virtual List
 import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
+
+setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 interface DataItem<T> {
   data: T;
@@ -134,6 +133,26 @@ export const PhotonMedicationDropdownFullWidth = <
       }, 100);
     }
   });
+
+  createEffect(() => {
+    // Lock body scroll when dropdown fullscreen takeover is open (fixes iOS Safari background scroll issue)
+    if (props.open) {
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+
+      onCleanup(() => {
+        const scrollY = document.body.style.top;
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      });
+    }
+  });
   type GroupedItem<T extends Treatment | PrescriptionTemplate | TreatmentOption> =
     | GroupTitle
     | DataItem<T>;
@@ -167,8 +186,15 @@ export const PhotonMedicationDropdownFullWidth = <
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>
       <style>{styles}</style>
-      <div class="fixed top-0 left-0 w-full max-h-screen h-screen bg-white overflow-x-hidden z-2000">
-        <div class={`flex items-center pb-2 pl-5 pr-5 pt-3`}>
+      <div
+        class="dropdown-container fixed top-0 left-0 w-full bg-white overflow-hidden z-2000 flex flex-col"
+        onTouchMove={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+      >
+        <div
+          class={`flex items-center pb-2 pl-5 pr-5 pt-3 flex-shrink-0`}
+          style={{ 'touch-action': 'none' }}
+        >
           <div class="flex items-center" style={{ 'font-size': '26px' }}>
             <sl-icon-button
               name="x"
@@ -194,77 +220,84 @@ export const PhotonMedicationDropdownFullWidth = <
           {props.required ? <p class="pl-1 text-red-400">*</p> : null}
           {props.optional ? <p class="text-gray-400 text-xs pl-2 font-sans">Optional</p> : null}
         </div>
-        <sl-input
-          value={props.searchText}
-          ref={inputRef}
-          slot="trigger"
-          placeholder={props.placeholder}
-          clearable
-          autocomplete="off"
-          disabled={props.disabled ?? false}
-          size="medium"
-          style={{
-            'border-radius': '0px',
-            border: '0px'
-          }}
-          classList={{
-            'treatment-search': true,
-            invalid: props.invalid ?? false,
-            input: true,
-            disabled: props.disabled ?? false,
-            'mb-2': true,
-            'px-4': true
-          }}
-          required={props.required}
-          on:input={(e: any) => {
-            debounceSearch(e.target.value);
-          }}
-          on:sl-clear={() => {
-            inputRef.value = '';
-            debounceSearch('');
-            dispatchDeselect();
-          }}
+        <div
+          class="flex-shrink-0"
+          style={{ 'touch-action': 'none' }}
+          onTouchMove={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
         >
-          <p
-            slot="help-text"
-            class="text-red-400 pt-1 font-sans"
+          <sl-input
+            value={props.searchText}
+            ref={inputRef}
+            slot="trigger"
+            placeholder={props.placeholder}
+            clearable
+            autocomplete="off"
+            disabled={props.disabled ?? false}
+            size="medium"
+            style={{
+              'border-radius': '0px',
+              border: '0px'
+            }}
             classList={{
-              'h-[21px]': props.forceLabelSize
+              'treatment-search': true,
+              invalid: props.invalid ?? false,
+              input: true,
+              disabled: props.disabled ?? false,
+              'mb-2': true,
+              'px-4': true
+            }}
+            required={props.required}
+            on:input={(e: any) => {
+              debounceSearch(e.target.value);
+            }}
+            on:sl-clear={() => {
+              inputRef.value = '';
+              debounceSearch('');
+              dispatchDeselect();
             }}
           >
-            {showHelpText(props.invalid ?? false)}
-          </p>
-          <div
-            slot="suffix"
-            classList={{
-              flex: true,
-              hidden: !props.isLoading
-            }}
-          >
-            <sl-spinner slot="suffix" />
-          </div>
-          <Show when={props.clearable}>
+            <p
+              slot="help-text"
+              class="text-red-400 pt-1 font-sans"
+              classList={{
+                'h-[21px]': props.forceLabelSize
+              }}
+            >
+              {showHelpText(props.invalid ?? false)}
+            </p>
             <div
               slot="suffix"
               classList={{
                 flex: true,
-                hidden: props.isLoading || !props.selectedData
+                hidden: !props.isLoading
               }}
             >
-              <sl-icon
-                class="text-gray-400 hover:text-gray-600"
-                name={'x-circle-fill'}
-                on:click={(e: any) => {
-                  e.stopImmediatePropagation();
-                  inputRef.value = '';
-                  debounceSearch('');
-                  dispatchDeselect();
-                }}
-              />
+              <sl-spinner slot="suffix" />
             </div>
-          </Show>
-        </sl-input>
-        <div class="w-full flex-1" ref={listRef}>
+            <Show when={props.clearable}>
+              <div
+                slot="suffix"
+                classList={{
+                  flex: true,
+                  hidden: props.isLoading || !props.selectedData
+                }}
+              >
+                <sl-icon
+                  class="text-gray-400 hover:text-gray-600"
+                  name={'x-circle-fill'}
+                  on:click={(e: any) => {
+                    e.stopImmediatePropagation();
+                    inputRef.value = '';
+                    debounceSearch('');
+                    dispatchDeselect();
+                  }}
+                />
+              </div>
+            </Show>
+          </sl-input>
+        </div>
+        <div class="w-full flex-1 overflow-y-auto .dropdown-container-list-items" ref={listRef}>
           <For
             each={rowVirtualizer().getVirtualItems()}
             fallback={<EmptyEl isLoading={props.isLoading} />}
@@ -297,10 +330,6 @@ export const PhotonMedicationDropdownFullWidth = <
                           inputRef.value = '';
                           debounceSearch('');
                           dispatchSelect((datum as DataItem<T>).data);
-
-                          if (props.onClose) {
-                            props.onClose();
-                          }
                         }
                       }
                     };

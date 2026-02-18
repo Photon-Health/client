@@ -5,25 +5,23 @@ import { Helmet } from 'react-helmet';
 import { FiNavigation, FiPhoneCall, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { triggerDemoNotification } from '../api';
-import { Coupons, DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
+import { PharmacyInfo, PoweredBy } from '../components';
 import { Card } from '../components/Card';
 import { HolidayAlert } from '../components/HolidayAlert';
 import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';
 import { OrderSummary } from '../components/order-summary/OrderSummary';
 import { OrderStatusHeader } from '../components/status/Header';
 import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
-import {
-  getFulfillmentType,
-  isDelivery,
-  isRerouteablePharmacy,
-  preparePharmacy
-} from '../utils/general';
+import { getFulfillmentType, isDelivery, preparePharmacy, wait } from '../utils/general';
 import { InsuranceAlert } from '../components/InsuranceAlert';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
+import { computeNumRefillsForPrescription } from '../utils/presenters';
+import { CouponCardList } from '../components/coupons';
+import { Pharmacy } from '../utils/models';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -34,8 +32,6 @@ export const Status = () => {
   const token = searchParams.get('token') ?? undefined;
   const type = searchParams.get('type') ?? undefined;
   const phone = searchParams.get('phone') ?? undefined;
-
-  const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
 
   const { fulfillment, pharmacy, readyBy, readyByTime } = order;
 
@@ -48,7 +44,7 @@ export const Status = () => {
     const url = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
     window.open(url);
 
-    patientAnalytics.track('Get Directions', {
+    patientAnalytics.track('Get Directions', order, {
       orderId: order?.id,
       pharmacyId: pharmacy?.id,
       pharmacyName: pharmacy?.name,
@@ -61,7 +57,7 @@ export const Status = () => {
     if (!pharmacy?.phone) return;
     window.location.href = `tel:${pharmacy.phone}`;
 
-    patientAnalytics.track('Call Pharmacy', {
+    patientAnalytics.track('Call Pharmacy', order, {
       orderId: order?.id,
       pharmacyId: pharmacy?.id,
       pharmacyName: pharmacy?.name,
@@ -72,52 +68,46 @@ export const Status = () => {
 
   usePageAnalytics({ pageName: 'Order Status' });
 
+  const handleDemoStatusPage = async (demoUserPhone: string, selectedDemoPharmacy: Pharmacy) => {
+    const isMailOrder = !!order.pharmacy?.fulfillmentTypes?.includes('MAIL_ORDER');
+
+    setOrder({
+      ...order,
+      fulfillment: {
+        state: isMailOrder ? 'SENT' : 'READY',
+        type: isMailOrder ? 'MAIL_ORDER' : 'PICK_UP'
+      }
+    });
+
+    if (!isMailOrder) {
+      await wait(1000);
+      await triggerDemoNotification(
+        demoUserPhone,
+        'photon:order_fulfillment:received',
+        selectedDemoPharmacy.name,
+        pharmacyFormattedAddress
+      );
+      await wait(1000);
+
+      await triggerDemoNotification(
+        demoUserPhone,
+        'photon:order_fulfillment:ready',
+        selectedDemoPharmacy.name,
+        pharmacyFormattedAddress
+      );
+    }
+  };
+
   useEffect(() => {
     if (!phone || !pharmacy || !order) {
       return;
     }
-    if (isDemo && !order.fulfillment) {
-      setTimeout(async () => {
-        // Send order received sms to demo participant
-        await triggerDemoNotification(
-          phone,
-          'photon:order_fulfillment:received',
-          pharmacy.name,
-          pharmacyFormattedAddress
-        );
-
-        setOrder({
-          ...order,
-          fulfillment: {
-            ...order.fulfillment,
-            state: 'RECEIVED',
-            type: 'PICK_UP'
-          }
-        });
-
-        setTimeout(async () => {
-          // Send ready sms
-          await triggerDemoNotification(
-            phone,
-            'photon:order_fulfillment:ready',
-            pharmacy.name,
-            pharmacyFormattedAddress
-          );
-
-          setOrder({
-            ...order,
-            fulfillment: {
-              ...order.fulfillment,
-              state: 'READY',
-              type: 'PICK_UP'
-            }
-          });
-
-          setTimeout(() => setShowDemoCtaModal(true), 1500);
-        }, 1000);
-      }, 1000);
+    const hasNotSetDemoFulfillment = isDemo && !order.fulfillment;
+    if (hasNotSetDemoFulfillment) {
+      handleDemoStatusPage(phone, pharmacy);
     }
   }, [
+    handleDemoStatusPage,
     isDemo,
     order,
     pharmacy,
@@ -139,8 +129,6 @@ export const Status = () => {
 
   const isDeliveryPharmacy = isDelivery({ pharmacy, fulfillmentType });
 
-  const isRerouteable = isRerouteablePharmacy({ pharmacy });
-
   if (!order) {
     console.error('No order found');
     return null;
@@ -157,8 +145,7 @@ export const Status = () => {
     });
     navigate(`/pharmacy?${query}`);
 
-    patientAnalytics.track('Reroute Order', {
-      orderId: order?.id,
+    patientAnalytics.track('Reroute Order', order, {
       pharmacyId: pharmacy?.id,
       pharmacyName: pharmacy?.name,
       isPharmacyOpen: displayPharmacy?.isOpen,
@@ -172,18 +159,17 @@ export const Status = () => {
     exceptions: f.exceptions.filter((e) => e.resolvedAt == null)
   }));
 
-  const prescriptions = fulfillments.map((f) => ({
-    rxName: f.prescription.treatment.name,
-    quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
-    daysSupply: f.prescription?.daysSupply ?? 0,
-    numRefills: f.prescription?.fillsAllowed ? f.prescription.fillsAllowed - 1 : 0,
-    expiresAt: f.prescription?.expirationDate ?? new Date()
+  const prescriptions = fulfillments.map((fulfillment) => ({
+    rxName: fulfillment.prescription.treatment.name,
+    quantity: `${fulfillment.prescription?.dispenseQuantity} ${fulfillment.prescription?.dispenseUnit}`,
+    daysSupply: fulfillment.prescription?.daysSupply ?? 0,
+    numRefills: computeNumRefillsForPrescription(order.fills, fulfillment.prescription?.id),
+    expiresAt: fulfillment.prescription?.expirationDate ?? new Date()
   }));
 
   const primaryButtonStyle = {
     variant: 'solid',
-    bg: 'blue.600',
-    _hover: { bg: 'blue.700' },
+    colorScheme: 'blue',
     color: 'white'
   };
 
@@ -249,7 +235,6 @@ export const Status = () => {
 
   return (
     <VStack flex={1}>
-      <DemoCtaModal isOpen={showDemoCtaModal} onClose={() => setShowDemoCtaModal(false)} />
       <OrderDetailsModal
         isOpen={orderDetailsIsOpen}
         onClose={() => setOrderDetailsIsOpen(false)}
@@ -267,6 +252,8 @@ export const Status = () => {
               <InsuranceAlert exception={unresolvedExceptions[0]?.exceptionType} />
               <OrderStatusHeader
                 status={orderState}
+                fulfillmentType={order.fulfillment?.type}
+                integrated={order.pharmacy?.integrated}
                 pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
                 patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
                 exception={exception}
@@ -277,6 +264,22 @@ export const Status = () => {
 
         <Container>
           <VStack spacing={7}>
+            <OrderSummary
+              fulfillments={fulfillments}
+              onViewDetails={() => {
+                setOrderDetailsIsOpen(true);
+                patientAnalytics.track('Status, View Order Details', order, {
+                  orderId: order?.id,
+                  pharmacyId: pharmacy?.id,
+                  pharmacyName: pharmacy?.name,
+                  fulfillmentType: fulfillmentType,
+                  prescriptionCount: fulfillments.length
+                });
+              }}
+            />
+
+            <CouponCardList />
+
             {displayPharmacy && (
               <VStack w="full" alignItems="stretch" spacing={4}>
                 <Heading as="h4" size="md">
@@ -302,32 +305,12 @@ export const Status = () => {
                         !isDeliveryPharmacy &&
                         exception &&
                         callPharmacyButton(true)}
-                      {/* right now mail order (aka delivery pharmacies) are considered to not be re-routable but this will eventually change*/}
-                      {(!isDeliveryPharmacy || isRerouteable) &&
-                        displayPharmacy &&
-                        canOrderReroute &&
-                        rerouteButton}
+                      {displayPharmacy && canOrderReroute && rerouteButton}
                     </VStack>
                   </VStack>
                 </Card>
               </VStack>
             )}
-
-            <OrderSummary
-              fulfillments={fulfillments}
-              onViewDetails={() => {
-                setOrderDetailsIsOpen(true);
-                patientAnalytics.track('Status, View Order Details', {
-                  orderId: order?.id,
-                  pharmacyId: pharmacy?.id,
-                  pharmacyName: pharmacy?.name,
-                  fulfillmentType: fulfillmentType,
-                  prescriptionCount: fulfillments.length
-                });
-              }}
-            />
-
-            <Coupons />
 
             <VStack w="full" alignItems="stretch" spacing={4}>
               <Heading as="h4" size="md">
@@ -340,12 +323,7 @@ export const Status = () => {
                   color="blue.500"
                   onClick={() => {
                     setFaqModalIsOpen(true);
-                    patientAnalytics.track('Status, Open FAQ Modal', {
-                      orderId: order?.id,
-                      pharmacyId: pharmacy?.id,
-                      pharmacyName: pharmacy?.name,
-                      fulfillmentType: fulfillmentType
-                    });
+                    patientAnalytics.track('Clicked Pharmacy Issue Button', order);
                   }}
                 >
                   I have a pharmacy issue

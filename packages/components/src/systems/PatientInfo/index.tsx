@@ -6,6 +6,8 @@ import { usePhotonClient } from '../SDKProvider';
 import Button from '../../particles/Button';
 import Text from '../../particles/Text';
 import Card from '../../particles/Card';
+import formatDate from '../../utils/formatDate';
+import Icon from '../../particles/Icon';
 
 const GET_PATIENT = gql`
   query GetPatient($id: ID!) {
@@ -20,6 +22,7 @@ const GET_PATIENT = gql`
       gender
       dateOfBirth
       address {
+        id
         street1
         street2
         city
@@ -49,6 +52,7 @@ const InfoRow = (props: InfoRowProps) => {
 };
 
 export type Address = {
+  id?: string;
   city: string;
   postalCode: string;
   state: string;
@@ -66,16 +70,10 @@ type PatientInfoProps = {
   address?: Address;
 };
 
-// Takes a date string in the format 'YYYY-MM-DD'
-// and returns it in the format 'MM-DD-YYYY'.
-const formatDate = (dateString: string) => {
-  const [year, month, day] = dateString.split('-');
-  return `${month}-${day}-${year}`;
-};
-
 export default function PatientInfo(props: PatientInfoProps) {
   const client = usePhotonClient();
   const [patient, setPatient] = createSignal<Patient | undefined>(undefined);
+  const [isExpanded, setIsExpanded] = createSignal(false);
 
   const fetchPatient = async () => {
     const { data } = await client!.apollo.query({
@@ -111,15 +109,30 @@ export default function PatientInfo(props: PatientInfoProps) {
         <Text color="gray">Patient Info</Text>
         <Show when={props?.editPatient}>
           <Button variant="secondary" size="sm" onClick={props?.editPatient}>
-            Edit Patient
+            Edit patient
           </Button>
         </Show>
       </div>
-      <div class="pt-4" data-dd-privacy="mask">
-        <Text size="lg" bold loading={!patient()} sampleLoadingText="Sally Patient">
-          {patient()?.name.full || 'N/A'}
-        </Text>
-        <div class="pt-4 sm:grid sm:grid-cols-2 sm:gap-2">
+      <div class="pt-2" data-dd-privacy="mask">
+        <div>
+          <Text size="lg" bold loading={!patient()} sampleLoadingText="Sally Patient">
+            {patient()?.name.full || 'N/A'}
+          </Text>
+          <button
+            type="button"
+            class="sm:hidden flex items-center gap-1 text-gray-400 hover:text-gray-500 mt-3"
+            onClick={() => setIsExpanded(!isExpanded())}
+            aria-expanded={isExpanded() ? 'true' : 'false'}
+          >
+            <span class="text-xs">{isExpanded() ? 'Show Less' : 'Show More'}</span>
+            <Icon name={isExpanded() ? 'chevronUp' : 'chevronDown'} size="sm" />
+          </button>
+        </div>
+        <div
+          class={`pt-4 sm:grid sm:grid-cols-2 sm:gap-2 ${
+            isExpanded() ? 'block' : 'hidden sm:grid'
+          }`}
+        >
           <table class="table-auto">
             <tbody>
               <InfoRow label="Email">

@@ -9,28 +9,42 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "npx graphql-codegen"
-      }
-    },
-    "codegen:watch": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/patient",
-        "command": "npx graphql-codegen --watch"
+        "command": "env-cmd -f .env.boson npx graphql-codegen"
       }
     },
     "codegen:tau": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "GQL_SCHEMA_URL='http://patient-api.tau.health:8080' npx graphql-codegen"
+        "command": "env-cmd -f .env.tau npx graphql-codegen"
       }
     },
-    "codegen:tau:watch": {
+    "codegen:neutron": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "GQL_SCHEMA_URL='http://patient-api.tau.health:8080' npx graphql-codegen --watch"
+        "command": "env-cmd -f .env.neutron npx graphql-codegen"
+      }
+    },
+    "codegen:photon": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "env-cmd -f .env.photon npx graphql-codegen"
+      }
+    },
+    "codegen:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "env-cmd -f .env.boson npx graphql-codegen --watch"
+      }
+    },
+    "codegen:watch:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "env-cmd -f .env.tau npx graphql-codegen --watch"
       }
     },
     "start": {
@@ -46,6 +60,28 @@
       "options": {
         "cwd": "apps/patient",
         "command": "env-cmd -f .env.tau react-app-rewired start"
+      },
+      "dependsOn": ["^build", "codegen:tau"]
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "commands": [
+          "env-cmd -f .env.boson react-app-rewired start",
+          "nx watch --projects=patient --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=patient"
+        ]
+      },
+      "dependsOn": ["^build", "codegen"]
+    },
+    "dev:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "commands": [
+          "env-cmd -f .env.tau react-app-rewired start",
+          "nx watch --projects=patient --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=patient"
+        ]
       },
       "dependsOn": ["^build", "codegen:tau"]
     },
@@ -65,7 +101,7 @@
         "command": "env-cmd -f .env.neutron react-app-rewired build",
         "outputs": "dist/apps/patient"
       },
-      "dependsOn": ["^build", "codegen"]
+      "dependsOn": ["^build", "codegen:neutron"]
     },
     "build:photon": {
       "executor": "nx:run-commands",
@@ -74,7 +110,7 @@
         "command": "env-cmd -f .env.photon react-app-rewired build",
         "outputs": "dist/apps/patient"
       },
-      "dependsOn": ["^build", "codegen"]
+      "dependsOn": ["^build", "codegen:photon"]
     },
     "test": {
       "executor": "nx:run-commands",
@@ -102,24 +138,38 @@
       "options": {
         "cwd": "apps/patient",
         "command": "npx eslint . --ext .tsx,.ts --quiet"
-      },
-      "dependsOn": ["codegen"]
+      }
     },
     "lint:fix": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
         "command": "npx eslint . --ext .tsx,.ts --fix && npx prettier --write src/**/*.{ts,tsx}"
-      },
-      "dependsOn": ["codegen"]
+      }
     },
-    "tsc": {
+    "tsc:boson": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
         "command": "npx tsc --noEmit"
       },
       "dependsOn": ["codegen"]
+    },
+    "tsc:neutron": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "npx tsc --noEmit"
+      },
+      "dependsOn": ["codegen:neutron"]
+    },
+    "tsc:photon": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "npx tsc --noEmit"
+      },
+      "dependsOn": ["codegen:photon"]
     }
   }
 }

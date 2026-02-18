@@ -22,6 +22,7 @@ export type Scalars = {
 
 export type Address = {
   __typename?: 'Address';
+  id?: Maybe<Scalars['ID']>;
   city: Scalars['String'];
   country: Scalars['String'];
   name?: Maybe<Name>;
@@ -166,7 +167,8 @@ export type LatLongSearch = {
 export type MedHistoryInput = {
   active: Scalars['Boolean'];
   comment?: InputMaybe<Scalars['String']>;
-  medicationId: Scalars['ID'];
+  medicationId?: InputMaybe<Scalars['ID']>;
+  medicalEquipmentId?: InputMaybe<Scalars['ID']>;
 };
 
 export type MedicalEquipment = Treatment & {
@@ -254,11 +256,13 @@ export type MutationAddToCatalogArgs = {
 };
 
 export type MutationCreateOrderArgs = {
-  address: AddressInput;
+  address?: InputMaybe<AddressInput>;
+  addressId?: InputMaybe<Scalars['ID']>;
   externalId?: InputMaybe<Scalars['ID']>;
   fills: Array<FillInput>;
   patientId: Scalars['ID'];
   pharmacyId?: InputMaybe<Scalars['ID']>;
+  groupId?: InputMaybe<Scalars['ID']>;
 };
 
 export type MutationCreatePatientArgs = {
@@ -281,7 +285,7 @@ export type MutationCreatePrescriptionArgs = {
   dispenseAsWritten?: InputMaybe<Scalars['Boolean']>;
   dispenseQuantity: Scalars['Float'];
   dispenseUnit: Scalars['String'];
-  effectiveDate?: InputMaybe<Scalars['AWSDate']>;
+  doNotFillBeforeDate?: InputMaybe<Scalars['AWSDate']>;
   externalId?: InputMaybe<Scalars['ID']>;
   instructions: Scalars['String'];
   notes?: InputMaybe<Scalars['String']>;
@@ -374,7 +378,7 @@ export type MutationUpdatePatientArgs = {
 };
 
 export type MutationUpdateProfileArgs = {
-  input: ProfileInput;
+  input: ProviderProfileInput;
 };
 
 export type MutationUpdateWebhookConfigArgs = {
@@ -584,6 +588,7 @@ export type Prescription = {
   dispenseQuantity: Scalars['Float'];
   dispenseUnit: Scalars['String'];
   effectiveDate: Scalars['AWSDate'];
+  doNotFillBeforeDate?: Maybe<Scalars['AWSDate']>;
   expirationDate: Scalars['AWSDate'];
   externalId?: Maybe<Scalars['ID']>;
   fills: Array<Maybe<Fill>>;
@@ -607,30 +612,21 @@ export type PrescriptionFilter = {
 };
 
 export type PrescriptionInput = {
-  /** Number of days a single fill lasts */
-  daysSupply?: InputMaybe<Scalars['Int']>;
-  /** ICD10 codes for patient diagnosises */
-  diagnoses?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
-  /** True if substitutes are not allowed at the pharmacy */
-  dispenseAsWritten?: InputMaybe<Scalars['Boolean']>;
-  /** Amount of a `dispenseUnit` per fill */
-  dispenseQuantity: Scalars['Float'];
-  /** Unit to dispense treatment in */
-  dispenseUnit: Scalars['String'];
-  /** Date when the script is first valid */
-  effectiveDate?: InputMaybe<Scalars['AWSDate']>;
-  /** Reference ID for linking to external objects */
+  templateId?: InputMaybe<Scalars['ID']>;
   externalId?: InputMaybe<Scalars['ID']>;
-  /** Prescriber instructions for patient */
-  instructions: Scalars['String'];
-  /** Prescriber notes, available to pharmacist */
-  notes?: InputMaybe<Scalars['String']>;
-  /** ID of the patient that this prescription belongs to */
   patientId: Scalars['ID'];
-  /** Number of fills allowed before expiration of script */
-  fillsAllowed: Scalars['Int'];
-  /** ID of the treatment being prescribed */
-  treatmentId: Scalars['ID'];
+  treatmentId?: InputMaybe<Scalars['ID']>;
+  dispenseAsWritten?: InputMaybe<Scalars['Boolean']>;
+  dispenseQuantity?: InputMaybe<Scalars['Float']>;
+  dispenseUnit?: InputMaybe<Scalars['String']>;
+  refillsAllowed?: InputMaybe<Scalars['Int']>;
+  fillsAllowed?: InputMaybe<Scalars['Int']>;
+  daysSupply?: InputMaybe<Scalars['Int']>;
+  instructions?: InputMaybe<Scalars['String']>;
+  notes?: InputMaybe<Scalars['String']>;
+  effectiveDate?: InputMaybe<Scalars['AWSDate']>;
+  doNotFillBeforeDate?: InputMaybe<Scalars['AWSDate']>;
+  diagnoses?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
 };
 
 export enum PrescriptionState {
@@ -663,7 +659,7 @@ export type ProductFilter = {
   type?: InputMaybe<MedicationType>;
 };
 
-export type ProfileInput = {
+export type ProviderProfileInput = {
   address?: InputMaybe<AddressInput>;
   fax?: InputMaybe<Scalars['AWSPhone']>;
   name?: InputMaybe<NameInput>;

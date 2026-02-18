@@ -1,25 +1,46 @@
-import { Button, triggerToast } from '@photonhealth/components';
+import { Button, triggerToast, usePhoton } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { format } from 'date-fns';
+import { types } from '@photonhealth/sdk';
 import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
-import { createSignal, onMount } from 'solid-js';
-import { usePhoton } from '@photonhealth/components';
+import { createMemo, createSignal, onMount } from 'solid-js';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import { PatientStore } from '../stores/patient';
 
-const shouldWarn = (form: any) =>
-  form()['notes']?.value.length > 0 ||
-  form()['instructions']?.value.length > 0 ||
-  form()['treatment']?.value ||
-  form()['patient']?.value ||
-  form()['dispenseAsWritten']?.value != false ||
-  form()['dispenseQuantity']?.value != 1 ||
-  form()['dispenseUnit']?.value != 'Each' ||
-  form()['daysSupply']?.value != 30 ||
-  form()['refillsInput']?.value != 0 ||
-  form()['addToTemplates']?.value != false ||
-  form()['effectiveDate']?.value != format(new Date(), 'yyyy-MM-dd').toString();
+const shouldWarn = (form: any) => {
+  return (
+    (form()['addToTemplates'] && form()['addToTemplates'].value != false) ||
+    form()['daysSupply']?.value ||
+    (form()['dispenseAsWritten'] && form()['dispenseAsWritten']?.value != false) ||
+    form()['dispenseQuantity']?.value ||
+    form()['dispenseUnit']?.value ||
+    form()['doNotFillBeforeDate']?.value ||
+    form()['instructions']?.value ||
+    form()['notes']?.value ||
+    form()['refillsInput']?.value ||
+    form()['treatment']?.value
+  );
+};
+
+const hasUsableAddress = (address?: { id?: string }) => {
+  return Boolean(address?.id);
+};
+
+const fulfillmentNeedsAddress = (fulfillmentType?: string) => {
+  return (
+    fulfillmentType === types.FulfillmentType.PickUp ||
+    fulfillmentType === types.FulfillmentType.MailOrder
+  );
+};
+
+const shouldBlockOrderWithoutAddress = (
+  fulfillmentType?: string,
+  address?: {
+    id?: string;
+  }
+) => {
+  return fulfillmentNeedsAddress(fulfillmentType) && !hasUsableAddress(address);
+};
 
 const Component = (props: {
   enableMedHistory: boolean;
@@ -42,6 +63,7 @@ const Component = (props: {
   enableOrder?: boolean;
   toastBuffer?: number;
   externalOrderId?: string;
+  optionalPatientAddress?: boolean;
 }) => {
   let ref: any;
   const client = usePhoton();
@@ -53,7 +75,8 @@ const Component = (props: {
   const [continueSaveOnly, setContinueSaveOnly] = createSignal<boolean>(false);
   const [triggerSubmit, setTriggerSubmit] = createSignal<boolean>(false);
   const { actions: patientActions } = PatientStore;
-  const [hideOrderButton, setHideOrderButton] = createSignal<boolean>(true);
+  const [attestationAgreed, setAttestationAgreed] = createSignal<boolean>(false);
+  const [draftPrescriptionCount, setDraftPrescriptionCount] = createSignal<number>(0);
 
   onMount(async () => {
     const token = await client!.getSDK().authentication.getAccessToken();
@@ -91,9 +114,25 @@ const Component = (props: {
     ref?.dispatchEvent(event);
   };
 
+  const attemptCreateOrder = () => {
+    const fulfillmentType = form()?.fulfillmentType?.value;
+    const address = form()?.address?.value ?? form()?.patient?.value?.address;
+    if (shouldBlockOrderWithoutAddress(fulfillmentType, address)) {
+      setTriggerSubmit(false);
+      return triggerToast({
+        status: 'error',
+        header: 'Address required',
+        body: 'Please add a patient address to place a local pickup or mail order.'
+      });
+    }
+
+    setIsCreateOrder(true);
+    setTriggerSubmit(true);
+  };
+
   const handleUnsavedConfirm = () => {
     setContinueSubmitOpen(false);
-    setTriggerSubmit(true);
+    attemptCreateOrder();
   };
   const handleUnsavedCancel = () => setContinueSubmitOpen(false);
 
@@ -102,7 +141,7 @@ const Component = (props: {
     if (!canSubmit()) {
       return triggerToast({
         status: 'info',
-        body: 'You need to add prescription(s) to this order before you can send it.'
+        body: 'You need to add prescription(s) before sending.'
       });
     }
 
@@ -120,8 +159,7 @@ const Component = (props: {
     }
 
     // else if all good, create the order
-    setIsCreateOrder(true);
-    setTriggerSubmit(true);
+    attemptCreateOrder();
   };
 
   const handleCreatePrescriptions = () => {
@@ -129,7 +167,7 @@ const Component = (props: {
     if (!canSubmit()) {
       return triggerToast({
         status: 'info',
-        body: 'You need to add prescription(s) to this order before you can send it.'
+        body: 'You need to add prescription(s) before sending.'
       });
     }
 
@@ -144,6 +182,8 @@ const Component = (props: {
     // create the prescriptions
     setContinueSaveOnly(true);
   };
+
+  const hideOrderButton = createMemo(() => !attestationAgreed() || draftPrescriptionCount() < 1);
 
   return (
     <div ref={ref}>
@@ -168,11 +208,10 @@ const Component = (props: {
         label="Save prescriptions without an order?"
         open={continueSaveOnly()}
         confirm-text="Save and create order"
-        cancel-text="Yes, Save Only"
+        cancel-text="Yes, save only"
         on:photon-dialog-confirmed={() => {
           setContinueSaveOnly(false);
-          setIsCreateOrder(true);
-          setTriggerSubmit(true);
+          attemptCreateOrder();
         }}
         on:photon-dialog-canceled={() => {
           setContinueSaveOnly(false);
@@ -197,31 +236,38 @@ const Component = (props: {
           patientActions.clearSelectedPatient();
         }}
         checkShouldWarn={() => shouldWarn(form)}
-        title="New Prescriptions"
+        title="New prescriptions"
         titleIconName="prescription"
-        headerRight={
+        footer={
           hideOrderButton() ? null : props.enableOrder ? (
-            <Button size="md" loading={triggerSubmit()} onClick={handleCreateOrder}>
-              Send Order
+            <Button
+              class="w-full xs:w-fit"
+              size="lg"
+              loading={triggerSubmit()}
+              onClick={handleCreateOrder}
+            >
+              Send
             </Button>
           ) : (
-            <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
+            <>
               <Button
-                size="md"
+                class="w-full xs:w-fit"
+                size="lg"
+                loading={triggerSubmit() && isCreateOrder()}
+                onClick={handleCreateOrder}
+              >
+                Save and create order
+              </Button>
+              <Button
+                class="w-full xs:w-fit"
+                size="lg"
                 variant="secondary"
                 loading={triggerSubmit() && !isCreateOrder()}
                 onClick={handleCreatePrescriptions}
               >
                 Save prescriptions
               </Button>
-              <Button
-                size="md"
-                loading={triggerSubmit() && isCreateOrder()}
-                onClick={handleCreateOrder}
-              >
-                Save and create order
-              </Button>
-            </div>
+            </>
           )
         }
         form={
@@ -246,6 +292,7 @@ const Component = (props: {
               enable-combine-and-duplicate={props.enableCombineAndDuplicate}
               enable-delivery-pharmacies={props.enableDeliveryPharmacies}
               enable-coverage-check={props.enableCoverageCheck}
+              optional-patient-address={props.optionalPatientAddress}
               pharmacy-id={props.pharmacyId}
               mail-order-ids={props.mailOrderIds}
               trigger-submit={triggerSubmit()}
@@ -254,6 +301,12 @@ const Component = (props: {
               on:photon-form-validate={(e: any) => {
                 setCanSubmit(e.detail.canSubmit);
                 setForm(e.detail.form);
+              }}
+              on:photon-draft-prescription-created={() => {
+                setDraftPrescriptionCount((prev) => prev + 1);
+              }}
+              on:photon-draft-prescription-deleted={() => {
+                setDraftPrescriptionCount((prev) => Math.max(0, prev - 1));
               }}
               on:photon-prescriptions-created={(e: any) => {
                 e.stopPropagation();
@@ -274,7 +327,7 @@ const Component = (props: {
                 setTriggerSubmit(false);
               }}
               on:photon-signature-attestation-agreed={() => {
-                setHideOrderButton(false);
+                setAttestationAgreed(true);
               }}
               on:photon-signature-attestation-canceled={() => {
                 dispatchClosed();
@@ -313,7 +366,8 @@ customElement(
     mailOrderIds: undefined,
     enableOrder: false,
     toastBuffer: 0,
-    externalOrderId: undefined
+    externalOrderId: undefined,
+    optionalPatientAddress: false
   },
   Component
 );

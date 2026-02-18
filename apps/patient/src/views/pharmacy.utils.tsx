@@ -1,19 +1,24 @@
-import { getOffers } from '../api/internal';
-import { AmazonOffer } from '../components';
-import { EnrichedPharmacy, Order } from '../utils/models';
-import { ExtendedFulfillmentType } from '../utils/models';
-import { Pharmacy as PharmacyType } from '../__generated__/graphql';
+import { getOffers } from '../api';
+import { Offer, PHARMACY_BRANDING } from '../components/pharmacy-card-list';
+import { EnrichedPharmacy, ExtendedFulfillmentType, Order } from '../utils/models';
+import { FulfillmentType, Pharmacy as PharmacyType } from '../__generated__/graphql';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
-function getNovocareOffers(order: Order): AmazonOffer[] {
+function getNovocareOffers(order: Order): Offer[] {
   const novocareExperimentSegment = determineNovocareExperimentSegment(order);
 
   if (novocareExperimentSegment) {
     return [
       {
         costType: 'NOVOCARE_OFFER',
-        deliveryEstimate: novocareExperimentSegment
+        deliveryEstimate: novocareExperimentSegment,
+        tags: ['Delivers in 3-5 days'],
+        pharmacy: {
+          id: process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string,
+          name: 'Novocare',
+          fulfillmentTypes: ['MAIL_ORDER']
+        }
       }
     ];
   } else {
@@ -22,7 +27,7 @@ function getNovocareOffers(order: Order): AmazonOffer[] {
 }
 
 // this function will return the offers available for the given order
-export async function fetchOffers(order: Order): Promise<AmazonOffer[] | undefined> {
+export async function fetchOffers(order: Order): Promise<Offer[] | undefined> {
   const offers = await getOffers(order.id);
 
   const amazonOffers = offers
@@ -31,7 +36,17 @@ export async function fetchOffers(order: Order): Promise<AmazonOffer[] | undefin
     .map((offer) => ({
       deliveryEstimate: offer.deliveryEstimate?.deliveryPromise,
       costType: offer.cost?.type,
-      costAmount: offer.cost?.amount
+      costAmount: offer.cost?.amount,
+      costAmountTitle: offer.cost?.amountTitle,
+      retailAmount: offer.cost?.retailAmount,
+      retailAmountTitle: offer.cost?.retailAmountTitle,
+      pharmacy: {
+        id: process.env.REACT_APP_AMAZON_PHARMACY_ID as string,
+        name: 'Amazon Pharmacy',
+        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[],
+        logo: PHARMACY_BRANDING['phr_demoAmazon'].logo
+      },
+      tags: ['In Stock']
     }));
 
   const novocareOffers = getNovocareOffers(order);

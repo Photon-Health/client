@@ -19,6 +19,20 @@ function generateChakraTheme({ accentColor = '#3182ce' }: { accentColor?: string
       800: color.clone().darken(30).toHexString(),
       900: color.clone().darken(40).toHexString()
     },
+    blue: {
+      25: '#EFF8FF',
+      50: '#D1E9FF',
+      100: '#B2DDFF',
+      200: '#84CAFF',
+      300: '#53B1FD',
+      400: '#2E90FA',
+      500: '#1570EF',
+      600: '#175CD3',
+      700: '#1849A9',
+      800: '#194185',
+      900: '#102A56',
+      950: '#102A56'
+    },
     link: linkColor
   };
 
@@ -45,6 +59,9 @@ function generateChakraTheme({ accentColor = '#3182ce' }: { accentColor?: string
     },
     components: {
       Button: {
+        baseStyle: {
+          borderRadius: 'lg'
+        },
         variants: {
           brand: () => ({
             color: textColor,

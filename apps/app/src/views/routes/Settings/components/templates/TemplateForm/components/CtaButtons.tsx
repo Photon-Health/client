@@ -28,7 +28,7 @@ export const CtaButtons = ({
       isLoading={loading || isSubmitting}
       loadingText="Saving template"
     >
-      {edit ? 'Save Changes' : 'Create Template'}
+      {edit ? 'Save changes' : 'Create template'}
     </Button>
   </HStack>
 );

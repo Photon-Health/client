@@ -24,7 +24,7 @@ import {
   SMARTSCRIPTS_PHARMACY_ID,
   STRIVE_PHARMACY_ID,
   TAILORMADE_PHARMACY_ID,
-  TRUEPILL_PHARMACY_ID,
+  FUZERX_PHARMACY_ID,
   TWENTYEIGHT_PARTNER_CARE_FIRST_PHARMACY_ID,
   TWENTYEIGHT_PARTNER_CATTLES_PHARMACY_ID,
   TWENTYEIGHT_PARTNER_COMPREHENSIVE_CARE_PHARMACY_ID,
@@ -69,7 +69,7 @@ const orgMailOrders: Record<string, Partial<MailOrderPharmacyConfigs>> = {
     provider: [
       CUREXA_PHARMACY_ID,
       CAREPOINT_PHARMACY_ID,
-      TRUEPILL_PHARMACY_ID,
+      FUZERX_PHARMACY_ID,
       HONEYBEE_PHARMACY_ID,
       GOGOMEDS_PHARMACY_ID,
       REDROCK_SPRINGVILLE_PHARMACY_ID,
@@ -96,7 +96,7 @@ const orgMailOrders: Record<string, Partial<MailOrderPharmacyConfigs>> = {
     ],
     patient: [AMAZON_PHARMACY_ID, COST_PLUS_PHARMACY_ID, WALMART_MAIL_ORDER_PHARMACY_ID]
   },
-  // NewCo (demo's)
+  // NewCo (i.e. Photon send-to-patient demo)
   org_YiUudCToTSrjOuow: {
     provider: [CAREPOINT_PHARMACY_ID],
     patient: [AMAZON_PHARMACY_ID]
@@ -151,14 +151,9 @@ const orgMailOrders: Record<string, Partial<MailOrderPharmacyConfigs>> = {
   },
   // Twentyeight Health
   org_tA6GiBBgGBZwnf4e: {
-    patient: [
-      AMAZON_PHARMACY_ID,
-      TRUEPILL_PHARMACY_ID,
-      CAREPOINT_PHARMACY_ID,
-      HONEYBEE_PHARMACY_ID
-    ],
+    patient: [AMAZON_PHARMACY_ID, FUZERX_PHARMACY_ID, CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID],
     provider: [
-      TRUEPILL_PHARMACY_ID,
+      FUZERX_PHARMACY_ID,
       CAREPOINT_PHARMACY_ID,
       HONEYBEE_PHARMACY_ID,
       TWENTYEIGHT_PARTNER_COMPREHENSIVE_CARE_PHARMACY_ID,
@@ -183,7 +178,7 @@ const orgMailOrders: Record<string, Partial<MailOrderPharmacyConfigs>> = {
   },
   // GoalMD
   org_4CKpLMduRVMHl2Ft: {
-    provider: [HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
+    provider: [HONEYBEE_PHARMACY_ID, FUZERX_PHARMACY_ID]
   },
   // Great Many
   org_3IVuVvEdKSStmAig: {
@@ -212,11 +207,11 @@ const orgMailOrders: Record<string, Partial<MailOrderPharmacyConfigs>> = {
   },
   // Miiskin integration testing account
   org_VWgnbn3MVynEjoND: {
-    provider: [CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
+    provider: [CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID, FUZERX_PHARMACY_ID]
   },
   // Miiskin Sandbox test sub-org
   org_HyrPueFq0JFqQIuf: {
-    provider: [CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
+    provider: [CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID, FUZERX_PHARMACY_ID]
   },
   // Fifty 410
   org_DFsDnAmXkPrtsrih: {

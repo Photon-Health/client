@@ -8,30 +8,75 @@ import {
   useNavigate,
   useSearchParams
 } from 'react-router-dom';
+import queryString from 'query-string';
 
-import { AUTH_HEADER_ERRORS, getOrder } from '../api/internal';
+import { AUTH_HEADER_ERRORS, getOrder } from '../api';
 import { Nav } from '../components';
 import { setAuthHeader } from '../configs/graphqlClient';
 import theme from '../configs/theme';
 import { demoOrder } from '../data/demoOrder';
-import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
+import { countFillsAndRemoveDuplicates, FillWithCount } from '../utils/general';
 import { Order } from '../utils/models';
 import { Pharmacy } from '../__generated__/graphql';
 import { FAQModal } from '../components/FAQModal';
 import { patientAnalytics } from '../configs/analytics';
+import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
+import { preloadImage } from '../utils/preloadImage';
+
+type FetchOrderOptions = {
+  triggerNavigationAfterFetch: boolean;
+};
 
 export interface OrderContextType {
   order: Order;
   flattenedFills: FillWithCount[];
   setOrder: (order: Order) => void;
+  // enablePrice is used to track whether the patient has enabled price on the pharmacy page
+  // but we need it set the pharmacy after the ready by page
+  enablePrice: boolean;
+  showPriceToggle: boolean;
+  setEnablePrice: (enablePrice: boolean) => void;
   logo: any;
   isDemo: boolean;
-  fetchOrder: (currentPharmacy?: Pharmacy) => void;
+  fetchOrder: (
+    currentPharmacy?: Pharmacy,
+    options?: FetchOrderOptions
+  ) => Promise<Order | undefined>;
   setFaqModalIsOpen: (isOpen: boolean) => void;
 }
 export const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
   useContext<OrderContextType>(OrderContext as Context<OrderContextType>);
+
+export enum PatientExperienceType {
+  CONTROLLED = 'CONTROLLED_SUBSTANCE',
+  UNCONTROLLED = 'UNCONTROLLED'
+}
+
+type TokenPrescriptionData = {
+  dispenseQuantity: number;
+  dispenseUnit: string;
+  externalId: string;
+  instructions: string;
+  notes: string;
+  refillsAllowed: number;
+  daysSupply?: number;
+  expiresAt?: string;
+  treatment: { id: string; name: string; schedule: string };
+};
+
+export type TokenPayload = {
+  organizationId: string;
+  context: PatientExperienceType;
+  metadata?: {
+    reason: PatientExperienceType;
+  };
+  prescriptions?: TokenPrescriptionData[];
+  pharmacyId: string;
+  iat: number;
+  exp: number;
+  sub: string; // the subject is the patient id
+};
 
 export const Main = () => {
   const [searchParams] = useSearchParams();
@@ -42,6 +87,9 @@ export const Main = () => {
   const location = useLocation();
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
+  // This is used to track whether the patient has enabled price on the pharmacy page
+  const [showPriceToggle, setShowPriceToggle] = useState<boolean>(false);
+  const [enablePrice, setEnablePrice] = useState<boolean>(!!isDemo);
 
   const [logo, setLogo] = useState<any>(undefined);
   const [loadingLogo, setLoadingLogo] = useState(true);
@@ -89,14 +137,6 @@ export const Main = () => {
             context: payload.context,
             metadata: payload.metadata
           });
-
-          patientAnalytics.track('Patient App Opened', {
-            orderId: payload.orderId,
-            patientId: payload.sub,
-            organizationId: payload.organizationId,
-            context: payload.context,
-            metadata: payload.metadata
-          });
         } catch (e) {
           console.error('Failed to parse JWT token', e);
         }
@@ -106,7 +146,23 @@ export const Main = () => {
   );
 
   useEffect(() => {
-    if (location.pathname !== '/canceled') {
+    // need to parse the token and see if this is a controlled substance link
+    let tokenData: TokenPayload | undefined;
+    try {
+      const base64TokenData = token?.split('.')?.[1];
+      tokenData = base64TokenData ? JSON.parse(atob(base64TokenData)) : undefined;
+    } catch (err) {
+      console.error('failed to parse token data', { err });
+    }
+
+    const isControlled =
+      tokenData?.context === PatientExperienceType.CONTROLLED ||
+      tokenData?.metadata?.reason === PatientExperienceType.CONTROLLED;
+
+    if (location.pathname === '/' && isControlled) {
+      // info lives outside of the main path, so none of these effect hooks will affect the ux
+      navigate(`/info?token=${token}`, { replace: true });
+    } else if (!['/canceled', '/info'].includes(location.pathname)) {
       if (!isDemo && (!orderId || !token)) {
         navigate('/no-match', { replace: true });
       }
@@ -119,10 +175,8 @@ export const Main = () => {
     }
   }, [token]);
 
-  const handleOrderResponse = useCallback(
+  const setOrderDataLocally = useCallback(
     (newOrder: Order, currentPharmacy?: Pharmacy) => {
-      console.log('handleOrderResponse', newOrder);
-
       // This is weird, but it's necessary to show the selected pharmacy
       // when the user goes from selection to the status page
       setOrder({
@@ -130,12 +184,23 @@ export const Main = () => {
         pharmacy: currentPharmacy || newOrder?.pharmacy || order?.pharmacy
       });
 
-      setFlattenedFills(countFillsAndRemoveDuplicates(newOrder.fills));
+      const newFlattenedFills = countFillsAndRemoveDuplicates(newOrder.fills);
+      setFlattenedFills(newFlattenedFills);
+
+      const showPriceToggle = shouldShowPriceToggle(newFlattenedFills, newOrder);
+      setShowPriceToggle(showPriceToggle);
+      setEnablePrice(showPriceToggle);
 
       datadogRum.setGlobalContextProperty('organizationId', newOrder.organization.id);
       datadogRum.setGlobalContextProperty('orderId', orderId);
       datadogRum.setUser({ patientId: newOrder.patient.id });
 
+      patientAnalytics.track('Patient App Opened', newOrder, {});
+    },
+    [orderId, order]
+  );
+  const navigateForOrder = useCallback(
+    (newOrder: Order) => {
       if (newOrder.state === 'CANCELED') {
         navigate('/canceled', { replace: true });
         return;
@@ -144,21 +209,30 @@ export const Main = () => {
       const hasPharmacy = newOrder.pharmacy?.id;
       const redirect = hasPharmacy ? '/status' : '/review';
 
-      navigate(`${redirect}?orderId=${newOrder.id}&token=${token}`, {
+      const query = queryString.stringify({ orderId: newOrder.id, token });
+      navigate(`${redirect}?${query}`, {
         replace: true
       });
     },
-    [navigate, orderId, token, order]
+    [navigate, token]
   );
 
   const fetchOrder = useCallback(
-    async (currentPharmacy?: Pharmacy) => {
+    async (
+      currentPharmacy?: Pharmacy,
+      options: FetchOrderOptions = { triggerNavigationAfterFetch: true }
+    ) => {
       if (isDemo) return demoOrder;
       try {
         const result = await getOrder(orderId!);
         if (result) {
-          handleOrderResponse(result, currentPharmacy);
+          setOrderDataLocally(result, currentPharmacy);
+
+          if (options.triggerNavigationAfterFetch) {
+            navigateForOrder(result);
+          }
         }
+        return result;
       } catch (e: any) {
         const error = e as any;
         console.log(error.response);
@@ -173,32 +247,26 @@ export const Main = () => {
         }
 
         // If an order was returned, use it for routing
-        handleOrderResponse(error.response.data.order);
+        setOrderDataLocally(error.response.data.order);
+        navigateForOrder(error.response.data.order);
       }
     },
-    [handleOrderResponse, isDemo, navigate, orderId]
+    [isDemo, orderId, setOrderDataLocally, navigateForOrder, navigate]
   );
 
   useEffect(() => {
     if (isDemo && (orderId || order?.id !== demoOrder.id || location.pathname === '/')) {
-      navigate(`/review?demo=true&phone=${phone}`, { replace: true });
+      const query = queryString.stringify({ demo: true, phone });
+      navigate(`/review?${query}`, { replace: true });
     }
   }, [isDemo, location.pathname, navigate, order, orderId, phone]);
 
   useEffect(() => {
-    if (!order) {
+    // it's valid to not have an orderId since we're notifying patients of controlled substances in athena
+    if (!order && orderId) {
       fetchOrder();
     }
   }, [order, orderId, fetchOrder, isDemo]);
-
-  const preloadImage = (url: string) => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = resolve;
-      img.onerror = reject;
-      img.src = url;
-    });
-  };
 
   const fetchLogo = useCallback(async (fileName: string) => {
     if (fileName === 'photon') {
@@ -225,9 +293,7 @@ export const Main = () => {
   // Set logo
   useEffect(() => {
     if (orgId) {
-      if (isDemo) {
-        fetchLogo('newco_logo.svg');
-      } else if (settings?.brandLogo) {
+      if (settings?.brandLogo) {
         fetchLogo(settings.brandLogo);
       } else {
         setLoadingLogo(false);
@@ -250,10 +316,15 @@ export const Main = () => {
     order,
     flattenedFills,
     setOrder,
+    showPriceToggle,
+    enablePrice,
+    setEnablePrice,
     logo,
     fetchOrder,
     setFaqModalIsOpen
   };
+
+  const isAutomatedOrder = order.organization.settings?.patientUx.enableAutomatedOps;
 
   return (
     <ChakraProvider theme={theme({ accentColor: settings?.brandColor })}>
@@ -261,7 +332,11 @@ export const Main = () => {
         <ScrollRestoration />
         <Nav />
         <Outlet />
-        <FAQModal isOpen={faqModalIsOpen} onClose={() => setFaqModalIsOpen(false)} />
+        <FAQModal
+          isOpen={faqModalIsOpen}
+          onClose={() => setFaqModalIsOpen(false)}
+          allowMessageSupport={!isAutomatedOrder}
+        />
       </OrderContext.Provider>
     </ChakraProvider>
   );

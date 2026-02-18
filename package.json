@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "app:local": "concurrently \"npx graphql-codegen --watch --config='apps/app/codegen.ts'\" \"npx nx run app:start\"",
-    "app:tau": "concurrently \"npx graphql-codegen --watch --config='apps/app/codegen.ts'\" \"npx nx run app:start:tau\"",
-    "patient:tau": "concurrently \"npx nx run patient:codegen:watch\" \"npx nx run patient:start:tau\"",
+    "app": "concurrently \"npx nx run app:codegen:watch\" \"npx nx run app:dev\"",
+    "app:tau": "concurrently \"npx nx run app:codegen:watch:tau\" \"npx nx run app:dev:tau\"",
     "patient": "concurrently \"npx nx run patient:codegen:watch\" \"npx nx run patient:start\"",
+    "patient:tau": "concurrently \"npx nx run patient:codegen:watch:tau\" \"npx nx run patient:start:tau\"",
     "lint": "npx nx run-many --target=lint",
     "lint:fix": "npx nx run-many --target=lint:fix",
     "prepare": "husky"
@@ -16,12 +16,16 @@
     "apps/*",
     "packages/*"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Photon-Health/client"
+  },
   "devDependencies": {
     "@babel/preset-react": "^7.14.5",
+    "@datadog/datadog-ci": "^4.4.0",
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/client-preset": "^4.1.0",
     "@graphql-codegen/typescript-graphql-request": "^6.2.0",
-    "@nx/cypress": "20.1.1",
     "@nx/eslint-plugin": "20.1.1",
     "@nx/jest": "20.1.1",
     "@nx/js": "20.1.1",
@@ -60,14 +64,12 @@
     "babel-jest": "29.7.0",
     "chromatic": "^6.17.4",
     "concurrently": "^7.6.0",
-    "cypress": "12.17.4",
     "env-cmd": "^10.1.0",
     "eslint": "^8.41.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-react-app": "^7.0.1",
-    "eslint-plugin-cypress": "2.15.2",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jsx-a11y": "6.10.1",
     "eslint-plugin-prettier": "^4.2.1",
@@ -103,7 +105,6 @@
     "@chakra-ui/react": "^2.8.2",
     "@chakra-ui/theme-tools": "^2.1.2",
     "@datadog/browser-rum": "^5.15.0",
-    "@datadog/datadog-ci": "^2.33.1",
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
     "@felte/solid": "^1.2.11",
@@ -125,7 +126,7 @@
     "git-revision-webpack-plugin": "^5.0.0",
     "graphiql": "^2.4.1",
     "graphql": ">=16.0.0 <16.7.0",
-    "graphql-request": "^5.2.0",
+    "graphql-request": "^6.1.0",
     "graphql-scalars": "^1.23.0",
     "graphql-tag": "^2.12.6",
     "jwt-decode": "^3.1.2",
@@ -174,5 +175,13 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.37.0"
+  },
+  "overrides": {
+    "@chakra-ui/react": {
+      "@zag-js/focus-visible": "^1.18.0"
+    },
+    "react-scripts": {
+      "form-data": "4.0.5"
+    }
   }
 }

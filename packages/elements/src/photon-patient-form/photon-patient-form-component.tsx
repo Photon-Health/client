@@ -1,25 +1,24 @@
 import { customElement } from 'solid-element';
-import { createEffect, onCleanup, onMount, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
-import { Spinner, PharmacySearch, Card } from '@photonhealth/components';
-import { usePhoton } from '@photonhealth/components';
+import { Card, Icon, PharmacySearch, Spinner, usePhoton } from '@photonhealth/components';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { email, empty, message, zipString, notFutureDate } from '../validators';
+import { email, empty, message, notFutureDate, zipString } from '../validators';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
-
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import { isZip } from '../utils';
-import { sexes } from '../photon-sex-input/photon-sex-input-component';
+import { sexes } from '../photon-sex-input';
 import { PhotonAuthorized } from '../photon-authorized';
+import { PharmacyOption } from '@photonhealth/components/dist/packages/components/src/systems/PharmacySearch/PharmacySearch';
+
+setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 const getPatientAddress = (pStore: any, store: any) => {
   const patientAddress = pStore.selectedPatient.data?.address;
@@ -38,9 +37,10 @@ const getPatientAddress = (pStore: any, store: any) => {
   return '';
 };
 
-const PatientForm = (props: { patientId: string }) => {
+const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean }) => {
   let ref: any;
   const client = usePhoton();
+  const [showOptionalFields, setShowOptionalFields] = createSignal(false);
   const { store: pStore, actions: pActions } = PatientStore;
   const { store, actions } = createFormStore({
     firstName: undefined,
@@ -71,7 +71,7 @@ const PatientForm = (props: { patientId: string }) => {
   });
   actions.registerValidator({
     key: 'sex',
-    validator: message(enums(sexes.map((s) => s.name)), 'Please enter Sex at Birth.')
+    validator: message(enums(sexes.map((s) => s.name.toUpperCase())), 'Please enter Sex at Birth.')
   });
   actions.registerValidator({
     key: 'phone',
@@ -81,9 +81,23 @@ const PatientForm = (props: { patientId: string }) => {
     key: 'email',
     validator: message(union([email(), empty()]), 'Please enter a valid email.')
   });
+
+  // Address validators - only run when address is required.
+  actions.registerValidator({
+    key: 'address_street1',
+    validator: message(size(string(), 1, Infinity), 'Please enter a valid Street 1.')
+  });
+  actions.registerValidator({
+    key: 'address_city',
+    validator: message(size(string(), 1, Infinity), 'Please enter a valid City.')
+  });
+  actions.registerValidator({
+    key: 'address_state',
+    validator: message(size(string(), 2, 2), 'Please enter a valid State.')
+  });
   actions.registerValidator({
     key: 'address_zip',
-    validator: message(union([zipString(), empty()]), 'Please enter a valid zip code...')
+    validator: message(zipString(), 'Please enter a valid zip code.')
   });
 
   onMount(() => {
@@ -102,6 +116,7 @@ const PatientForm = (props: { patientId: string }) => {
         form: form,
         actions: actions,
         selected: pStore,
+        optionalPatientAddress: props.optionalPatientAddress,
         reset: () => {
           actions.reset();
           pActions.reset();
@@ -165,6 +180,17 @@ const PatientForm = (props: { patientId: string }) => {
     }
   });
 
+  // Check if any address field has a value
+  const hasAnyAddressField = createMemo(() => {
+    return !!(
+      store['address_street1']?.value ||
+      store['address_street2']?.value ||
+      store['address_city']?.value ||
+      store['address_state']?.value ||
+      store['address_zip']?.value
+    );
+  });
+
   createEffect(() => {
     dispatchFormUpdated(store);
   });
@@ -173,6 +199,106 @@ const PatientForm = (props: { patientId: string }) => {
     pActions.clearSelectedPatient();
     actions.reset();
   });
+
+  const preferredPharmacy = createMemo(() => {
+    const pref = pStore.selectedPatient.data?.preferredPharmacies?.[0];
+    if (!pref) return;
+
+    const address = pref.address as PharmacyOption['address'];
+    const prefOption: PharmacyOption = {
+      ...pref,
+      address,
+      isPrevious: true,
+      isPreferred: true
+    };
+
+    return prefOption;
+  });
+
+  const AddressFields = () => (
+    <>
+      {/*Using !mt-8 because of tailwind issue in shadowDom elements */}
+      {/*when not using the !important modifier*/}
+      <p class="font-sans text-lg mt-4 md:!mt-8">
+        Address
+        <Show when={props.optionalPatientAddress && !hasAnyAddressField()}>
+          <span class="text-gray-500 text-sm font-normal"> (optional)</span>
+        </Show>
+      </p>
+      <photon-text-input
+        debounce-time="0"
+        invalid={store['address_street1']?.error}
+        help-text={store['address_street1']?.error}
+        label="Street 1"
+        required={!props.optionalPatientAddress || hasAnyAddressField()}
+        on:photon-input-changed={async (e: any) => {
+          actions.updateFormValue({
+            key: 'address_street1',
+            value: e.detail.input
+          });
+        }}
+        value={store['address_street1']?.value ?? pStore.selectedPatient.data?.address?.street1}
+      />
+      <photon-text-input
+        debounce-time="0"
+        invalid={store['address_street2']?.error}
+        help-text={store['address_street2']?.error}
+        label="Street 2"
+        on:photon-input-changed={async (e: any) => {
+          actions.updateFormValue({
+            key: 'address_street2',
+            value: e.detail.input
+          });
+        }}
+        value={store['address_street2']?.value ?? pStore.selectedPatient.data?.address?.street2}
+      />
+      <photon-text-input
+        debounce-time="0"
+        invalid={store['address_city']?.error}
+        help-text={store['address_city']?.error}
+        label="City"
+        required={!props.optionalPatientAddress || hasAnyAddressField()}
+        on:photon-input-changed={async (e: any) => {
+          actions.updateFormValue({
+            key: 'address_city',
+            value: e.detail.input
+          });
+        }}
+        value={store['address_city']?.value ?? pStore.selectedPatient.data?.address?.city}
+      />
+      <div class="flex gap-4">
+        <photon-state-input
+          class="flex-grow min-w-[40%]"
+          label="State"
+          required={!props.optionalPatientAddress || hasAnyAddressField()}
+          help-text={store['address_state']?.error}
+          invalid={store['address_state']?.error !== undefined}
+          on:photon-state-selected={(e: any) => {
+            actions.updateFormValue({
+              key: 'address_state',
+              value: e.detail.state
+            });
+          }}
+          selected={store['state']?.value ?? pStore.selectedPatient.data?.address?.state}
+        />
+        <photon-text-input
+          debounce-time="0"
+          class="flex-grow min-w-[40%]"
+          invalid={store['address_zip']?.error}
+          help-text={store['address_zip']?.error}
+          label="Zip code"
+          required={!props.optionalPatientAddress || hasAnyAddressField()}
+          on:photon-input-changed={async (e: any) => {
+            actions.updateFormValue({
+              key: 'address_zip',
+              value: e.detail.input
+            });
+          }}
+          value={store['address_zip']?.value ?? pStore.selectedPatient.data?.address?.postalCode}
+        />
+      </div>
+    </>
+  );
 
   return (
     <div class="w-full h-full relative" ref={ref}>
@@ -191,14 +317,14 @@ const PatientForm = (props: { patientId: string }) => {
           <div class="flex flex-col gap-8">
             <Card>
               <div>
-                <p class="font-sans text-lg flex-grow">Personal</p>
-                <div class="flex flex-col xs:flex-row xs:gap-4">
+                <p class="font-sans text-lg flex-grow">Patient info</p>
+                <div class="flex flex-col">
                   <photon-text-input
-                    class="flex-grow min-w-[40%]"
+                    class="w-full"
                     debounce-time="0"
                     invalid={store['firstName']?.error}
                     help-text={store['firstName']?.error}
-                    label="First Name"
+                    label="First name"
                     required="true"
                     on:photon-input-changed={async (e: any) => {
                       actions.updateFormValue({
@@ -209,11 +335,11 @@ const PatientForm = (props: { patientId: string }) => {
                     value={store['firstName']?.value ?? pStore.selectedPatient.data?.name.first}
                   />
                   <photon-text-input
-                    class="min-w-[48%]"
+                    class="w-full"
                     debounce-time="0"
                     invalid={store['lastName']?.error}
                     help-text={store['lastName']?.error}
-                    label="Last Name"
+                    label="Last name"
                     required="true"
                     on:photon-input-changed={async (e: any) => {
                       actions.updateFormValue({
@@ -223,14 +349,11 @@ const PatientForm = (props: { patientId: string }) => {
                     }}
                     value={store['lastName']?.value ?? pStore.selectedPatient.data?.name.last}
                   />
-                </div>
-                <div class="flex flex-col xs:flex-row items-center xs:gap-4">
                   <photon-datepicker
-                    no-initial-date="true"
-                    class="flex-grow w-full xs:min-w-[40%]"
+                    class="w-full"
                     invalid={store['dateOfBirth']?.error}
                     help-text={store['dateOfBirth']?.error}
-                    label="Date of Birth"
+                    label="Date of birth"
                     required="true"
                     on:photon-datepicker-selected={async (e: any) => {
                       actions.updateFormValue({
@@ -245,10 +368,10 @@ const PatientForm = (props: { patientId: string }) => {
                     }
                   />
                   <photon-phone-input
-                    class="w-full xs:min-w-[48%]"
+                    class="w-full"
                     invalid={store['phone']?.error}
                     help-text={store['phone']?.error}
-                    label="Mobile Number"
+                    label="Mobile number"
                     required="true"
                     on:photon-phone-changed={async (e: any) => {
                       actions.updateFormValue({
@@ -258,53 +381,67 @@ const PatientForm = (props: { patientId: string }) => {
                     }}
                     value={store['phone']?.value ?? pStore.selectedPatient.data?.phone}
                   />
+                  <photon-sex-input
+                    label="Sex at birth"
+                    required="true"
+                    help-text={store['sex']?.error}
+                    invalid={store['sex']?.error !== undefined}
+                    on:photon-sex-selected={(e: any) => {
+                      actions.updateFormValue({
+                        key: 'sex',
+                        value: e.detail.sex
+                      });
+                    }}
+                    on:photon-sex-deselected={() => {
+                      actions.updateFormValue({
+                        key: 'sex',
+                        value: undefined
+                      });
+                    }}
+                    selected={pStore.selectedPatient.data?.sex}
+                  />
                 </div>
-                <div class="flex flex-col xs:flex-row justify-between xs:gap-4">
-                  <div class="flex-grow w-full xs:min-w-[40%]">
-                    <photon-gender-input
-                      label="Gender"
-                      required="false"
-                      help-text={store['gender']?.error}
-                      invalid={store['gender']?.error !== undefined}
-                      on:photon-gender-selected={(e: any) => {
-                        actions.updateFormValue({
-                          key: 'gender',
-                          value: e.detail.gender
-                        });
-                      }}
-                      on:photon-gender-deselected={() => {
-                        actions.updateFormValue({
-                          key: 'gender',
-                          value: undefined
-                        });
-                      }}
-                      selected={pStore.selectedPatient.data?.gender}
-                    />
-                  </div>
-                  <div class="flex-grow w-full xs:min-w-[40%]">
-                    <photon-sex-input
-                      label="Sex at Birth"
-                      required="true"
-                      help-text={store['sex']?.error}
-                      invalid={store['sex']?.error !== undefined}
-                      on:photon-sex-selected={(e: any) => {
-                        actions.updateFormValue({
-                          key: 'sex',
-                          value: e.detail.sex
-                        });
-                      }}
-                      on:photon-sex-deselected={() => {
-                        actions.updateFormValue({
-                          key: 'sex',
-                          value: undefined
-                        });
-                      }}
-                      selected={pStore.selectedPatient.data?.sex}
-                    />
-                  </div>
-                </div>
-                <div class="mt-2">
+                <Show when={!props.optionalPatientAddress}>
+                  <AddressFields />
+                </Show>
+                <button
+                  class="mb-4 mt-8 flex items-center md:!hidden"
+                  onClick={() => setShowOptionalFields((value) => !value)}
+                >
+                  <span class="font-sans text-lg">
+                    {showOptionalFields() ? 'Hide optional fields' : 'Show optional fields'}
+                  </span>
+                  <Icon
+                    name={showOptionalFields() ? 'chevronUp' : 'chevronDown'}
+                    size="md"
+                    class="inline-block ml-1 mt-1"
+                  />
+                </button>
+                <div class={`mb-4 ${showOptionalFields() ? 'block' : 'hidden md:!block'}`}>
+                  <Show when={props.optionalPatientAddress}>
+                    <AddressFields />
+                  </Show>
+                  <photon-gender-input
+                    label="Gender"
+                    required="false"
+                    help-text={store['gender']?.error}
+                    invalid={store['gender']?.error !== undefined}
+                    on:photon-gender-selected={(e: any) => {
+                      actions.updateFormValue({
+                        key: 'gender',
+                        value: e.detail.gender
+                      });
+                    }}
+                    on:photon-gender-deselected={() => {
+                      actions.updateFormValue({
+                        key: 'gender',
+                        value: undefined
+                      });
+                    }}
+                    selected={pStore.selectedPatient.data?.gender}
+                  />
                   <photon-text-input
+                    class="w-full"
                     debounce-time="0"
                     invalid={store['email']?.error}
                     help-text={store['email']?.error}
@@ -317,107 +454,20 @@ const PatientForm = (props: { patientId: string }) => {
                     }}
                     value={store['email']?.value ?? pStore.selectedPatient.data?.email}
                   />
-                </div>
-              </div>
-            </Card>
-
-            <Card>
-              <div>
-                <p class="font-sans text-lg flex-grow">Address</p>
-                <photon-text-input
-                  debounce-time="0"
-                  invalid={store['address_street1']?.error}
-                  help-text={store['address_street1']?.error}
-                  label="Street 1"
-                  on:photon-input-changed={async (e: any) => {
-                    actions.updateFormValue({
-                      key: 'address_street1',
-                      value: e.detail.input
-                    });
-                  }}
-                  value={
-                    store['address_street1']?.value ?? pStore.selectedPatient.data?.address?.street1
-                  }
-                />
-                <photon-text-input
-                  debounce-time="0"
-                  invalid={store['address_street2']?.error}
-                  help-text={store['address_street2']?.error}
-                  label="Street 2"
-                  optional={true}
-                  on:photon-input-changed={async (e: any) => {
-                    actions.updateFormValue({
-                      key: 'address_street2',
-                      value: e.detail.input
-                    });
-                  }}
-                  value={
-                    store['address_street2']?.value ?? pStore.selectedPatient.data?.address?.street2
-                  }
-                />
-                <photon-text-input
-                  debounce-time="0"
-                  invalid={store['address_city']?.error}
-                  help-text={store['address_city']?.error}
-                  label="City"
-                  on:photon-input-changed={async (e: any) => {
-                    actions.updateFormValue({
-                      key: 'address_city',
-                      value: e.detail.input
-                    });
-                  }}
-                  value={store['address_city']?.value ?? pStore.selectedPatient.data?.address?.city}
-                />
-                <div class="flex gap-4 pb-5 xs:pb-2">
-                  <photon-state-input
-                    class="flex-grow min-w-[40%]"
-                    label="State"
-                    required="false"
-                    help-text={store['address_state']?.error}
-                    invalid={store['address_state']?.error !== undefined}
-                    on:photon-state-selected={(e: any) => {
+                  <p class="font-sans text-sm m-0">Preferred pharmacy</p>
+                  <PharmacySearch
+                    address={getPatientAddress(pStore, store)}
+                    setPharmacy={(pharmacy: any) => {
                       actions.updateFormValue({
-                        key: 'address_state',
-                        value: e.detail.state
+                        key: 'preferredPharmacy',
+                        value: pharmacy.id
                       });
                     }}
-                    selected={store['state']?.value ?? pStore.selectedPatient.data?.address?.state}
-                  />
-                  <photon-text-input
-                    debounce-time="0"
-                    class="flex-grow min-w-[40%]"
-                    invalid={store['address_zip']?.error}
-                    help-text={store['address_zip']?.error}
-                    label="Zip Code"
-                    on:photon-input-changed={async (e: any) => {
-                      actions.updateFormValue({
-                        key: 'address_zip',
-                        value: e.detail.input
-                      });
-                    }}
-                    value={
-                      store['address_zip']?.value ??
-                      pStore.selectedPatient.data?.address?.postalCode
-                    }
+                    patientId={props.patientId}
+                    initialValue={preferredPharmacy()}
+                    hidePreferred
                   />
                 </div>
-              </div>
-            </Card>
-
-            <Card>
-              <div>
-                <p class="font-sans text-lg flex-grow">Preferred Local Pharmacy</p>
-                <PharmacySearch
-                  address={getPatientAddress(pStore, store)}
-                  setPharmacy={(pharmacy: any) => {
-                    actions.updateFormValue({
-                      key: 'preferredPharmacy',
-                      value: pharmacy.id
-                    });
-                  }}
-                  patientId={props.patientId}
-                  hidePreferred
-                />
               </div>
             </Card>
           </div>
@@ -427,4 +477,4 @@ const PatientForm = (props: { patientId: string }) => {
   );
 };
 
-customElement('photon-patient-form', { patientId: '' }, PatientForm);
+customElement('photon-patient-form', { patientId: '', optionalPatientAddress: false }, PatientForm);

@@ -11,6 +11,14 @@ vi.mock('../components', () => ({
   PrescriptionsList: () => <div>Mock Prescriptions List</div>
 }));
 
+vi.mock('../api', () => ({
+  geocode: vi.fn().mockResolvedValue({
+    lat: 40.7128,
+    lng: -74.006,
+    address: '123 Main St, New York, NY 10001'
+  })
+}));
+
 describe('Canceled', () => {
   const testOrder = generateOrder({
     patient: generatePatient({ name: { full: 'Jane Doe' } })
@@ -39,13 +47,18 @@ describe('Canceled', () => {
 
 const renderCanceled = (orderContextValueOverride: Partial<OrderContextType> = {}) => {
   const orderContextValue: OrderContextType = {
-    fetchOrder(currentPharmacy: Order['pharmacy'] | undefined): void {},
+    fetchOrder(currentPharmacy: Order['pharmacy'] | undefined) {
+      return Promise.resolve(undefined);
+    },
     flattenedFills: [],
     isDemo: false,
     logo: undefined,
     order: generateOrder(),
     setFaqModalIsOpen(isOpen: boolean): void {},
     setOrder(order: Order): void {},
+    enablePrice: false,
+    showPriceToggle: true,
+    setEnablePrice(enablePrice: boolean): void {},
     ...orderContextValueOverride
   };
   return render(

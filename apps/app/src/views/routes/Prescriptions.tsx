@@ -1,9 +1,10 @@
-import { Link as RouterLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import {
-  Select,
   HStack,
   IconButton,
+  Link,
+  Select,
   Skeleton,
   SkeletonCircle,
   SkeletonText,
@@ -11,8 +12,7 @@ import {
   Tag,
   Text,
   Tooltip,
-  useToast,
-  Link
+  useToast
 } from '@chakra-ui/react';
 import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 import { useEffect, useRef, useState } from 'react';
@@ -422,9 +422,12 @@ export const Prescriptions = () => {
         columns={columns}
         loading={loading}
         error={error}
-        ctaText="New Prescription"
+        ctaText="Create prescription"
         ctaColor="blue"
         ctaRoute="/prescriptions/new"
+        emptyStateTitle="No prescriptions yet"
+        emptyStateText="Create a prescription and it will show up here."
+        hasSearch={!!filterText || !!status}
         filterText={filterText}
         setFilterText={setFilterText}
         hasMore={rows.length % 25 === 0 && !finished}

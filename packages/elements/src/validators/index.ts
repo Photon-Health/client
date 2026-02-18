@@ -1,3 +1,4 @@
+import { CALENDAR_DATE_FORMAT } from '@photonhealth/components';
 import { differenceInHours, isToday, parse } from 'date-fns';
 import { Struct, is, define, refine, string, any } from 'superstruct';
 
@@ -20,7 +21,10 @@ export const notFutureDate = define('NotFutureDate', (value) => {
   return valueDate <= now;
 });
 
-export const afterDate = (date: Date, parser = (v: string) => parse(v, 'yyyy-MM-dd', new Date())) =>
+export const afterDate = (
+  date: Date,
+  parser = (v: string) => parse(v, CALENDAR_DATE_FORMAT, new Date())
+) =>
   define('between', function isAfter(value) {
     return (
       differenceInHours(parser(value as string), date) >= 0 || isToday(parser(value as string))

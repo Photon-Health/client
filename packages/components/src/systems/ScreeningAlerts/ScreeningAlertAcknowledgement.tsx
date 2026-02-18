@@ -80,7 +80,7 @@ export function ScreeningAlertAcknowledgementDialog(
               <Icon name="exclamationCircle" />
             </div>
             <Text bold>
-              Are you sure you want to send an order with {formatWarning(props.alerts)}?
+              Are you sure you want to send prescriptions with {formatWarning(props.alerts)}?
             </Text>
           </div>
         </div>
@@ -95,7 +95,7 @@ export function ScreeningAlertAcknowledgementDialog(
               ignoreWarningAndCreateAnyway();
             }}
           >
-            Send Order
+            Send order
           </Button>
           <Button
             variant="secondary"

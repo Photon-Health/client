@@ -1,4 +1,4 @@
-import { gql } from 'graphql-request';
+import { gql } from '@apollo/client';
 
 export const MARK_ORDER_AS_PICKED_UP = gql`
   mutation MarkOrderAsPickedUp($markOrderAsPickedUpId: ID!) {
@@ -39,5 +39,39 @@ export const SET_ORDER_PHARMACY = gql`
       readyByTime: $readyByTime
       patientSelectedPrice: $patientSelectedPrice
     )
+  }
+`;
+
+export const UPDATE_PATIENT = gql`
+  mutation UpdatePatient($patientId: ID!, $input: UpdatePatientInput!) {
+    updatePatient(patientId: $patientId, input: $input) {
+      id
+      address {
+        id
+        street1
+        street2
+        city
+        state
+        postalCode
+        country
+      }
+    }
+  }
+`;
+
+export const UPDATE_ORDER = gql`
+  mutation UpdateOrder($orderId: ID!, $input: UpdateOrderInput!) {
+    updateOrder(orderId: $orderId, input: $input) {
+      id
+      address {
+        id
+        street1
+        street2
+        city
+        state
+        postalCode
+        country
+      }
+    }
   }
 `;

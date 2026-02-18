@@ -6,7 +6,7 @@ import { FiPackage } from 'react-icons/fi';
 import { IoDocumentTextOutline } from 'react-icons/io5';
 import { roundUpTo15MinInterval } from '../../utils/dates';
 import { Step } from './Step';
-import { PrescriptionFulfillment } from '../../__generated__/graphql';
+import { FulfillmentType, PrescriptionFulfillment } from '../../__generated__/graphql';
 
 export interface OrderStatusHeaderProps {
   status: PrescriptionFulfillment['state'] | 'DELAYED' | 'FILLING' | 'SHIPPED';
@@ -33,6 +33,9 @@ export interface OrderStatusHeaderProps {
     | 'SUPERVISING_PHYSICIAN_NEEDED';
   pharmacyEstimatedReadyAt?: Date;
   patientDesiredReadyAt?: Date | 'URGENT';
+  fulfillmentType?: FulfillmentType;
+  integrated?: boolean;
+  subHeaderOverride?: string;
 }
 
 function headerText(props: OrderStatusHeaderProps) {
@@ -121,6 +124,12 @@ function subheaderText(props: OrderStatusHeaderProps) {
   }
 
   // Then just check the status
+  if (
+    (props.fulfillmentType === 'MAIL_ORDER' || props.integrated) &&
+    ['CREATED', 'SENT', 'RECEIVED'].includes(props.status)
+  ) {
+    return "We've sent your order to the pharmacy. They will reach out shortly.";
+  }
   if (props.status === 'CREATED' || props.status === 'SENT') {
     return "We're confirming your order with the pharmacy.";
   }
@@ -137,7 +146,7 @@ function subheaderText(props: OrderStatusHeaderProps) {
     return 'Your order is out for delivery';
   }
   if (props.status === 'RECEIVED') {
-    return 'Your pharmacy has received your order. We weren’t able to get a ready time.';
+    return 'Your pharmacy has received your order.';
   }
   if (props.status === 'PROCESSING') {
     if (props.pharmacyEstimatedReadyAt) {
@@ -254,7 +263,7 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
 
   const header = headerText(derivedProps);
   const displayProgressBar = props.exception !== 'EXTERNAL_TRANSFER';
-  const subheader = subheaderText(derivedProps);
+  const subheader = props.subHeaderOverride || subheaderText(derivedProps);
   const color = progressLevel(derivedProps);
   const progressBar = progress(derivedProps);
 

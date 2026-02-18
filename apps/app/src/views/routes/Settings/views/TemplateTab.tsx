@@ -129,17 +129,17 @@ export const TemplateTab = () => {
         fragment: CatalogTreatmentFieldsMap
       });
     }
-  }, [catalogs.loading, catalogs.catalogs.length, catalogs.catalogs[0]?.id]);
+  }, [catalogs.loading]);
 
   useEffect(() => {
-    if (!catalog.loading && catalog.catalog) {
+    if (!catalog.loading && catalog.catalog?.templates) {
       const preppedRows = catalog.catalog.templates
         .filter((x): x is PrescriptionTemplate => !!x)
         .sort((a, b) => (a.treatment.name.toLowerCase() > b.treatment.name.toLowerCase() ? 1 : -1));
       setRows(preppedRows);
       setCurrentPage(1);
     }
-  }, [catalog.loading, catalogId, catalog.catalog?.templates]);
+  }, [catalog.loading, catalog.catalog?.templates]);
 
   useEffect(() => {
     // Reset current page to first page on debounce
@@ -148,44 +148,35 @@ export const TemplateTab = () => {
     }
   }, [debouncedFilterText]);
 
-  const templateRowRender = useCallback(
-    (template: PrescriptionTemplate) =>
-      renderTemplateRow(
-        template,
-        setSingleView,
-        catalogId ?? '',
-        setChildLoading,
-        setTemplateToEdit,
-        setShowModal
-      ),
-    [setSingleView, catalogId, setChildLoading, setTemplateToEdit, setShowModal]
-  );
-
-  const typeFilter = useCallback(
-    (template: PrescriptionTemplate) =>
+  const formattedRows = useMemo(() => {
+    const typeFilter = (template: PrescriptionTemplate) =>
       filterType === 'ALL' ||
       (filterType === 'GLOBAL' && !template.isPrivate) ||
-      (filterType === 'INDIVIDUAL' && template.isPrivate),
-    [filterType]
-  );
+      (filterType === 'INDIVIDUAL' && template.isPrivate);
 
-  const filteredRows = useMemo(
-    () =>
-      rows.filter(
+    const result = rows
+      .filter(
         (x) =>
           (x.treatment.name.toLowerCase().includes(debouncedFilterText.toLowerCase()) ||
             x.name?.toLowerCase().includes(debouncedFilterText.toLowerCase())) &&
           typeFilter(x)
-      ),
-    [debouncedFilterText, rows, pageSize, typeFilter]
-  );
+      )
+      .map((template: PrescriptionTemplate) =>
+        renderTemplateRow(
+          template,
+          setSingleView,
+          catalogId ?? '',
+          setChildLoading,
+          setTemplateToEdit,
+          setShowModal
+        )
+      );
 
-  const formattedRows = useMemo(() => {
     return {
-      rows: filteredRows.map(templateRowRender),
-      pages: Math.ceil(filteredRows.length / pageSize)
+      rows: result,
+      pages: Math.ceil(result.length / pageSize)
     };
-  }, [filteredRows]);
+  }, [debouncedFilterText, rows, pageSize, filterType]);
 
   const [doseCalcVis, setDoseCalcVis] = useState(false);
   const quantityRef = useRef<HTMLInputElement>(null);
@@ -196,15 +187,15 @@ export const TemplateTab = () => {
 
   const isLoading = catalogs.loading || (catalog.loading && !catalog.catalog) || childLoading;
 
-  const onFilterChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
+  const onFilterChange = (e: ChangeEvent<HTMLSelectElement>) => {
     // Change event triggered even if no change
     if (e.target.value !== filterType) {
       setCurrentPage(1);
       setFilterType(e.target.value as FilterTypes);
     }
-  }, []);
+  };
 
-  if (catalogs.loading || !catalogId) {
+  if (!catalogId) {
     return null;
   }
 
@@ -245,9 +236,8 @@ export const TemplateTab = () => {
       />
       <VStack w="full">
         <TemplateTable
-          isLoading={isLoading}
-          rows={filteredRows}
-          filteredRows={formattedRows.rows}
+          loading={isLoading}
+          rows={formattedRows.rows}
           pages={formattedRows.pages}
           pageSize={pageSize}
           currentPage={currentPage}
@@ -262,6 +252,7 @@ export const TemplateTab = () => {
               <option value="INDIVIDUAL">Personal Templates</option>
             </Select>
           }
+          hasSearch={filterType !== 'ALL' || !!filterText}
         />
       </VStack>
     </>

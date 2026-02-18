@@ -1,3 +1,4 @@
+import { FulfillmentType } from '../__generated__/graphql';
 import { graphQLClient } from '../configs/graphqlClient';
 
 export const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
@@ -24,7 +25,7 @@ export const getOffers = async (orderId: string) => {
     throw new Error('No offers found');
   }
 };
-export const getPharmacies = async ({
+export const getPharmaciesByLocation = async ({
   searchParams,
   limit,
   offset,
@@ -62,10 +63,57 @@ export const getPharmacies = async ({
     });
   } catch (e: any) {
     const errorMessage =
-      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on getPharmacies.';
+      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on getPharmaciesByLocation.';
     throw new Error(errorMessage);
   }
 };
+
+export async function getPharmacies({
+  fulfillmentType,
+  integrated,
+  limit,
+  offset
+}: {
+  fulfillmentType?: FulfillmentType;
+  integrated?: boolean;
+  limit?: number;
+  offset?: number;
+}) {
+  try {
+    return await graphQLClient.GetPharmacies({
+      fulfillmentType,
+      integrated,
+      limit,
+      offset
+    });
+  } catch (e: any) {
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unkown error occurred on getPharmacies';
+    throw new Error(errorMessage);
+  }
+}
+
+export async function getInfoPageData({
+  organizationId,
+  pharmacyId,
+  pharmacyOpenAt = new Date()
+}: {
+  organizationId: string;
+  pharmacyId: string;
+  pharmacyOpenAt?: Date;
+}) {
+  try {
+    return await graphQLClient.GetInfoPageData({
+      organizationId,
+      pharmacyId,
+      openAt: pharmacyOpenAt
+    });
+  } catch (e: any) {
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unkown error occurred on getPharmacies';
+    throw new Error(errorMessage);
+  }
+}
 
 /**
  * Mutations
@@ -156,6 +204,54 @@ export const setPreferredPharmacy = async (patientId: string, pharmacyId: string
   } catch (e: any) {
     const errorMessage =
       e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on setPreferredPharmacy.';
+    throw new Error(errorMessage);
+  }
+};
+
+export const updatePatientAddress = async (
+  patientId: string,
+  address: {
+    street1: string;
+    street2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  }
+) => {
+  try {
+    const response = await graphQLClient.UpdatePatient({
+      patientId,
+      input: { address }
+    });
+
+    if (response?.updatePatient) {
+      return response.updatePatient;
+    } else {
+      throw new Error('Unable to update patient address');
+    }
+  } catch (e: any) {
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on updatePatientAddress.';
+    throw new Error(errorMessage);
+  }
+};
+
+export const updateOrderAddress = async (orderId: string, addressId: string) => {
+  try {
+    const response = await graphQLClient.UpdateOrder({
+      orderId,
+      input: { addressId }
+    });
+
+    if (response?.updateOrder) {
+      return response.updateOrder;
+    } else {
+      throw new Error('Unable to update order address');
+    }
+  } catch (e: any) {
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on updateOrderAddress.';
     throw new Error(errorMessage);
   }
 };

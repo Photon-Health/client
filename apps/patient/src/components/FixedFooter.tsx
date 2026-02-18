@@ -6,7 +6,7 @@ interface FixedFooterProps {
   show?: boolean;
 }
 
-export const FixedFooter = ({ children, show }: FixedFooterProps) => {
+export const FixedFooter = ({ children, show = false }: FixedFooterProps) => {
   return (
     <Slide direction="bottom" in={show}>
       <Box pt={5} pb={3} backgroundColor="white" borderTop="1px" borderColor="gray.100">
@@ -14,8 +14,4 @@ export const FixedFooter = ({ children, show }: FixedFooterProps) => {
       </Box>
     </Slide>
   );
-};
-
-FixedFooter.defaultProps = {
-  show: false
 };

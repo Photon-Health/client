@@ -23,6 +23,7 @@ type ListSelectProps = {
   selectMessage: string;
   list: ListItem[];
   name: string; // name of input
+  openUpward?: boolean;
 };
 
 export default function ListSelect(props: ListSelectProps): JSX.Element {
@@ -39,7 +40,7 @@ export default function ListSelect(props: ListSelectProps): JSX.Element {
         value={selected()}
         onSelectChange={(item?: ListItem) => {
           setSelected(item ?? { name: props.selectMessage });
-          onInput(item?.name ?? '');
+          onInput(item?.value ?? item?.id ?? item?.name ?? '');
         }}
         class="relative shadow-sm rounded-lg"
       >
@@ -71,7 +72,10 @@ export default function ListSelect(props: ListSelectProps): JSX.Element {
             >
               <ListboxOptions
                 unmount={false}
-                class="absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-10"
+                class={clsx(
+                  'absolute w-full py-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-10',
+                  props.openUpward ? 'bottom-full mb-1' : 'mt-1'
+                )}
               >
                 <For each={props.list}>
                   {(person): JSX.Element => (

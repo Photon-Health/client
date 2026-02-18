@@ -20,6 +20,7 @@ export const PATIENT_FIELDS = gql`
     email
     phone
     address {
+      id
       name {
         full
       }
@@ -149,6 +150,7 @@ export const PRESCRIPTION_FIELDS = gql`
     instructions
     notes
     effectiveDate
+    doNotFillBeforeDate
     expirationDate
     writtenAt
   }

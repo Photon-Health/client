@@ -20,8 +20,7 @@
     "build": "vite build && npx tailwindcss -i ./src/index.css -o ./dist/style.css",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "chromatic": "npx chromatic --project-token=CHROMATIC_PROJECT_TOKEN --exit-zero-on-changes --allow-console-errors",
-    "test": "vitest"
+    "chromatic": "npx chromatic --project-token=CHROMATIC_PROJECT_TOKEN --exit-zero-on-changes --allow-console-errors"
   },
   "type": "module",
   "dependencies": {
@@ -29,6 +28,7 @@
     "@tailwindcss/forms": "^0.5.3",
     "@tailwindcss/typography": "^0.5.9",
     "clsx": "^1.2.1",
+    "date-fns": "^4.1.0",
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
     "jwt-decode": "^3.1.2",

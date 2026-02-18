@@ -26,6 +26,15 @@ const UPDATE_PATIENT_ADDRESS = gql`
   mutation UpdateAddress($id: ID!, $address: AddressInput) {
     updatePatient(id: $id, address: $address) {
       id
+      address {
+        id
+        street1
+        street2
+        city
+        state
+        postalCode
+        country
+      }
     }
   }
 `;
@@ -42,36 +51,38 @@ type AddressProps = {
 type AddressFormProps = {
   patientId: string;
   setAddress?: (address: AddressProps) => void;
+  showRequiredBanner?: boolean;
+  openStateDropdownUpward?: boolean;
 };
 
 export default function AddressForm(props: AddressFormProps) {
   const [submitting, setSubmitting] = createSignal(false);
   const client = usePhotonClient();
+  const showRequiredBanner = () => props.showRequiredBanner ?? true;
 
   const updatePatientAddress = async (address: AddressProps) => {
-    await client!.apollo.mutate({
+    const { data } = await client!.apollo.mutate({
       mutation: UPDATE_PATIENT_ADDRESS,
-      variables: { id: props.patientId, address },
-      update: () => {
-        setSubmitting(false);
-        triggerToast({
-          header: 'Address Updated',
-          body: 'The patient address has been updated.',
-          status: 'success'
-        });
-        if (props?.setAddress) {
-          props.setAddress(address);
-        }
-      }
+      variables: { id: props.patientId, address }
     });
+    setSubmitting(false);
+    triggerToast({
+      header: 'Address Updated',
+      body: 'The patient address has been updated.',
+      status: 'success'
+    });
+    if (props?.setAddress) {
+      props.setAddress(data?.updatePatient?.address ?? address);
+    }
   };
 
   const { form, errors } = createForm({
     onSubmit: async (values) => {
       setSubmitting(true);
       try {
-        updatePatientAddress({ country: 'US', ...values });
+        await updatePatientAddress({ country: 'US', ...values });
       } catch (e) {
+        setSubmitting(false);
         triggerToast({
           header: 'Error Updating Patient',
           body: 'The patient address has not been updated.',
@@ -87,11 +98,13 @@ export default function AddressForm(props: AddressFormProps) {
       <div class="flex items-center justify-between">
         <Text color="gray">Patient Address</Text>
         <Button type="submit" form="patient-address" disabled={submitting()} loading={submitting()}>
-          Save Address
+          Save address
         </Button>
       </div>
       <div>
-        <Banner status="info">Patient address is required to write a prescription</Banner>
+        {showRequiredBanner() && (
+          <Banner status="info">Patient address is required to write a prescription</Banner>
+        )}
         <form ref={form} id="patient-address" class="mt-4">
           <InputGroup
             label="Address Line 1 *"
@@ -108,7 +121,12 @@ export default function AddressForm(props: AddressFormProps) {
           </InputGroup>
           <div class="grid grid-cols-1 sm:gap-4 sm:grid-cols-2">
             <InputGroup label="State *" error={errors().state}>
-              <ListSelect list={states} selectMessage="Select a State" name="state" />
+              <ListSelect
+                list={states}
+                selectMessage="Select a State"
+                name="state"
+                openUpward={props.openStateDropdownUpward}
+              />
             </InputGroup>
             <InputGroup label="Zip Code *" error={errors().postalCode}>
               <Input type="text" name="postalCode" />

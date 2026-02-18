@@ -73,7 +73,6 @@ export const Nav = () => {
   const federated = data?.organization?.settings?.providerUx?.federatedAuth ?? false;
 
   const onLogout = useCallback(() => {
-    localStorage.removeItem('previouslyAuthed');
     logout({ returnTo: window.location.origin, federated });
   }, [logout, federated]);
 
@@ -82,7 +81,7 @@ export const Nav = () => {
   }, [clearOrganization]);
 
   return (
-    <Box as="nav" bg="#001740" py="3">
+    <Box as="nav" bg="#001740" py="3" position="fixed" top={0} insetX={0} zIndex={40}>
       <Container>
         <Flex justifyContent="space-between">
           <HStack>
@@ -120,9 +119,12 @@ export const Nav = () => {
                     <Text color="muted" fontSize="sm">
                       {user?.email}
                     </Text>
-                    <Text color="muted" fontSize="sm">
-                      {organization?.name && organization.name}
-                    </Text>
+                    {organization?.name &&
+                      user?.name.toLowerCase() !== organization?.name.toLowerCase() && (
+                        <Text color="muted" fontSize="sm">
+                          {organization.name}
+                        </Text>
+                      )}
                   </VStack>
                   <MenuDivider my={0} py={0} />
                   <MenuItem

@@ -1,6 +1,6 @@
 {
   "name": "@photonhealth/elements",
-  "version": "0.16.12",
+  "version": "0.19.6",
   "description": "",
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
@@ -21,6 +21,10 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Photon-Health/client"
   },
   "files": [
     "dist",

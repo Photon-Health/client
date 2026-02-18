@@ -34,12 +34,31 @@ export const GET_ORDER = gql`
       readyByTime
       readyByDay
       address {
+        id
         street1
         street2
         city
         state
         country
         postalCode
+      }
+      group {
+        id
+        name
+      }
+      metadata {
+        type
+        marketIsRequired
+        fulfillmentMethod
+        transmissionType
+        routingHistory {
+          pharmacy {
+            id
+            name
+          }
+          selector
+          createdAt
+        }
       }
       organization {
         id
@@ -49,6 +68,7 @@ export const GET_ORDER = gql`
           brandLogo
           priorAuthorizationExceptionMessage
           patientUx {
+            enableAutomatedOps
             enablePatientRerouting
             enablePatientDeliveryPharmacies
             patientFeaturedPharmacyName
@@ -62,7 +82,6 @@ export const GET_ORDER = gql`
         trackingNumber
         pharmacyEstimatedReadyAt
       }
-
       exceptions {
         exceptionType
         message
@@ -71,6 +90,9 @@ export const GET_ORDER = gql`
       pharmacy {
         id
         name
+        logo
+        integrated
+        fulfillmentTypes
         address {
           street1
           street2
@@ -142,12 +164,33 @@ export const GET_ORDER = gql`
           dispenseAsWritten
           expirationDate
           fillsAllowed
+          provider {
+            id
+            name {
+              full
+            }
+          }
         }
       }
       patient {
         id
         name {
           full
+        }
+        dateOfBirth
+        gender
+        sex
+        address {
+          id
+          street1
+          street2
+          city
+          state
+          postalCode
+          country
+        }
+        preferredPharmacies {
+          ...PharmacyFields
         }
       }
       fulfillments {
@@ -196,6 +239,7 @@ export const GET_ORDER = gql`
         memberId
         pharmacyId
         source
+        externalUrl
       }
     }
   }
@@ -205,6 +249,7 @@ const PHARMACY_FIELDS = gql`
   fragment PharmacyFields on Pharmacy {
     id
     name
+    logo
     address {
       street1
       street2
@@ -213,6 +258,9 @@ const PHARMACY_FIELDS = gql`
       country
       postalCode
     }
+    phone
+    fulfillmentTypes
+    integrated
     distance
     isOpen(at: $openAt)
     nextEvents(at: $openAt) {
@@ -256,7 +304,7 @@ const PHARMACY_FIELDS = gql`
   }
 `;
 
-export const GET_PHARMACIES = gql`
+export const GET_PHARMACIES_BY_LOCATION = gql`
   query GetPharmaciesByLocation(
     $location: LatLongSearch!
     $limit: Int
@@ -281,6 +329,62 @@ export const GET_PHARMACIES = gql`
   ${PHARMACY_FIELDS}
 `;
 
+export const GET_PHARMACIES = gql`
+  query GetPharmacies(
+    $fulfillmentType: FulfillmentType
+    $integrated: Boolean
+    $limit: Int
+    $offset: Int
+  ) {
+    pharmacies(
+      fulfillmentType: $fulfillmentType
+      integrated: $integrated
+      limit: $limit
+      offset: $offset
+    ) {
+      id
+      name
+      logo
+      fulfillmentTypes
+    }
+  }
+`;
+
+export const GET_INFO_PAGE_DATA = gql`
+  query GetInfoPageData($organizationId: ID!, $pharmacyId: ID!, $openAt: DateTime) {
+    me {
+      name {
+        full
+        title
+        first
+        middle
+        last
+      }
+    }
+    organization(id: $organizationId) {
+      id
+      name
+      settings {
+        id
+        organizationId
+        brandColor
+        brandLogo
+        priorAuthorizationExceptionMessage
+        patientUx {
+          enableAutomatedOps
+          enablePatientRerouting
+          enablePatientDeliveryPharmacies
+          patientFeaturedPharmacyName
+        }
+      }
+    }
+    pharmacy(id: $pharmacyId) {
+      ...PharmacyFields
+    }
+  }
+  ${PHARMACY_FIELDS}
+`;
+
 export const GET_OFFERS = gql`
   query GetOffersForOrder($orderId: ID!) {
     offers(orderId: $orderId) {
@@ -292,6 +396,9 @@ export const GET_OFFERS = gql`
       cost {
         type
         amount
+        amountTitle
+        retailAmount
+        retailAmountTitle
       }
       supplier
     }

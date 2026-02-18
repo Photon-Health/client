@@ -24,6 +24,7 @@ import { TablePage } from '../components/TablePage';
 import PatientView from '../components/PatientView';
 import ContactView from '../components/ContactView';
 import { Patient } from 'packages/sdk/dist/types';
+import { compact } from 'lodash';
 
 const GET_PATIENTS = gql`
   query GetPatients($name: String, $after: ID, $first: Int) {
@@ -60,7 +61,7 @@ const EditView = (props: EditViewProps) => {
         />
         <MenuList>
           <MenuItem icon={<FiEye fontSize="1.2em" />} as={RouterLink} to={`/patients/${id}`}>
-            View Patient
+            View patient
           </MenuItem>
           <MenuItem
             icon={<FiEdit fontSize="1.2em" />}
@@ -70,21 +71,21 @@ const EditView = (props: EditViewProps) => {
               setDisableScroll(true);
             }}
           >
-            Edit Patient
+            Edit patient
           </MenuItem>
           <MenuItem
             icon={<TbPrescription fontSize="1.2em" />}
             as={RouterLink}
             to={`/prescriptions/new?patientId=${id}`}
           >
-            New Prescription
+            Create prescription
           </MenuItem>
           <MenuItem
             icon={<FiShoppingCart fontSize="1.2em" />}
             as={RouterLink}
             to={`/orders/new?patientId=${id}`}
           >
-            New Order
+            Create order
           </MenuItem>
         </MenuList>
       </Menu>
@@ -123,7 +124,22 @@ const renderSkeletonRow = () => ({
 });
 
 export const Patients = () => {
-  const columns = [
+  const [filterText, setFilterText] = useState('');
+  const [rows, setRows] = useState<any[]>([]);
+  const [finished, setFinished] = useState<boolean>(false);
+  const [disableScroll, setDisableScroll] = useState<boolean>(false);
+  const [filterTextDebounce] = useDebounce(filterText, 250);
+
+  const patientFilters = {
+    first: 25,
+    name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
+  };
+  const { data, loading, error, fetchMore, refetch } = useQuery(GET_PATIENTS, {
+    variables: patientFilters
+  });
+  const patients: Patient[] | undefined = data?.patients;
+  const showExternalIdColumn = patients?.some((p) => !!p.externalId);
+  const columns = compact([
     {
       Header: 'Name',
       accessor: 'name' // accessor is the "key" in the data
@@ -136,30 +152,17 @@ export const Patients = () => {
       Header: 'Contact',
       accessor: 'contact'
     },
-    {
-      Header: 'Ext. Id',
-      accessor: 'externalId'
-    },
+    showExternalIdColumn
+      ? {
+          Header: 'Ext. Id',
+          accessor: 'externalId'
+        }
+      : undefined,
     {
       Header: '',
       accessor: 'edit'
     }
-  ];
-
-  const [filterText, setFilterText] = useState('');
-  const [rows, setRows] = useState<any[]>([]);
-  const [finished, setFinished] = useState<boolean>(false);
-  const [disableScroll, setDisableScroll] = useState<boolean>(false);
-  const [filterTextDebounce] = useDebounce(filterText, 250);
-
-  const getPatientsData = {
-    first: 25,
-    name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
-  };
-  const { data, loading, error, fetchMore, refetch } = useQuery(GET_PATIENTS, {
-    variables: getPatientsData
-  });
-  const patients: Patient[] | undefined = data?.patients;
+  ]);
 
   useEffect(() => {
     if (filterTextDebounce) {
@@ -193,9 +196,12 @@ export const Patients = () => {
         columns={columns}
         loading={loading}
         error={error}
-        ctaText="New Patient"
+        ctaText="Create patient"
         ctaColor="blue"
         ctaRoute="/patients/new"
+        emptyStateTitle="No patients yet"
+        emptyStateText="Create a patient to begin sending prescriptions."
+        hasSearch={!!filterText}
         filterText={filterText}
         setFilterText={setFilterText}
         searchPlaceholder="Search by patient name"
@@ -203,7 +209,7 @@ export const Patients = () => {
         fetchMoreData={async () => {
           await fetchMore({
             variables: {
-              ...getPatientsData,
+              ...patientFilters,
               after: rows?.at(-1)?.id,
               name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
             },

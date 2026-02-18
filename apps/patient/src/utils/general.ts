@@ -7,10 +7,15 @@ import utc from 'dayjs/plugin/utc';
 import costcoLogo from '../assets/costco_logo_small.png';
 import walgreensLogo from '../assets/walgreens_logo_small_circle.png';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
-import { EnrichedPharmacy, Fill, OrderFulfillment, Pharmacy } from './models';
-import { ExtendedFulfillmentType } from './models';
+import {
+  EnrichedPharmacy,
+  ExtendedFulfillmentType,
+  Fill,
+  OrderFulfillment,
+  Pharmacy
+} from './models';
 import { PharmacyCloseEvent, PharmacyEvent, PharmacyOpenEvent } from '../__generated__/graphql';
-import { PHARMACY_BRANDING } from '../components';
+import { PHARMACY_BRANDING } from '../components/pharmacy-card-list';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -120,7 +125,7 @@ export const preparePharmacy = (
   let opens = '';
   let closes = '';
   let showReadyIn30Min = false;
-  let logo = null;
+  let logo: string | undefined = undefined;
 
   // for mail-order pharmacies, use the info mapped by this branding constant
   if (fulfillmentType && isDelivery({ pharmacy, fulfillmentType })) {
@@ -221,3 +226,5 @@ export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string
 
   return targetTime.utc().toDate();
 };
+
+export const wait = (ms: number) => new Promise((res) => setTimeout(res, ms));

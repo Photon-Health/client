@@ -14,6 +14,7 @@ import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import { createMutation } from '../../utils/createMutation';
 import { Order } from '@photonhealth/sdk/dist/types';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
+import { usePrescribeEventDispatch } from '../PrescribeEventDispatchProvider';
 
 const COMBINE_ORDERS_MUTATION = gql`
   mutation RecentOrdersCombineDialogUpdateOrder($orderId: ID!, $fills: [FillInput!]!) {
@@ -42,9 +43,10 @@ const CREATE_ORDER_MUTATION = gql`
   mutation RecentOrdersCombineDialogCreateOrder(
     $patientId: ID!
     $fills: [FillInput!]!
-    $address: AddressInput!
+    $addressId: ID
+    $address: AddressInput
   ) {
-    createOrder(patientId: $patientId, fills: $fills, address: $address) {
+    createOrder(patientId: $patientId, fills: $fills, addressId: $addressId, address: $address) {
       id
     }
   }
@@ -61,14 +63,14 @@ type SuccessCreateOrder = { createOrder: SuccessResponse };
 type VariablesCreateOrder = {
   patientId: string;
   fills: { prescriptionId: string }[];
-  address: Address;
+  addressId?: string;
+  address?: Address;
 };
 
 export default function RecentOrdersCombineDialog() {
   let ref: Ref<any> | undefined;
-  const draftPrescriptionsContext = useDraftPrescriptions();
-
-  const { draftPrescriptions } = draftPrescriptionsContext;
+  const { draftPrescriptions } = useDraftPrescriptions();
+  const { dispatchOrderCreated, dispatchOrderCombined } = usePrescribeEventDispatch();
 
   const client = usePhotonClient();
   const [state, actions] = useRecentOrders();
@@ -88,26 +90,6 @@ export default function RecentOrdersCombineDialog() {
       client: client.apollo
     }
   );
-
-  const dispatchCombineOrderUpdated = (order: Order) => {
-    const event = new CustomEvent('photon-order-combined', {
-      composed: true,
-      bubbles: true,
-      detail: { order }
-    });
-    ref?.dispatchEvent(event);
-  };
-
-  const dispatchOrderCreated = (order: SuccessResponse) => {
-    const event = new CustomEvent('photon-order-created', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        order: order
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
 
   createEffect(() => {
     if (state.isCombineDialogOpen) {
@@ -147,7 +129,7 @@ export default function RecentOrdersCombineDialog() {
       });
 
       // Trigger message to redirect to order page
-      dispatchCombineOrderUpdated(updatedOrder.updateOrder as Order);
+      dispatchOrderCombined(updatedOrder.updateOrder as Order);
 
       setIsCombiningOrders(false);
       actions.setIsCombineDialogOpen(false);
@@ -156,7 +138,7 @@ export default function RecentOrdersCombineDialog() {
       // if there is an error updating an order, most likely because the order state has
       // changed since it was first fetched so we need to create a new order
       try {
-        if (!state?.address || !state?.patientId) {
+        if ((!state?.addressId && !state?.address) || !state?.patientId) {
           throw new Error('No address provided');
         }
 
@@ -164,16 +146,16 @@ export default function RecentOrdersCombineDialog() {
           variables: {
             patientId: state.patientId,
             fills,
-            address: state.address
+            ...(state.addressId ? { addressId: state.addressId } : { address: state.address })
           }
         });
 
-        dispatchOrderCreated(newOrder.createOrder);
+        dispatchOrderCreated(newOrder.createOrder as Order);
         setIsCombiningOrders(false);
       } catch {
         triggerToast({
           header: 'Error Creating Order',
-          body: 'The prescription was created but not turned into an order.',
+          body: 'The draft was created but not turned into an active prescription.',
           status: 'info'
         });
         setIsCombiningOrders(false);
@@ -200,7 +182,7 @@ export default function RecentOrdersCombineDialog() {
 
         <div class="flex flex-col gap-4">
           <div class="flex flex-col gap-2">
-            <Text>This patient currently has an order for:</Text>
+            <Text>This patient currently has prescriptions for:</Text>
             <div class="border border-solid border-gray-200 rounded-lg bg-gray-50 py-3 px-4">
               <For each={fillsWithRoutingState()}>
                 {(fill) => (

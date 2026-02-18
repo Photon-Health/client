@@ -22,7 +22,7 @@ import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import { formatAddress, formatPrice, titleCase } from '../utils/formatters';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
-import { AmazonOffer, BrandedOptionOverrides } from './BrandedOptions';
+import { BrandedOptionOverrides } from './pharmacy-card-list';
 
 dayjs.extend(customParseFormat);
 
@@ -222,7 +222,12 @@ const DistanceAddress = ({
   );
 };
 
-const CostWidget = ({ costAmount, costType }: AmazonOffer) => {
+type CostWidgetProps = {
+  costAmount?: number;
+  costType?: string;
+};
+
+const CostWidget = ({ costAmount, costType }: CostWidgetProps) => {
   if (costAmount == 0 || !costAmount) {
     return null;
   }
@@ -295,10 +300,10 @@ export const PharmacyInfo = ({
   const taglineOverride = showNovocareTagline || showAmazonTagline;
 
   return (
-    <VStack align="start" w="full">
+    <VStack data-testid="pharmacy-info" align="start" w="full">
       <HStack w="full" justify="space-between">
         <VStack w="full">
-          <HStack w="full">
+          <HStack w="full" paddingBottom="2">
             {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
               <Box boxSize="32px" overflow="hidden">
                 <Image
@@ -310,7 +315,11 @@ export const PharmacyInfo = ({
                 />
               </Box>
             ) : null}
-            <Text fontSize="md" fontWeight={boldPharmacyName ? 'bold' : 'medium'}>
+            <Text
+              data-testid="pharmacy-info-name"
+              fontSize="md"
+              fontWeight={boldPharmacyName ? 'bold' : 'medium'}
+            >
               {whiteLabelDeliveryPharmacy ? 'Free Express Delivery' : pharmacy.name}
             </Text>
           </HStack>
@@ -377,7 +386,7 @@ export const PharmacyInfo = ({
           {showPreferredTag ? (
             <Tag size="sm" colorScheme="blue">
               <TagLeftIcon boxSize="12px" as={FiStar} />
-              <TagLabel> {t.preferred}</TagLabel>
+              <TagLabel>{t.preferred}</TagLabel>
             </Tag>
           ) : null}
           {showReadyIn30MinTag ? (
@@ -417,7 +426,9 @@ export const PharmacyInfo = ({
           borderWidth="1px"
           mb={1}
         >
-          <TagLabel fontWeight="bold">Current Pharmacy</TagLabel>
+          <TagLabel data-testid="pharmacy-info-current-pharmacy" fontWeight="bold">
+            Current Pharmacy
+          </TagLabel>
         </Tag>
       ) : null}
       {trackingLink && (

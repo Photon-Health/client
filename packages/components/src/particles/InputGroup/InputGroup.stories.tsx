@@ -34,6 +34,9 @@ export const MultipleInputs: InputGroupStory = {
             return person.name.toLowerCase().includes(query().toLowerCase());
           });
     });
+    const [selectedPerson, setSelectedPerson] = createSignal<
+      { id: string; name: string } | undefined
+    >();
 
     return (
       <div class="grid grid-cols-2 gap-4">
@@ -65,7 +68,7 @@ export const MultipleInputs: InputGroupStory = {
         </InputGroup>
 
         <InputGroup label="Select Name" helpText="So many options">
-          <ComboBox>
+          <ComboBox value={selectedPerson()} setSelected={setSelectedPerson}>
             <ComboBox.Input
               onInput={(e) => setQuery(e.currentTarget.value)}
               displayValue={(person) => person.name}
@@ -83,7 +86,7 @@ export const MultipleInputs: InputGroupStory = {
         </InputGroup>
 
         <InputGroup label="Loading ComboBox" loading>
-          <ComboBox>
+          <ComboBox setSelected={setSelectedPerson}>
             <ComboBox.Input displayValue={() => ''} placeholder="...fetching combo" />
           </ComboBox>
         </InputGroup>

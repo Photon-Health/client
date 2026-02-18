@@ -1,4 +1,4 @@
-import { createSignal, Ref } from 'solid-js';
+import { createSignal } from 'solid-js';
 import {
   Card,
   CoverageOption,
@@ -8,13 +8,11 @@ import {
   ScreeningAlertType,
   Text,
   useDraftPrescriptions,
-  usePrescribe
+  usePrescribe,
+  usePrescribeEventDispatch
 } from '@photonhealth/components';
 import repopulateForm from '../util/repopulateForm';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { PhotonTooltip } from '../../photon-tooltip';
-import { Prescription } from '@photonhealth/sdk/dist/types';
-import { format } from 'date-fns';
 
 export const DraftPrescriptionCard = (props: {
   prescriptionRef: HTMLDivElement | undefined;
@@ -26,25 +24,14 @@ export const DraftPrescriptionCard = (props: {
   routingConstraints: RoutingConstraint[];
   enableOrder: boolean;
 }) => {
-  let ref: Ref<any> | undefined;
+  const { dispatchDraftPrescriptionDeleted } = usePrescribeEventDispatch();
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
   const [editDialogConfirm, setEditDialogConfirm] = createSignal<(() => void) | undefined>();
   const [editDraft, setEditDraft] = createSignal<PrescriptionFormData | undefined>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
-  const { prescriptionIds, deletePrescription, selectOtherCoverageOption } = usePrescribe();
-  const { draftPrescriptions } = useDraftPrescriptions();
-
-  const dispatchPrescriptionDraftDeleted = (prescription?: Prescription) => {
-    const event = new CustomEvent('photon-draft-prescription-deleted', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        prescription
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
+  const { selectOtherCoverageOption } = usePrescribe();
+  const { draftPrescriptions, prescriptionIds, deletePrescription } = useDraftPrescriptions();
 
   const editPrescription = () => {
     const formData = editDraft();
@@ -76,6 +63,7 @@ export const DraftPrescriptionCard = (props: {
       props.setIsEditing(true);
       editPrescription();
       onConfirm?.();
+      dispatchDraftPrescriptionDeleted();
     } else {
       setEditDialogOpen(true);
       setEditDialogConfirm(onConfirm);
@@ -95,6 +83,7 @@ export const DraftPrescriptionCard = (props: {
 
     editDialogConfirm()?.();
     setEditDialogConfirm(undefined);
+    dispatchDraftPrescriptionDeleted();
   };
   const handleEditCancel = () => {
     setEditDialogOpen(false);
@@ -106,7 +95,7 @@ export const DraftPrescriptionCard = (props: {
     if (deletedId) {
       const deletedRx = draftPrescriptions().find((rx) => rx.id === deletedId);
       deletePrescription(deletedId);
-      dispatchPrescriptionDraftDeleted(deletedRx);
+      dispatchDraftPrescriptionDeleted(deletedRx);
     }
 
     setDeleteDialogOpen(false);
@@ -125,8 +114,7 @@ export const DraftPrescriptionCard = (props: {
   };
 
   return (
-    <div ref={ref}>
-      <style>{photonStyles}</style>
+    <div>
       <photon-dialog
         open={editDialogOpen()}
         label="Overwrite in progress prescription?"
@@ -158,7 +146,7 @@ export const DraftPrescriptionCard = (props: {
       <Card addChildrenDivider={true}>
         <div class="flex items-center space-x-2 text-slate-500">
           <Text color="gray" class="pr-2">
-            {props.enableOrder ? 'Pending Order' : 'Pending Prescriptions'}
+            Draft Prescriptions
           </Text>
           <PhotonTooltip
             maxWidth="300px"
@@ -191,8 +179,7 @@ function toFormData(coverageOption: CoverageOption): PrescriptionFormData {
     // re-using the prescriptionId (via coverageOption.prescriptionId) of the original Prescription
     // so that the edit flow will remove it from the list of prescriptions
     id: coverageOption.prescriptionId,
-
-    effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+    doNotFillBeforeDate: undefined,
     dispenseAsWritten: false,
     dispenseQuantity: coverageOption.dispenseQuantity,
     dispenseUnit: coverageOption.dispenseUnit,

@@ -62,6 +62,12 @@ export function RadioGroupCardsProvider(props: RadioGroupCardsProps) {
   ];
 
   createEffect(() => {
+    if (props.value) {
+      setState('selected', props.value);
+    }
+  });
+
+  createEffect(() => {
     if (props.contextRef) {
       props.contextRef(radioGroup);
     }
@@ -145,6 +151,7 @@ RadioGroupCards Root
 */
 export interface RadioGroupCardsProps {
   label: string;
+  value?: string;
   initSelected?: string;
   children: JSXElement;
   setSelected?: (selected: string) => void;

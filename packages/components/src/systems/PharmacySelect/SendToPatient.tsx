@@ -27,7 +27,7 @@ const stpStates: {
   patientWillSelect: {
     badgeColor: 'purple',
     badgeText: 'Patient Will Select',
-    text: 'Patient will select a pharmacy after you send an order.'
+    text: 'Patient will select a pharmacy after you send the prescription(s).'
   },
   recentPharmacy: {
     badgeColor: 'yellow',
@@ -37,7 +37,7 @@ const stpStates: {
   preferredPharmacy: {
     badgeColor: 'blue',
     badgeText: 'Preferred Pharmacy',
-    text: 'This patient selected this as their preferred pharmacy.'
+    text: "The patient can update their preferred pharmacy selection for 15 minutes. Otherwise, we'll send it to their preferred pharmacy on file."
   },
   coverageOptionPharmacy: {
     badgeColor: 'gray',

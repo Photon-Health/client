@@ -1,4 +1,4 @@
-import { Link, HStack, Text } from '@chakra-ui/react';
+import { Link, VStack, Text } from '@chakra-ui/react';
 import { FulfillmentState } from 'packages/sdk/src/types';
 import React, { ReactNode } from 'react';
 import { ExtendedFulfillmentType } from './models';
@@ -25,6 +25,7 @@ export const text = {
   errorMarkPickedUp: 'Unable to mark order as picked up',
   errorMarkDelivered: 'Unable to mark order as delivered',
   expires: 'Expires',
+  demoTitle: 'Patient experience demo',
   fakeRx: 'This is not a real prescription.',
   fakeRxs: 'These are not real prescriptions.',
   findLoc: 'Find a location',
@@ -97,13 +98,9 @@ export const text = {
   pricesCanChange:
     'Prices subject to change without notice and may change based on supply and demand. If there’s a huge price discrepancy, please message us.',
   quantity: 'Quantity',
-  questionVerb: 'If you have any questions, please text us at ',
+  questionVerb: 'If you have any questions, please contact support',
   questionsPhoneNumber: '+1 (513) 866 3212',
-  reachOut: (
-    <>
-      If you have any questions, please <PhoneLink>text us</PhoneLink> or reach out to your provider
-    </>
-  ),
+  reachOut: 'If you have any questions, please reach out to your provider',
   readyBy: 'Ready by',
   readyByOptions: {
     Today: [
@@ -214,21 +211,11 @@ export const text = {
   setLoc: 'Set location',
   setSearchLoc: 'Set search location',
   shipTo: (deliveryAddress: string) => `Ship to ${deliveryAddress}`,
-  showDiscountCardPrices: (onClick: () => void) => (
-    <>
-      <HStack>
-        <Text fontWeight="semibold">Show coupon card prices</Text>
-        <Link
-          textDecoration="underline"
-          textUnderlineOffset="2px"
-          color="blue.500"
-          fontSize="sm"
-          onClick={onClick}
-        >
-          What's this?
-        </Link>
-      </HStack>
-    </>
+  showDiscountCardPrices: () => (
+    <VStack align="flex-start" spacing={0}>
+      <Text fontWeight="semibold">Show lowest cash prices</Text>
+      <Text fontSize="sm">May be cheaper than your insurance</Text>
+    </VStack>
   ),
   showThisCoupon: 'Show this at the pharmacy to get this coupon price',
   showCouponToPharmacy: (isPlural: boolean) =>
@@ -240,7 +227,7 @@ export const text = {
   thankYou: 'Thank you!',
   track: 'Track your order',
   tracking: 'Tracking #:',
-  tryPhoton: 'Try Photon',
+  learnMore: 'Learn More',
   useLoc: 'Use my current location',
   usingWithInsurance: (
     <>

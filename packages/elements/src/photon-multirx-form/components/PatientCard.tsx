@@ -11,7 +11,23 @@ import {
 import { Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
-import type { Address } from '../photon-prescribe-workflow';
+import type { Address } from './PrescribeWorkflow';
+const hasUsableAddress = (address?: {
+  street1?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+}) => {
+  if (!address) {
+    return false;
+  }
+  return Boolean(
+    address.street1?.trim() &&
+      address.city?.trim() &&
+      address.state?.trim() &&
+      address.postalCode?.trim()
+  );
+};
 
 const patientValidator = message(record(string(), any()), 'Please select a patient...');
 
@@ -22,8 +38,11 @@ const patientAddressValidator = message(
 
 interface PatientCardStoreProp {
   patient?: {
-    value?: { id: string; address: any };
+    value?: { id: string; address: any; preferredPharmacies?: any[] };
     error: boolean;
+  };
+  address?: {
+    value?: any;
   };
 }
 
@@ -40,9 +59,9 @@ export const PatientCard = (props: {
   enableMedHistoryLinks?: boolean;
   enableMedHistoryRefillButton?: boolean;
   hidePatientCard?: boolean;
+  optionalPatientAddress?: boolean;
 }) => {
   const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
-  undefined;
   const [showEditPatientView, setShowEditPatientView] = createSignal(false);
   const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
   const { actions, store } = PatientStore;
@@ -100,11 +119,26 @@ export const PatientCard = (props: {
     return currentPatientId() ?? '';
   });
 
+  const hasAddress = createMemo(() => {
+    const address = props.store.address?.value || props.store.patient?.value?.address;
+    return hasUsableAddress(address);
+  });
+  const hasPreferredPharmacy = createMemo(() => {
+    return Boolean(props.store.patient?.value?.preferredPharmacies?.length);
+  });
+
   // Show the address form only if the patient doesnt have an address
-  const showAddressForm = createMemo(
-    () =>
-      props.store.patient?.value?.id && !props.store.patient?.value?.address && props.enableOrder
-  );
+  // and the address is not marked as optional in the provider UX
+  const showAddressForm = createMemo(() => {
+    if (!props.store.patient?.value?.id || !props.enableOrder) {
+      return false;
+    }
+    if (!props.optionalPatientAddress) {
+      return !hasAddress();
+    }
+    // optionalpatientaddress skips address requirement unless a preferred pharmacy is set
+    return hasPreferredPharmacy() && !hasAddress();
+  });
 
   return (
     <div class="flex flex-col gap-8">
@@ -153,6 +187,7 @@ export const PatientCard = (props: {
               setShowEditPatientView(false);
             }}
             patient-id={patientId()}
+            optional-patient-address={props.optionalPatientAddress}
           />
         </div>
       </Show>
@@ -167,7 +202,6 @@ export const PatientCard = (props: {
             hideAddMedicationDialog={() => setShowAddMedDialog(false)}
           />
           <photon-add-medication-history-dialog
-            title="Add Medication History"
             open={showAddMedDialog()}
             on:photon-medication-selected={(e: { detail: { medication: Treatment } }) => {
               setNewMedication(e.detail.medication);

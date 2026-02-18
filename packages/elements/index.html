@@ -38,7 +38,9 @@
     >
       <div style="padding: 15px" id="parent">
         <photon-prescribe-workflow
-          patient-id="pat_01JRZWHBJMKHC9GSAN3PEW045J"
+          patient-id="pat_01KF40AHFHKG02P786WXJGRVR0"
+          optional-patient-address="true"
+          address='{"street1": "123 Main St", "city": "Calistoga", "state": "CA", "postalCode": "94515"}'
           enable-order="true"
           enable-med-history="true"
           enable-med-history-refill-button="true"
@@ -46,6 +48,7 @@
           enable-coverage-check="true"
           enable-send-to-patient="true"
           enable-local-pickup="true"
+          disable-list='[{"treatmentIds": ["med_01J6ZE5RSPDRXZRX7SEFHJSMDB"], "reason": "Not covered by patient insurance"}, {"treatmentIds": ["med_01J6ZE5RTEB5FK0CES2DDQWYV2"], "reason": "Too expensive"}]'
           id="one"
         ></photon-prescribe-workflow>
       </div>

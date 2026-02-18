@@ -13,15 +13,15 @@ type Sex = {
 export const sexes: Sex[] = [
   {
     id: '1',
-    name: 'MALE'
+    name: 'Male'
   },
   {
     id: '2',
-    name: 'FEMALE'
+    name: 'Female'
   },
   {
     id: '3',
-    name: 'UNKNOWN'
+    name: 'Unknown'
   }
 ];
 
@@ -41,7 +41,7 @@ const Component = (props: {
       composed: true,
       bubbles: true,
       detail: {
-        sex: sex
+        sex
       }
     });
     ref?.dispatchEvent(event);
@@ -51,7 +51,7 @@ const Component = (props: {
     <div
       ref={ref}
       on:photon-data-selected={(e: any) => {
-        dispatchSexSelected(e.detail.data.name);
+        dispatchSexSelected(e.detail.data.name.toUpperCase());
       }}
     >
       <style>{tailwind}</style>
@@ -68,7 +68,6 @@ const Component = (props: {
         displayAccessor={(p) => p?.name || ''}
         showOverflow={true}
         noDataMsg={''}
-        optional={false}
         helpText={props.helpText}
         selectedData={sexes.filter((x) => x.name.toUpperCase() === props.selected)?.[0]}
       />
