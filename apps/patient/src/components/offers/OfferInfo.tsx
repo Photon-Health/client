@@ -68,10 +68,12 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
   const costAmount = offer.costAmount ?? offer.retailAmount;
   const costAmountTitle = offer.costAmountTitle ?? offer.retailAmountTitle;
 
-  // if they're already paying the retail amount
-  // there's no point in showing what they'll save
-  const retailAmount = costAmount === offer.retailAmount ? undefined : offer.retailAmount;
-  const retailAmountTitle = costAmount === offer.retailAmount ? undefined : offer.retailAmountTitle;
+  // if they cost is higher than the retail amount
+  // there's no point in showing what the strike price because it will be clear they're paying more
+  const retailIsSameOrLower =
+    offer.retailAmount != null && costAmount != null && offer.retailAmount <= costAmount;
+  const retailAmount = retailIsSameOrLower ? undefined : offer.retailAmount;
+  const retailAmountTitle = retailIsSameOrLower ? undefined : offer.retailAmountTitle;
 
   const isAmazonPharmacy = pharmacy.id === process.env.REACT_APP_AMAZON_PHARMACY_ID;
 
