@@ -131,13 +131,11 @@ export const AddPrescriptionCard = (props: {
     supervisorFullName: refine(optional(string()), 'fullNameValidation', () => {
       const result = validateSupervisorFields();
       const error = result.errors?.supervisorFullName;
-      console.log('fullNameValidation', error);
       return error ? error : true;
     }),
     supervisorNpi: refine(optional(string()), 'npiValidation', () => {
       const result = validateSupervisorFields();
       const error = result.errors?.supervisorNpi;
-      console.log('npiValidation', error);
       return error ? error : true;
     })
   };
@@ -161,7 +159,6 @@ export const AddPrescriptionCard = (props: {
     const keys = [...Object.keys(validators), ...Object.keys(supervisorValidators)];
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
-    console.log(props.actions.getErrors(keys));
 
     if (errorsPresent) {
       setIsLoading(false);
@@ -172,6 +169,12 @@ export const AddPrescriptionCard = (props: {
       return;
     }
 
+    const supervisorPrefix = `Supervising Physician:`;
+    const supervisorString = `${supervisorPrefix} ${props.store.supervisorFullName.value}, ${props.store.supervisorNpi.value}`;
+    const notes = props.store.notes.value;
+    // This may happen if user edits a draft prescription
+    const notesHasSupervisor = notes.toLowerCase().includes(supervisorPrefix.toLowerCase());
+
     const prescriptionFormData: PrescriptionFormData = {
       doNotFillBeforeDate: props.store.doNotFillBeforeDate?.value,
       treatment: { id: props.store.treatment.value.id, name: props.store.treatment.value.name },
@@ -180,7 +183,7 @@ export const AddPrescriptionCard = (props: {
       dispenseUnit: props.store.dispenseUnit.value,
       daysSupply: props.store.daysSupply.value,
       instructions: props.store.instructions.value,
-      notes: props.store.notes.value,
+      notes: notesHasSupervisor ? notes : `${notes}\n\n${supervisorString}`.trim(),
       fillsAllowed: props.store.refillsInput.value + 1,
       // TODO: set this from template-overrides. can we stop using the props.store, with this param as a starting point?
       diagnoseCodes: []
@@ -224,6 +227,8 @@ export const AddPrescriptionCard = (props: {
       'templateName',
       'addToTemplates',
       'doNotFillBeforeDate'
+      // Purposefully do not clear supervisorFullName and supervisorNpi
+      // so the fields will repopulate on additional prescriptions
     ]);
     setOffCatalog(undefined);
     clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);
@@ -470,7 +475,7 @@ export const AddPrescriptionCard = (props: {
           here can help avoid callbacks and delays.
         </Text>
         <photon-text-input
-          label="Full Name"
+          label="Supervising Physician Full Name"
           value={props.store.supervisorFullName?.value ?? ''}
           invalid={props.store.supervisorFullName?.error ?? false}
           help-text={props.store.supervisorFullName?.error}
@@ -482,7 +487,7 @@ export const AddPrescriptionCard = (props: {
           }
         />
         <photon-text-input
-          label="NPI"
+          label="Supervising Physician NPI"
           value={props.store.supervisorNpi?.value ?? ''}
           invalid={props.store.supervisorNpi?.error ?? false}
           help-text={props.store.supervisorNpi?.error}
