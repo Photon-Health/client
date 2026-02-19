@@ -1,5 +1,15 @@
-import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@chakra-ui/react';
-import { FiStar } from 'react-icons/fi';
+import {
+  Box,
+  HStack,
+  Image,
+  Tag,
+  TagLabel,
+  TagLeftIcon,
+  Text,
+  Tooltip,
+  VStack
+} from '@chakra-ui/react';
+import { FiInfo, FiStar } from 'react-icons/fi';
 import { text as t } from '../../utils/text';
 
 import { formatPrice } from '../../utils/formatters';
@@ -121,9 +131,29 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
           {offer.deliveryEstimate}
         </Text>
         {isAmazonPharmacy && (
-          <Text fontSize="sm" color="gray.500">
-            Sponsored
-          </Text>
+          <Tooltip
+            label="This pharmacy has paid for preferred placement. Photon Health does not endorse this pharmacy over others. Other pharmacies may offer this medication at the same or similar price."
+            hasArrow={true}
+            placement="bottom-start"
+            bg="white"
+            color="gray.800"
+            fontWeight="normal"
+            boxShadow="lg"
+            borderRadius="lg"
+            border="1px solid"
+            borderColor="gray.200"
+            p={3}
+            sx={{
+              '--popper-arrow-shadow-color': 'colors.gray.200'
+            }}
+          >
+            <HStack alignItems={'center'} spacing={1}>
+              <Text fontSize="sm" color="gray.500">
+                Sponsored
+              </Text>
+              <FiInfo color="var(--chakra-colors-gray-500)" size={16} />
+            </HStack>
+          </Tooltip>
         )}
       </VStack>
     </VStack>
