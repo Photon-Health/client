@@ -15,6 +15,7 @@ import {
 import { Card } from './Card';
 import { FAQContents } from './FAQ';
 import { useOrderContext } from '../views/Main';
+import { patientAnalytics } from '../configs/analytics';
 
 export const FAQModal = ({
   isOpen,
@@ -25,7 +26,7 @@ export const FAQModal = ({
   onClose: () => void;
   allowMessageSupport?: boolean;
 }) => {
-  const { isDemo } = useOrderContext();
+  const { order, isDemo } = useOrderContext();
   const toast = useToast();
 
   const handleClose = () => {
@@ -43,6 +44,10 @@ export const FAQModal = ({
         isClosable: true
       });
     }
+
+    patientAnalytics.track('Patient Clicked Message Support', order, {
+      isDemo: isDemo
+    });
   };
 
   return (

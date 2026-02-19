@@ -17,6 +17,8 @@ import { PoweredBy } from '../PoweredBy';
 import { MailOrderSelectList } from './MailOrderSelectList';
 import { MailOrderPharmacyOption } from './MailOrderSelectCard';
 import { datadogRum } from '@datadog/browser-rum';
+import { patientAnalytics } from '../../configs/analytics';
+import { useOrderContext } from '../../views/Main';
 
 type MailOrderSelectModalProps = Omit<ModalProps, 'children'> & {
   options?: MailOrderPharmacyOption[];
@@ -30,12 +32,18 @@ export function MailOrderSelectModal({
 }: MailOrderSelectModalProps) {
   const [confirming, setConfirming] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<MailOrderPharmacyOption | undefined>();
+  const { order } = useOrderContext();
 
   const handleOptionSelect = (val: MailOrderPharmacyOption) => {
     const newSelection = val.id !== selectedOption?.id;
     if (newSelection) {
       datadogRum.addAction('patient_mail_order_pharmacy_selected', {
         pharmacyId: val.id
+      });
+
+      patientAnalytics.track('Patient Clicked Mail Order Pharmacy', order, {
+        pharmacyId: val.id,
+        pharmacyName: val.name
       });
     }
     setSelectedOption(newSelection ? val : undefined);
@@ -49,6 +57,11 @@ export function MailOrderSelectModal({
       await onConfirm(selectedOption);
       datadogRum.addAction('patient_mail_order_pharmacy_confirmed', {
         pharmacyId: selectedOption.id
+      });
+
+      patientAnalytics.track('Patient Confirmed Mail Order Pharmacy', order, {
+        pharmacyId: selectedOption.id,
+        pharmacyName: selectedOption.name
       });
     } finally {
       setConfirming(false);
