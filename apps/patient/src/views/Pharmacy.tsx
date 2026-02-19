@@ -629,6 +629,12 @@ export const Pharmacy = () => {
     }
 
     setLoadingPharmacies(false);
+
+    patientAnalytics.track('Patient Clicked Show More Pharmacies', order, {
+      latitude,
+      longitude,
+      pageOffset
+    });
   };
 
   const handleSelect = (pharmacyId: string) => {
@@ -1149,7 +1155,12 @@ export const Pharmacy = () => {
                     size="lg"
                     aria-label="Show lowest cash prices"
                     isChecked={enablePrice}
-                    onChange={(e) => setEnablePrice(e.target.checked)}
+                    onChange={(e) => {
+                      setEnablePrice(e.target.checked);
+                      patientAnalytics.track('Patient Toggle Show CashPrice Filter', order, {
+                        enabled: e.target.checked
+                      });
+                    }}
                   />
                 </HStack>
                 {enablePrice ? (
