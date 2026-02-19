@@ -29,6 +29,7 @@ import { RxLightningBolt } from 'react-icons/rx';
 import { FiCheck } from 'react-icons/fi';
 import { capitalize } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
+import { patientAnalytics } from '../configs/analytics';
 
 dayjs.extend(timezone);
 
@@ -184,6 +185,9 @@ export const ReadyBy = () => {
                   setSelectedTime(undefined);
                   setSelectedDay(undefined);
                   setActiveTab(day);
+                  patientAnalytics.track('Patient Clicked Ready By Day', order, {
+                    selectedDay: day
+                  });
                 }}
                 borderRadius="xl"
               >
@@ -215,6 +219,11 @@ export const ReadyBy = () => {
                         if (!isDisabled) {
                           setSelectedTime(option.label);
                           setSelectedDay(activeTab);
+
+                          patientAnalytics.track('Patient Clicked Ready By Time', order, {
+                            selectedTime: option.label,
+                            selectedDay: activeTab
+                          });
                         }
                       }}
                       m="auto"
