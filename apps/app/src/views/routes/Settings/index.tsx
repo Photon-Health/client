@@ -46,17 +46,25 @@ const tabs = [
   '/settings/user',
   '/settings/organization',
   '/settings/developers',
-  '/settings/templates',
-  '/settings/catalog'
+  '/settings/catalog',
+  '/settings/templates'
 ] as const;
 
 const canNavigate = (
   route: (typeof tabs)[number],
-  { hasDeveloper, hasTeam, hasOrg }: { hasDeveloper: boolean; hasTeam: boolean; hasOrg: boolean }
+  {
+    hasDeveloper,
+    hasTeam,
+    canManageOrganization
+  }: {
+    hasDeveloper: boolean;
+    hasTeam: boolean;
+    canManageOrganization: boolean;
+  }
 ) => {
   if (route === '/settings/developers') return hasDeveloper;
   if (route === '/settings/team') return hasTeam;
-  if (route === '/settings/organization') return hasOrg;
+  if (route === '/settings/organization') return canManageOrganization;
   return true;
 };
 
@@ -81,7 +89,7 @@ export const Settings = () => {
 
   const hasDeveloper = usePermissions(['read:client']);
   const hasTeam = usePermissions(['read:profile']);
-  const hasOrg = usePermissions(['read:organization']);
+  const canManageOrganization = usePermissions(['manage:organization']);
 
   useEffect(() => {
     if (loading) {
@@ -91,20 +99,23 @@ export const Settings = () => {
     const newTabIndex = tabs.findIndex((path) => path === pathname);
     const newTabRoute = tabs[newTabIndex];
 
-    if (newTabIndex >= 0 && canNavigate(newTabRoute, { hasDeveloper, hasTeam, hasOrg })) {
+    if (
+      newTabIndex >= 0 &&
+      canNavigate(newTabRoute, { hasDeveloper, hasTeam, canManageOrganization })
+    ) {
       setTabIndex(newTabIndex);
     } else {
       // Find the first page they can navigate to
       const firstEligible = tabs.find((route) =>
-        canNavigate(route, { hasDeveloper, hasTeam, hasOrg })
+        canNavigate(route, { hasDeveloper, hasTeam, canManageOrganization })
       );
       navigate(firstEligible ?? tabs[1]);
     }
-  }, [pathname, loading, hasDeveloper, hasTeam, hasOrg]);
+  }, [pathname, loading, hasDeveloper, hasTeam, canManageOrganization]);
 
   const handleTabsChange = (index: number) => {
     const newPath = tabs[index];
-    if (!canNavigate(newPath, { hasDeveloper, hasOrg, hasTeam })) return;
+    if (!canNavigate(newPath, { hasDeveloper, hasTeam, canManageOrganization })) return;
     setTabIndex(index);
     if (newPath) {
       navigate(newPath);
@@ -123,10 +134,10 @@ export const Settings = () => {
           <TabList overflowX={'auto'} overflowY={'hidden'}>
             <Tab hidden={!hasTeam}>Team</Tab>
             <Tab>User</Tab>
-            <Tab hidden={!hasOrg}>Organization</Tab>
+            <Tab hidden={!canManageOrganization}>Organization</Tab>
             <Tab hidden={!hasDeveloper}>Developers</Tab>
-            <Tab>Templates</Tab>
             <Tab>Catalog</Tab>
+            <Tab>Templates</Tab>
           </TabList>
           <TabPanels>
             <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
@@ -142,10 +153,10 @@ export const Settings = () => {
               <DevelopersTab />
             </TabPanel>
             <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
-              <TemplateTab />
+              <TreatmentTab organization={data?.organization ?? undefined} />
             </TabPanel>
             <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
-              <TreatmentTab organization={data?.organization ?? undefined} />
+              <TemplateTab />
             </TabPanel>
           </TabPanels>
         </Tabs>
