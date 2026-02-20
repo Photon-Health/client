@@ -73,7 +73,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   });
   actions.registerValidator({
     key: 'dateOfBirth',
-    validator: message(union([notFutureDate, empty()]), 'Please enter a valid date of birth.')
+    validator: message(notFutureDate, 'Please enter a valid date of birth.')
   });
   actions.registerValidator({
     key: 'sex',
@@ -142,6 +142,10 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
       actions.updateFormValue({
         key: 'lastName',
         value: pStore.selectedPatient.data.name.last
+      });
+      actions.updateFormValue({
+        key: 'dateOfBirth',
+        value: pStore.selectedPatient.data.dateOfBirth
       });
       actions.updateFormValue({
         key: 'phone',
@@ -244,8 +248,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
           }}
         />
       </InputGroup>
-      {/* TODO: remove once InputGroup always reserves help-text space */}
-      {!store['address_street1']?.error && <div class="h-[21px] pt-1" />}
+
       <InputGroup label="Street 2" error={store['address_street2']?.error}>
         <Input
           value={store['address_street2']?.value ?? pStore.selectedPatient.data?.address?.street2}
@@ -254,8 +257,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
           }}
         />
       </InputGroup>
-      {/* TODO: remove once InputGroup always reserves help-text space */}
-      {!store['address_street2']?.error && <div class="h-[21px] pt-1" />}
+
       <InputGroup
         label="City"
         error={store['address_city']?.error}
@@ -269,8 +271,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
           }}
         />
       </InputGroup>
-      {/* TODO: remove once InputGroup always reserves help-text space */}
-      {!store['address_city']?.error && <div class="h-[21px] pt-1" />}
+
       <div class="flex gap-4">
         <div class="flex-grow min-w-[40%]">
           <InputGroup
@@ -286,8 +287,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
               }}
             />
           </InputGroup>
-          {/* TODO: remove once InputGroup always reserves help-text space */}
-          {!store['address_state']?.error && <div class="h-[21px] pt-1" />}
         </div>
         <div class="flex-grow min-w-[40%]">
           <InputGroup
@@ -305,8 +304,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
               }}
             />
           </InputGroup>
-          {/* TODO: remove once InputGroup always reserves help-text space */}
-          {!store['address_zip']?.error && <div class="h-[21px] pt-1" />}
         </div>
       </div>
     </>
@@ -343,8 +340,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                       }}
                     />
                   </InputGroup>
-                  {/* TODO: remove once InputGroup always reserves help-text space */}
-                  {!store['firstName']?.error && <div class="h-[21px] pt-1" />}
+
                   <InputGroup label="Last name" error={store['lastName']?.error} required>
                     <Input
                       required
@@ -357,23 +353,19 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                       }}
                     />
                   </InputGroup>
-                  {/* TODO: remove once InputGroup always reserves help-text space */}
-                  {!store['lastName']?.error && <div class="h-[21px] pt-1" />}
+
                   <InputGroup label="Date of birth" error={store['dateOfBirth']?.error} required>
                     <DateInput
                       required
                       value={
-                        props.patientId
-                          ? pStore.selectedPatient.data?.dateOfBirth
-                          : store['dateOfBirth']?.value
+                        store['dateOfBirth']?.value ?? pStore.selectedPatient.data?.dateOfBirth
                       }
                       onDateChange={(value) => {
                         actions.updateFormValue({ key: 'dateOfBirth', value });
                       }}
                     />
                   </InputGroup>
-                  {/* TODO: remove once InputGroup always reserves help-text space */}
-                  {!store['dateOfBirth']?.error && <div class="h-[21px] pt-1" />}
+
                   <InputGroup label="Mobile number" error={store['phone']?.error} required>
                     <PhoneInput
                       required
@@ -383,8 +375,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                       }}
                     />
                   </InputGroup>
-                  {/* TODO: remove once InputGroup always reserves help-text space */}
-                  {!store['phone']?.error && <div class="h-[21px] pt-1" />}
+
                   <InputGroup label="Sex at birth" error={store['sex']?.error} required>
                     <SexSelect
                       required
@@ -394,8 +385,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                       }
                     />
                   </InputGroup>
-                  {/* TODO: remove once InputGroup always reserves help-text space */}
-                  {!store['sex']?.error && <div class="h-[21px] pt-1" />}
                 </div>
                 <Show when={!props.optionalPatientAddress}>
                   <AddressFields />
@@ -430,8 +419,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                       }
                     />
                   </InputGroup>
-                  {/* TODO: remove once InputGroup always reserves help-text space */}
-                  {!store['gender']?.error && <div class="h-[21px] pt-1" />}
+
                   <InputGroup label="Email" error={store['email']?.error}>
                     <Input
                       type="email"
@@ -441,8 +429,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                       }}
                     />
                   </InputGroup>
-                  {/* TODO: remove once InputGroup always reserves help-text space */}
-                  {!store['email']?.error && <div class="h-[21px] pt-1" />}
+
                   <p class="font-sans text-sm m-0">Preferred pharmacy</p>
                   <PharmacySearch
                     address={getPatientAddress(pStore, store)}
