@@ -46,8 +46,8 @@ const tabs = [
   '/settings/user',
   '/settings/organization',
   '/settings/developers',
-  '/settings/templates',
-  '/settings/catalog'
+  '/settings/catalog',
+  '/settings/templates'
 ] as const;
 
 const canNavigate = (
@@ -125,8 +125,8 @@ export const Settings = () => {
             <Tab>User</Tab>
             <Tab hidden={!hasOrg}>Organization</Tab>
             <Tab hidden={!hasDeveloper}>Developers</Tab>
-            <Tab>Templates</Tab>
             <Tab>Catalog</Tab>
+            <Tab>Templates</Tab>
           </TabList>
           <TabPanels>
             <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
@@ -142,10 +142,10 @@ export const Settings = () => {
               <DevelopersTab />
             </TabPanel>
             <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
-              <TemplateTab />
+              <TreatmentTab organization={data?.organization ?? undefined} />
             </TabPanel>
             <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
-              <TreatmentTab organization={data?.organization ?? undefined} />
+              <TemplateTab />
             </TabPanel>
           </TabPanels>
         </Tabs>
