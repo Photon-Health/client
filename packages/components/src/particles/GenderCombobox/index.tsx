@@ -50,7 +50,9 @@ export default function GenderSelect(props: GenderSelectProps) {
       onBlur={props.onBlur}
       class={selectClass()}
     >
-      <option value="">Select gender</option>
+      <option value="" disabled>
+        Select gender
+      </option>
       <For each={GENDER_OPTIONS}>
         {(opt) => (
           <option value={opt.id} selected={props.value === opt.id}>

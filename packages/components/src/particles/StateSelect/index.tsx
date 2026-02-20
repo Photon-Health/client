@@ -41,7 +41,9 @@ export default function StateSelect(props: StateSelectProps) {
       onBlur={props.onBlur}
       class={selectClass()}
     >
-      <option value="">Select state</option>
+      <option value="" disabled>
+        Select state
+      </option>
       <For each={states}>
         {(state) => (
           <option value={state.id} selected={props.value === state.id}>

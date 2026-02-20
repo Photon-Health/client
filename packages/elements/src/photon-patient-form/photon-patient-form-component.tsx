@@ -430,7 +430,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                     />
                   </InputGroup>
 
-                  <p class="font-sans text-sm m-0">Preferred pharmacy</p>
+                  <p class="font-sans text-sm m-0 mt-6">Preferred pharmacy</p>
                   <PharmacySearch
                     address={getPatientAddress(pStore, store)}
                     setPharmacy={(pharmacy: any) => {

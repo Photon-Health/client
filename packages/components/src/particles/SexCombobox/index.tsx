@@ -46,7 +46,9 @@ export default function SexSelect(props: SexSelectProps) {
       onBlur={props.onBlur}
       class={selectClass()}
     >
-      <option value="">Select sex</option>
+      <option value="" disabled>
+        Select sex
+      </option>
       <For each={SEX_OPTIONS}>
         {(opt) => (
           <option value={opt.id} selected={props.value === opt.id}>
