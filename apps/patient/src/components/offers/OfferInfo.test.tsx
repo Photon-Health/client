@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { OfferInfo } from './OfferInfo';
 import { Offer } from '../pharmacy-card-list';
 
@@ -11,6 +11,10 @@ vi.mock('../../utils/text', () => ({
 }));
 
 describe('OfferInfo', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   const baseOffer: Offer = {
     pharmacy: {
       id: 'test-pharmacy-id',
@@ -268,5 +272,23 @@ describe('OfferInfo', () => {
     expect(screen.getByText('Current Pharmacy')).toBeInTheDocument();
     expect(screen.getByText('In Stock')).toBeInTheDocument();
     expect(screen.getByText('Free Shipping')).toBeInTheDocument();
+  });
+
+  test('shows Sponsored text when pharmacy is Amazon', () => {
+    const amazonPharmacyId = 'amazon-pharmacy-id';
+    vi.stubEnv('REACT_APP_AMAZON_PHARMACY_ID', amazonPharmacyId);
+
+    const amazonPharmacy = { ...baseOffer.pharmacy, id: amazonPharmacyId };
+
+    render(
+      <OfferInfo
+        pharmacy={amazonPharmacy}
+        offer={{ ...baseOffer, pharmacy: amazonPharmacy }}
+        isCurrentPharmacy={false}
+        isPreferred={false}
+      />
+    );
+
+    expect(screen.getByText('Sponsored')).toBeInTheDocument();
   });
 });
