@@ -70,7 +70,7 @@ export function determineNovocareExperimentSegment(order: Order): string | undef
   const medicinesAndDeliveryTypes = [
     {
       patterns: ['wegovy'],
-      deliveryType: 'Delivers in 3-5 days'
+      deliveryType: ''
     }
   ];
 
