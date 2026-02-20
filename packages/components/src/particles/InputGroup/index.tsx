@@ -1,11 +1,11 @@
 import {
+  createContext,
+  createEffect,
+  createMemo,
+  createUniqueId,
   JSX,
   Show,
-  createUniqueId,
-  createContext,
-  useContext,
-  createEffect,
-  createMemo
+  useContext
 } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
@@ -84,6 +84,7 @@ export interface InputGroupProps {
   children?: JSX.Element;
   loading?: boolean;
   disabled?: boolean;
+  required?: boolean;
 }
 
 function InputGroupWrapper(props: InputGroupProps) {
@@ -115,12 +116,17 @@ function InputGroupWrapper(props: InputGroupProps) {
         <div>
           <Show when={isLabelString()}>
             <label
-              class={`block text-base font-light leading-6 text-gray-900 ${
+              class={`block text-sm font-normal leading-6 text-gray-700 pt-3 pb-1 ${
                 props?.subLabel ? 'mb-0' : ''
               }`}
               for={state.id}
             >
               {props.label}
+              <Show when={props.required}>
+                <span aria-hidden="true" class="text-red-500 ml-0.5">
+                  *
+                </span>
+              </Show>
             </label>
           </Show>
           <Show when={!isLabelString()}>{props.label}</Show>
@@ -144,7 +150,7 @@ function InputGroupWrapper(props: InputGroupProps) {
       {(props.error || props.helpText) && (
         <div class="h-6">
           <p
-            class={`mt-1 text-sm ${props.error ? 'text-red-600' : 'text-gray-500'}`}
+            class={`mt-1 text-sm ${props.error ? 'text-red-400' : 'text-gray-500'}`}
             id={ariaDescribedBy}
           >
             {props.error || props.helpText}

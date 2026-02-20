@@ -1,4 +1,4 @@
-import { JSX, Show, createEffect, createMemo, createSignal, splitProps } from 'solid-js';
+import { createEffect, createMemo, createSignal, JSX, Show, splitProps } from 'solid-js';
 import Icon from '../Icon';
 import clsx from 'clsx';
 import { useInputGroup } from '../InputGroup';
@@ -36,12 +36,11 @@ export default function Input(props: InputProps) {
     const error = nonNativeProps.error || state.error;
     const readonly = inputProps.readonly || inputProps.readOnly;
     return clsx(
-      'block w-full rounded-lg border-0 py-3 px-4 shadow-sm ring-1 ring-inset text-sm sm:text-base sm:leading-6 focus:outline-none',
+      'block w-full rounded-lg border-0 py-3 px-4 ring-1 ring-inset text-sm sm:text-base sm:leading-6 focus:outline-none',
       {
         'pl-10': inputProps.type === 'email',
-        'ring-red-300 placeholder:text-red-300 focus:ring-inset focus:ring-red-500':
-          !!error && !disabled,
-        'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-inset focus:ring-blue-600':
+        'ring-red-300 placeholder:text-red-300 focus:ring-sky-500/40': !!error && !disabled,
+        'text-gray-900 ring-gray-300 placeholder:text-gray-400 hover:ring-gray-400 focus:ring-sky-500/40':
           !error && !disabled,
         'focus:ring-2': !readonly,
         'cursor-not-allowed bg-gray-50 text-gray-500 ring-gray-200': inputProps.disabled,
@@ -79,10 +78,12 @@ export default function Input(props: InputProps) {
         </Show>
         <input
           id={state?.id}
+          aria-invalid={!!(nonNativeProps.error || state.error) || undefined}
+          aria-describedby={nonNativeProps.error || state.error ? `${state.id}-error` : undefined}
+          autocomplete="off"
           onInput={inputProps.type === 'number' ? handleInput : handler.onInput}
           {...inputProps}
           class={inputClass()}
-          autocomplete="off"
         />
         <Show when={state.loading || inputProps.loading}>
           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1">

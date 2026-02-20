@@ -1,24 +1,30 @@
 import { customElement } from 'solid-element';
 import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
-import { Card, Icon, PharmacySearch, Spinner, usePhoton } from '@photonhealth/components';
+import {
+  Card,
+  DateInput,
+  GenderSelect,
+  Icon,
+  Input,
+  InputGroup,
+  PharmacySearch,
+  PhoneInput,
+  SEX_OPTIONS,
+  SexSelect,
+  Spinner,
+  StateSelect,
+  usePhoton
+} from '@photonhealth/components';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { email, empty, message, notFutureDate, zipString } from '../validators';
 
-//Shoelace
-import '@shoelace-style/shoelace/dist/components/spinner/spinner';
-import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
-import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import { isZip } from '../utils';
-import { sexes } from '../photon-sex-input';
 import { PhotonAuthorized } from '../photon-authorized';
 import { PharmacyOption } from '@photonhealth/components/dist/packages/components/src/systems/PharmacySearch/PharmacySearch';
-
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 const getPatientAddress = (pStore: any, store: any) => {
   const patientAddress = pStore.selectedPatient.data?.address;
@@ -71,7 +77,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   });
   actions.registerValidator({
     key: 'sex',
-    validator: message(enums(sexes.map((s) => s.name.toUpperCase())), 'Please enter Sex at Birth.')
+    validator: message(enums(SEX_OPTIONS.map((o) => o.id)), 'Please enter Sex at Birth.')
   });
   actions.registerValidator({
     key: 'phone',
@@ -219,83 +225,89 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
     <>
       {/*Using !mt-8 because of tailwind issue in shadowDom elements */}
       {/*when not using the !important modifier*/}
-      <p class="font-sans text-lg mt-4 md:!mt-8">
+      <p class="font-sans text-lg mt-4 md:!mt-8" role="heading" aria-level="3">
         Address
         <Show when={props.optionalPatientAddress && !hasAnyAddressField()}>
           <span class="text-gray-500 text-sm font-normal"> (optional)</span>
         </Show>
       </p>
-      <photon-text-input
-        debounce-time="0"
-        invalid={store['address_street1']?.error}
-        help-text={store['address_street1']?.error}
+      <InputGroup
         label="Street 1"
+        error={store['address_street1']?.error}
         required={!props.optionalPatientAddress || hasAnyAddressField()}
-        on:photon-input-changed={async (e: any) => {
-          actions.updateFormValue({
-            key: 'address_street1',
-            value: e.detail.input
-          });
-        }}
-        value={store['address_street1']?.value ?? pStore.selectedPatient.data?.address?.street1}
-      />
-      <photon-text-input
-        debounce-time="0"
-        invalid={store['address_street2']?.error}
-        help-text={store['address_street2']?.error}
-        label="Street 2"
-        on:photon-input-changed={async (e: any) => {
-          actions.updateFormValue({
-            key: 'address_street2',
-            value: e.detail.input
-          });
-        }}
-        value={store['address_street2']?.value ?? pStore.selectedPatient.data?.address?.street2}
-      />
-      <photon-text-input
-        debounce-time="0"
-        invalid={store['address_city']?.error}
-        help-text={store['address_city']?.error}
+      >
+        <Input
+          required={!props.optionalPatientAddress || hasAnyAddressField()}
+          value={store['address_street1']?.value ?? pStore.selectedPatient.data?.address?.street1}
+          onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+            actions.updateFormValue({ key: 'address_street1', value: e.currentTarget.value });
+          }}
+        />
+      </InputGroup>
+      {/* TODO: remove once InputGroup always reserves help-text space */}
+      {!store['address_street1']?.error && <div class="h-[21px] pt-1" />}
+      <InputGroup label="Street 2" error={store['address_street2']?.error}>
+        <Input
+          value={store['address_street2']?.value ?? pStore.selectedPatient.data?.address?.street2}
+          onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+            actions.updateFormValue({ key: 'address_street2', value: e.currentTarget.value });
+          }}
+        />
+      </InputGroup>
+      {/* TODO: remove once InputGroup always reserves help-text space */}
+      {!store['address_street2']?.error && <div class="h-[21px] pt-1" />}
+      <InputGroup
         label="City"
+        error={store['address_city']?.error}
         required={!props.optionalPatientAddress || hasAnyAddressField()}
-        on:photon-input-changed={async (e: any) => {
-          actions.updateFormValue({
-            key: 'address_city',
-            value: e.detail.input
-          });
-        }}
-        value={store['address_city']?.value ?? pStore.selectedPatient.data?.address?.city}
-      />
+      >
+        <Input
+          required={!props.optionalPatientAddress || hasAnyAddressField()}
+          value={store['address_city']?.value ?? pStore.selectedPatient.data?.address?.city}
+          onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+            actions.updateFormValue({ key: 'address_city', value: e.currentTarget.value });
+          }}
+        />
+      </InputGroup>
+      {/* TODO: remove once InputGroup always reserves help-text space */}
+      {!store['address_city']?.error && <div class="h-[21px] pt-1" />}
       <div class="flex gap-4">
-        <photon-state-input
-          class="flex-grow min-w-[40%]"
-          label="State"
-          required={!props.optionalPatientAddress || hasAnyAddressField()}
-          help-text={store['address_state']?.error}
-          invalid={store['address_state']?.error !== undefined}
-          on:photon-state-selected={(e: any) => {
-            actions.updateFormValue({
-              key: 'address_state',
-              value: e.detail.state
-            });
-          }}
-          selected={store['state']?.value ?? pStore.selectedPatient.data?.address?.state}
-        />
-        <photon-text-input
-          debounce-time="0"
-          class="flex-grow min-w-[40%]"
-          invalid={store['address_zip']?.error}
-          help-text={store['address_zip']?.error}
-          label="Zip code"
-          required={!props.optionalPatientAddress || hasAnyAddressField()}
-          on:photon-input-changed={async (e: any) => {
-            actions.updateFormValue({
-              key: 'address_zip',
-              value: e.detail.input
-            });
-          }}
-          value={store['address_zip']?.value ?? pStore.selectedPatient.data?.address?.postalCode}
-        />
+        <div class="flex-grow min-w-[40%]">
+          <InputGroup
+            label="State"
+            error={store['address_state']?.error}
+            required={!props.optionalPatientAddress || hasAnyAddressField()}
+          >
+            <StateSelect
+              required={!props.optionalPatientAddress || hasAnyAddressField()}
+              value={store['address_state']?.value ?? pStore.selectedPatient.data?.address?.state}
+              onChange={(e) => {
+                actions.updateFormValue({ key: 'address_state', value: e.currentTarget.value });
+              }}
+            />
+          </InputGroup>
+          {/* TODO: remove once InputGroup always reserves help-text space */}
+          {!store['address_state']?.error && <div class="h-[21px] pt-1" />}
+        </div>
+        <div class="flex-grow min-w-[40%]">
+          <InputGroup
+            label="Zip code"
+            error={store['address_zip']?.error}
+            required={!props.optionalPatientAddress || hasAnyAddressField()}
+          >
+            <Input
+              required={!props.optionalPatientAddress || hasAnyAddressField()}
+              value={
+                store['address_zip']?.value ?? pStore.selectedPatient.data?.address?.postalCode
+              }
+              onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+                actions.updateFormValue({ key: 'address_zip', value: e.currentTarget.value });
+              }}
+            />
+          </InputGroup>
+          {/* TODO: remove once InputGroup always reserves help-text space */}
+          {!store['address_zip']?.error && <div class="h-[21px] pt-1" />}
+        </div>
       </div>
     </>
   );
@@ -303,8 +315,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   return (
     <div class="w-full h-full relative" ref={ref}>
       <style>{tailwind}</style>
-      <style>{shoelaceDarkStyles}</style>
-      <style>{shoelaceLightStyles}</style>
       <style>{photonStyles}</style>
       <Show when={pStore.selectedPatient.isLoading}>
         <div class="w-full flex justify-center">
@@ -317,95 +327,83 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
           <div class="flex flex-col gap-8">
             <Card>
               <div>
-                <p class="font-sans text-lg flex-grow">Patient info</p>
+                <p class="font-sans text-lg flex-grow" role="heading" aria-level="2">
+                  Patient info
+                </p>
                 <div class="flex flex-col">
-                  <photon-text-input
-                    class="w-full"
-                    debounce-time="0"
-                    invalid={store['firstName']?.error}
-                    help-text={store['firstName']?.error}
-                    label="First name"
-                    required="true"
-                    on:photon-input-changed={async (e: any) => {
-                      actions.updateFormValue({
-                        key: 'firstName',
-                        value: e.detail.input
-                      });
-                    }}
-                    value={store['firstName']?.value ?? pStore.selectedPatient.data?.name.first}
-                  />
-                  <photon-text-input
-                    class="w-full"
-                    debounce-time="0"
-                    invalid={store['lastName']?.error}
-                    help-text={store['lastName']?.error}
-                    label="Last name"
-                    required="true"
-                    on:photon-input-changed={async (e: any) => {
-                      actions.updateFormValue({
-                        key: 'lastName',
-                        value: e.detail.input
-                      });
-                    }}
-                    value={store['lastName']?.value ?? pStore.selectedPatient.data?.name.last}
-                  />
-                  <photon-datepicker
-                    class="w-full"
-                    invalid={store['dateOfBirth']?.error}
-                    help-text={store['dateOfBirth']?.error}
-                    label="Date of birth"
-                    required="true"
-                    on:photon-datepicker-selected={async (e: any) => {
-                      actions.updateFormValue({
-                        key: 'dateOfBirth',
-                        value: e.detail.date
-                      });
-                    }}
-                    value={
-                      props.patientId
-                        ? pStore.selectedPatient.data?.dateOfBirth
-                        : store['dateOfBirth']?.value
-                    }
-                  />
-                  <photon-phone-input
-                    class="w-full"
-                    invalid={store['phone']?.error}
-                    help-text={store['phone']?.error}
-                    label="Mobile number"
-                    required="true"
-                    on:photon-phone-changed={async (e: any) => {
-                      actions.updateFormValue({
-                        key: 'phone',
-                        value: e.detail.phone
-                      });
-                    }}
-                    value={store['phone']?.value ?? pStore.selectedPatient.data?.phone}
-                  />
-                  <photon-sex-input
-                    label="Sex at birth"
-                    required="true"
-                    help-text={store['sex']?.error}
-                    invalid={store['sex']?.error !== undefined}
-                    on:photon-sex-selected={(e: any) => {
-                      actions.updateFormValue({
-                        key: 'sex',
-                        value: e.detail.sex
-                      });
-                    }}
-                    on:photon-sex-deselected={() => {
-                      actions.updateFormValue({
-                        key: 'sex',
-                        value: undefined
-                      });
-                    }}
-                    selected={pStore.selectedPatient.data?.sex}
-                  />
+                  <InputGroup label="First name" error={store['firstName']?.error} required>
+                    <Input
+                      required
+                      value={store['firstName']?.value ?? pStore.selectedPatient.data?.name.first}
+                      onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+                        actions.updateFormValue({
+                          key: 'firstName',
+                          value: e.currentTarget.value
+                        });
+                      }}
+                    />
+                  </InputGroup>
+                  {/* TODO: remove once InputGroup always reserves help-text space */}
+                  {!store['firstName']?.error && <div class="h-[21px] pt-1" />}
+                  <InputGroup label="Last name" error={store['lastName']?.error} required>
+                    <Input
+                      required
+                      value={store['lastName']?.value ?? pStore.selectedPatient.data?.name.last}
+                      onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+                        actions.updateFormValue({
+                          key: 'lastName',
+                          value: e.currentTarget.value
+                        });
+                      }}
+                    />
+                  </InputGroup>
+                  {/* TODO: remove once InputGroup always reserves help-text space */}
+                  {!store['lastName']?.error && <div class="h-[21px] pt-1" />}
+                  <InputGroup label="Date of birth" error={store['dateOfBirth']?.error} required>
+                    <DateInput
+                      required
+                      value={
+                        props.patientId
+                          ? pStore.selectedPatient.data?.dateOfBirth
+                          : store['dateOfBirth']?.value
+                      }
+                      onDateChange={(value) => {
+                        actions.updateFormValue({ key: 'dateOfBirth', value });
+                      }}
+                    />
+                  </InputGroup>
+                  {/* TODO: remove once InputGroup always reserves help-text space */}
+                  {!store['dateOfBirth']?.error && <div class="h-[21px] pt-1" />}
+                  <InputGroup label="Mobile number" error={store['phone']?.error} required>
+                    <PhoneInput
+                      required
+                      value={store['phone']?.value ?? pStore.selectedPatient.data?.phone}
+                      onPhoneChange={(value) => {
+                        actions.updateFormValue({ key: 'phone', value });
+                      }}
+                    />
+                  </InputGroup>
+                  {/* TODO: remove once InputGroup always reserves help-text space */}
+                  {!store['phone']?.error && <div class="h-[21px] pt-1" />}
+                  <InputGroup label="Sex at birth" error={store['sex']?.error} required>
+                    <SexSelect
+                      required
+                      value={store['sex']?.value ?? pStore.selectedPatient.data?.sex}
+                      onChange={(e) =>
+                        actions.updateFormValue({ key: 'sex', value: e.currentTarget.value })
+                      }
+                    />
+                  </InputGroup>
+                  {/* TODO: remove once InputGroup always reserves help-text space */}
+                  {!store['sex']?.error && <div class="h-[21px] pt-1" />}
                 </div>
                 <Show when={!props.optionalPatientAddress}>
                   <AddressFields />
                 </Show>
                 <button
                   class="mb-4 mt-8 flex items-center md:!hidden"
+                  aria-expanded={showOptionalFields()}
+                  aria-controls="optional-fields-section"
                   onClick={() => setShowOptionalFields((value) => !value)}
                 >
                   <span class="font-sans text-lg">
@@ -417,43 +415,34 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                     class="inline-block ml-1 mt-1"
                   />
                 </button>
-                <div class={`mb-4 ${showOptionalFields() ? 'block' : 'hidden md:!block'}`}>
+                <div
+                  id="optional-fields-section"
+                  class={`mb-4 ${showOptionalFields() ? 'block' : 'hidden md:!block'}`}
+                >
                   <Show when={props.optionalPatientAddress}>
                     <AddressFields />
                   </Show>
-                  <photon-gender-input
-                    label="Gender"
-                    required="false"
-                    help-text={store['gender']?.error}
-                    invalid={store['gender']?.error !== undefined}
-                    on:photon-gender-selected={(e: any) => {
-                      actions.updateFormValue({
-                        key: 'gender',
-                        value: e.detail.gender
-                      });
-                    }}
-                    on:photon-gender-deselected={() => {
-                      actions.updateFormValue({
-                        key: 'gender',
-                        value: undefined
-                      });
-                    }}
-                    selected={pStore.selectedPatient.data?.gender}
-                  />
-                  <photon-text-input
-                    class="w-full"
-                    debounce-time="0"
-                    invalid={store['email']?.error}
-                    help-text={store['email']?.error}
-                    label="Email"
-                    on:photon-input-changed={async (e: any) => {
-                      actions.updateFormValue({
-                        key: 'email',
-                        value: e.detail.input
-                      });
-                    }}
-                    value={store['email']?.value ?? pStore.selectedPatient.data?.email}
-                  />
+                  <InputGroup label="Gender" error={store['gender']?.error}>
+                    <GenderSelect
+                      value={store['gender']?.value ?? pStore.selectedPatient.data?.gender}
+                      onChange={(e) =>
+                        actions.updateFormValue({ key: 'gender', value: e.currentTarget.value })
+                      }
+                    />
+                  </InputGroup>
+                  {/* TODO: remove once InputGroup always reserves help-text space */}
+                  {!store['gender']?.error && <div class="h-[21px] pt-1" />}
+                  <InputGroup label="Email" error={store['email']?.error}>
+                    <Input
+                      type="email"
+                      value={store['email']?.value ?? pStore.selectedPatient.data?.email}
+                      onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+                        actions.updateFormValue({ key: 'email', value: e.currentTarget.value });
+                      }}
+                    />
+                  </InputGroup>
+                  {/* TODO: remove once InputGroup always reserves help-text space */}
+                  {!store['email']?.error && <div class="h-[21px] pt-1" />}
                   <p class="font-sans text-sm m-0">Preferred pharmacy</p>
                   <PharmacySearch
                     address={getPatientAddress(pStore, store)}
