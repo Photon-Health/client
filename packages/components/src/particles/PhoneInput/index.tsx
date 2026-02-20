@@ -2,25 +2,6 @@ import { createEffect, createSignal, JSX } from 'solid-js';
 import { AsYouType, parsePhoneNumber } from 'libphonenumber-js';
 import Input from '../Input';
 
-function toNational(value: string): string {
-  try {
-    if (value.length > 2) {
-      return new AsYouType('US').input(parsePhoneNumber(value, 'US').formatNational());
-    }
-  } catch {
-    // fall through
-  }
-  return value;
-}
-
-function toE164(value: string): string {
-  try {
-    return parsePhoneNumber(value, 'US').format('E.164');
-  } catch {
-    return value;
-  }
-}
-
 export interface PhoneInputProps {
   value?: string;
   required?: boolean;
@@ -53,4 +34,23 @@ export default function PhoneInput(props: PhoneInputProps) {
       disabled={props.disabled}
     />
   );
+}
+
+function toNational(value: string): string {
+  try {
+    if (value.length > 2) {
+      return new AsYouType('US').input(parsePhoneNumber(value, 'US').formatNational());
+    }
+  } catch {
+    // fall through
+  }
+  return value;
+}
+
+function toE164(value: string): string {
+  try {
+    return parsePhoneNumber(value, 'US').format('E.164');
+  } catch {
+    return value;
+  }
 }
