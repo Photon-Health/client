@@ -167,10 +167,10 @@
   "lint-staged": {
     "**/*.{js,ts,jsx,tsx}": [
       "eslint",
-      "prettier --check"
+      "prettier --write"
     ],
     "**/*.{json,css,scss,md}": [
-      "prettier --check"
+      "prettier --write"
     ]
   },
   "optionalDependencies": {
