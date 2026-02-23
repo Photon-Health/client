@@ -30,7 +30,7 @@ export const toTitleCase = (str: string) => {
 };
 
 export const isZip = (zip: string) => {
-  return /^\d+$/.test(zip) && zip.length >= 5;
+  return /^\d{5}(-\d{4})?$/.test(zip);
 };
 
 // Takes a date string in the format 'YYYY-MM-DD'

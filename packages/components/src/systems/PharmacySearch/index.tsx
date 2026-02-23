@@ -1,4 +1,4 @@
-import { Show, createEffect, createMemo, createSignal } from 'solid-js';
+import { Show, createEffect, createMemo, createSignal, onCleanup } from 'solid-js';
 import { gql } from '@apollo/client';
 import { Address, Pharmacy as _Pharmacy } from '@photonhealth/sdk/dist/types';
 import LocationSelect from '../LocationSelect';
@@ -78,6 +78,7 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
   const [fetchingPreferred, setFetchingPreferred] = createSignal(false);
   const [openLocationSearch, setOpenLocationSearch] = createSignal(false);
   const [previousId, setPreviousId] = createSignal<string | null>(null);
+  const [lastGeocodedAddress, setLastGeocodedAddress] = createSignal('');
 
   async function fetchPharmacies() {
     const { data } = await client!.apollo.query({
@@ -211,9 +212,14 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
 
   createEffect(() => {
     // if address is set later in lifecycle, fetch
-    if (props?.address) {
+    const address = props?.address;
+    if (address && address !== lastGeocodedAddress()) {
       setFetchingPharmacies(true);
-      getAndSetLocation(props.address);
+      const timer = setTimeout(() => {
+        setLastGeocodedAddress(address);
+        getAndSetLocation(address);
+      }, 500);
+      onCleanup(() => clearTimeout(timer));
     }
   });
 
