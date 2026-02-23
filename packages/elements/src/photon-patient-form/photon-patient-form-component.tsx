@@ -331,7 +331,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                 <div class="flex flex-col">
                   <InputGroup label="First name" error={store['firstName']?.error} required>
                     <Input
-                      required
                       value={store['firstName']?.value ?? pStore.selectedPatient.data?.name.first}
                       onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
                         actions.updateFormValue({
@@ -344,7 +343,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
                   <InputGroup label="Last name" error={store['lastName']?.error} required>
                     <Input
-                      required
                       value={store['lastName']?.value ?? pStore.selectedPatient.data?.name.last}
                       onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
                         actions.updateFormValue({
@@ -357,7 +355,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
                   <InputGroup label="Date of birth" error={store['dateOfBirth']?.error} required>
                     <DateInput
-                      required
                       value={
                         store['dateOfBirth']?.value ?? pStore.selectedPatient.data?.dateOfBirth
                       }
@@ -369,7 +366,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
                   <InputGroup label="Mobile number" error={store['phone']?.error} required>
                     <PhoneInput
-                      required
                       value={store['phone']?.value ?? pStore.selectedPatient.data?.phone}
                       onPhoneChange={(value) => {
                         actions.updateFormValue({ key: 'phone', value });
@@ -379,7 +375,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
                   <InputGroup label="Sex at birth" error={store['sex']?.error} required>
                     <SexSelect
-                      required
                       value={store['sex']?.value ?? pStore.selectedPatient.data?.sex}
                       onChange={(e) =>
                         actions.updateFormValue({ key: 'sex', value: e.currentTarget.value })
