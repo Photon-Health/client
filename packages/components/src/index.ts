@@ -58,6 +58,13 @@ import {
   PrescribeEventDispatchProvider,
   usePrescribeEventDispatch
 } from './systems/PrescribeEventDispatchProvider';
+import {
+  dispatchAnalyticsEvent,
+  type FormAnalyticsEventDetail,
+  type MilestoneType,
+  type FieldCompletionSnapshot
+} from './analytics/dispatchAnalyticsEvent';
+import { buildFieldSnapshot, PATIENT_FORM_FIELDS } from './analytics/buildFieldSnapshot';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
 
@@ -110,7 +117,10 @@ export {
   useGoogleService,
   CALENDAR_DATE_FORMAT,
   PrescribeEventDispatchProvider,
-  usePrescribeEventDispatch
+  usePrescribeEventDispatch,
+  dispatchAnalyticsEvent,
+  buildFieldSnapshot,
+  PATIENT_FORM_FIELDS
 };
 
 // Export types
@@ -120,5 +130,8 @@ export type {
   TemplateOverrides,
   PrescriptionFormData,
   CoverageOption,
-  TryCreatePrescriptionTemplateOptions
+  TryCreatePrescriptionTemplateOptions,
+  FormAnalyticsEventDetail,
+  MilestoneType,
+  FieldCompletionSnapshot
 };

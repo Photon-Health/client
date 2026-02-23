@@ -1,6 +1,12 @@
 import { customElement } from 'solid-element';
-import { createSignal, Show } from 'solid-js';
-import { Button, usePhoton } from '@photonhealth/components';
+import { createEffect, createSignal, Show } from 'solid-js';
+import {
+  buildFieldSnapshot,
+  Button,
+  dispatchAnalyticsEvent,
+  PATIENT_FORM_FIELDS,
+  usePhoton
+} from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
@@ -54,6 +60,19 @@ const Component = (props: PatientDialogProps) => {
     });
     ref?.dispatchEvent(event);
   };
+
+  createEffect(() => {
+    if (props.open) {
+      dispatchAnalyticsEvent(
+        {
+          formName: 'patient_form',
+          milestone: 'patient_form_opened',
+          properties: { isEdit: Boolean(props.patientId) }
+        },
+        ref
+      );
+    }
+  });
 
   const submitForm = async (store: any, actions: any, pStore: any, createPrescription = false) => {
     setGlobalError(undefined);
@@ -130,6 +149,15 @@ const Component = (props: PatientDialogProps) => {
         const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
         await updatePatientMutation({ variables: patientData, awaitRefetchQueries: false });
         dispatchUpdate(props.patientId, createPrescription);
+        dispatchAnalyticsEvent(
+          {
+            formName: 'patient_form',
+            milestone: 'patient_updated',
+            fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS),
+            properties: { patientId: props.patientId, createPrescription }
+          },
+          ref
+        );
       } else {
         // otherwise, create a new patient
         const createPatientMutation = client!.getSDK().clinical.patient.createPatient({});
@@ -137,7 +165,17 @@ const Component = (props: PatientDialogProps) => {
           variables: patientData,
           awaitRefetchQueries: false
         });
-        dispatchCreated(patient?.data?.createPatient?.id || '', createPrescription);
+        const patientId = patient?.data?.createPatient?.id || '';
+        dispatchCreated(patientId, createPrescription);
+        dispatchAnalyticsEvent(
+          {
+            formName: 'patient_form',
+            milestone: 'patient_created',
+            fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS),
+            properties: { patientId, createPrescription }
+          },
+          ref
+        );
       }
       setLoading(false);
       actions.resetStores();
@@ -154,6 +192,17 @@ const Component = (props: PatientDialogProps) => {
       <Show when={props.open}>
         <PhotonFormWrapper
           onClosed={() => {
+            dispatchAnalyticsEvent(
+              {
+                formName: 'patient_form',
+                milestone: 'patient_form_closed',
+                fields: formStore()
+                  ? buildFieldSnapshot(formStore(), PATIENT_FORM_FIELDS)
+                  : undefined,
+                properties: { isEdit: Boolean(props.patientId) }
+              },
+              ref
+            );
             dispatchClosed();
             actions().resetStores();
             props.open = false;

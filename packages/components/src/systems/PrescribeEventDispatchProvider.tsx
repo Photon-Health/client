@@ -2,6 +2,11 @@ import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createContext, JSXElement, useContext } from 'solid-js';
 import { ScreeningAlertType } from './ScreeningAlerts';
+import {
+  dispatchAnalyticsEvent,
+  FieldCompletionSnapshot,
+  MilestoneType
+} from '../analytics/dispatchAnalyticsEvent';
 
 const PrescribeEventDispatchContext = createContext<{
   dispatchFormValidate: (canSubmit: boolean, form: any) => void;
@@ -17,6 +22,11 @@ const PrescribeEventDispatchContext = createContext<{
   dispatchClinicalAlertCancel: (alerts: ScreeningAlertType[]) => void;
   dispatchSignatureAttestationAgreed: () => void;
   dispatchSignatureAttestationCanceled: () => void;
+  dispatchAnalytics: (
+    milestone: MilestoneType,
+    fields?: FieldCompletionSnapshot,
+    properties?: Record<string, unknown>
+  ) => void;
 }>();
 
 interface DraftPrescriptionProviderProps {
@@ -165,6 +175,14 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref?.dispatchEvent(event);
   };
 
+  const dispatchAnalytics = (
+    milestone: MilestoneType,
+    fields?: FieldCompletionSnapshot,
+    properties?: Record<string, unknown>
+  ) => {
+    dispatchAnalyticsEvent({ formName: 'prescribe_workflow', milestone, fields, properties }, ref);
+  };
+
   const value = {
     dispatchFormValidate,
     dispatchDraftPrescriptionCreated,
@@ -178,7 +196,8 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     dispatchClinicalAlertAcknowledge,
     dispatchClinicalAlertCancel,
     dispatchSignatureAttestationAgreed,
-    dispatchSignatureAttestationCanceled
+    dispatchSignatureAttestationCanceled,
+    dispatchAnalytics
   };
 
   return (
