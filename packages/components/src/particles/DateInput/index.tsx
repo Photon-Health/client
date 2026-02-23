@@ -7,6 +7,7 @@ export interface DateInputProps {
   disabled?: boolean;
   onDateChange?: (value: string | undefined) => void;
   onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
+  onComplete?: () => void;
 }
 
 export default function DateInput(props: DateInputProps) {
@@ -18,6 +19,14 @@ export default function DateInput(props: DateInputProps) {
       value={props.value}
       onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
         props.onDateChange?.(e.currentTarget.value || undefined);
+      }}
+      onChange={(e: Event & { currentTarget: HTMLInputElement }) => {
+        if (
+          (e.currentTarget as HTMLInputElement).value &&
+          window.matchMedia('(pointer: coarse)').matches
+        ) {
+          props.onComplete?.();
+        }
       }}
       onPaste={(e: ClipboardEvent & { currentTarget: HTMLInputElement }) => {
         const pasteText = e.clipboardData?.getData('Text');

@@ -45,6 +45,7 @@ const getPatientAddress = (pStore: any, store: any) => {
 
 const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean }) => {
   let ref: any;
+  let phoneContainer: HTMLDivElement | undefined;
   const client = usePhoton();
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
   const { store: pStore, actions: pActions } = PatientStore;
@@ -361,16 +362,19 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                       onDateChange={(value) => {
                         actions.updateFormValue({ key: 'dateOfBirth', value });
                       }}
+                      onComplete={() => phoneContainer?.querySelector('input')?.focus()}
                     />
                   </InputGroup>
 
                   <InputGroup label="Mobile number" error={store['phone']?.error} required>
-                    <PhoneInput
-                      value={store['phone']?.value ?? pStore.selectedPatient.data?.phone}
-                      onPhoneChange={(value) => {
-                        actions.updateFormValue({ key: 'phone', value });
-                      }}
-                    />
+                    <div ref={phoneContainer}>
+                      <PhoneInput
+                        value={store['phone']?.value ?? pStore.selectedPatient.data?.phone}
+                        onPhoneChange={(value) => {
+                          actions.updateFormValue({ key: 'phone', value });
+                        }}
+                      />
+                    </div>
                   </InputGroup>
 
                   <InputGroup label="Sex at birth" error={store['sex']?.error} required>
