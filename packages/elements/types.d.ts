@@ -16,9 +16,6 @@ declare module 'solid-js' {
       'photon-textarea': unknown;
       'photon-card': unknown;
       'photon-checkbox': unknown;
-      'photon-phone-input': unknown;
-      'photon-gender-input': unknown;
-      'photon-sex-input': unknown;
       'photon-patient-form': unknown;
       'photon-patient-dialog': unknown;
       'photon-update-patient-dialog': unknown;
