@@ -8,8 +8,6 @@ declare module 'solid-js' {
       'photon-patient-select': unknown;
       'photon-auth-wrapper': unknown;
       'photon-text-input': unknown;
-      'photon-state-input': unknown;
-      'photon-treatment-select': unknown;
       'photon-datepicker': unknown;
       'photon-number-input': unknown;
       'photon-dispense-units': unknown;
@@ -36,8 +34,6 @@ declare module 'solid-js' {
       'sl-button': unknown;
       'sl-alert': unknown;
       'sl-radio': unknown;
-      'photon-radio-card': unknown;
-      'photon-radio-group': unknown;
       'photon-medication-search': unknown;
       'photon-add-medication-history-dialog': unknown;
       'photon-multirx-form': unknown;
