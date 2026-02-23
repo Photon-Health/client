@@ -14,18 +14,20 @@ interface InputGroupState {
   error: string;
   loading: boolean;
   disabled: boolean;
+  required: boolean;
 }
 
 interface InputGroupActions {
   setError: (error: string) => void;
   setLoading: (loading: boolean) => void;
   setDisabled: (disabled: boolean) => void;
+  setRequired: (required: boolean) => void;
 }
 
 type InputGroupContextValue = [InputGroupState, InputGroupActions];
 
 export const InputGroupContext = createContext<InputGroupContextValue>([
-  { id: '', error: '', loading: false, disabled: false },
+  { id: '', error: '', loading: false, disabled: false, required: false },
   {
     setError: () => {
       // init method, do nothing.
@@ -34,6 +36,9 @@ export const InputGroupContext = createContext<InputGroupContextValue>([
       // init method, do nothing.
     },
     setDisabled: () => {
+      // init method, do nothing.
+    },
+    setRequired: () => {
       // init method, do nothing.
     }
   }
@@ -49,7 +54,8 @@ export function InputGroupProvider(props: CounterProviderProps) {
     id: `input-${createUniqueId()}`,
     error: props.error || '',
     loading: false,
-    disabled: false
+    disabled: false,
+    required: false
   });
   const inputGroup: InputGroupContextValue = [
     state,
@@ -62,6 +68,9 @@ export function InputGroupProvider(props: CounterProviderProps) {
       },
       setDisabled(disabled: boolean) {
         setState('disabled', disabled);
+      },
+      setRequired(required: boolean) {
+        setState('required', required);
       }
     }
   ];
@@ -88,7 +97,7 @@ export interface InputGroupProps {
 }
 
 function InputGroupWrapper(props: InputGroupProps) {
-  const [state, { setError, setLoading, setDisabled }] = useContext(InputGroupContext);
+  const [state, { setError, setLoading, setDisabled, setRequired }] = useContext(InputGroupContext);
   const ariaDescribedBy = props.error
     ? `${state.id}-error`
     : props.helpText
@@ -105,6 +114,10 @@ function InputGroupWrapper(props: InputGroupProps) {
 
   createEffect(() => {
     setDisabled(props.disabled || false);
+  });
+
+  createEffect(() => {
+    setRequired(props.required || false);
   });
 
   const isLabelString = createMemo(() => typeof props.label === 'string');

@@ -225,89 +225,84 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
     return prefOption;
   });
 
-  const AddressFields = () => (
-    <>
-      {/*Using !mt-8 because of tailwind issue in shadowDom elements */}
-      {/*when not using the !important modifier*/}
-      <p class="font-sans text-lg mt-4 md:!mt-8" role="heading" aria-level="3">
-        Address
-        <Show when={props.optionalPatientAddress && !hasAnyAddressField()}>
-          <span class="text-gray-500 text-sm font-normal"> (optional)</span>
-        </Show>
-      </p>
-      <InputGroup
-        label="Street 1"
-        error={store['address_street1']?.error}
-        required={!props.optionalPatientAddress || hasAnyAddressField()}
-      >
-        <Input
-          required={!props.optionalPatientAddress || hasAnyAddressField()}
-          value={store['address_street1']?.value ?? pStore.selectedPatient.data?.address?.street1}
-          onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-            actions.updateFormValue({ key: 'address_street1', value: e.currentTarget.value });
-          }}
-        />
-      </InputGroup>
+  const AddressFields = () => {
+    const isAddressRequired = !props.optionalPatientAddress || hasAnyAddressField();
+    return (
+      <>
+        {/*Using !mt-8 because of tailwind issue in shadowDom elements */}
+        {/*when not using the !important modifier*/}
+        <p class="font-sans text-lg mt-4 md:!mt-8" role="heading" aria-level="3">
+          Address
+          <Show when={props.optionalPatientAddress && !hasAnyAddressField()}>
+            <span class="text-gray-500 text-sm font-normal"> (optional)</span>
+          </Show>
+        </p>
+        <InputGroup
+          label="Street 1"
+          error={store['address_street1']?.error}
+          required={isAddressRequired}
+        >
+          <Input
+            value={store['address_street1']?.value ?? pStore.selectedPatient.data?.address?.street1}
+            onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+              actions.updateFormValue({ key: 'address_street1', value: e.currentTarget.value });
+            }}
+          />
+        </InputGroup>
 
-      <InputGroup label="Street 2" error={store['address_street2']?.error}>
-        <Input
-          value={store['address_street2']?.value ?? pStore.selectedPatient.data?.address?.street2}
-          onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-            actions.updateFormValue({ key: 'address_street2', value: e.currentTarget.value });
-          }}
-        />
-      </InputGroup>
+        <InputGroup label="Street 2" error={store['address_street2']?.error}>
+          <Input
+            value={store['address_street2']?.value ?? pStore.selectedPatient.data?.address?.street2}
+            onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+              actions.updateFormValue({ key: 'address_street2', value: e.currentTarget.value });
+            }}
+          />
+        </InputGroup>
 
-      <InputGroup
-        label="City"
-        error={store['address_city']?.error}
-        required={!props.optionalPatientAddress || hasAnyAddressField()}
-      >
-        <Input
-          required={!props.optionalPatientAddress || hasAnyAddressField()}
-          value={store['address_city']?.value ?? pStore.selectedPatient.data?.address?.city}
-          onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-            actions.updateFormValue({ key: 'address_city', value: e.currentTarget.value });
-          }}
-        />
-      </InputGroup>
+        <InputGroup label="City" error={store['address_city']?.error} required={isAddressRequired}>
+          <Input
+            value={store['address_city']?.value ?? pStore.selectedPatient.data?.address?.city}
+            onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+              actions.updateFormValue({ key: 'address_city', value: e.currentTarget.value });
+            }}
+          />
+        </InputGroup>
 
-      <div class="flex gap-4">
-        <div class="flex-grow min-w-[40%]">
-          <InputGroup
-            label="State"
-            error={store['address_state']?.error}
-            required={!props.optionalPatientAddress || hasAnyAddressField()}
-          >
-            <StateSelect
-              required={!props.optionalPatientAddress || hasAnyAddressField()}
-              value={store['address_state']?.value ?? pStore.selectedPatient.data?.address?.state}
-              onChange={(e) => {
-                actions.updateFormValue({ key: 'address_state', value: e.currentTarget.value });
-              }}
-            />
-          </InputGroup>
+        <div class="flex gap-4">
+          <div class="flex-grow min-w-[40%]">
+            <InputGroup
+              label="State"
+              error={store['address_state']?.error}
+              required={isAddressRequired}
+            >
+              <StateSelect
+                value={store['address_state']?.value ?? pStore.selectedPatient.data?.address?.state}
+                onChange={(e) => {
+                  actions.updateFormValue({ key: 'address_state', value: e.currentTarget.value });
+                }}
+              />
+            </InputGroup>
+          </div>
+          <div class="flex-grow min-w-[40%]">
+            <InputGroup
+              label="Zip code"
+              error={store['address_zip']?.error}
+              required={isAddressRequired}
+            >
+              <Input
+                value={
+                  store['address_zip']?.value ?? pStore.selectedPatient.data?.address?.postalCode
+                }
+                onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+                  actions.updateFormValue({ key: 'address_zip', value: e.currentTarget.value });
+                }}
+              />
+            </InputGroup>
+          </div>
         </div>
-        <div class="flex-grow min-w-[40%]">
-          <InputGroup
-            label="Zip code"
-            error={store['address_zip']?.error}
-            required={!props.optionalPatientAddress || hasAnyAddressField()}
-          >
-            <Input
-              required={!props.optionalPatientAddress || hasAnyAddressField()}
-              value={
-                store['address_zip']?.value ?? pStore.selectedPatient.data?.address?.postalCode
-              }
-              onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-                actions.updateFormValue({ key: 'address_zip', value: e.currentTarget.value });
-              }}
-            />
-          </InputGroup>
-        </div>
-      </div>
-    </>
-  );
+      </>
+    );
+  };
 
   return (
     <div class="w-full h-full relative" ref={ref}>

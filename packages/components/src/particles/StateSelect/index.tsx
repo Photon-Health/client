@@ -34,8 +34,8 @@ export default function StateSelect(props: StateSelectProps) {
       id={state.id}
       aria-invalid={!!state.error || undefined}
       aria-describedby={state.error ? `${state.id}-error` : undefined}
-      aria-required={props.required}
-      required={props.required}
+      aria-required={state.required || props.required}
+      required={state.required || props.required}
       disabled={state.disabled || props.disabled}
       onChange={props.onChange}
       onBlur={props.onBlur}

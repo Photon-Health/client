@@ -83,6 +83,7 @@ export default function Input(props: InputProps) {
           autocomplete="off"
           onInput={inputProps.type === 'number' ? handleInput : handler.onInput}
           {...inputProps}
+          required={state.required || inputProps.required}
           class={inputClass()}
         />
         <Show when={state.loading || inputProps.loading}>

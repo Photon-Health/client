@@ -39,8 +39,8 @@ export default function SexSelect(props: SexSelectProps) {
       id={state.id}
       aria-invalid={!!state.error || undefined}
       aria-describedby={state.error ? `${state.id}-error` : undefined}
-      aria-required={props.required}
-      required={props.required}
+      aria-required={state.required || props.required}
+      required={state.required || props.required}
       value={props.value ?? ''}
       disabled={state.disabled || props.disabled}
       onChange={props.onChange}
