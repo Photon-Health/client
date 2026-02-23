@@ -226,7 +226,9 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   });
 
   const AddressFields = () => {
-    const isAddressRequired = !props.optionalPatientAddress || hasAnyAddressField();
+    const isAddressRequired = createMemo(
+      () => !props.optionalPatientAddress || hasAnyAddressField()
+    );
     return (
       <>
         {/*Using !mt-8 because of tailwind issue in shadowDom elements */}
@@ -240,7 +242,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
         <InputGroup
           label="Street 1"
           error={store['address_street1']?.error}
-          required={isAddressRequired}
+          required={isAddressRequired()}
         >
           <Input
             value={store['address_street1']?.value ?? pStore.selectedPatient.data?.address?.street1}
@@ -259,7 +261,11 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
           />
         </InputGroup>
 
-        <InputGroup label="City" error={store['address_city']?.error} required={isAddressRequired}>
+        <InputGroup
+          label="City"
+          error={store['address_city']?.error}
+          required={isAddressRequired()}
+        >
           <Input
             value={store['address_city']?.value ?? pStore.selectedPatient.data?.address?.city}
             onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
@@ -273,7 +279,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
             <InputGroup
               label="State"
               error={store['address_state']?.error}
-              required={isAddressRequired}
+              required={isAddressRequired()}
             >
               <StateSelect
                 value={store['address_state']?.value ?? pStore.selectedPatient.data?.address?.state}
@@ -287,7 +293,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
             <InputGroup
               label="Zip code"
               error={store['address_zip']?.error}
-              required={isAddressRequired}
+              required={isAddressRequired()}
             >
               <Input
                 value={
