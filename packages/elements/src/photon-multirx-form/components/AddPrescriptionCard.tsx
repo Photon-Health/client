@@ -61,6 +61,10 @@ const validators = {
   )
 };
 
+// superstruct doesn't support validation based on sibling fields
+// and we also want to move away from superstruct generally.
+// Temporary escape hatch to zod validation while photon-prescribe-workflow
+// still uses superstruct
 const supervisorSchema = zod
   .object({
     supervisorFullName: zod.string().optional(),
@@ -146,8 +150,6 @@ export const AddPrescriptionCard = (props: {
     return { errors: validationErrors };
   };
 
-  // superstruct doesn't have the ability to validate based on other schema fields
-  // but we can use superstruct `refine` as an escape hatch to zod-based validation.
   const supervisorValidators = {
     supervisorFullName: refine(optional(string()), 'fullNameValidation', () => {
       const result = validateSupervisorFields();
@@ -198,11 +200,13 @@ export const AddPrescriptionCard = (props: {
       return;
     }
 
-    const supervisorPrefix = `Supervising Physician:`;
-    const supervisorString = `${supervisorPrefix} ${props.store.supervisorFullName.value}, ${props.store.supervisorNpi.value}`;
     const notes = props.store.notes.value;
-    // This may happen if user edits a draft prescription
-    const notesHasSupervisor = notes.toLowerCase().includes(supervisorPrefix.toLowerCase());
+    const supervisorPrefix = `Supervising Physician:`;
+    // Notes may already contain supervisor
+    // if user edits a draft prescription
+    const notesNeedsSupervisor =
+      needsSupervisor() && !notes.toLowerCase().includes(supervisorPrefix.toLowerCase());
+    const supervisorString = `${supervisorPrefix} ${props.store.supervisorFullName.value}, ${props.store.supervisorNpi.value}`;
 
     const prescriptionFormData: PrescriptionFormData = {
       doNotFillBeforeDate: props.store.doNotFillBeforeDate?.value,
@@ -212,7 +216,7 @@ export const AddPrescriptionCard = (props: {
       dispenseUnit: props.store.dispenseUnit.value,
       daysSupply: props.store.daysSupply.value,
       instructions: props.store.instructions.value,
-      notes: notesHasSupervisor ? notes : `${notes}\n\n${supervisorString}`.trim(),
+      notes: notesNeedsSupervisor ? `${notes.trim()}\n\n${supervisorString}` : notes,
       fillsAllowed: props.store.refillsInput.value + 1,
       // TODO: set this from template-overrides. can we stop using the props.store, with this param as a starting point?
       diagnoseCodes: []
