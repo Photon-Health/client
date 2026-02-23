@@ -173,7 +173,9 @@ The platform has two backend API layers. The SDK (`packages/sdk`) maintains sepa
 | **Services** | `clinical-api.{env}.health` | GraphQL + REST | Newer API — the consolidation target |
 | **Lambdas** | `api.{env}.health` | GraphQL (AppSync) | Legacy API — being migrated to services |
 
-The team is actively consolidating all APIs to **services**. The patient API is already fully on services. New features should target the services API. The SDK exposes both clients (`apollo` for lambdas, `apolloClinical` for services) and uses different auth header patterns for each (`authorization` for lambdas, `x-photon-auth-token` for services).
+The SDK exposes both clients (`apollo` for lambdas, `apolloClinical` for services) and uses different auth header patterns for each (`authorization` for lambdas, `x-photon-auth-token` for services).
+
+The team is actively consolidating all APIs to **services**. The patient API is already fully on services. New features should target the services API by sending a GraphQL request through `apolloClinical`. We no longer want to wrap requests in methods like we did with the lambdas API.
 
 ### Routing
 
