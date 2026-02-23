@@ -39,6 +39,7 @@ export default function StateSelect(props: StateSelectProps) {
       disabled={state.disabled || props.disabled}
       onChange={props.onChange}
       onBlur={props.onBlur}
+      value={props.value || ''}
       class={selectClass()}
     >
       <option value="" disabled>

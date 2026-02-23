@@ -3,9 +3,9 @@ import clsx from 'clsx';
 import { useInputGroup } from '../InputGroup';
 
 export const SEX_OPTIONS = [
-  { id: 'MALE', name: 'Male' },
-  { id: 'FEMALE', name: 'Female' },
-  { id: 'UNKNOWN', name: 'Unknown' }
+  { value: 'MALE', name: 'Male' },
+  { value: 'FEMALE', name: 'Female' },
+  { value: 'UNKNOWN', name: 'Unknown' }
 ];
 
 export interface SexSelectProps {
@@ -41,6 +41,7 @@ export default function SexSelect(props: SexSelectProps) {
       aria-describedby={state.error ? `${state.id}-error` : undefined}
       aria-required={props.required}
       required={props.required}
+      value={props.value ?? ''}
       disabled={state.disabled || props.disabled}
       onChange={props.onChange}
       onBlur={props.onBlur}
@@ -51,7 +52,7 @@ export default function SexSelect(props: SexSelectProps) {
       </option>
       <For each={SEX_OPTIONS}>
         {(opt) => (
-          <option value={opt.id} selected={props.value === opt.id}>
+          <option value={opt.value} selected={props.value === opt.value}>
             {opt.name}
           </option>
         )}

@@ -3,13 +3,13 @@ import clsx from 'clsx';
 import { useInputGroup } from '../InputGroup';
 
 export const GENDER_OPTIONS = [
-  { id: 'Male/Man', name: 'Male/Man' },
-  { id: 'Female/Woman', name: 'Female/Woman' },
-  { id: 'TransMale/TransMan', name: 'TransMale/TransMan' },
-  { id: 'TransFemale/TransWoman', name: 'TransFemale/TransWoman' },
-  { id: 'Genderqueer/Gender nonconforming', name: 'Genderqueer/Gender nonconforming' },
-  { id: 'Something else', name: 'Something else' },
-  { id: 'Decline to answer', name: 'Decline to answer' }
+  { value: 'Male/Man', name: 'Male/Man' },
+  { value: 'Female/Woman', name: 'Female/Woman' },
+  { value: 'TransMale/TransMan', name: 'TransMale/TransMan' },
+  { value: 'TransFemale/TransWoman', name: 'TransFemale/TransWoman' },
+  { value: 'Genderqueer/Gender nonconforming', name: 'Genderqueer/Gender nonconforming' },
+  { value: 'Something else', name: 'Something else' },
+  { value: 'Decline to answer', name: 'Decline to answer' }
 ];
 
 export interface GenderSelectProps {
@@ -45,6 +45,7 @@ export default function GenderSelect(props: GenderSelectProps) {
       aria-describedby={state.error ? `${state.id}-error` : undefined}
       aria-required={props.required}
       required={props.required}
+      value={props.value ?? ''}
       disabled={state.disabled || props.disabled}
       onChange={props.onChange}
       onBlur={props.onBlur}
@@ -55,7 +56,7 @@ export default function GenderSelect(props: GenderSelectProps) {
       </option>
       <For each={GENDER_OPTIONS}>
         {(opt) => (
-          <option value={opt.id} selected={props.value === opt.id}>
+          <option value={opt.value} selected={props.value === opt.value}>
             {opt.name}
           </option>
         )}

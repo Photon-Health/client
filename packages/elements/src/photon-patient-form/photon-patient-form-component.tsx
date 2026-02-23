@@ -77,7 +77,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   });
   actions.registerValidator({
     key: 'sex',
-    validator: message(enums(SEX_OPTIONS.map((o) => o.id)), 'Please enter Sex at Birth.')
+    validator: message(enums(SEX_OPTIONS.map((o) => o.value)), 'Please enter Sex at Birth.')
   });
   actions.registerValidator({
     key: 'phone',
