@@ -42,7 +42,9 @@ export default function StateSelect(props: StateSelectProps) {
       value={props.value || ''}
       class={selectClass()}
     >
-      <option value="">Select state</option>
+      <option value="" disabled>
+        Select state
+      </option>
       <For each={states}>
         {(state) => (
           <option value={state.id} selected={props.value === state.id}>
