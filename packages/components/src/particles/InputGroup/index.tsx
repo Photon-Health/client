@@ -1,11 +1,11 @@
 import {
+  createContext,
+  createEffect,
+  createMemo,
+  createUniqueId,
   JSX,
   Show,
-  createUniqueId,
-  createContext,
-  useContext,
-  createEffect,
-  createMemo
+  useContext
 } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
@@ -14,18 +14,20 @@ interface InputGroupState {
   error: string;
   loading: boolean;
   disabled: boolean;
+  required: boolean;
 }
 
 interface InputGroupActions {
   setError: (error: string) => void;
   setLoading: (loading: boolean) => void;
   setDisabled: (disabled: boolean) => void;
+  setRequired: (required: boolean) => void;
 }
 
 type InputGroupContextValue = [InputGroupState, InputGroupActions];
 
 export const InputGroupContext = createContext<InputGroupContextValue>([
-  { id: '', error: '', loading: false, disabled: false },
+  { id: '', error: '', loading: false, disabled: false, required: false },
   {
     setError: () => {
       // init method, do nothing.
@@ -34,6 +36,9 @@ export const InputGroupContext = createContext<InputGroupContextValue>([
       // init method, do nothing.
     },
     setDisabled: () => {
+      // init method, do nothing.
+    },
+    setRequired: () => {
       // init method, do nothing.
     }
   }
@@ -49,7 +54,8 @@ export function InputGroupProvider(props: CounterProviderProps) {
     id: `input-${createUniqueId()}`,
     error: props.error || '',
     loading: false,
-    disabled: false
+    disabled: false,
+    required: false
   });
   const inputGroup: InputGroupContextValue = [
     state,
@@ -62,6 +68,9 @@ export function InputGroupProvider(props: CounterProviderProps) {
       },
       setDisabled(disabled: boolean) {
         setState('disabled', disabled);
+      },
+      setRequired(required: boolean) {
+        setState('required', required);
       }
     }
   ];
@@ -84,10 +93,11 @@ export interface InputGroupProps {
   children?: JSX.Element;
   loading?: boolean;
   disabled?: boolean;
+  required?: boolean;
 }
 
 function InputGroupWrapper(props: InputGroupProps) {
-  const [state, { setError, setLoading, setDisabled }] = useContext(InputGroupContext);
+  const [state, { setError, setLoading, setDisabled, setRequired }] = useContext(InputGroupContext);
   const ariaDescribedBy = props.error
     ? `${state.id}-error`
     : props.helpText
@@ -106,6 +116,10 @@ function InputGroupWrapper(props: InputGroupProps) {
     setDisabled(props.disabled || false);
   });
 
+  createEffect(() => {
+    setRequired(props.required || false);
+  });
+
   const isLabelString = createMemo(() => typeof props.label === 'string');
   const isContextTextString = createMemo(() => typeof props?.contextText === 'string');
 
@@ -115,12 +129,17 @@ function InputGroupWrapper(props: InputGroupProps) {
         <div>
           <Show when={isLabelString()}>
             <label
-              class={`block text-base font-light leading-6 text-gray-900 ${
+              class={`block text-sm font-normal leading-6 text-gray-700 pt-3 pb-1 ${
                 props?.subLabel ? 'mb-0' : ''
               }`}
               for={state.id}
             >
               {props.label}
+              <Show when={props.required}>
+                <span aria-hidden="true" class="text-red-500 ml-0.5">
+                  *
+                </span>
+              </Show>
             </label>
           </Show>
           <Show when={!isLabelString()}>{props.label}</Show>
@@ -144,7 +163,7 @@ function InputGroupWrapper(props: InputGroupProps) {
       {(props.error || props.helpText) && (
         <div class="h-6">
           <p
-            class={`mt-1 text-sm ${props.error ? 'text-red-600' : 'text-gray-500'}`}
+            class={`mt-1 text-sm ${props.error ? 'text-red-400' : 'text-gray-500'}`}
             id={ariaDescribedBy}
           >
             {props.error || props.helpText}
