@@ -63,7 +63,6 @@ const Component = (props: PatientDialogProps) => {
 
   createEffect(() => {
     if (props.open) {
-      console.log('isOpen');
       dispatchAnalyticsEvent(
         {
           trackEventType: 'patient_form_opened',
@@ -71,8 +70,6 @@ const Component = (props: PatientDialogProps) => {
         },
         ref
       );
-    } else {
-      console.log('is NOT Open');
     }
   });
 
