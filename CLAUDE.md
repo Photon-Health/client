@@ -101,6 +101,8 @@ Pure **Solid.js + TypeScript** component library (private, not published to npm)
 
 When building new UI for Photon Elements, add Solid.js components here and compose them in `packages/elements`.
 
+**Never import from `@photonhealth/components` (or any path into `packages/components/src`) inside `apps/app` or `apps/patient`.** Both apps use React's JSX transform (`"jsx": "react-jsx"`), while `packages/components` uses Solid's (`"jsxImportSource": "solid-js"`). Importing across that boundary causes TypeScript to type-check Solid JSX as React JSX, producing spurious errors (`class` vs `className`, `Show`/`Match` not valid JSX components, etc.). Any types that need to cross this boundary belong in `packages/sdk` — see **Shared types** in Code Conventions.
+
 #### `packages/sdk` — Core JS SDK
 
 Published as `@photonhealth/sdk`. Wraps the Photon GraphQL API with typed methods organized by domain:
