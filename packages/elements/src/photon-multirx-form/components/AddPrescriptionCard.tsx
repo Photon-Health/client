@@ -125,7 +125,7 @@ const calculateNeedsSupervisor = ({
 }) =>
   !!title &&
   ['NP', 'PA'].includes(title) &&
-  ['CA', 'FL', 'GA', 'MI', 'MO', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA'].includes(state);
+  ['CA', 'FL', 'GA', 'MI', 'MO', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA'].includes(state.toUpperCase());
 
 export const AddPrescriptionCard = (props: {
   hideAddToTemplates: boolean;
