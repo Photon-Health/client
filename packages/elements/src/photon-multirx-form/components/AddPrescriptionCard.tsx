@@ -13,7 +13,13 @@ import {
   useDraftPrescriptions,
   usePhoton
 } from '@photonhealth/components';
-import { DispenseUnit, Medication, Prescription } from '@photonhealth/sdk/dist/types';
+import {
+  Address,
+  DispenseUnit,
+  Medication,
+  Name,
+  Prescription
+} from '@photonhealth/sdk/dist/types';
 import {
   any,
   intersection,
@@ -93,17 +99,31 @@ const supervisorSchema = zod
 const MeUserQuery = gql`
   query MeUserQuery {
     me {
-      address {
-        state
-      }
       name {
         title
+      }
+      address {
+        state
       }
     }
   }
 `;
 
-const calculateNeedsSupervisor = (title: string, state: string) =>
+type MeUserQueryType = {
+  me: {
+    name: Pick<Name, 'title'>;
+    address: Pick<Address, 'state'>;
+  };
+};
+
+const calculateNeedsSupervisor = ({
+  title,
+  state
+}: {
+  title: Name['title'];
+  state: Address['state'];
+}) =>
+  !!title &&
   ['NP', 'PA'].includes(title) &&
   ['CA', 'FL', 'GA', 'MI', 'MO', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA'].includes(state);
 
@@ -176,10 +196,13 @@ export const AddPrescriptionCard = (props: {
 
     const {
       data: { me }
-    } = await client.sdk.apolloClinical.query({
+    } = await client.sdk.apolloClinical.query<MeUserQueryType>({
       query: MeUserQuery
     });
-    const needsSupervisor = calculateNeedsSupervisor(me.name.title, me.address.state);
+    const needsSupervisor = calculateNeedsSupervisor({
+      title: me.name.title,
+      state: me.address.state
+    });
     setNeedsSupervisor(needsSupervisor);
   });
 
