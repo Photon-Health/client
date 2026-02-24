@@ -3,7 +3,7 @@ export interface FieldCompletionSnapshot {
 }
 
 // ---------------------------------------------------------------------------
-// Typesafe form analytics events (photon-analytics-event CustomEvent)
+// Typesafe form analytics events (photon-analytics-track-event CustomEvent)
 // ---------------------------------------------------------------------------
 
 export type PatientFormTrackEventType =
@@ -18,6 +18,8 @@ export type SignatureAttestationTrackEventType =
   | 'signature_attestation_agreed'
   | 'signature_attestation_canceled';
 
+// below PrescriptionFormTrackEventType is a temporary placeholder
+// and should be reviewed and updated in work during PHO-271
 export type PrescriptionFormTrackEventType =
   | 'prescription_form_opened'
   | 'draft_added'
