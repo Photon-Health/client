@@ -7,7 +7,7 @@ import { graphql } from 'apps/app/src/gql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 import { buildSignatureAttestationFormInteractionPayload } from '../../instrumentation/analyticsTrackEventListenerUtils';
-import { PhotonEmbedAnalyticsEventDetail } from '@photonhealth/components/src';
+import { PhotonEmbedAnalyticsEventDetail } from '@photonhealth/sdk';
 
 declare global {
   namespace JSX {

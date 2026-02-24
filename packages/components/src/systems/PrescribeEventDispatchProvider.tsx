@@ -2,11 +2,8 @@ import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createContext, JSXElement, useContext } from 'solid-js';
 import { ScreeningAlertType } from './ScreeningAlerts';
-import {
-  ClinicalAppTrackEventType,
-  dispatchAnalyticsTrackEvent,
-  FieldCompletionSnapshot
-} from '../analytics/dispatchAnalyticsTrackEvent';
+import { dispatchAnalyticsTrackEvent } from '../analytics/dispatchAnalyticsTrackEvent';
+import { ClinicalAppTrackEventType, FieldCompletionSnapshot } from '@photonhealth/sdk';
 
 const PrescribeEventDispatchContext = createContext<{
   dispatchFormValidate: (canSubmit: boolean, form: any) => void;

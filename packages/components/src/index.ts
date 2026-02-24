@@ -58,12 +58,7 @@ import {
   PrescribeEventDispatchProvider,
   usePrescribeEventDispatch
 } from './systems/PrescribeEventDispatchProvider';
-import {
-  type ClinicalAppTrackEventType,
-  dispatchAnalyticsTrackEvent,
-  type FieldCompletionSnapshot,
-  type PhotonEmbedAnalyticsEventDetail
-} from './analytics/dispatchAnalyticsTrackEvent';
+import { dispatchAnalyticsTrackEvent } from './analytics/dispatchAnalyticsTrackEvent';
 import { buildFieldSnapshot, PATIENT_FORM_FIELDS } from './analytics/buildFieldSnapshot';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
@@ -130,8 +125,5 @@ export type {
   TemplateOverrides,
   PrescriptionFormData,
   CoverageOption,
-  TryCreatePrescriptionTemplateOptions,
-  PhotonEmbedAnalyticsEventDetail,
-  ClinicalAppTrackEventType,
-  FieldCompletionSnapshot
+  TryCreatePrescriptionTemplateOptions
 };

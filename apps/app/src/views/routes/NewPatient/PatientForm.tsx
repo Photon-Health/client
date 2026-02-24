@@ -4,7 +4,7 @@ import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
 import { useProviderAnalytics } from '../../../hooks/useProviderAnalytics';
-import { type PhotonEmbedAnalyticsEventDetail } from '@photonhealth/components';
+import { type PhotonEmbedAnalyticsEventDetail } from '@photonhealth/sdk';
 import { buildPatientFormInteractionPayload } from '../../../instrumentation/analyticsTrackEventListenerUtils';
 
 declare global {

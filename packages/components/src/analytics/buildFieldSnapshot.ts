@@ -1,4 +1,4 @@
-import { FieldCompletionSnapshot } from './dispatchAnalyticsTrackEvent';
+import { FieldCompletionSnapshot } from '@photonhealth/sdk';
 
 export const PATIENT_FORM_FIELDS = [
   'firstName',

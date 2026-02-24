@@ -1,8 +1,8 @@
 import { Auth0Client, Auth0ClientOptions } from '@auth0/auth0-spa-js';
 import {
   ApolloClient,
-  InMemoryCache,
   HttpLink,
+  InMemoryCache,
   NormalizedCacheObject,
   OnQueryUpdated
 } from '@apollo/client';
@@ -11,17 +11,21 @@ import { AuthManager } from './auth';
 import { ClinicalQueryManager } from './clinical';
 import { ManagementQueryManager } from './management';
 import {
+  clinicalApiUrl,
+  clinicalAppUrl,
   Env as Environment,
   getClinicalUrl,
-  clinicalApiUrl,
-  lambdasApiUrl,
-  clinicalAppUrl
+  lambdasApiUrl
 } from './utils';
+import pkg from '../package.json';
 
 export * as types from './types';
 export * as fragments from './fragments';
-
-import pkg from '../package.json';
+export type {
+  ClinicalAppTrackEventType,
+  FieldCompletionSnapshot,
+  PhotonEmbedAnalyticsEventDetail
+} from './clinicalAnalyticsTypes';
 
 const version: string = pkg?.version ?? 'unknown';
 

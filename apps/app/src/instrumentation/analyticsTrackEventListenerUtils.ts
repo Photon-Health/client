@@ -1,4 +1,4 @@
-import { PhotonEmbedAnalyticsEventDetail } from '@photonhealth/components';
+import { PhotonEmbedAnalyticsEventDetail } from '@photonhealth/sdk';
 
 function flattenSnapshot(
   fields: PhotonEmbedAnalyticsEventDetail['fields']

@@ -3,7 +3,7 @@ import { usePhoton } from '@photonhealth/react';
 import { createRef, MutableRefObject, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
-import { type PhotonEmbedAnalyticsEventDetail } from '@photonhealth/components';
+import { type PhotonEmbedAnalyticsEventDetail } from '@photonhealth/sdk';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 import { buildPatientFormInteractionPayload } from '../../instrumentation/analyticsTrackEventListenerUtils';
 
