@@ -160,8 +160,9 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   createEffect(() => {
     const curr = status();
     if (curr.status === 'NEEDS ATTESTATION') {
-      dispatchAnalytics('signature_attestation_shown', undefined, {
-        attestationVersion: curr.version
+      dispatchAnalytics({
+        trackEventType: 'signature_attestation_shown',
+        properties: { attestationVersion: curr.version }
       });
     }
   });
@@ -181,8 +182,9 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
       if (res.data?.agreeToSignatureAttestation) {
         setSubmitting(false);
         setStatus({ status: 'COMPLETE' });
-        dispatchAnalytics('signature_attestation_agreed', undefined, {
-          attestationVersion: curr.version
+        dispatchAnalytics({
+          trackEventType: 'signature_attestation_agreed',
+          properties: { attestationVersion: curr.version }
         });
       } else if (res.error || res.errors) {
         setSubmitting(false);
@@ -216,7 +218,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
           <AgreementCard
             onAgree={onAgree}
             onCancel={() => {
-              dispatchAnalytics('signature_attestation_canceled');
+              dispatchAnalytics({ trackEventType: 'signature_attestation_canceled' });
               dispatchSignatureAttestationCanceled();
             }}
             disabled={submitting()}

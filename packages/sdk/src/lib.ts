@@ -24,7 +24,12 @@ export * as fragments from './fragments';
 export type {
   ClinicalAppTrackEventType,
   FieldCompletionSnapshot,
-  PhotonEmbedAnalyticsEventDetail
+  PhotonEmbedAnalyticsEventDetail,
+  PatientFormTrackEventType,
+  SignatureAttestationTrackEventType,
+  PrescriptionFormTrackEventType,
+  FormTrackEventType,
+  PhotonEmbedAnalyticsEventInput
 } from './clinicalAnalyticsTypes';
 
 const version: string = pkg?.version ?? 'unknown';

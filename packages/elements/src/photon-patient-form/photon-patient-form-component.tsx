@@ -229,7 +229,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   const trackFieldInteraction = (fieldName: string, hasValue: boolean) => {
     dispatchAnalyticsTrackEvent(
       {
-        trackEventType: 'field_interaction',
+        trackEventType: 'patient_field_interaction',
         properties: { fieldName, hasValue }
       },
       ref

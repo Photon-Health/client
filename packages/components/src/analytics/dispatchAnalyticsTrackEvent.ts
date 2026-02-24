@@ -1,7 +1,7 @@
-import type { PhotonEmbedAnalyticsEventDetail } from '@photonhealth/sdk';
+import type { PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
 
 export const dispatchAnalyticsTrackEvent = (
-  detail: Omit<PhotonEmbedAnalyticsEventDetail, 'timestamp'>,
+  detail: PhotonEmbedAnalyticsEventInput,
   ref: { dispatchEvent(event: CustomEvent): void }
 ) => {
   const event = new CustomEvent('photon-analytics-track-event', {
