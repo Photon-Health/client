@@ -30,7 +30,7 @@ const orgSettingsQuery = graphql(/* GraphQL */ `
 export const PatientForm = () => {
   const ref: MutableRefObject<any> = useRef(null);
   const navigate = useNavigate();
-  const { track } = useProviderAnalytics();
+  const providerAnalytics = useProviderAnalytics();
   const { clinicalClient } = usePhoton();
 
   const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
@@ -47,7 +47,7 @@ export const PatientForm = () => {
     ref.current.addEventListener(
       'photon-analytics-track-event',
       (e: CustomEvent<PatientFormAnalyticsEvent>) => {
-        track(
+        providerAnalytics.track(
           'clinicalapp_patient_form_track_events',
           buildPatientFormInteractionPayload(e.detail)
         );
@@ -79,7 +79,7 @@ export const PatientForm = () => {
     );
 
     return () => abortController.abort();
-  }, [navigate, track]);
+  }, [navigate, providerAnalytics]);
 
   return (
     <div>

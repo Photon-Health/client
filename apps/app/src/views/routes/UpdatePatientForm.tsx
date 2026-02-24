@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client';
 import { usePhoton } from '@photonhealth/react';
-import { createRef, MutableRefObject, useEffect } from 'react';
+import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
 import { type PatientFormAnalyticsEvent } from '@photonhealth/sdk';
@@ -28,10 +28,10 @@ const orgSettingsQuery = graphql(/* GraphQL */ `
 `);
 
 export const UpdatePatientForm = () => {
-  const ref: MutableRefObject<any> = createRef();
+  const ref: MutableRefObject<any> = useRef(null);
   const params = useParams();
   const navigate = useNavigate();
-  const { track } = useProviderAnalytics();
+  const providerAnalytics = useProviderAnalytics();
   const { clinicalClient } = usePhoton();
   const id = params.patientId;
 
@@ -49,7 +49,7 @@ export const UpdatePatientForm = () => {
     ref.current.addEventListener(
       'photon-analytics-track-event',
       (e: CustomEvent<PatientFormAnalyticsEvent>) => {
-        track(
+        providerAnalytics.track(
           'clinicalapp_patient_form_track_events',
           buildPatientFormInteractionPayload(e.detail)
         );
@@ -81,7 +81,7 @@ export const UpdatePatientForm = () => {
     );
 
     return () => abortController.abort();
-  }, [navigate, track]);
+  }, [navigate, providerAnalytics, id]);
 
   return (
     <div>
