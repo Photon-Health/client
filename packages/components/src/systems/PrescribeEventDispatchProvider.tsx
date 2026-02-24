@@ -3,9 +3,9 @@ import { GraphQLFormattedError } from 'graphql';
 import { createContext, JSXElement, useContext } from 'solid-js';
 import { ScreeningAlertType } from './ScreeningAlerts';
 import {
+  ClinicalAppTrackEventType,
   dispatchAnalyticsEvent,
-  FieldCompletionSnapshot,
-  MilestoneType
+  FieldCompletionSnapshot
 } from '../analytics/dispatchAnalyticsEvent';
 
 const PrescribeEventDispatchContext = createContext<{
@@ -23,7 +23,7 @@ const PrescribeEventDispatchContext = createContext<{
   dispatchSignatureAttestationAgreed: () => void;
   dispatchSignatureAttestationCanceled: () => void;
   dispatchAnalytics: (
-    milestone: MilestoneType,
+    trackEventType: ClinicalAppTrackEventType,
     fields?: FieldCompletionSnapshot,
     properties?: Record<string, unknown>
   ) => void;
@@ -176,11 +176,11 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
   };
 
   const dispatchAnalytics = (
-    milestone: MilestoneType,
+    trackEventType: ClinicalAppTrackEventType,
     fields?: FieldCompletionSnapshot,
     properties?: Record<string, unknown>
   ) => {
-    dispatchAnalyticsEvent({ formName: 'prescribe_workflow', milestone, fields, properties }, ref);
+    dispatchAnalyticsEvent({ trackEventType, fields, properties }, ref);
   };
 
   const value = {

@@ -59,10 +59,10 @@ import {
   usePrescribeEventDispatch
 } from './systems/PrescribeEventDispatchProvider';
 import {
+  type ClinicalAppTrackEventType,
   dispatchAnalyticsEvent,
-  type FormAnalyticsEventDetail,
-  type MilestoneType,
-  type FieldCompletionSnapshot
+  type FieldCompletionSnapshot,
+  type PhotonEmbedAnalyticsEventDetail
 } from './analytics/dispatchAnalyticsEvent';
 import { buildFieldSnapshot, PATIENT_FORM_FIELDS } from './analytics/buildFieldSnapshot';
 
@@ -131,7 +131,7 @@ export type {
   PrescriptionFormData,
   CoverageOption,
   TryCreatePrescriptionTemplateOptions,
-  FormAnalyticsEventDetail,
-  MilestoneType,
+  PhotonEmbedAnalyticsEventDetail,
+  ClinicalAppTrackEventType,
   FieldCompletionSnapshot
 };

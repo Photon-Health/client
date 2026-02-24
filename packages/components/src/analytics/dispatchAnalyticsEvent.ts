@@ -1,6 +1,4 @@
-type FormName = 'prescribe_workflow' | 'patient_form';
-
-export type MilestoneType =
+export type ClinicalAppTrackEventType =
   | 'patient_form_opened'
   | 'patient_form_closed'
   | 'patient_created'
@@ -21,19 +19,18 @@ export interface FieldCompletionSnapshot {
   [fieldName: string]: { completed: boolean };
 }
 
-export interface FormAnalyticsEventDetail {
-  formName: FormName;
-  milestone: MilestoneType;
+export interface PhotonEmbedAnalyticsEventDetail {
+  trackEventType: ClinicalAppTrackEventType;
   fields?: FieldCompletionSnapshot;
   properties?: Record<string, unknown>;
   timestamp: string;
 }
 
 export const dispatchAnalyticsEvent = (
-  detail: Omit<FormAnalyticsEventDetail, 'timestamp'>,
+  detail: Omit<PhotonEmbedAnalyticsEventDetail, 'timestamp'>,
   ref: { dispatchEvent(event: CustomEvent): void }
 ) => {
-  const event = new CustomEvent('photon-analytics-event', {
+  const event = new CustomEvent('photon-analytics-track-event', {
     composed: true,
     bubbles: true,
     detail: { ...detail, timestamp: new Date().toISOString() }

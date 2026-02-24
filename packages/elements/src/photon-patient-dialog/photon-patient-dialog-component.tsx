@@ -28,13 +28,13 @@ const Component = (props: PatientDialogProps) => {
   const [globalError, setGlobalError] = createSignal<string | undefined>(undefined);
   const [hasAnyAddressField, setHasAnyAddressField] = createSignal<boolean>(false);
 
-  const dispatchUpdate = (patientId: string, createPrescription = false) => {
+  const dispatchUpdate = (patientId: string, didClickCreatePatientAndPrescription = false) => {
     const event = new CustomEvent('photon-patient-updated', {
       composed: true,
       bubbles: true,
       detail: {
         patientId: patientId,
-        createPrescription
+        didClickCreatePatientAndPrescription
       }
     });
     ref?.dispatchEvent(event);
@@ -63,20 +63,27 @@ const Component = (props: PatientDialogProps) => {
 
   createEffect(() => {
     if (props.open) {
+      console.log('isOpen');
       dispatchAnalyticsEvent(
         {
-          formName: 'patient_form',
-          milestone: 'patient_form_opened',
+          trackEventType: 'patient_form_opened',
           properties: { isEdit: Boolean(props.patientId) }
         },
         ref
       );
+    } else {
+      console.log('is NOT Open');
     }
   });
 
-  const submitForm = async (store: any, actions: any, pStore: any, createPrescription = false) => {
+  const submitForm = async (
+    store: any,
+    actions: any,
+    pStore: any,
+    didClickCreatePatientAndPrescription = false
+  ) => {
     setGlobalError(undefined);
-    setIsCreatePrescription(createPrescription);
+    setIsCreatePrescription(didClickCreatePatientAndPrescription);
     setLoading(true);
 
     // Base keys that are always required
@@ -148,13 +155,15 @@ const Component = (props: PatientDialogProps) => {
         // if patientId is provided, update the patient.
         const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
         await updatePatientMutation({ variables: patientData, awaitRefetchQueries: false });
-        dispatchUpdate(props.patientId, createPrescription);
+        dispatchUpdate(props.patientId, didClickCreatePatientAndPrescription);
         dispatchAnalyticsEvent(
           {
-            formName: 'patient_form',
-            milestone: 'patient_updated',
+            trackEventType: 'patient_updated',
             fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS),
-            properties: { patientId: props.patientId, createPrescription }
+            properties: {
+              patientId: props.patientId,
+              didClickCreatePatientAndPrescription
+            }
           },
           ref
         );
@@ -166,13 +175,12 @@ const Component = (props: PatientDialogProps) => {
           awaitRefetchQueries: false
         });
         const patientId = patient?.data?.createPatient?.id || '';
-        dispatchCreated(patientId, createPrescription);
+        dispatchCreated(patientId, didClickCreatePatientAndPrescription);
         dispatchAnalyticsEvent(
           {
-            formName: 'patient_form',
-            milestone: 'patient_created',
+            trackEventType: 'patient_created',
             fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS),
-            properties: { patientId, createPrescription }
+            properties: { patientId, createPrescription: didClickCreatePatientAndPrescription }
           },
           ref
         );
@@ -194,8 +202,7 @@ const Component = (props: PatientDialogProps) => {
           onClosed={() => {
             dispatchAnalyticsEvent(
               {
-                formName: 'patient_form',
-                milestone: 'patient_form_closed',
+                trackEventType: 'patient_form_closed',
                 fields: formStore()
                   ? buildFieldSnapshot(formStore(), PATIENT_FORM_FIELDS)
                   : undefined,

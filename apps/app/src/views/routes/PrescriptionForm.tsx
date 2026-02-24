@@ -6,7 +6,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
-import { buildFormInteractionPayload } from './analyticsListener';
+import { buildSignatureAttestationFormInteractionPayload } from '../../instrumentation/analyticsTrackEventListenerUtils';
+import { PhotonEmbedAnalyticsEventDetail } from '@photonhealth/components/src';
 
 declare global {
   namespace JSX {
@@ -80,6 +81,31 @@ export const PrescriptionForm = () => {
     const listenerOptions = { signal: abortControllerSignal };
 
     ref.current.addEventListener(
+      'photon-analytics-track-event',
+      (e: { detail: PhotonEmbedAnalyticsEventDetail }) => {
+        const { trackEventType } = e.detail;
+        if (
+          trackEventType === 'signature_attestation_shown' ||
+          trackEventType === 'signature_attestation_agreed' ||
+          trackEventType === 'signature_attestation_canceled'
+        ) {
+          track(
+            'test_clinicalapp_signature_attestation_form_track_events',
+            buildSignatureAttestationFormInteractionPayload(e.detail)
+          );
+        }
+      },
+      listenerOptions
+    );
+
+    if (patientId && ref.current) {
+      // this ref.current setter must be after the photon-analytics-track-event so that the data is set properly when the
+      // photon-analytics-track-event fires, due to how the solidjs code within the WebComponent executes.
+      // the ref.current data is utilized by photon-analytics-track-event
+      ref.current.patientId = patientId;
+    }
+
+    ref.current.addEventListener(
       'photon-prescriptions-created',
       (e: any) => {
         track('prescription_form_created', {
@@ -140,30 +166,8 @@ export const PrescriptionForm = () => {
       },
       listenerOptions
     );
-
-    ref.current.addEventListener(
-      'photon-analytics-event',
-      (e: any) => {
-        const { milestone } = e.detail;
-        if (
-          milestone === 'signature_attestation_shown' ||
-          milestone === 'signature_attestation_agreed' ||
-          milestone === 'signature_attestation_canceled'
-        ) {
-          track('test_form_interaction', buildFormInteractionPayload(e.detail));
-        }
-      },
-      listenerOptions
-    );
-
     return () => abortController.abort();
   }, [navigate, track, patientId, user, onClose]);
-
-  useEffect(() => {
-    if (patientId && ref.current) {
-      ref.current.patientId = patientId;
-    }
-  }, [patientId]);
 
   const enableCoverageCheck = useMemo(() => {
     if (user) {

@@ -4,8 +4,8 @@ import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
 import { useProviderAnalytics } from '../../../hooks/useProviderAnalytics';
-import { type FormAnalyticsEventDetail } from '@photonhealth/components';
-import { buildFormInteractionPayload } from '../analyticsListener';
+import { type PhotonEmbedAnalyticsEventDetail } from '@photonhealth/components';
+import { buildPatientFormInteractionPayload } from '../../../instrumentation/analyticsTrackEventListenerUtils';
 
 declare global {
   namespace JSX {
@@ -42,17 +42,28 @@ export const PatientForm = () => {
 
     const abortController = new AbortController();
     const { signal: abortControllerSignal } = abortController;
-
-    ref.current.open = true;
-    track('patient_form_opened');
-
     const listenerOptions = { signal: abortControllerSignal };
+
+    ref.current.addEventListener(
+      'photon-analytics-track-event',
+      (e: CustomEvent<PhotonEmbedAnalyticsEventDetail>) => {
+        track(
+          'test_clinicalapp_patient_form_track_events',
+          buildPatientFormInteractionPayload(e.detail)
+        );
+      },
+      listenerOptions
+    );
+
+    // this ref.current setter must be after the photon-analytics-track-event so that the data is set properly when the
+    // photon-analytics-track-event fires, due to how the solidjs code within the WebComponent executes.
+    // photon-analytics-track-event depends on the `ref.current.open` value
+    ref.current.open = true;
+
     ref.current.addEventListener(
       'photon-patient-created',
       (e: any) => {
         const id = e?.detail?.patientId;
-        track('patient_form_created', { patientId: id });
-
         if (e?.detail?.createPrescription) {
           navigate(`/prescriptions/new?patientId=${id}`);
         } else {
@@ -64,13 +75,6 @@ export const PatientForm = () => {
     ref.current.addEventListener(
       'photon-patient-closed',
       () => navigate(`/patients`),
-      listenerOptions
-    );
-    ref.current.addEventListener(
-      'photon-analytics-event',
-      (e: CustomEvent<FormAnalyticsEventDetail>) => {
-        track('test_form_interaction', buildFormInteractionPayload(e.detail));
-      },
       listenerOptions
     );
 
