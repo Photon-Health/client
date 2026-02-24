@@ -10,16 +10,9 @@ import {
   triggerToast,
   usePrescribeEventDispatch,
   TryCreatePrescriptionTemplateOptions,
-  useDraftPrescriptions,
-  usePhoton
+  useDraftPrescriptions
 } from '@photonhealth/components';
-import {
-  Address,
-  DispenseUnit,
-  Medication,
-  Name,
-  Prescription
-} from '@photonhealth/sdk/dist/types';
+import { DispenseUnit, Medication, Prescription } from '@photonhealth/sdk/dist/types';
 import {
   any,
   intersection,
@@ -32,7 +25,6 @@ import {
   refine,
   string
 } from 'superstruct';
-import * as zod from 'zod';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -44,7 +36,7 @@ import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
 import { DisableList } from './PrescribeWorkflow';
 import { afterDate, message } from '../../validators';
-import gql from 'graphql-tag';
+import { SupervisorCard, supervisorValidatorKeys } from './SupervisorCard';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -67,66 +59,6 @@ const validators = {
   )
 };
 
-// superstruct doesn't support validation based on sibling fields
-// and we also want to move away from superstruct generally.
-// Temporary escape hatch to zod validation while photon-prescribe-workflow
-// still uses superstruct
-const supervisorSchema = zod
-  .object({
-    supervisorFullName: zod.string().optional(),
-    supervisorNpi: zod
-      .union([zod.literal(''), zod.string().regex(/^[0-9]+$/, 'Enter a valid NPI')])
-      .optional()
-  })
-  .superRefine((data, ctx) => {
-    if (!!data.supervisorFullName && !data.supervisorNpi) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'NPI is required when Full Name is filled out',
-        path: ['supervisorNpi']
-      });
-    }
-
-    if (!data.supervisorFullName && !!data.supervisorNpi) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Full Name is required when NPI is filled out',
-        path: ['supervisorFullName']
-      });
-    }
-  });
-
-const MeUserQuery = gql`
-  query MeUserQuery {
-    me {
-      name {
-        title
-      }
-      address {
-        state
-      }
-    }
-  }
-`;
-
-type MeUserQueryType = {
-  me: {
-    name: Pick<Name, 'title'>;
-    address: Pick<Address, 'state'>;
-  };
-};
-
-const calculateNeedsSupervisor = ({
-  title,
-  state
-}: {
-  title: Name['title'];
-  state: Address['state'];
-}) =>
-  !!title &&
-  ['NP', 'PA'].includes(title) &&
-  ['CA', 'FL', 'GA', 'MI', 'MO', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA'].includes(state.toUpperCase());
-
 export const AddPrescriptionCard = (props: {
   hideAddToTemplates: boolean;
   actions: Record<string, (...args: any) => any>;
@@ -146,7 +78,6 @@ export const AddPrescriptionCard = (props: {
 }) => {
   const { tryCreatePrescription } = useDraftPrescriptions();
   const { dispatchOrderError } = usePrescribeEventDispatch();
-  const client = usePhoton();
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
@@ -154,37 +85,8 @@ export const AddPrescriptionCard = (props: {
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
   const [needsSupervisor, setNeedsSupervisor] = createSignal<boolean>(false);
 
-  const validateSupervisorFields = () => {
-    const result = supervisorSchema.safeParse({
-      supervisorFullName: props.store.supervisorFullName?.value,
-      supervisorNpi: props.store.supervisorNpi?.value
-    });
-    if (result.success) {
-      return {};
-    }
-    const errors = result.error.flatten().fieldErrors;
-    const validationErrors = {
-      supervisorFullName: errors.supervisorFullName?.[0],
-      supervisorNpi: errors.supervisorNpi?.[0]
-    };
-    return { errors: validationErrors };
-  };
-
-  const supervisorValidators = {
-    supervisorFullName: refine(optional(string()), 'fullNameValidation', () => {
-      const result = validateSupervisorFields();
-      const error = result.errors?.supervisorFullName;
-      return error ? error : true;
-    }),
-    supervisorNpi: refine(optional(string()), 'npiValidation', () => {
-      const result = validateSupervisorFields();
-      const error = result.errors?.supervisorNpi;
-      return error ? error : true;
-    })
-  };
-
-  onMount(async () => {
-    for (const [k, v] of Object.entries({ ...validators, ...supervisorValidators })) {
+  onMount(() => {
+    for (const [k, v] of Object.entries(validators)) {
       props.actions.registerValidator({
         key: k,
         validator: v
@@ -193,24 +95,13 @@ export const AddPrescriptionCard = (props: {
 
     // initialize values in the prescribe form
     clearForm(props.actions, props?.prefillNotes ? { notes: props.prefillNotes } : undefined);
-
-    const {
-      data: { me }
-    } = await client.sdk.apolloClinical.query<MeUserQueryType>({
-      query: MeUserQuery
-    });
-    const needsSupervisor = calculateNeedsSupervisor({
-      title: me.name.title,
-      state: me.address.state
-    });
-    setNeedsSupervisor(needsSupervisor);
   });
 
   const handleAddPrescription = async () => {
     setIsLoading(true);
 
     // TODO TODO TODO move validation to the prescribe provider
-    const keys = [...Object.keys(validators), ...Object.keys(supervisorValidators)];
+    const keys = [...Object.keys(validators), ...supervisorValidatorKeys];
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
 
@@ -526,39 +417,12 @@ export const AddPrescriptionCard = (props: {
           }
           value={props.store.notes?.value}
         />
-        {needsSupervisor() && (
-          <>
-            <Text size="sm" color="black" class="pb-[21px]">
-              Some pharmacies require supervising physician information for this prescription.
-              Adding it here can help avoid callbacks and delays.
-            </Text>
-            <photon-text-input
-              label="Supervising Physician Full Name"
-              value={props.store.supervisorFullName?.value ?? ''}
-              invalid={props.store.supervisorFullName?.error ?? false}
-              help-text={props.store.supervisorFullName?.error}
-              on:photon-input-changed={(e: any) =>
-                props.actions.updateFormValue({
-                  key: 'supervisorFullName',
-                  value: e.detail.input
-                })
-              }
-            />
-            <photon-text-input
-              label="Supervising Physician NPI"
-              value={props.store.supervisorNpi?.value ?? ''}
-              invalid={props.store.supervisorNpi?.error ?? false}
-              help-text={props.store.supervisorNpi?.error}
-              on:photon-input-changed={(e: any) =>
-                props.actions.updateFormValue({
-                  key: 'supervisorNpi',
-                  value: e.detail.input
-                })
-              }
-            />
-          </>
-        )}
-
+        <SupervisorCard
+          actions={props.actions}
+          store={props.store}
+          needsSupervisor={needsSupervisor}
+          setNeedsSupervisor={setNeedsSupervisor}
+        />
         <div class="w-full">
           <photon-datepicker
             value={props.store.doNotFillBeforeDate?.value}
