@@ -39,7 +39,7 @@ const orgSettingsQuery = graphql(/* GraphQL */ `
 export const PrescriptionForm = () => {
   const ref: MutableRefObject<any> = useRef();
   const { user, clinicalClient } = usePhoton();
-  const { track, isReady } = useProviderAnalytics();
+  const providerAnalytics = useProviderAnalytics();
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
   const pharmacyId = params.get('pharmacyId') || '';
@@ -66,13 +66,13 @@ export const PrescriptionForm = () => {
     navigate('/prescriptions');
   };
 
-  const openTracked = useRef(false);
+  const prescriptionFormOpenWasTracked = useRef(false);
   useEffect(() => {
-    if (isReady && !openTracked.current) {
-      openTracked.current = true;
-      track('prescription_form_opened', { patientId: patientId || undefined });
+    if (providerAnalytics.isReady && !prescriptionFormOpenWasTracked.current) {
+      prescriptionFormOpenWasTracked.current = true;
+      providerAnalytics.track('prescription_form_opened', { patientId: patientId || undefined });
     }
-  }, [isReady, track, patientId]);
+  }, [providerAnalytics, patientId]);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -89,7 +89,7 @@ export const PrescriptionForm = () => {
           trackEventType === 'signature_attestation_agreed' ||
           trackEventType === 'signature_attestation_canceled'
         ) {
-          track(
+          providerAnalytics.track(
             'clinicalapp_signature_attestation_form_track_events',
             buildSignatureAttestationFormInteractionPayload(e.detail)
           );
@@ -108,7 +108,7 @@ export const PrescriptionForm = () => {
     ref.current.addEventListener(
       'photon-prescriptions-created',
       (e: any) => {
-        track('prescription_form_created', {
+        providerAnalytics.track('prescription_form_created', {
           patientId: e.detail.patientId,
           prescriptionIds: e.detail.prescriptionIds,
           createOrder: e.detail.createOrder
@@ -167,7 +167,7 @@ export const PrescriptionForm = () => {
       listenerOptions
     );
     return () => abortController.abort();
-  }, [navigate, track, patientId, onClose]);
+  }, [navigate, providerAnalytics, patientId, onClose]);
 
   const enableCoverageCheck = useMemo(() => {
     if (user) {
