@@ -3,7 +3,7 @@ import { usePhoton } from '@photonhealth/react';
 import { createRef, MutableRefObject, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
-import { type PhotonEmbedAnalyticsEventDetail } from '@photonhealth/sdk';
+import { type PatientFormAnalyticsEvent } from '@photonhealth/sdk';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 import { buildPatientFormInteractionPayload } from '../../instrumentation/analyticsTrackEventListenerUtils';
 
@@ -48,7 +48,7 @@ export const UpdatePatientForm = () => {
 
     ref.current.addEventListener(
       'photon-analytics-track-event',
-      (e: CustomEvent<PhotonEmbedAnalyticsEventDetail>) => {
+      (e: CustomEvent<PatientFormAnalyticsEvent>) => {
         track(
           'clinicalapp_patient_form_track_events',
           buildPatientFormInteractionPayload(e.detail)

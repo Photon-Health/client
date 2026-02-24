@@ -7,7 +7,7 @@ import { graphql } from 'apps/app/src/gql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 import { buildSignatureAttestationFormInteractionPayload } from '../../instrumentation/analyticsTrackEventListenerUtils';
-import { PhotonEmbedAnalyticsEventDetail } from '@photonhealth/sdk';
+import { type PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
 
 declare global {
   namespace JSX {
@@ -82,7 +82,7 @@ export const PrescriptionForm = () => {
 
     ref.current.addEventListener(
       'photon-analytics-track-event',
-      (e: { detail: PhotonEmbedAnalyticsEventDetail }) => {
+      (e: { detail: PhotonEmbedAnalyticsEventInput }) => {
         const { trackEventType } = e.detail;
         if (
           trackEventType === 'signature_attestation_shown' ||

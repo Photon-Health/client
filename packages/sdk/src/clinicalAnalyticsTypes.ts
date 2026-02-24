@@ -1,31 +1,5 @@
-export type ClinicalAppTrackEventType =
-  | 'patient_form_opened'
-  | 'patient_form_closed'
-  | 'patient_created'
-  | 'patient_updated'
-  | 'draft_added'
-  | 'draft_deleted'
-  | 'draft_edited'
-  | 'form_submitted'
-  | 'order_created'
-  | 'alert_acknowledged'
-  | 'alert_canceled'
-  | 'signature_attestation_shown'
-  | 'signature_attestation_agreed'
-  | 'signature_attestation_canceled'
-  | 'field_interaction';
-
 export interface FieldCompletionSnapshot {
   [fieldName: string]: { completed: boolean };
-}
-
-// Legacy loose type — used by dispatchAnalyticsTrackEvent (photon-analytics-track-event).
-// New code should use PhotonEmbedAnalyticsEventInput + dispatchAnalyticsEvent instead.
-export interface PhotonEmbedAnalyticsEventDetail {
-  trackEventType: ClinicalAppTrackEventType;
-  fields?: FieldCompletionSnapshot;
-  properties?: Record<string, unknown>;
-  timestamp: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -133,7 +107,7 @@ type PrescriptionFieldInteraction = {
   properties: { fieldName: string; hasValue: boolean };
 };
 
-// Input type passed to dispatchAnalyticsEvent — no timestamp (added by the dispatch fn).
+// Input type passed to dispatchAnalyticsTrackEvent — no timestamp (added by the dispatch fn).
 // Do NOT derive an "input" type via Omit on the full detail type; Omit doesn't distribute
 // over unions and collapses the discriminant.
 export type PhotonEmbedAnalyticsEventInput =
@@ -155,3 +129,13 @@ export type PhotonEmbedAnalyticsEventInput =
   | AlertCanceled
   | PrescriptionFormClosed
   | PrescriptionFieldInteraction;
+
+export type PatientFormAnalyticsEvent = Extract<
+  PhotonEmbedAnalyticsEventInput,
+  { trackEventType: PatientFormTrackEventType }
+>;
+
+export type SignatureAttestationAnalyticsEvent = Extract<
+  PhotonEmbedAnalyticsEventInput,
+  { trackEventType: SignatureAttestationTrackEventType }
+>;

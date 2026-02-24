@@ -22,14 +22,14 @@ import pkg from '../package.json';
 export * as types from './types';
 export * as fragments from './fragments';
 export type {
-  ClinicalAppTrackEventType,
   FieldCompletionSnapshot,
-  PhotonEmbedAnalyticsEventDetail,
   PatientFormTrackEventType,
   SignatureAttestationTrackEventType,
   PrescriptionFormTrackEventType,
   FormTrackEventType,
-  PhotonEmbedAnalyticsEventInput
+  PhotonEmbedAnalyticsEventInput,
+  PatientFormAnalyticsEvent,
+  SignatureAttestationAnalyticsEvent
 } from './clinicalAnalyticsTypes';
 
 const version: string = pkg?.version ?? 'unknown';

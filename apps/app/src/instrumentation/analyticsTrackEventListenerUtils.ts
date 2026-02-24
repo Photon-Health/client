@@ -1,7 +1,11 @@
-import { PhotonEmbedAnalyticsEventDetail } from '@photonhealth/sdk';
+import type {
+  FieldCompletionSnapshot,
+  PatientFormAnalyticsEvent,
+  SignatureAttestationAnalyticsEvent
+} from '@photonhealth/sdk';
 
 function flattenSnapshot(
-  fields: PhotonEmbedAnalyticsEventDetail['fields']
+  fields: FieldCompletionSnapshot | undefined
 ): Record<string, boolean | null> {
   if (!fields) return {};
   return Object.fromEntries(
@@ -12,27 +16,31 @@ function flattenSnapshot(
   );
 }
 
-export function buildPatientFormInteractionPayload(detail: PhotonEmbedAnalyticsEventDetail) {
-  const { fields, properties, trackEventType } = detail;
+export function buildPatientFormInteractionPayload(detail: PatientFormAnalyticsEvent) {
+  const { trackEventType, properties } = detail;
   return {
     trackEventType,
-    fieldName: (properties?.fieldName as string) ?? null,
-    fieldHasValue: (properties?.hasValue as boolean) ?? null,
-    patientId: (properties?.patientId as string) ?? null,
-    isEdit: (properties?.isEdit as boolean) ?? null,
+    fieldName: 'fieldName' in properties ? properties.fieldName : null,
+    fieldHasValue: 'hasValue' in properties ? properties.hasValue : null,
+    patientId: 'patientId' in properties ? properties.patientId : null,
+    isEdit: 'isEdit' in properties ? properties.isEdit : null,
     didClickCreatePatientAndPrescription:
-      (properties?.didClickCreatePatientAndPrescription as boolean) ?? null,
-    ...flattenSnapshot(fields)
+      'didClickCreatePatientAndPrescription' in properties
+        ? properties.didClickCreatePatientAndPrescription
+        : null,
+    ...flattenSnapshot('fields' in properties ? properties.fields : undefined)
   };
 }
 
 export function buildSignatureAttestationFormInteractionPayload(
-  detail: PhotonEmbedAnalyticsEventDetail
+  detail: SignatureAttestationAnalyticsEvent
 ) {
-  const { fields, properties, trackEventType } = detail;
+  const { trackEventType, properties } = detail;
   return {
     trackEventType,
-    attestationVersion: (properties?.attestationVersion as string) ?? null,
-    ...flattenSnapshot(fields)
+    attestationVersion:
+      properties != null && 'attestationVersion' in properties
+        ? properties.attestationVersion
+        : null
   };
 }

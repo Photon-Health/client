@@ -156,10 +156,10 @@ const Component = (props: PatientDialogProps) => {
         dispatchAnalyticsTrackEvent(
           {
             trackEventType: 'patient_updated',
-            fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS),
             properties: {
               patientId: props.patientId,
-              didClickCreatePatientAndPrescription
+              didClickCreatePatientAndPrescription,
+              fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS)
             }
           },
           ref
@@ -176,8 +176,11 @@ const Component = (props: PatientDialogProps) => {
         dispatchAnalyticsTrackEvent(
           {
             trackEventType: 'patient_created',
-            fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS),
-            properties: { patientId, didClickCreatePatientAndPrescription }
+            properties: {
+              patientId,
+              didClickCreatePatientAndPrescription,
+              fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS)
+            }
           },
           ref
         );
@@ -200,10 +203,12 @@ const Component = (props: PatientDialogProps) => {
             dispatchAnalyticsTrackEvent(
               {
                 trackEventType: 'patient_form_closed',
-                fields: formStore()
-                  ? buildFieldSnapshot(formStore(), PATIENT_FORM_FIELDS)
-                  : undefined,
-                properties: { isEdit: Boolean(props.patientId) }
+                properties: {
+                  isEdit: Boolean(props.patientId),
+                  fields: formStore()
+                    ? buildFieldSnapshot(formStore(), PATIENT_FORM_FIELDS)
+                    : undefined
+                }
               },
               ref
             );
