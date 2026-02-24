@@ -167,7 +167,7 @@ export const PrescriptionForm = () => {
       listenerOptions
     );
     return () => abortController.abort();
-  }, [navigate, track, patientId, user, onClose]);
+  }, [navigate, track, patientId, onClose]);
 
   const enableCoverageCheck = useMemo(() => {
     if (user) {
