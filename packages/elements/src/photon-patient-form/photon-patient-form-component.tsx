@@ -4,7 +4,7 @@ import { enums, size, string, union } from 'superstruct';
 import {
   Card,
   DateInput,
-  dispatchAnalyticsEvent,
+  dispatchAnalyticsTrackEvent,
   GenderSelect,
   Icon,
   Input,
@@ -227,7 +227,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   });
 
   const trackFieldInteraction = (fieldName: string, hasValue: boolean) => {
-    dispatchAnalyticsEvent(
+    dispatchAnalyticsTrackEvent(
       {
         trackEventType: 'field_interaction',
         properties: { fieldName, hasValue }

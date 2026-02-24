@@ -60,10 +60,10 @@ import {
 } from './systems/PrescribeEventDispatchProvider';
 import {
   type ClinicalAppTrackEventType,
-  dispatchAnalyticsEvent,
+  dispatchAnalyticsTrackEvent,
   type FieldCompletionSnapshot,
   type PhotonEmbedAnalyticsEventDetail
-} from './analytics/dispatchAnalyticsEvent';
+} from './analytics/dispatchAnalyticsTrackEvent';
 import { buildFieldSnapshot, PATIENT_FORM_FIELDS } from './analytics/buildFieldSnapshot';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
@@ -118,7 +118,7 @@ export {
   CALENDAR_DATE_FORMAT,
   PrescribeEventDispatchProvider,
   usePrescribeEventDispatch,
-  dispatchAnalyticsEvent,
+  dispatchAnalyticsTrackEvent,
   buildFieldSnapshot,
   PATIENT_FORM_FIELDS
 };

@@ -4,9 +4,9 @@ import { createContext, JSXElement, useContext } from 'solid-js';
 import { ScreeningAlertType } from './ScreeningAlerts';
 import {
   ClinicalAppTrackEventType,
-  dispatchAnalyticsEvent,
+  dispatchAnalyticsTrackEvent,
   FieldCompletionSnapshot
-} from '../analytics/dispatchAnalyticsEvent';
+} from '../analytics/dispatchAnalyticsTrackEvent';
 
 const PrescribeEventDispatchContext = createContext<{
   dispatchFormValidate: (canSubmit: boolean, form: any) => void;
@@ -180,7 +180,7 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     fields?: FieldCompletionSnapshot,
     properties?: Record<string, unknown>
   ) => {
-    dispatchAnalyticsEvent({ trackEventType, fields, properties }, ref);
+    dispatchAnalyticsTrackEvent({ trackEventType, fields, properties }, ref);
   };
 
   const value = {

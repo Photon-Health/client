@@ -3,7 +3,7 @@ import { createEffect, createSignal, Show } from 'solid-js';
 import {
   buildFieldSnapshot,
   Button,
-  dispatchAnalyticsEvent,
+  dispatchAnalyticsTrackEvent,
   PATIENT_FORM_FIELDS,
   usePhoton
 } from '@photonhealth/components';
@@ -63,7 +63,7 @@ const Component = (props: PatientDialogProps) => {
 
   createEffect(() => {
     if (props.open) {
-      dispatchAnalyticsEvent(
+      dispatchAnalyticsTrackEvent(
         {
           trackEventType: 'patient_form_opened',
           properties: { isEdit: Boolean(props.patientId) }
@@ -153,7 +153,7 @@ const Component = (props: PatientDialogProps) => {
         const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
         await updatePatientMutation({ variables: patientData, awaitRefetchQueries: false });
         dispatchUpdate(props.patientId, didClickCreatePatientAndPrescription);
-        dispatchAnalyticsEvent(
+        dispatchAnalyticsTrackEvent(
           {
             trackEventType: 'patient_updated',
             fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS),
@@ -173,7 +173,7 @@ const Component = (props: PatientDialogProps) => {
         });
         const patientId = patient?.data?.createPatient?.id || '';
         dispatchCreated(patientId, didClickCreatePatientAndPrescription);
-        dispatchAnalyticsEvent(
+        dispatchAnalyticsTrackEvent(
           {
             trackEventType: 'patient_created',
             fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS),
@@ -197,7 +197,7 @@ const Component = (props: PatientDialogProps) => {
       <Show when={props.open}>
         <PhotonFormWrapper
           onClosed={() => {
-            dispatchAnalyticsEvent(
+            dispatchAnalyticsTrackEvent(
               {
                 trackEventType: 'patient_form_closed',
                 fields: formStore()

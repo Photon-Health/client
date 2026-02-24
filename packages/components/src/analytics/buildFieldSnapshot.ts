@@ -1,4 +1,4 @@
-import { FieldCompletionSnapshot } from './dispatchAnalyticsEvent';
+import { FieldCompletionSnapshot } from './dispatchAnalyticsTrackEvent';
 
 export const PATIENT_FORM_FIELDS = [
   'firstName',

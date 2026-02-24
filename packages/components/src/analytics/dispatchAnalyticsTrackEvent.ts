@@ -26,7 +26,7 @@ export interface PhotonEmbedAnalyticsEventDetail {
   timestamp: string;
 }
 
-export const dispatchAnalyticsEvent = (
+export const dispatchAnalyticsTrackEvent = (
   detail: Omit<PhotonEmbedAnalyticsEventDetail, 'timestamp'>,
   ref: { dispatchEvent(event: CustomEvent): void }
 ) => {
