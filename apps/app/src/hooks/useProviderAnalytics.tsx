@@ -50,8 +50,8 @@ export interface ProviderContextData {
 
 // these values map to table names, so please use clinicalapp as a prefix
 type ClinicalAppTrackEventName =
-  | 'test_clinicalapp_patient_form_track_events'
-  | 'test_clinicalapp_signature_attestation_form_track_events'
+  | 'clinicalapp_patient_form_track_events'
+  | 'clinicalapp_signature_attestation_form_track_events'
   | 'prescription_form_opened'
   | 'prescription_form_created';
 

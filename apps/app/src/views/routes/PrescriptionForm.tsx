@@ -90,7 +90,7 @@ export const PrescriptionForm = () => {
           trackEventType === 'signature_attestation_canceled'
         ) {
           track(
-            'test_clinicalapp_signature_attestation_form_track_events',
+            'clinicalapp_signature_attestation_form_track_events',
             buildSignatureAttestationFormInteractionPayload(e.detail)
           );
         }

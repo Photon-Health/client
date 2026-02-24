@@ -177,7 +177,7 @@ const Component = (props: PatientDialogProps) => {
           {
             trackEventType: 'patient_created',
             fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS),
-            properties: { patientId, createPrescription: didClickCreatePatientAndPrescription }
+            properties: { patientId, didClickCreatePatientAndPrescription }
           },
           ref
         );

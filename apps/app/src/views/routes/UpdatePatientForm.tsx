@@ -50,7 +50,7 @@ export const UpdatePatientForm = () => {
       'photon-analytics-track-event',
       (e: CustomEvent<PhotonEmbedAnalyticsEventDetail>) => {
         track(
-          'test_clinicalapp_patient_form_track_events',
+          'clinicalapp_patient_form_track_events',
           buildPatientFormInteractionPayload(e.detail)
         );
       },
