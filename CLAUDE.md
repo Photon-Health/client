@@ -78,6 +78,7 @@ Browser bookmarklets for dev/testing workflows live in `tools/bookmarklets/` as 
 | File | Purpose |
 |------|---------|
 | `patient-form-filler.txt` | Fills the `photon-patient-dialog` patient creation form with randomized test data. Prompts once for a phone number and caches it in `localStorage` under `pf_phone`. |
+| `patient-form-filler-with-address.txt` | Same as above, plus fills address fields with 106 N 7th St, Brooklyn NY 11249. |
 | `reset-form-localstorage.txt` | Clears the cached phone number (`pf_phone`) from `localStorage` so `patient-form-filler` will prompt again on next run. |
 
 ## Architecture
