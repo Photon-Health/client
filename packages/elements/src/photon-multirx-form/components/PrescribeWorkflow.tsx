@@ -27,9 +27,15 @@ import {
   usePrescribeEventDispatch
 } from '@photonhealth/components';
 import { types } from '@photonhealth/sdk';
-import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
+import {
+  Prescription,
+  PrescriptionState,
+  Supervisor,
+  SupervisorInput
+} from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
+import { SupervisorCard, supervisorValidatorKeys } from './SupervisorCard';
 
 const hasUsableAddress = (address?: {
   street1?: string;
@@ -127,6 +133,14 @@ export const ScreenDraftedPrescriptionsQuery = gql`
   }
 `;
 
+const CreateSupervisorMutation = gql`
+  mutation CreateSupervisorMutation($fullName: String!, $npi: String!) {
+    createSupervisor(input: { fullName: $fullName, npi: $npi }) {
+      id
+    }
+  }
+`;
+
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
   let prescriptionRef: HTMLDivElement | undefined;
@@ -143,6 +157,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchClinicalAlertAcknowledge,
     dispatchClinicalAlertCancel
   } = usePrescribeEventDispatch();
+  const [needsSupervisor, setNeedsSupervisor] = createSignal<boolean>(false);
 
   const autoRoutedPharmacyId = createMemo(() => {
     if (props.pharmacyId) {
@@ -321,14 +336,14 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const displayCombineDialog = () => {
     return recentOrdersActions.setIsCombineDialogOpen(
       true,
-      () => submitForm(props.enableOrder),
+      () => submitForm(),
       addressId(),
       formattedAddress()
     );
   };
 
   // submits the form to create a new order
-  const submitForm = async (enableOrder: boolean) => {
+  const submitForm = async () => {
     if (isLoading()) {
       return;
     }
@@ -363,10 +378,16 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     }
 
     const requiresAddress =
-      enableOrder && (!props.optionalPatientAddress || hasPreferredPharmacy());
-    const keys = requiresAddress ? ['patient', 'address'] : ['patient'];
+      props.enableOrder && (!props.optionalPatientAddress || hasPreferredPharmacy());
+    const requiresSupervisor = props.enableOrder && needsSupervisor();
+    const keys = [
+      'patient',
+      ...(requiresAddress ? ['address'] : []),
+      ...(requiresSupervisor ? supervisorValidatorKeys : [])
+    ];
     props.formActions.validate(keys);
     const errors = props.formActions.getErrors(keys);
+    console.log(errors);
     if (errors.length === 0) {
       setIsLoading(true);
       props.formActions.updateFormValue({
@@ -384,6 +405,13 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       dispatchPrescriptionsCreated(draftPrescriptions());
     } else {
       setErrors(errors);
+      dispatchOrderError(errors);
+      setIsLoading(false);
+      triggerToast({
+        status: 'error',
+        header: 'Error Creating Order',
+        body: 'Please check your order details'
+      });
     }
   };
 
@@ -442,32 +470,60 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         pharmacyId = '';
       }
 
-      const { data: orderData, errors } = await orderMutation({
-        variables: {
-          ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
-          ...(props.groupId ? { groupId: props.groupId } : {}),
-          patientId: props.formStore.patient?.value.id,
-          pharmacyId,
-          fulfillmentType: props.formStore.fulfillmentType?.value || '',
-          ...(addressId()
-            ? { addressId: addressId() }
-            : hasValidAddress()
-            ? { address: formattedAddress() }
-            : {}),
-          fills: prescriptionIds().map((id) => ({
-            prescriptionId: id
-          }))
-        },
-        refetchQueries: [],
-        awaitRefetchQueries: false
+      console.log('data', {
+        fullName: props.formStore.supervisorFullName?.value,
+        npi: props.formStore.supervisorNpi?.value
       });
+      const testing = true;
+      if (!testing) {
+        let supervisorId: string | undefined;
+        if (needsSupervisor() && props.formStore.supervisorId?.value) {
+          supervisorId = props.formStore.supervisorId.value;
+        } else if (
+          needsSupervisor() &&
+          props.formStore.supervisorFullName?.value &&
+          props.formStore.supervisorNpi?.value
+        ) {
+          const { data } = await clinicalClient.mutate<Supervisor, SupervisorInput>({
+            mutation: CreateSupervisorMutation,
+            variables: {
+              fullName: props.formStore.supervisorFullName.value,
+              npi: props.formStore.supervisorNpi.value
+            }
+          });
+          supervisorId = data?.id;
+        }
+
+        const { data: orderData, errors } = await orderMutation({
+          variables: {
+            ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
+            ...(props.groupId ? { groupId: props.groupId } : {}),
+            patientId: props.formStore.patient?.value.id,
+            pharmacyId,
+            fulfillmentType: props.formStore.fulfillmentType?.value || '',
+            ...(addressId()
+              ? { addressId: addressId() }
+              : hasValidAddress()
+              ? { address: formattedAddress() }
+              : {}),
+            fills: prescriptionIds().map((id) => ({
+              prescriptionId: id
+            })),
+            supervisorId: supervisorId || undefined
+          },
+          refetchQueries: [],
+          awaitRefetchQueries: false
+        });
+
+        setIsLoading(false);
+        if (errors) {
+          dispatchOrderError(errors);
+          return;
+        }
+        dispatchOrderCreated(orderData!.createOrder);
+      }
 
       setIsLoading(false);
-      if (errors) {
-        dispatchOrderError(errors);
-        return;
-      }
-      dispatchOrderCreated(orderData!.createOrder);
     } catch (err) {
       dispatchOrderError([err as GraphQLFormattedError]);
       setIsLoading(false);
@@ -491,7 +547,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       return displayCombineDialog();
     }
 
-    return submitForm(props.enableOrder);
+    return submitForm();
   };
 
   createEffect(() => {
@@ -628,7 +684,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       screeningAlerts={screeningAlerts()}
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
-                      enableOrder={props.enableOrder}
                       disableList={props.disableList}
                     />
                   </div>
@@ -645,6 +700,14 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   routingConstraints={routingConstraints()}
                   enableOrder={props.enableOrder}
                 />
+                <Show when={props.enableOrder}>
+                  <SupervisorCard
+                    actions={props.formActions}
+                    store={props.formStore}
+                    needsSupervisor={needsSupervisor()}
+                    setNeedsSupervisor={setNeedsSupervisor}
+                  />
+                </Show>
                 <Show when={props.enableOrder && !autoRoutedPharmacyId()}>
                   <OrderCard
                     store={props.formStore}

@@ -25,6 +25,7 @@ import {
   refine,
   string
 } from 'superstruct';
+import { afterDate, message } from '../../validators';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -35,8 +36,6 @@ import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
 import { DisableList } from './PrescribeWorkflow';
-import { afterDate, message } from '../../validators';
-import { SupervisorCard, supervisorValidatorKeys } from './SupervisorCard';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -73,7 +72,6 @@ export const AddPrescriptionCard = (props: {
   screeningAlerts: ScreeningAlertType[];
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
-  enableOrder: boolean;
   disableList?: DisableList;
 }) => {
   const { tryCreatePrescription } = useDraftPrescriptions();
@@ -82,8 +80,7 @@ export const AddPrescriptionCard = (props: {
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
   const [searchText, setSearchText] = createSignal<string>('');
-  const [isLoading, setIsLoading] = createSignal<boolean>(false);
-  const [needsSupervisor, setNeedsSupervisor] = createSignal<boolean>(false);
+  const [isLoading, setIsLoading] = createSignal(false);
 
   onMount(() => {
     for (const [k, v] of Object.entries(validators)) {
@@ -101,7 +98,7 @@ export const AddPrescriptionCard = (props: {
     setIsLoading(true);
 
     // TODO TODO TODO move validation to the prescribe provider
-    const keys = [...Object.keys(validators), ...supervisorValidatorKeys];
+    const keys = Object.keys(validators);
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
 
@@ -114,14 +111,6 @@ export const AddPrescriptionCard = (props: {
       return;
     }
 
-    const notes = props.store.notes.value;
-    const supervisorPrefix = `Supervising Physician:`;
-    // Notes may already contain supervisor
-    // if user edits a draft prescription
-    const notesNeedsSupervisor =
-      needsSupervisor() && !notes.toLowerCase().includes(supervisorPrefix.toLowerCase());
-    const supervisorString = `${supervisorPrefix} ${props.store.supervisorFullName.value}, ${props.store.supervisorNpi.value}`;
-
     const prescriptionFormData: PrescriptionFormData = {
       doNotFillBeforeDate: props.store.doNotFillBeforeDate?.value,
       treatment: { id: props.store.treatment.value.id, name: props.store.treatment.value.name },
@@ -130,7 +119,7 @@ export const AddPrescriptionCard = (props: {
       dispenseUnit: props.store.dispenseUnit.value,
       daysSupply: props.store.daysSupply.value,
       instructions: props.store.instructions.value,
-      notes: notesNeedsSupervisor ? `${notes.trim()}\n\n${supervisorString}` : notes,
+      notes: props.store.notes.value,
       fillsAllowed: props.store.refillsInput.value + 1,
       // TODO: set this from template-overrides. can we stop using the props.store, with this param as a starting point?
       diagnoseCodes: []
@@ -174,8 +163,6 @@ export const AddPrescriptionCard = (props: {
       'templateName',
       'addToTemplates',
       'doNotFillBeforeDate'
-      // Purposefully do not clear supervisorFullName and supervisorNpi
-      // so the fields will repopulate on additional prescriptions
     ]);
     setOffCatalog(undefined);
     clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);
@@ -416,12 +403,6 @@ export const AddPrescriptionCard = (props: {
             })
           }
           value={props.store.notes?.value}
-        />
-        <SupervisorCard
-          actions={props.actions}
-          store={props.store}
-          needsSupervisor={needsSupervisor}
-          setNeedsSupervisor={setNeedsSupervisor}
         />
         <div class="w-full">
           <photon-datepicker

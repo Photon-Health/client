@@ -14,14 +14,18 @@ function Card(preProps: CardProps) {
   const props = mergeProps({ variant: 'white', autoPadding: true }, preProps);
 
   const cardClasses = createMemo(() =>
-    clsx('border rounded-lg ', {
-      'divide-y divide-gray-300': props?.addChildrenDivider,
-      'border-blue-600 bg-blue-50': props?.selected,
-      'border-gray-300': !props?.selected,
-      'bg-white': props?.variant === 'white',
-      'bg-gray-50': props?.variant === 'gray',
-      'opacity-35': props?.disabled
-    })
+    clsx(
+      'border rounded-lg ',
+      {
+        'divide-y divide-gray-300': props?.addChildrenDivider,
+        'border-blue-600 bg-blue-50': props?.selected,
+        'border-gray-300': !props?.selected,
+        'bg-white': props?.variant === 'white',
+        'bg-gray-50': props?.variant === 'gray',
+        'opacity-35': props?.disabled
+      },
+      props.class
+    )
   );
 
   return (

@@ -1,9 +1,10 @@
 import * as zod from 'zod';
-import { Text, usePhoton } from '@photonhealth/components';
+import { Card, Input, InputGroup, Text, usePhoton } from '@photonhealth/components';
 import { Address, Name } from '@photonhealth/sdk/dist/types';
-import { optional, refine, string } from 'superstruct';
-import { Accessor, onMount, Setter, Show } from 'solid-js';
+import { createEffect, onMount, Setter, Show } from 'solid-js';
 import gql from 'graphql-tag';
+import { createForm } from '@felte/solid';
+import { validator } from '@felte/validator-zod';
 
 const supervisorSchema = zod
   .object({
@@ -29,6 +30,8 @@ const supervisorSchema = zod
       });
     }
   });
+
+export const supervisorValidatorKeys = ['supervisorFullName', 'supervisorNpi'];
 
 const MeUserQuery = gql`
   query MeUserQuery {
@@ -61,55 +64,24 @@ const calculateNeedsSupervisor = ({
   ['NP', 'PA'].includes(title) &&
   ['CA', 'FL', 'GA', 'MI', 'MO', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA'].includes(state.toUpperCase());
 
-export const supervisorValidatorKeys = ['supervisorFullName', 'supervisorNpi'];
-
 interface SupervisorCardProps {
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
-  needsSupervisor: Accessor<boolean>;
+  needsSupervisor: boolean;
   setNeedsSupervisor: Setter<boolean>;
 }
 
 export const SupervisorCard = (props: SupervisorCardProps) => {
   const client = usePhoton();
 
-  const validateSupervisorFields = () => {
-    const result = supervisorSchema.safeParse({
-      supervisorFullName: props.store.supervisorFullName?.value,
-      supervisorNpi: props.store.supervisorNpi?.value
-    });
-    if (result.success) {
-      return {};
-    }
-    const errors = result.error.flatten().fieldErrors;
-    const validationErrors = {
-      supervisorFullName: errors.supervisorFullName?.[0],
-      supervisorNpi: errors.supervisorNpi?.[0]
-    };
-    return { errors: validationErrors };
-  };
-
-  const supervisorValidators = {
-    supervisorFullName: refine(optional(string()), 'fullNameValidation', () => {
-      const result = validateSupervisorFields();
-      const error = result.errors?.supervisorFullName;
-      return error ? error : true;
-    }),
-    supervisorNpi: refine(optional(string()), 'npiValidation', () => {
-      const result = validateSupervisorFields();
-      const error = result.errors?.supervisorNpi;
-      return error ? error : true;
-    })
-  };
+  const { form, data, errors, validate } = createForm({
+    onSubmit: () => {
+      // form only handles validation and state management
+    },
+    extend: validator({ schema: supervisorSchema })
+  });
 
   onMount(async () => {
-    for (const [k, v] of Object.entries(supervisorValidators)) {
-      props.actions.registerValidator({
-        key: k,
-        validator: v
-      });
-    }
-
     const {
       data: { me }
     } = await client.sdk.apolloClinical.query<MeUserQueryType>({
@@ -122,36 +94,43 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
     props.setNeedsSupervisor(needsSupervisor);
   });
 
+  createEffect(() => {
+    props.actions.updateFormValue({
+      key: 'supervisorFullName',
+      value: data().supervisorFullName
+    });
+    props.actions.updateFormError({
+      key: 'supervisorFullName',
+      error: errors().supervisorFullName?.[0]
+    });
+
+    props.actions.updateFormValue({
+      key: 'supervisorNpi',
+      value: data().supervisorNpi
+    });
+    props.actions.updateFormError({
+      key: 'supervisorNpi',
+      error: errors().supervisorNpi?.[0]
+    });
+  });
+
   return (
-    <Show when={props.needsSupervisor()}>
-      <Text size="sm" color="black" class="pb-[21px]">
-        Some pharmacies require supervising physician information for this prescription. Adding it
-        here can help avoid callbacks and delays.
-      </Text>
-      <photon-text-input
-        label="Full Name"
-        value={props.store.supervisorFullName?.value ?? ''}
-        invalid={props.store.supervisorFullName?.error ?? false}
-        help-text={props.store.supervisorFullName?.error}
-        on:photon-input-changed={(e: any) =>
-          props.actions.updateFormValue({
-            key: 'supervisorFullName',
-            value: e.detail.input
-          })
-        }
-      />
-      <photon-text-input
-        label="NPI"
-        value={props.store.supervisorNpi?.value ?? ''}
-        invalid={props.store.supervisorNpi?.error ?? false}
-        help-text={props.store.supervisorNpi?.error}
-        on:photon-input-changed={(e: any) =>
-          props.actions.updateFormValue({
-            key: 'supervisorNpi',
-            value: e.detail.input
-          })
-        }
-      />
+    <Show when={props.needsSupervisor}>
+      <Card addChildrenDivider={true} class="pb-2">
+        <Text color="gray">Supervising Physician</Text>
+        <form ref={form}>
+          <Text size="sm" color="black">
+            Some pharmacies require supervising physician information for this prescription. Adding
+            it here can help avoid callbacks and delays.
+          </Text>
+          <InputGroup label="Full Name" error={errors().supervisorFullName?.[0]}>
+            <Input name="supervisorFullName" onInput={validate} />
+          </InputGroup>
+          <InputGroup label="NPI" error={errors().supervisorNpi?.[0]}>
+            <Input name="supervisorNpi" onInput={validate} />
+          </InputGroup>
+        </form>
+      </Card>
     </Show>
   );
 };
