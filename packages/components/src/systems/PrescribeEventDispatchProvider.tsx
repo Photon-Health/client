@@ -2,6 +2,8 @@ import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createContext, JSXElement, useContext } from 'solid-js';
 import { ScreeningAlertType } from './ScreeningAlerts';
+import { dispatchAnalyticsTrackEvent } from '../analytics/dispatchAnalyticsTrackEvent';
+import { PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
 
 const PrescribeEventDispatchContext = createContext<{
   dispatchFormValidate: (canSubmit: boolean, form: any) => void;
@@ -17,6 +19,7 @@ const PrescribeEventDispatchContext = createContext<{
   dispatchClinicalAlertCancel: (alerts: ScreeningAlertType[]) => void;
   dispatchSignatureAttestationAgreed: () => void;
   dispatchSignatureAttestationCanceled: () => void;
+  dispatchAnalytics: (detail: PhotonEmbedAnalyticsEventInput) => void;
 }>();
 
 interface DraftPrescriptionProviderProps {
@@ -165,6 +168,10 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref?.dispatchEvent(event);
   };
 
+  const dispatchAnalytics = (detail: PhotonEmbedAnalyticsEventInput) => {
+    dispatchAnalyticsTrackEvent(detail, ref);
+  };
+
   const value = {
     dispatchFormValidate,
     dispatchDraftPrescriptionCreated,
@@ -178,7 +185,8 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     dispatchClinicalAlertAcknowledge,
     dispatchClinicalAlertCancel,
     dispatchSignatureAttestationAgreed,
-    dispatchSignatureAttestationCanceled
+    dispatchSignatureAttestationCanceled,
+    dispatchAnalytics
   };
 
   return (

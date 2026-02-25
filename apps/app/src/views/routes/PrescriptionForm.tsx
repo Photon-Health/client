@@ -6,6 +6,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
+import { buildSignatureAttestationFormInteractionPayload } from '../../instrumentation/analyticsTrackEventListenerUtils';
+import { type PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
 
 declare global {
   namespace JSX {
@@ -37,7 +39,7 @@ const orgSettingsQuery = graphql(/* GraphQL */ `
 export const PrescriptionForm = () => {
   const ref: MutableRefObject<any> = useRef();
   const { user, clinicalClient } = usePhoton();
-  const { track } = useProviderAnalytics();
+  const providerAnalytics = useProviderAnalytics();
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
   const pharmacyId = params.get('pharmacyId') || '';
@@ -64,12 +66,49 @@ export const PrescriptionForm = () => {
     navigate('/prescriptions');
   };
 
+  const prescriptionFormOpenWasTracked = useRef(false);
   useEffect(() => {
-    if (ref.current) {
-      track('prescription_form_opened', { patientId: patientId || undefined });
+    if (providerAnalytics.isReady && !prescriptionFormOpenWasTracked.current) {
+      prescriptionFormOpenWasTracked.current = true;
+      providerAnalytics.track('prescription_form_opened', { patientId: patientId || undefined });
+    }
+  }, [providerAnalytics, patientId]);
 
-      ref.current.addEventListener('photon-prescriptions-created', (e: any) => {
-        track('prescription_form_created', {
+  useEffect(() => {
+    if (!ref.current) return;
+    const abortController = new AbortController();
+    const { signal: abortControllerSignal } = abortController;
+    const listenerOptions = { signal: abortControllerSignal };
+
+    ref.current.addEventListener(
+      'photon-analytics-track-event',
+      (e: { detail: PhotonEmbedAnalyticsEventInput }) => {
+        const { trackEventType } = e.detail;
+        if (
+          trackEventType === 'signature_attestation_shown' ||
+          trackEventType === 'signature_attestation_agreed' ||
+          trackEventType === 'signature_attestation_canceled'
+        ) {
+          providerAnalytics.track(
+            'clinicalapp_signature_attestation_form_track_events',
+            buildSignatureAttestationFormInteractionPayload(e.detail)
+          );
+        }
+      },
+      listenerOptions
+    );
+
+    if (patientId && ref.current) {
+      // this ref.current setter must be after the photon-analytics-track-event so that the data is set properly when the
+      // photon-analytics-track-event fires, due to how the solidjs code within the WebComponent executes.
+      // the ref.current data is utilized by photon-analytics-track-event
+      ref.current.patientId = patientId;
+    }
+
+    ref.current.addEventListener(
+      'photon-prescriptions-created',
+      (e: any) => {
+        providerAnalytics.track('prescription_form_created', {
           patientId: e.detail.patientId,
           prescriptionIds: e.detail.prescriptionIds,
           createOrder: e.detail.createOrder
@@ -87,55 +126,48 @@ export const PrescriptionForm = () => {
             search: searchParams.toString()
           });
         }
-      });
-      ref.current.addEventListener(
-        'photon-order-created',
-        (e: { detail: { order: { id: string } } }) => {
-          const searchParams = new URLSearchParams();
-          if (!e?.detail?.order) {
-            return onClose();
-          }
+      },
+      listenerOptions
+    );
+    ref.current.addEventListener(
+      'photon-order-created',
+      (e: { detail: { order: { id: string } } }) => {
+        const searchParams = new URLSearchParams();
+        if (!e?.detail?.order) {
+          return onClose();
+        }
 
-          navigate({
-            pathname: `/orders/${e.detail.order.id}`,
-            search: searchParams.toString()
-          });
-        }
-      );
-      ref.current.addEventListener('photon-prescriptions-closed', () => {
-        onClose();
-      });
-      ref.current.addEventListener(
-        'photon-order-combined',
-        (e: { detail: { order: { id: string } } }) => {
-          navigate(`/orders/${e.detail.order.id}`);
-        }
-      );
-      ref.current.addEventListener(
-        'photon-datadog-action',
-        (e: {
-          detail: {
-            action: string;
-            data: {
-              [key: string]: unknown;
-            };
+        navigate({
+          pathname: `/orders/${e.detail.order.id}`,
+          search: searchParams.toString()
+        });
+      },
+      listenerOptions
+    );
+    ref.current.addEventListener('photon-prescriptions-closed', () => onClose(), listenerOptions);
+    ref.current.addEventListener(
+      'photon-order-combined',
+      (e: { detail: { order: { id: string } } }) => {
+        navigate(`/orders/${e.detail.order.id}`);
+      },
+      listenerOptions
+    );
+    ref.current.addEventListener(
+      'photon-datadog-action',
+      (e: {
+        detail: {
+          action: string;
+          data: {
+            [key: string]: unknown;
           };
-        }) => {
-          datadogRum.addAction(e.detail.action, e.detail.data);
-        }
-      );
-      // TODO REMOVE: we're running discovery on which providers are using advanced search
-      ref.current.addEventListener('photon-medication-search-open', () => {
-        datadogRum.addAction('photon-medication-search-open', { user });
-      });
-    }
-  }, [navigate, track, patientId, user, onClose]);
-
-  useEffect(() => {
-    if (patientId && ref.current) {
-      ref.current.patientId = patientId;
-    }
-  }, [patientId]);
+        };
+      }) => {
+        datadogRum.addAction(e.detail.action, e.detail.data);
+      },
+      listenerOptions
+    );
+    return () => abortController.abort();
+  }, [navigate, providerAnalytics, patientId, onClose]);
 
   const enableCoverageCheck = useMemo(() => {
     if (user) {

@@ -116,8 +116,11 @@ type Status =
   | { status: 'ERROR'; errors: any[] };
 
 export const SignatureAttestationModal = (props: SignatureAttestationModalProps) => {
-  const { dispatchSignatureAttestationAgreed, dispatchSignatureAttestationCanceled } =
-    usePrescribeEventDispatch();
+  const {
+    dispatchSignatureAttestationAgreed,
+    dispatchSignatureAttestationCanceled,
+    dispatchAnalytics
+  } = usePrescribeEventDispatch();
   const [status, setStatus] = createSignal<Status>({ status: 'LOADING' });
   const [submitting, setSubmitting] = createSignal(false);
 
@@ -155,6 +158,16 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   });
 
   createEffect(() => {
+    const curr = status();
+    if (curr.status === 'NEEDS ATTESTATION') {
+      dispatchAnalytics({
+        trackEventType: 'signature_attestation_shown',
+        properties: { attestationVersion: curr.version }
+      });
+    }
+  });
+
+  createEffect(() => {
     refreshAttestationStatus();
   });
 
@@ -169,6 +182,10 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
       if (res.data?.agreeToSignatureAttestation) {
         setSubmitting(false);
         setStatus({ status: 'COMPLETE' });
+        dispatchAnalytics({
+          trackEventType: 'signature_attestation_agreed',
+          properties: { attestationVersion: curr.version }
+        });
       } else if (res.error || res.errors) {
         setSubmitting(false);
         setStatus({
@@ -200,7 +217,10 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
         <div class="w-full">
           <AgreementCard
             onAgree={onAgree}
-            onCancel={dispatchSignatureAttestationCanceled}
+            onCancel={() => {
+              dispatchAnalytics({ trackEventType: 'signature_attestation_canceled' });
+              dispatchSignatureAttestationCanceled();
+            }}
             disabled={submitting()}
           />
         </div>
