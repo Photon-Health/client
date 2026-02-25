@@ -1,10 +1,13 @@
-import { createUniqueId, Show } from 'solid-js';
-import { JSXElement, mergeProps } from 'solid-js';
+import { createUniqueId, JSXElement, mergeProps, Show } from 'solid-js';
+import Icon from '../Icon';
+import Tooltip from '../Tooltip';
 
 interface CheckboxProps {
   id?: string;
   mainText: string;
   secondaryText?: string;
+  tooltip?: string;
+  showOptionalSubtext?: boolean;
   checked?: boolean;
   onChange: (checked: boolean) => void;
 }
@@ -26,26 +29,41 @@ export default function Checkbox(props: CheckboxProps): JSXElement {
   };
 
   return (
-    <div class="relative flex items-start">
-      <div class="flex h-6 items-center">
-        <input
-          id={mergedProps.id}
-          aria-describedby={`${mergedProps.id}-description`}
-          name={mergedProps.id}
-          type="checkbox"
-          class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
-          checked={mergedProps.checked}
-          onChange={handleChange}
-        />
-      </div>
-      <div class="ml-3 text-sm leading-6">
-        <label for={mergedProps.id} class="font-medium text-gray-900">
-          {mergedProps.mainText}
-        </label>
+    <div class="relative flex items-center">
+      <input
+        id={mergedProps.id}
+        aria-describedby={`${mergedProps.id}-description`}
+        name={mergedProps.id}
+        type="checkbox"
+        class="h-4 w-4 flex-shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
+        checked={mergedProps.checked}
+        onChange={handleChange}
+      />
+      <div class="ml-3 text-sm leading-none">
+        <div class="flex items-center gap-1">
+          <label for={mergedProps.id} class="m-0 font-medium text-gray-500">
+            {mergedProps.mainText}
+          </label>
+          <Show when={mergedProps.tooltip}>
+            <Tooltip text={mergedProps.tooltip!}>
+              <Icon name="informationCircle" size="sm" class="text-gray-400 cursor-help" />
+            </Tooltip>
+          </Show>
+        </div>
         <Show when={mergedProps?.secondaryText}>
-          <span id={`${mergedProps.id}-description`} class="text-gray-500">
-            <span class="sr-only">{mergedProps.mainText} </span> {mergedProps.secondaryText}
-          </span>
+          <label
+            for={mergedProps.id}
+            id={`${mergedProps.id}-description`}
+            class="m-0 text-gray-500 text-xs cursor-pointer"
+          >
+            <span class="sr-only">{mergedProps.mainText} </span>
+            {mergedProps.secondaryText}
+          </label>
+        </Show>
+        <Show when={mergedProps.showOptionalSubtext}>
+          <label for={mergedProps.id} class="m-0 text-gray-400 text-xs cursor-pointer">
+            Optional
+          </label>
         </Show>
       </div>
     </div>

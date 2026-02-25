@@ -1,8 +1,11 @@
 import AddressForm from './systems/AddressForm';
 import { Alert } from './particles/Alert';
+import Checkbox from './particles/Checkbox';
+import DispenseUnitSelect from './particles/DispenseUnitSelect';
 import Input from './particles/Input';
 import { InputGroup } from './particles/InputGroup';
 import DateInput from './particles/DateInput';
+import Select from './particles/Select';
 import StateSelect from './particles/StateSelect';
 import PhoneInput from './particles/PhoneInput';
 import SexSelect, { SEX_OPTIONS } from './particles/SexSelect';
@@ -32,6 +35,7 @@ import Button from './particles/Button';
 import SDKProvider, { usePhotonClient } from './systems/SDKProvider';
 import Table from './particles/Table';
 import Text from './particles/Text';
+import Textarea from './particles/Textarea';
 import Toaster from './particles/Toaster';
 import {
   ScreeningAlertAcknowledgementDialog,
@@ -67,7 +71,10 @@ export {
   AddressForm,
   Alert,
   Banner,
+  Checkbox,
+  DispenseUnitSelect,
   Input,
+  Select,
   InputGroup,
   DateInput,
   StateSelect,
@@ -98,6 +105,7 @@ export {
   Spinner,
   Table,
   Text,
+  Textarea,
   Toaster,
   createQuery,
   formatDate,

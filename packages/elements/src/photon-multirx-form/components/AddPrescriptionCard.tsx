@@ -1,32 +1,33 @@
 import {
   Button,
+  CALENDAR_DATE_FORMAT,
   Card,
+  Checkbox,
+  DispenseUnitSelect,
   DoseCalculator,
   Icon,
+  Input,
+  InputGroup,
   PrescriptionFormData,
   ScreeningAlerts,
   ScreeningAlertType,
   Text,
+  Textarea,
   triggerToast,
-  usePrescribeEventDispatch,
   TryCreatePrescriptionTemplateOptions,
-  useDraftPrescriptions
+  useDraftPrescriptions,
+  usePrescribeEventDispatch
 } from '@photonhealth/components';
-import { DispenseUnit, Medication, Prescription } from '@photonhealth/sdk/dist/types';
+import { format } from 'date-fns';
+import { Medication, Prescription } from '@photonhealth/sdk/dist/types';
 import { any, min, number, optional, record, refine, size, string } from 'superstruct';
 import { afterDate, between, message } from '../../validators';
 
-//Shoelace
-import '@shoelace-style/shoelace/dist/components/icon/icon';
-import '@shoelace-style/shoelace/dist/components/button/button';
-import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
 import { DisableList } from './PrescribeWorkflow';
-
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 const validators = {
   treatment: message(record(string(), any()), 'Please select a treatment'),
@@ -64,7 +65,6 @@ export const AddPrescriptionCard = (props: {
   const { tryCreatePrescription } = useDraftPrescriptions();
   const { dispatchOrderError } = usePrescribeEventDispatch();
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
-  const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
   const [searchText, setSearchText] = createSignal<string>('');
   const [isLoading, setIsLoading] = createSignal(false);
@@ -232,48 +232,38 @@ export const AddPrescriptionCard = (props: {
           owningId={props.store.treatment?.value?.id}
         />
 
-        <div class="flex flex-col sm:flex-none sm:grid sm:grid-cols-2 sm:gap-4">
-          <div class="order-last sm:order-first">
-            <photon-checkbox
-              label="Dispense as written"
-              tip="This prescription will be filled generically unless this box is checked"
-              form-name="daw"
-              class="flex-grow"
-              checked={props.store.dispenseAsWritten?.value || false}
-              on:photon-checkbox-toggled={(e: any) =>
-                props.actions.updateFormValue({
-                  key: 'dispenseAsWritten',
-                  value: e.detail.checked
-                })
-              }
-            />
-          </div>
+        <div class="mt-2">
+          <Checkbox
+            mainText="Dispense as written"
+            tooltip="This prescription will be filled generically unless this box is checked"
+            showOptionalSubtext={true}
+            checked={props.store.dispenseAsWritten?.value || false}
+            onChange={(checked: boolean) =>
+              props.actions.updateFormValue({
+                key: 'dispenseAsWritten',
+                value: checked
+              })
+            }
+          />
         </div>
-        <div class="mt-2 sm:mt-0 sm:grid sm:grid-cols-2 sm:gap-4">
-          <div class="flex items-end gap-1 items-stretch">
-            <photon-number-input
-              class="flex-grow flex-1 w-2/5 sm:w-auto"
-              label="Quantity"
-              value={props.store.dispenseQuantity?.value ?? null}
-              required="true"
-              min={0}
-              invalid={props.store.dispenseQuantity?.error ?? false}
-              help-text={props.store.dispenseQuantity?.error}
-              on:photon-input-changed={(e: any) => {
-                const inputValue = Number(e.detail.input);
-                // this handles a bug on mobile where the input is cleared when the user types a decimal.
-                // However, this introduces a bug where the input validator isn't registered. To fix this, we
-                // add a undefined form update in the onMount function up top 🙄
-                // https://github.com/Photon-Health/client/commit/9566daa5dea50709677c66fdceac6d2edbd43fe5
-                if (!isNaN(inputValue) && e.detail.input !== '') {
-                  props.actions.updateFormValue({
-                    key: 'dispenseQuantity',
-                    value: inputValue
-                  });
-                }
-              }}
-              style={{ width: '100px' }}
-            />
+        <div class="mt-2 sm:grid sm:grid-cols-2 sm:gap-4">
+          <div class="flex items-start gap-1">
+            <div class="flex-1" style={{ width: '100px' }}>
+              {/* Input's number handler skips NaN values, handling the mobile decimal bug */}
+              <InputGroup label="Quantity" required error={props.store.dispenseQuantity?.error}>
+                <Input
+                  type="number"
+                  value={props.store.dispenseQuantity?.value ?? undefined}
+                  min={0}
+                  onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+                    props.actions.updateFormValue({
+                      key: 'dispenseQuantity',
+                      value: Number(e.currentTarget.value)
+                    });
+                  }}
+                />
+              </InputGroup>
+            </div>
             <DoseCalculator
               open={openDoseCalculator()}
               onClose={() => setOpenDoseCalculator(false)}
@@ -301,139 +291,126 @@ export const AddPrescriptionCard = (props: {
                 }
               }}
             />
-            <div>
+            <div class="pt-10">
               <Button
                 variant="secondary"
-                class="w-fit"
+                class="w-fit h-12"
                 onClick={() => setOpenDoseCalculator(true)}
-                style={{
-                  // ya, it ain't pretty, but it works. just need it for a lil bit longer
-                  height: '40px',
-                  'margin-top': '32px'
-                }}
               >
                 <Icon name="calculator" size="sm" />
               </Button>
-              <div style={{ height: '23px' }} class="pt-1" />
             </div>
           </div>
-          <photon-dispense-units
-            label="Dispense Unit"
-            required="true"
-            force-label-size="true"
-            selected={props.store.dispenseUnit?.value ?? dispenseUnit()?.name}
-            invalid={props.store.dispenseUnit?.error ?? false}
-            help-text={props.store.dispenseUnit?.error}
-            on:photon-dispense-unit-selected={(e: any) => {
-              props.actions.updateFormValue({
-                key: 'dispenseUnit',
-                value: e.detail.dispenseUnit.name
-              });
-            }}
-          />
+          <InputGroup label="Dispense Unit" required error={props.store.dispenseUnit?.error}>
+            <DispenseUnitSelect
+              value={props.store.dispenseUnit?.value ?? undefined}
+              onChange={(e: Event & { currentTarget: HTMLSelectElement }) =>
+                props.actions.updateFormValue({
+                  key: 'dispenseUnit',
+                  value: e.currentTarget.value
+                })
+              }
+            />
+          </InputGroup>
         </div>
         <div class="sm:grid sm:grid-cols-2 sm:gap-4">
-          <photon-number-input
-            class="flex-grow flex-shrink flex-1"
-            label="Days Supply"
-            value={props.store.daysSupply?.value ?? null}
-            invalid={props.store.daysSupply?.error ?? false}
-            help-text={props.store.daysSupply?.error}
-            required="true"
-            min={0}
-            on:photon-input-changed={(e: any) => {
+          <InputGroup label="Days Supply" required error={props.store.daysSupply?.error}>
+            <Input
+              type="number"
+              value={props.store.daysSupply?.value ?? undefined}
+              min={0}
+              onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+                props.actions.updateFormValue({
+                  key: 'daysSupply',
+                  value: Number(e.currentTarget.value)
+                });
+              }}
+            />
+          </InputGroup>
+          <InputGroup label="Refills" required error={props.store.refillsInput?.error}>
+            <Input
+              type="number"
+              value={props.store.refillsInput?.value ?? undefined}
+              min={0}
+              max={11}
+              onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) =>
+                props.actions.updateFormValue({
+                  key: 'refillsInput',
+                  value: Number(e.currentTarget.value)
+                })
+              }
+            />
+          </InputGroup>
+        </div>
+        <InputGroup
+          label="Patient Instructions (SIG)"
+          required
+          error={props.store.instructions?.error}
+        >
+          <Textarea
+            placeholder="Enter patient instructions"
+            value={props.store.instructions?.value}
+            onInput={(value: string) =>
               props.actions.updateFormValue({
-                key: 'daysSupply',
-                value: Number(e.detail.input)
-              });
-            }}
-          />
-          <photon-number-input
-            class="flex-grow flex-shrink flex-1"
-            label="Refills"
-            value={props.store.refillsInput?.value}
-            required="true"
-            min={0}
-            max={11}
-            invalid={props.store.refillsInput?.error ?? false}
-            help-text={props.store.refillsInput?.error}
-            on:photon-input-changed={(e: any) =>
-              props.actions.updateFormValue({
-                key: 'refillsInput',
-                value: Number(e.detail.input)
+                key: 'instructions',
+                value
               })
             }
           />
-        </div>
-        <photon-textarea
-          label="Patient Instructions (SIG)"
-          form-name="patient_instructions"
-          required="true"
-          placeholder="Enter patient instructions"
-          invalid={props.store.instructions?.error ?? false}
-          help-text={props.store.instructions?.error}
-          on:photon-textarea-changed={(e: any) =>
-            props.actions.updateFormValue({
-              key: 'instructions',
-              value: e.detail.value
-            })
-          }
-          value={props.store.instructions?.value}
-        />
-        <photon-textarea
-          label="Pharmacy Note"
-          placeholder="Enter pharmacy note"
-          on:photon-textarea-changed={(e: any) =>
-            props.actions.updateFormValue({
-              key: 'notes',
-              value: e.detail.value
-            })
-          }
-          value={props.store.notes?.value}
-        />
-        <div class="w-full">
-          <photon-datepicker
+        </InputGroup>
+        <InputGroup label="Pharmacy Note">
+          <Textarea
+            placeholder="Enter pharmacy note"
+            value={props.store.notes?.value}
+            onInput={(value: string) =>
+              props.actions.updateFormValue({
+                key: 'notes',
+                value
+              })
+            }
+          />
+        </InputGroup>
+        <InputGroup label="Do Not Fill Before" error={props.store.doNotFillBeforeDate?.error}>
+          <Input
+            type="date"
             value={props.store.doNotFillBeforeDate?.value}
-            label="Do Not Fill Before"
-            invalid={props.store.doNotFillBeforeDate?.error ?? false}
-            help-text={props.store.doNotFillBeforeDate?.error}
-            min={new Date()}
-            on:photon-datepicker-selected={(e: any) =>
+            min={format(new Date(), CALENDAR_DATE_FORMAT)}
+            onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) =>
               props.actions.updateFormValue({
                 key: 'doNotFillBeforeDate',
-                value: e.detail.date
+                value: e.currentTarget.value || undefined
               })
             }
           />
-        </div>
-        <div class="flex flex-col xs:flex-row gap-2">
+        </InputGroup>
+        <div class="flex flex-col xs:flex-row gap-2 mt-2">
           <Show when={!props.hideAddToTemplates}>
-            <photon-checkbox
-              label="Add To Personal Templates"
-              form-name="addToTemplates"
+            <Checkbox
+              mainText="Add To Personal Templates"
+              showOptionalSubtext={true}
               checked={props.store.addToTemplates?.value || false}
-              on:photon-checkbox-toggled={(e: any) => {
+              onChange={(checked: boolean) => {
                 props.actions.updateFormValue({
                   key: 'addToTemplates',
-                  value: e.detail.checked
+                  value: checked
                 });
               }}
             />
           </Show>
           <Show when={props.store.addToTemplates?.value ?? false}>
-            <photon-text-input
-              class="flex-grow flex-shrink flex-1"
-              label="Template Name"
-              value={props.store.templateName?.value ?? ''}
-              invalid={props.store.templateName?.error ?? false}
-              help-text={props.store.templateName?.error}
-              on:photon-input-changed={(e: any) =>
-                props.actions.updateFormValue({
-                  key: 'templateName',
-                  value: e.detail.input
-                })
-              }
-            />
+            <div class="flex-1">
+              <InputGroup label="Template Name" error={props.store.templateName?.error}>
+                <Input
+                  value={props.store.templateName?.value ?? ''}
+                  onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) =>
+                    props.actions.updateFormValue({
+                      key: 'templateName',
+                      value: e.currentTarget.value
+                    })
+                  }
+                />
+              </InputGroup>
+            </div>
           </Show>
           <div class="flex flex-grow justify-end">
             <Button
