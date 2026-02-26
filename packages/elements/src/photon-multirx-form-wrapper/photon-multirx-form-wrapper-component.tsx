@@ -1,4 +1,9 @@
-import { Button, triggerToast, usePhoton } from '@photonhealth/components';
+import {
+  Button,
+  triggerToast,
+  usePhoton,
+  dispatchAnalyticsTrackEvent
+} from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { types } from '@photonhealth/sdk';
 import jwtDecode from 'jwt-decode';
@@ -106,6 +111,13 @@ const Component = (props: {
   };
 
   const dispatchClosed = () => {
+    dispatchAnalyticsTrackEvent(
+      {
+        trackEventType: 'prescription_form_closed',
+        properties: { hadUnsavedWork: shouldWarn(form) }
+      },
+      ref
+    );
     const event = new CustomEvent('photon-prescriptions-closed', {
       composed: true,
       bubbles: true,

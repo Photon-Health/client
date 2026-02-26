@@ -1,5 +1,15 @@
 import { FieldCompletionSnapshot } from '@photonhealth/sdk';
 
+export const PRESCRIPTION_FORM_FIELDS = [
+  'treatment',
+  'dispenseQuantity',
+  'dispenseUnit',
+  'daysSupply',
+  'refills',
+  'instructions',
+  'fulfillmentType'
+] as const;
+
 export const PATIENT_FORM_FIELDS = [
   'firstName',
   'lastName',

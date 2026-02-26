@@ -6,8 +6,15 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
-import { buildSignatureAttestationFormInteractionPayload } from '../../instrumentation/analyticsTrackEventListenerUtils';
-import { type PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
+import {
+  buildPrescriptionFormInteractionPayload,
+  buildSignatureAttestationFormInteractionPayload
+} from '../../instrumentation/analyticsTrackEventListenerUtils';
+import {
+  type PhotonEmbedAnalyticsEventInput,
+  type PrescriptionFormAnalyticsEvent,
+  type PrescriptionFormTrackEventType
+} from '@photonhealth/sdk';
 
 declare global {
   namespace JSX {
@@ -66,19 +73,25 @@ export const PrescriptionForm = () => {
     navigate('/prescriptions');
   };
 
-  const prescriptionFormOpenWasTracked = useRef(false);
-  useEffect(() => {
-    if (providerAnalytics.isReady && !prescriptionFormOpenWasTracked.current) {
-      prescriptionFormOpenWasTracked.current = true;
-      providerAnalytics.track('prescription_form_opened', { patientId: patientId || undefined });
-    }
-  }, [providerAnalytics, patientId]);
-
   useEffect(() => {
     if (!ref.current) return;
     const abortController = new AbortController();
     const { signal: abortControllerSignal } = abortController;
     const listenerOptions = { signal: abortControllerSignal };
+
+    const prescriptionFormEventTypes: Set<string> = new Set<PrescriptionFormTrackEventType>([
+      'prescription_form_opened',
+      'draft_added',
+      'draft_deleted',
+      'draft_edited',
+      'prescription_form_submitted',
+      'order_created',
+      'alert_acknowledged',
+      'alert_canceled',
+      'prescription_form_closed',
+      'prescription_field_interaction',
+      'pharmacy_interaction'
+    ]);
 
     ref.current.addEventListener(
       'photon-analytics-track-event',
@@ -92,6 +105,11 @@ export const PrescriptionForm = () => {
           providerAnalytics.track(
             'clinicalapp_signature_attestation_form_track_events',
             buildSignatureAttestationFormInteractionPayload(e.detail)
+          );
+        } else if (prescriptionFormEventTypes.has(trackEventType)) {
+          providerAnalytics.track(
+            'clinicalapp_prescription_form_track_events',
+            buildPrescriptionFormInteractionPayload(e.detail as PrescriptionFormAnalyticsEvent)
           );
         }
       },
@@ -108,12 +126,6 @@ export const PrescriptionForm = () => {
     ref.current.addEventListener(
       'photon-prescriptions-created',
       (e: any) => {
-        providerAnalytics.track('prescription_form_created', {
-          patientId: e.detail.patientId,
-          prescriptionIds: e.detail.prescriptionIds,
-          createOrder: e.detail.createOrder
-        });
-
         if (!e.detail.createOrder) {
           onClose();
         }

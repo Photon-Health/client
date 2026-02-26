@@ -16,7 +16,9 @@ import {
   triggerToast,
   TryCreatePrescriptionTemplateOptions,
   useDraftPrescriptions,
-  usePrescribeEventDispatch
+  usePrescribeEventDispatch,
+  buildFieldSnapshot,
+  PRESCRIPTION_FORM_FIELDS
 } from '@photonhealth/components';
 import { format } from 'date-fns';
 import { Medication, Prescription } from '@photonhealth/sdk/dist/types';
@@ -63,7 +65,7 @@ export const AddPrescriptionCard = (props: {
   disableList?: DisableList;
 }) => {
   const { tryCreatePrescription } = useDraftPrescriptions();
-  const { dispatchOrderError } = usePrescribeEventDispatch();
+  const { dispatchOrderError, dispatchAnalytics } = usePrescribeEventDispatch();
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
   const [searchText, setSearchText] = createSignal<string>('');
@@ -123,6 +125,12 @@ export const AddPrescriptionCard = (props: {
       createdPrescription = await tryCreatePrescription(prescriptionFormData, options);
       if (createdPrescription) {
         props.onDraftPrescriptionCreated();
+        dispatchAnalytics({
+          trackEventType: 'draft_added',
+          properties: {
+            fields: buildFieldSnapshot(props.store, PRESCRIPTION_FORM_FIELDS)
+          }
+        });
       }
     } catch (err) {
       dispatchOrderError([err as GraphQLFormattedError]);
@@ -174,6 +182,10 @@ export const AddPrescriptionCard = (props: {
             key: 'treatment',
             value: e.detail.medication
           });
+          dispatchAnalytics({
+            trackEventType: 'prescription_field_interaction',
+            properties: { fieldName: 'treatment', hasValue: true }
+          });
 
           props.draftedPrescriptionChanged();
         }}
@@ -200,6 +212,10 @@ export const AddPrescriptionCard = (props: {
                 value: e.detail.data
               });
             }
+            dispatchAnalytics({
+              trackEventType: 'prescription_field_interaction',
+              properties: { fieldName: 'treatment', hasValue: true }
+            });
 
             if (e.detail.catalogId) {
               props.actions.updateFormValue({
@@ -238,12 +254,16 @@ export const AddPrescriptionCard = (props: {
             tooltip="This prescription will be filled generically unless this box is checked"
             showOptionalSubtext
             checked={props.store.dispenseAsWritten?.value || false}
-            onChange={(checked: boolean) =>
+            onChange={(checked: boolean) => {
               props.actions.updateFormValue({
                 key: 'dispenseAsWritten',
                 value: checked
-              })
-            }
+              });
+              dispatchAnalytics({
+                trackEventType: 'prescription_field_interaction',
+                properties: { fieldName: 'dispenseAsWritten', hasValue: checked }
+              });
+            }}
           />
         </div>
         <div class="sm:grid sm:grid-cols-2 sm:gap-4 mt-2">
@@ -259,6 +279,13 @@ export const AddPrescriptionCard = (props: {
                     props.actions.updateFormValue({
                       key: 'dispenseQuantity',
                       value: Number(e.currentTarget.value)
+                    });
+                    dispatchAnalytics({
+                      trackEventType: 'prescription_field_interaction',
+                      properties: {
+                        fieldName: 'dispenseQuantity',
+                        hasValue: Boolean(e.currentTarget.value)
+                      }
                     });
                   }}
                 />
@@ -278,12 +305,19 @@ export const AddPrescriptionCard = (props: {
           <InputGroup label="Dispense Unit" required error={props.store.dispenseUnit?.error}>
             <DispenseUnitSelect
               value={props.store.dispenseUnit?.value ?? undefined}
-              onChange={(e: Event & { currentTarget: HTMLSelectElement }) =>
+              onChange={(e: Event & { currentTarget: HTMLSelectElement }) => {
                 props.actions.updateFormValue({
                   key: 'dispenseUnit',
                   value: e.currentTarget.value
-                })
-              }
+                });
+                dispatchAnalytics({
+                  trackEventType: 'prescription_field_interaction',
+                  properties: {
+                    fieldName: 'dispenseUnit',
+                    hasValue: Boolean(e.currentTarget.value)
+                  }
+                });
+              }}
             />
           </InputGroup>
         </div>
@@ -326,6 +360,13 @@ export const AddPrescriptionCard = (props: {
                   key: 'daysSupply',
                   value: Number(e.currentTarget.value)
                 });
+                dispatchAnalytics({
+                  trackEventType: 'prescription_field_interaction',
+                  properties: {
+                    fieldName: 'daysSupply',
+                    hasValue: Boolean(e.currentTarget.value)
+                  }
+                });
               }}
             />
           </InputGroup>
@@ -336,12 +377,19 @@ export const AddPrescriptionCard = (props: {
               value={props.store.refillsInput?.value ?? undefined}
               min={0}
               max={11}
-              onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) =>
+              onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
                 props.actions.updateFormValue({
                   key: 'refillsInput',
                   value: Number(e.currentTarget.value)
-                })
-              }
+                });
+                dispatchAnalytics({
+                  trackEventType: 'prescription_field_interaction',
+                  properties: {
+                    fieldName: 'refills',
+                    hasValue: Boolean(e.currentTarget.value)
+                  }
+                });
+              }}
             />
           </InputGroup>
         </div>
@@ -353,24 +401,32 @@ export const AddPrescriptionCard = (props: {
           <Textarea
             placeholder="Enter patient instructions"
             value={props.store.instructions?.value}
-            onInput={(value: string) =>
+            onInput={(value: string) => {
               props.actions.updateFormValue({
                 key: 'instructions',
                 value
-              })
-            }
+              });
+              dispatchAnalytics({
+                trackEventType: 'prescription_field_interaction',
+                properties: { fieldName: 'instructions', hasValue: Boolean(value) }
+              });
+            }}
           />
         </InputGroup>
         <InputGroup label="Pharmacy Note" showOptionalSubtext>
           <Textarea
             placeholder="Enter pharmacy note"
             value={props.store.notes?.value}
-            onInput={(value: string) =>
+            onInput={(value: string) => {
               props.actions.updateFormValue({
                 key: 'notes',
                 value
-              })
-            }
+              });
+              dispatchAnalytics({
+                trackEventType: 'prescription_field_interaction',
+                properties: { fieldName: 'pharmacy_notes', hasValue: Boolean(value) }
+              });
+            }}
           />
         </InputGroup>
         <InputGroup
@@ -382,12 +438,19 @@ export const AddPrescriptionCard = (props: {
             type="date"
             value={props.store.doNotFillBeforeDate?.value}
             min={format(new Date(), CALENDAR_DATE_FORMAT)}
-            onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) =>
+            onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
               props.actions.updateFormValue({
                 key: 'doNotFillBeforeDate',
                 value: e.currentTarget.value || undefined
-              })
-            }
+              });
+              dispatchAnalytics({
+                trackEventType: 'prescription_field_interaction',
+                properties: {
+                  fieldName: 'doNotFillBeforeDate',
+                  hasValue: Boolean(e.currentTarget.value)
+                }
+              });
+            }}
           />
         </InputGroup>
         <div class="flex flex-col xs:flex-row mt-4">
@@ -400,6 +463,10 @@ export const AddPrescriptionCard = (props: {
                 props.actions.updateFormValue({
                   key: 'addToTemplates',
                   value: checked
+                });
+                dispatchAnalytics({
+                  trackEventType: 'prescription_field_interaction',
+                  properties: { fieldName: 'addToTemplates', hasValue: checked }
                 });
               }}
             />

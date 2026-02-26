@@ -1,7 +1,13 @@
 import { createMemo } from 'solid-js';
-import { PharmacySelect, usePrescribe } from '@photonhealth/components';
-import { Card, Text } from '@photonhealth/components';
+import {
+  Card,
+  PharmacySelect,
+  Text,
+  usePrescribe,
+  usePrescribeEventDispatch
+} from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
+
 const hasUsableAddress = (address?: {
   street1?: string;
   city?: string;
@@ -28,6 +34,7 @@ export const OrderCard = (props: {
   mailOrderIds?: string;
 }) => {
   const { setOrderFormData } = usePrescribe();
+  const { dispatchAnalytics } = usePrescribeEventDispatch();
   const patientIds = createMemo(() =>
     props.store['patient']?.value ? [props.store['patient']?.value?.id] : []
   );
@@ -59,10 +66,15 @@ export const OrderCard = (props: {
           mailOrderPharmacyIds={props.mailOrderIds ? props.mailOrderIds.split(',') : undefined}
           patientIds={patientIds()}
           address={address()}
+          hasPreferredPharmacy={Boolean(props.store['patient']?.value?.preferredPharmacies?.length)}
           setFufillmentType={(type: string | undefined) => {
             props.actions.updateFormValue({
               key: 'fulfillmentType',
               value: type || ''
+            });
+            dispatchAnalytics({
+              trackEventType: 'prescription_field_interaction',
+              properties: { fieldName: 'fulfillmentType', hasValue: Boolean(type) }
             });
           }}
           setPreferredPharmacy={(shouldSet = false) => {

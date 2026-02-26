@@ -24,7 +24,9 @@ import {
   usePhoton,
   usePrescribe,
   useRecentOrders,
-  usePrescribeEventDispatch
+  usePrescribeEventDispatch,
+  buildFieldSnapshot,
+  PRESCRIPTION_FORM_FIELDS
 } from '@photonhealth/components';
 import { types } from '@photonhealth/sdk';
 import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
@@ -141,7 +143,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchOrderCreated,
     dispatchOrderError,
     dispatchClinicalAlertAcknowledge,
-    dispatchClinicalAlertCancel
+    dispatchClinicalAlertCancel,
+    dispatchAnalytics
   } = usePrescribeEventDispatch();
 
   const autoRoutedPharmacyId = createMemo(() => {
@@ -198,6 +201,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   }
 
   onMount(() => {
+    dispatchAnalytics({
+      trackEventType: 'prescription_form_opened',
+      properties: { patientId: props.patientId ?? '' }
+    });
+
     if (props.address) {
       // if manually overriding address, update the store on mount
       props.formActions.updateFormValue({
@@ -382,6 +390,14 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
       // this reflects the prescription state changing from 'draft' to 'active'
       dispatchPrescriptionsCreated(draftPrescriptions());
+      dispatchAnalytics({
+        trackEventType: 'prescription_form_submitted',
+        properties: {
+          prescriptionCount: draftPrescriptions().length,
+          enableOrder: props.enableOrder,
+          fields: buildFieldSnapshot(props.formStore, PRESCRIPTION_FORM_FIELDS)
+        }
+      });
     } else {
       setErrors(errors);
     }
@@ -468,6 +484,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         return;
       }
       dispatchOrderCreated(orderData!.createOrder);
+      dispatchAnalytics({
+        trackEventType: 'order_created',
+        properties: { orderId: orderData!.createOrder.id }
+      });
     } catch (err) {
       dispatchOrderError([err as GraphQLFormattedError]);
       setIsLoading(false);
@@ -543,11 +563,19 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             setIsScreeningAlertWarningOpen(false);
             combineOrSubmit();
             dispatchClinicalAlertAcknowledge(screeningAlerts());
+            dispatchAnalytics({
+              trackEventType: 'alert_acknowledged',
+              properties: { alertCount: screeningAlerts().length }
+            });
           }}
           onRevisitPrescriptions={() => {
             setIsLoading(false);
             setIsScreeningAlertWarningOpen(false);
             dispatchClinicalAlertCancel(screeningAlerts());
+            dispatchAnalytics({
+              trackEventType: 'alert_canceled',
+              properties: { alertCount: screeningAlerts().length }
+            });
           }}
         />
       </Show>

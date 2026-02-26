@@ -6,7 +6,8 @@ import {
   PatientInfo,
   PatientMedHistory,
   PhotonClientStore,
-  Text
+  Text,
+  usePrescribeEventDispatch
 } from '@photonhealth/components';
 import { Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
@@ -61,6 +62,7 @@ export const PatientCard = (props: {
   hidePatientCard?: boolean;
   optionalPatientAddress?: boolean;
 }) => {
+  const { dispatchAnalytics } = usePrescribeEventDispatch();
   const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
   const [showEditPatientView, setShowEditPatientView] = createSignal(false);
   const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
@@ -91,12 +93,20 @@ export const PatientCard = (props: {
       key: 'patient',
       value: e.detail.patient
     });
+    dispatchAnalytics({
+      trackEventType: 'prescription_field_interaction',
+      properties: { fieldName: 'patient', hasValue: Boolean(e.detail.patient) }
+    });
     if (props.enableOrder && !props.address) {
       // update address when you want to allow send order
       // but the address hasn't been manually overridden
       props.actions.updateFormValue({
         key: 'address',
         value: e.detail.patient.address
+      });
+      dispatchAnalytics({
+        trackEventType: 'prescription_field_interaction',
+        properties: { fieldName: 'address', hasValue: Boolean(e.detail.patient.address) }
       });
     }
   };
@@ -226,6 +236,10 @@ export const PatientCard = (props: {
                 ...props.store.patient!.value,
                 address
               }
+            });
+            dispatchAnalytics({
+              trackEventType: 'prescription_field_interaction',
+              properties: { fieldName: 'address', hasValue: Boolean(address) }
             });
           }}
         />
