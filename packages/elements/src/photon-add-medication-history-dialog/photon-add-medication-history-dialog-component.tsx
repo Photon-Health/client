@@ -1,11 +1,10 @@
 import { Treatment } from '@photonhealth/sdk/dist/types';
 
-import { Button, Dialog, usePhoton } from '@photonhealth/components';
+import { boldSubstring, Button, Dialog, usePhoton } from '@photonhealth/components';
 import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
 import { gql } from '@apollo/client';
 import { debounce } from '@solid-primitives/scheduled';
-import { boldSubstring } from '../photon-medication-search/photon-medication-search-component';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/dropdown/dropdown';

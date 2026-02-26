@@ -38,11 +38,7 @@ import Table from './particles/Table';
 import Text from './particles/Text';
 import Textarea from './particles/Textarea';
 import Toaster from './particles/Toaster';
-import {
-  ScreeningAlertAcknowledgementDialog,
-  ScreeningAlerts,
-  ScreeningAlertType
-} from './systems/ScreeningAlerts';
+import { ScreeningAlertAcknowledgementDialog, ScreeningAlerts, ScreeningAlertType } from './systems/ScreeningAlerts';
 import { RoutingConstraint } from './systems/RoutingConstraints';
 
 import triggerToast from './utils/toastTriggers';
@@ -50,6 +46,9 @@ import generateString from './utils/generateString';
 import { createQuery } from './utils/createQuery';
 import formatDate, { CALENDAR_DATE_FORMAT } from './utils/formatDate';
 import { formatPrescriptionDetails } from './utils/formatPrescriptionDetail';
+
+import MedicationSearch from './systems/MedicationSearch';
+import { boldSubstring } from './utils/boldSubstring';
 
 import { SignatureAttestationModal } from './systems/SignatureAttestation';
 
@@ -59,10 +58,7 @@ import { CoverageOption, PrescribeProvider, usePrescribe } from './systems/Presc
 
 import { GoogleServiceProvider, useGoogleService } from './systems/GoogleServiceProvider';
 
-import {
-  PrescribeEventDispatchProvider,
-  usePrescribeEventDispatch
-} from './systems/PrescribeEventDispatchProvider';
+import { PrescribeEventDispatchProvider, usePrescribeEventDispatch } from './systems/PrescribeEventDispatchProvider';
 import { dispatchAnalyticsTrackEvent } from './analytics/dispatchAnalyticsTrackEvent';
 import { buildFieldSnapshot, PATIENT_FORM_FIELDS } from './analytics/buildFieldSnapshot';
 
@@ -124,7 +120,9 @@ export {
   PrescribeEventDispatchProvider,
   usePrescribeEventDispatch,
   dispatchAnalyticsTrackEvent,
+  boldSubstring,
   buildFieldSnapshot,
+  MedicationSearch,
   PATIENT_FORM_FIELDS
 };
 
@@ -137,3 +135,4 @@ export type {
   CoverageOption,
   TryCreatePrescriptionTemplateOptions
 };
+export type { MedicationSearchProps, DisableList } from './systems/MedicationSearch/types';

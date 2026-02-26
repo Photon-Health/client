@@ -26,6 +26,7 @@ import {
   useRecentOrders,
   usePrescribeEventDispatch
 } from '@photonhealth/components';
+import type { DisableList } from '@photonhealth/components';
 import { types } from '@photonhealth/sdk';
 import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
@@ -68,12 +69,6 @@ export type Address = {
   country?: string;
 };
 
-export interface DisabledItem {
-  treatmentIds?: string[];
-  reason?: string;
-}
-
-export type DisableList = DisabledItem[];
 
 export type PrescribeProps = {
   patientId?: string;

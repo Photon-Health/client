@@ -3,11 +3,13 @@ import {
   CALENDAR_DATE_FORMAT,
   Card,
   Checkbox,
+  DisableList,
   DispenseUnitSelect,
   DoseCalculator,
   Icon,
   Input,
   InputGroup,
+  MedicationSearch,
   PrescriptionFormData,
   ScreeningAlerts,
   ScreeningAlertType,
@@ -27,7 +29,6 @@ import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
-import { DisableList } from './PrescribeWorkflow';
 
 const validators = {
   treatment: message(record(string(), any()), 'Please select a treatment'),
@@ -178,39 +179,41 @@ export const AddPrescriptionCard = (props: {
           props.draftedPrescriptionChanged();
         }}
       >
-        <photon-medication-search
+        <MedicationSearch
           label="Search for Treatment"
-          catalog-id={props.catalogId}
-          allow-off-catalog-search={props.allowOffCatalogSearch}
+          catalogId={props.catalogId}
+          allowOffCatalogSearch={props.allowOffCatalogSearch}
           selected={props.store.treatment?.value ?? undefined}
-          invalid={props.store.treatment?.error ?? false}
-          help-text={props.store.treatment?.error}
-          off-catalog-option={offCatalog()}
-          search-text={searchText()}
-          disable-list={props.disableList}
-          on:photon-treatment-selected={(e: any) => {
-            if (e.detail.data.__typename === 'PrescriptionTemplate') {
+          invalid={!!props.store.treatment?.error}
+          helpText={props.store.treatment?.error}
+          offCatalogOption={offCatalog()}
+          searchText={searchText()}
+          disableList={props.disableList}
+          onTreatmentSelected={(detail) => {
+            if (detail.data.__typename === 'PrescriptionTemplate') {
               repopulateForm(props.actions, {
-                ...e.detail.data,
-                notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
+                ...detail.data,
+                notes: [(detail.data as any)?.notes, props.prefillNotes]
+                  .filter((x) => x)
+                  .join('\n\n')
               });
             } else {
               props.actions.updateFormValue({
                 key: 'treatment',
-                value: e.detail.data
+                value: detail.data
               });
             }
 
-            if (e.detail.catalogId) {
+            if (detail.catalogId) {
               props.actions.updateFormValue({
                 key: 'catalogId',
-                value: e.detail.catalogId
+                value: detail.catalogId
               });
             }
 
             props.draftedPrescriptionChanged();
           }}
-          on:photon-treatment-unselected={() => {
+          onTreatmentUnselected={() => {
             clearForm(
               props.actions,
               props?.prefillNotes ? { notes: props.prefillNotes } : undefined
@@ -218,7 +221,7 @@ export const AddPrescriptionCard = (props: {
 
             props.draftedPrescriptionChanged();
           }}
-          on:photon-search-text-changed={(e: any) => setSearchText(e.detail.text)}
+          onSearchTextChanged={(text) => setSearchText(text)}
         />
 
         <ScreeningAlerts

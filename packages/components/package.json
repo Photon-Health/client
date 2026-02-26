@@ -33,6 +33,8 @@
     "graphql-tag": "^2.12.6",
     "jwt-decode": "^3.1.2",
     "solid-heroicons": "^3.2.4",
+    "@solid-primitives/scheduled": "^1.4.3",
+    "@tanstack/solid-virtual": "^3.11.3",
     "solid-transition-group": "^0.3.0",
     "superstruct": "^1.0.3"
   },

@@ -30,6 +30,8 @@ const CATALOG_TREATMENTS_FIELDS = gql`
     }
     templates {
       id
+      name
+      isPrivate
       daysSupply
       dispenseAsWritten
       dispenseQuantity
