@@ -1,3 +1,8 @@
+/**
+ * This file should only contain types for the lambdas api
+ * Types for clinical-api  are handled by codegen
+ */
+
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };

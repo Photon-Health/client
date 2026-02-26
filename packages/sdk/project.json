@@ -13,7 +13,8 @@
           "rimraf dist",
           "tsc --emitDeclarationOnly --outDir dist",
           "vite build",
-          "cp src/types.ts dist/types.ts"
+          "cp src/types.ts dist/types.ts",
+          "cp src/graphql/clinical-api/gql/* dist/graphql/clinical-api/gql"
         ],
         "parallel": false
       },
@@ -45,6 +46,13 @@
       "options": {
         "cwd": "packages/sdk",
         "command": "npx tsc --noEmit"
+      }
+    },
+    "codegen:clinical-api": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/sdk",
+        "command": "npx graphql-codegen --config codegen.clinical-api.ts && npx prettier src/graphql/clinical-api/gql --write"
       }
     }
   }
