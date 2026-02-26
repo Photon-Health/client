@@ -5,7 +5,6 @@ import SmartTooltip from '../SmartTooltip';
 interface CheckboxProps {
   id?: string;
   mainText: string;
-  secondaryText?: string;
   tooltip?: string;
   showOptionalSubtext?: boolean;
   checked?: boolean;
@@ -50,16 +49,6 @@ export default function Checkbox(props: CheckboxProps): JSXElement {
             </SmartTooltip>
           </Show>
         </div>
-        <Show when={mergedProps?.secondaryText}>
-          <label
-            for={mergedProps.id}
-            id={`${mergedProps.id}-description`}
-            class="m-0 text-gray-500 text-xs cursor-pointer"
-          >
-            <span class="sr-only">{mergedProps.mainText} </span>
-            {mergedProps.secondaryText}
-          </label>
-        </Show>
         <Show when={mergedProps.showOptionalSubtext}>
           <label for={mergedProps.id} class="m-0 text-gray-400 text-xs cursor-pointer">
             Optional
