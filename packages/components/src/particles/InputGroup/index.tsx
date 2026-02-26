@@ -88,7 +88,7 @@ export interface InputGroupProps {
   label: string | JSX.Element;
   subLabel?: string;
   error?: string;
-  contextText?: string | JSX.Element;
+  showOptionalSubtext?: boolean;
   helpText?: string | JSX.Element;
   children?: JSX.Element;
   loading?: boolean;
@@ -121,7 +121,6 @@ function InputGroupWrapper(props: InputGroupProps) {
   });
 
   const isLabelString = createMemo(() => typeof props.label === 'string');
-  const isContextTextString = createMemo(() => typeof props?.contextText === 'string');
 
   return (
     <div>
@@ -129,7 +128,7 @@ function InputGroupWrapper(props: InputGroupProps) {
         <div>
           <Show when={isLabelString()}>
             <label
-              class={`block text-sm font-normal leading-6 text-gray-700 pt-3 pb-1 ${
+              class={`block text-sm font-normal leading-6 text-gray-700 pb-1 ${
                 props?.subLabel ? 'mb-0' : ''
               }`}
               for={state.id}
@@ -140,6 +139,9 @@ function InputGroupWrapper(props: InputGroupProps) {
                   *
                 </span>
               </Show>
+              <Show when={props.showOptionalSubtext}>
+                <span class="text-xs text-gray-400 ml-2">Optional</span>
+              </Show>
             </label>
           </Show>
           <Show when={!isLabelString()}>{props.label}</Show>
@@ -147,29 +149,20 @@ function InputGroupWrapper(props: InputGroupProps) {
             <div class="text-xs leading-6 text-gray-500">{props.subLabel}</div>
           </Show>
         </div>
-
-        <Show when={!!props.contextText}>
-          <Show when={isContextTextString}>
-            <span class="text-xs leading-6 text-gray-500" id="email-optional">
-              {props.contextText}
-            </span>
-          </Show>
-          <Show when={!isContextTextString}>{props.contextText}</Show>
-        </Show>
       </div>
 
       {props.children}
 
-      {(props.error || props.helpText) && (
-        <div class="h-6">
+      <div class="h-6">
+        <Show when={props.error || props.helpText}>
           <p
-            class={`mt-1 text-sm ${props.error ? 'text-red-400' : 'text-gray-500'}`}
+            class={`text-sm ${props.error ? 'text-red-400' : 'text-gray-500'}`}
             id={ariaDescribedBy}
           >
             {props.error || props.helpText}
           </p>
-        </div>
-      )}
+        </Show>
+      </div>
     </div>
   );
 }

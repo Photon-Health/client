@@ -34,8 +34,8 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
   return (
     <div
       ref={ref}
-      class="z-50 fixed top-0 left-0 w-full h-screen overflow-y-auto bg-[#F9FAFB]"
-      style="height: 100dvh; -webkit-overflow-scrolling: touch; touch-action: pan-y;"
+      class="z-50 fixed top-0 left-0 w-full h-screen overflow-y-auto overflow-x-hidden bg-[#F9FAFB]"
+      style={{ height: '100dvh', '-webkit-overflow-scrolling': 'touch', 'touch-action': 'pan-y' }}
     >
       <style>{tailwind}</style>
 

@@ -7,13 +7,7 @@ declare module 'solid-js' {
       'photon-auth-button': unknown;
       'photon-patient-select': unknown;
       'photon-auth-wrapper': unknown;
-      'photon-text-input': unknown;
-      'photon-datepicker': unknown;
-      'photon-number-input': unknown;
-      'photon-dispense-units': unknown;
-      'photon-textarea': unknown;
       'photon-card': unknown;
-      'photon-checkbox': unknown;
       'photon-patient-form': unknown;
       'photon-patient-dialog': unknown;
       'photon-update-patient-dialog': unknown;
