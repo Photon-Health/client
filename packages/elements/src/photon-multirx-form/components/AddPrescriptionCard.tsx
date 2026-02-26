@@ -167,7 +167,7 @@ export const AddPrescriptionCard = (props: {
     <Card addChildrenDivider={true}>
       <Text color="gray">Add Prescription</Text>
       <div
-        class="flex flex-col"
+        class="flex flex-col gap-1"
         on:photon-medication-selected={(e: any) => {
           setOffCatalog(e.detail.medication);
           props.actions.updateFormValue({
@@ -236,7 +236,7 @@ export const AddPrescriptionCard = (props: {
           <Checkbox
             mainText="Dispense as written"
             tooltip="This prescription will be filled generically unless this box is checked"
-            showOptionalSubtext={true}
+            showOptionalSubtext
             checked={props.store.dispenseAsWritten?.value || false}
             onChange={(checked: boolean) =>
               props.actions.updateFormValue({
@@ -247,7 +247,7 @@ export const AddPrescriptionCard = (props: {
           />
         </div>
         <div class="mt-2 sm:grid sm:grid-cols-2 sm:gap-4">
-          <div class="flex items-start gap-1">
+          <div class="flex items-end gap-1">
             <div class="flex-1" style={{ width: '100px' }}>
               {/* Input's number handler skips NaN values, handling the mobile decimal bug */}
               <InputGroup label="Quantity" required error={props.store.dispenseQuantity?.error}>
@@ -264,42 +264,13 @@ export const AddPrescriptionCard = (props: {
                 />
               </InputGroup>
             </div>
-            <DoseCalculator
-              open={openDoseCalculator()}
-              onClose={() => setOpenDoseCalculator(false)}
-              medicationName={props.store.treatment?.value?.name}
-              weight={props.weight}
-              weightUnit={props.weightUnit}
-              setAutocompleteValues={({ liquidDose, totalLiquid, unit, days }) => {
-                props.actions.updateFormValue({
-                  key: 'daysSupply',
-                  value: Number(days)
-                });
-                props.actions.updateFormValue({
-                  key: 'dispenseQuantity',
-                  value: Number(totalLiquid)
-                });
-                props.actions.updateFormValue({
-                  key: 'instructions',
-                  value: `${liquidDose} ${unit} ${props.store.instructions?.value}`
-                });
-                if (unit === 'mL') {
-                  props.actions.updateFormValue({
-                    key: 'dispenseUnit',
-                    value: 'Milliliter'
-                  });
-                }
-              }}
-            />
-            <div class="pt-10">
-              <Button
-                variant="secondary"
-                class="w-fit h-12"
-                onClick={() => setOpenDoseCalculator(true)}
-              >
-                <Icon name="calculator" size="sm" />
-              </Button>
-            </div>
+            <Button
+              variant="secondary"
+              class="w-11 h-11 sm:h-12"
+              onClick={() => setOpenDoseCalculator(true)}
+            >
+              <Icon name="calculator" size="sm" />
+            </Button>
           </div>
           <InputGroup label="Dispense Unit" required error={props.store.dispenseUnit?.error}>
             <DispenseUnitSelect
@@ -313,6 +284,33 @@ export const AddPrescriptionCard = (props: {
             />
           </InputGroup>
         </div>
+        <DoseCalculator
+          open={openDoseCalculator()}
+          onClose={() => setOpenDoseCalculator(false)}
+          medicationName={props.store.treatment?.value?.name}
+          weight={props.weight}
+          weightUnit={props.weightUnit}
+          setAutocompleteValues={({ liquidDose, totalLiquid, unit, days }) => {
+            props.actions.updateFormValue({
+              key: 'daysSupply',
+              value: Number(days)
+            });
+            props.actions.updateFormValue({
+              key: 'dispenseQuantity',
+              value: Number(totalLiquid)
+            });
+            props.actions.updateFormValue({
+              key: 'instructions',
+              value: `${liquidDose} ${unit} ${props.store.instructions?.value}`
+            });
+            if (unit === 'mL') {
+              props.actions.updateFormValue({
+                key: 'dispenseUnit',
+                value: 'Milliliter'
+              });
+            }
+          }}
+        />
         <div class="sm:grid sm:grid-cols-2 sm:gap-4">
           <InputGroup label="Days Supply" required error={props.store.daysSupply?.error}>
             <Input
@@ -358,7 +356,7 @@ export const AddPrescriptionCard = (props: {
             }
           />
         </InputGroup>
-        <InputGroup label="Pharmacy Note">
+        <InputGroup label="Pharmacy Note" showOptionalSubtext>
           <Textarea
             placeholder="Enter pharmacy note"
             value={props.store.notes?.value}
@@ -370,7 +368,11 @@ export const AddPrescriptionCard = (props: {
             }
           />
         </InputGroup>
-        <InputGroup label="Do Not Fill Before" error={props.store.doNotFillBeforeDate?.error}>
+        <InputGroup
+          label="Do Not Fill Before"
+          showOptionalSubtext
+          error={props.store.doNotFillBeforeDate?.error}
+        >
           <Input
             type="date"
             value={props.store.doNotFillBeforeDate?.value}
@@ -383,11 +385,11 @@ export const AddPrescriptionCard = (props: {
             }
           />
         </InputGroup>
-        <div class="flex flex-col xs:flex-row gap-2 mt-2">
+        <div class="flex flex-col xs:flex-row mt-4">
           <Show when={!props.hideAddToTemplates}>
             <Checkbox
               mainText="Add To Personal Templates"
-              showOptionalSubtext={true}
+              showOptionalSubtext
               checked={props.store.addToTemplates?.value || false}
               onChange={(checked: boolean) => {
                 props.actions.updateFormValue({
@@ -414,7 +416,7 @@ export const AddPrescriptionCard = (props: {
           </Show>
           <div class="flex flex-grow justify-end">
             <Button
-              class="w-full xs:!w-auto h-fit"
+              class="w-full xs:!w-auto h-fit mt-6"
               size="lg"
               onClick={() => {
                 if (!isLoading()) {
