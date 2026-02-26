@@ -14,7 +14,7 @@ function Card(preProps: CardProps) {
   const props = mergeProps({ variant: 'white', autoPadding: true }, preProps);
 
   const cardClasses = createMemo(() =>
-    clsx('border rounded-lg ', {
+    clsx('border rounded-lg', {
       'divide-y divide-gray-300': props?.addChildrenDivider,
       'border-blue-600 bg-blue-50': props?.selected,
       'border-gray-300': !props?.selected,
