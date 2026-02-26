@@ -141,7 +141,7 @@ const CreateSupervisorMutation = gql`
   }
 `;
 
-type CreateSupervisorMutationResultType = { createSupervisor: Pick<Supervisor, 'id'> };
+type CreateSupervisorMutationResult = { createSupervisor: Pick<Supervisor, 'id'> };
 
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
@@ -481,7 +481,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         props.formStore.supervisorNpi?.value
       ) {
         const { data } = await clinicalClient.mutate<
-          CreateSupervisorMutationResultType,
+          CreateSupervisorMutationResult,
           SupervisorInput
         >({
           mutation: CreateSupervisorMutation,

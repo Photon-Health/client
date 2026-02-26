@@ -46,12 +46,24 @@ const MeUserQuery = gql`
   }
 `;
 
-type MeUserQueryType = {
+type MeUserQueryVariables = {
   me: {
     name: Pick<Name, 'title'>;
     address: Pick<Address, 'state'>;
   };
 };
+
+// const SupervisorsQuery = gql`
+//   query SupervisorsQuery {
+//     supervisors {
+//       id
+//       fullName
+//       npi
+//     }
+//   }
+// `;
+
+// type SupervisorsQueryResult = {supervisors: Array<Pick<Supervisor>>}
 
 const calculateNeedsSupervisor = ({
   title,
@@ -84,7 +96,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
   onMount(async () => {
     const {
       data: { me }
-    } = await client.sdk.apolloClinical.query<MeUserQueryType>({
+    } = await client.sdk.apolloClinical.query<MeUserQueryVariables>({
       query: MeUserQuery
     });
     const needsSupervisor = calculateNeedsSupervisor({
