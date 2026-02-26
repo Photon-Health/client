@@ -33,6 +33,7 @@ import { RecentOrders, useRecentOrders } from './systems/RecentOrders';
 import Dialog from './particles/Dialog';
 import Button from './particles/Button';
 import SDKProvider, { usePhotonClient } from './systems/SDKProvider';
+import SmartTooltip from './particles/SmartTooltip';
 import Table from './particles/Table';
 import Text from './particles/Text';
 import Textarea from './particles/Textarea';
@@ -102,6 +103,7 @@ export {
   ScreeningAlerts,
   ScreeningAlertAcknowledgementDialog,
   SignatureAttestationModal,
+  SmartTooltip,
   Spinner,
   Table,
   Text,

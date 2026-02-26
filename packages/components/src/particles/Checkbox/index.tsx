@@ -1,6 +1,6 @@
 import { createUniqueId, JSXElement, mergeProps, Show } from 'solid-js';
 import Icon from '../Icon';
-import Tooltip from '../Tooltip';
+import SmartTooltip from '../SmartTooltip';
 
 interface CheckboxProps {
   id?: string;
@@ -45,9 +45,9 @@ export default function Checkbox(props: CheckboxProps): JSXElement {
             {mergedProps.mainText}
           </label>
           <Show when={mergedProps.tooltip}>
-            <Tooltip text={mergedProps.tooltip!}>
+            <SmartTooltip text={mergedProps.tooltip!}>
               <Icon name="informationCircle" size="sm" class="text-gray-400 cursor-help" />
-            </Tooltip>
+            </SmartTooltip>
           </Show>
         </div>
         <Show when={mergedProps?.secondaryText}>
