@@ -128,7 +128,7 @@ function InputGroupWrapper(props: InputGroupProps) {
         <div>
           <Show when={isLabelString()}>
             <label
-              class={`block text-sm font-normal leading-6 text-gray-700 pt-3 pb-1 ${
+              class={`block text-sm font-normal leading-6 text-gray-700 pb-1 ${
                 props?.subLabel ? 'mb-0' : ''
               }`}
               for={state.id}
@@ -153,16 +153,16 @@ function InputGroupWrapper(props: InputGroupProps) {
 
       {props.children}
 
-      {(props.error || props.helpText) && (
-        <div class="h-6">
+      <div class="h-6">
+        <Show when={props.error || props.helpText}>
           <p
-            class={`mt-1 text-sm ${props.error ? 'text-red-400' : 'text-gray-500'}`}
+            class={`text-sm ${props.error ? 'text-red-400' : 'text-gray-500'}`}
             id={ariaDescribedBy}
           >
             {props.error || props.helpText}
           </p>
-        </div>
-      )}
+        </Show>
+      </div>
     </div>
   );
 }

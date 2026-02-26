@@ -246,10 +246,9 @@ export const AddPrescriptionCard = (props: {
             }
           />
         </div>
-        <div class="mt-2 sm:grid sm:grid-cols-2 sm:gap-4">
-          <div class="flex items-end gap-1">
+        <div class="sm:grid sm:grid-cols-2 sm:gap-4 mt-2">
+          <div class="flex items-start gap-1">
             <div class="flex-1" style={{ width: '100px' }}>
-              {/* Input's number handler skips NaN values, handling the mobile decimal bug */}
               <InputGroup label="Quantity" required error={props.store.dispenseQuantity?.error}>
                 <Input
                   type="number"
@@ -264,13 +263,16 @@ export const AddPrescriptionCard = (props: {
                 />
               </InputGroup>
             </div>
-            <Button
-              variant="secondary"
-              class="w-11 h-11 sm:h-12"
-              onClick={() => setOpenDoseCalculator(true)}
-            >
-              <Icon name="calculator" size="sm" />
-            </Button>
+            {/* Wrap in InputGroup with invisible label to match Quantity's vertical layout */}
+            <InputGroup label={'\u00A0'}>
+              <Button
+                variant="secondary"
+                class="w-11 h-11 sm:h-12"
+                onClick={() => setOpenDoseCalculator(true)}
+              >
+                <Icon name="calculator" size="sm" />
+              </Button>
+            </InputGroup>
           </div>
           <InputGroup label="Dispense Unit" required error={props.store.dispenseUnit?.error}>
             <DispenseUnitSelect
@@ -400,7 +402,7 @@ export const AddPrescriptionCard = (props: {
             />
           </Show>
           <Show when={props.store.addToTemplates?.value ?? false}>
-            <div class="flex-1">
+            <div class="flex-1 mt-2">
               <InputGroup label="Template Name" error={props.store.templateName?.error}>
                 <Input
                   value={props.store.templateName?.value ?? ''}
