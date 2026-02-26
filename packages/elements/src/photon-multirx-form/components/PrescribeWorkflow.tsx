@@ -141,6 +141,8 @@ const CreateSupervisorMutation = gql`
   }
 `;
 
+type CreateSupervisorMutationResultType = { createSupervisor: Pick<Supervisor, 'id'> };
+
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
   let prescriptionRef: HTMLDivElement | undefined;
@@ -470,30 +472,31 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         pharmacyId = '';
       }
 
-      console.log('data', {
-        fullName: props.formStore.supervisorFullName?.value,
-        npi: props.formStore.supervisorNpi?.value
-      });
+      let supervisorId: string | undefined;
+      if (needsSupervisor() && props.formStore.supervisorId?.value) {
+        supervisorId = props.formStore.supervisorId.value;
+      } else if (
+        needsSupervisor() &&
+        props.formStore.supervisorFullName?.value &&
+        props.formStore.supervisorNpi?.value
+      ) {
+        const { data } = await clinicalClient.mutate<
+          CreateSupervisorMutationResultType,
+          SupervisorInput
+        >({
+          mutation: CreateSupervisorMutation,
+          variables: {
+            fullName: props.formStore.supervisorFullName.value,
+            npi: props.formStore.supervisorNpi.value
+          }
+        });
+        supervisorId = data?.createSupervisor.id;
+      }
+
+      console.log({ supervisorId });
+
       const testing = true;
       if (!testing) {
-        let supervisorId: string | undefined;
-        if (needsSupervisor() && props.formStore.supervisorId?.value) {
-          supervisorId = props.formStore.supervisorId.value;
-        } else if (
-          needsSupervisor() &&
-          props.formStore.supervisorFullName?.value &&
-          props.formStore.supervisorNpi?.value
-        ) {
-          const { data } = await clinicalClient.mutate<Supervisor, SupervisorInput>({
-            mutation: CreateSupervisorMutation,
-            variables: {
-              fullName: props.formStore.supervisorFullName.value,
-              npi: props.formStore.supervisorNpi.value
-            }
-          });
-          supervisorId = data?.id;
-        }
-
         const { data: orderData, errors } = await orderMutation({
           variables: {
             ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
@@ -524,6 +527,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       }
 
       setIsLoading(false);
+      dispatchOrderError([]);
     } catch (err) {
       dispatchOrderError([err as GraphQLFormattedError]);
       setIsLoading(false);
