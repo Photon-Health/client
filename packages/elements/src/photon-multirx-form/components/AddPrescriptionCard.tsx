@@ -252,6 +252,7 @@ export const AddPrescriptionCard = (props: {
               <InputGroup label="Quantity" required error={props.store.dispenseQuantity?.error}>
                 <Input
                   type="number"
+                  inputMode="decimal"
                   value={props.store.dispenseQuantity?.value ?? undefined}
                   min={0}
                   onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
@@ -317,6 +318,7 @@ export const AddPrescriptionCard = (props: {
           <InputGroup label="Days Supply" required error={props.store.daysSupply?.error}>
             <Input
               type="number"
+              inputMode="numeric"
               value={props.store.daysSupply?.value ?? undefined}
               min={0}
               onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
@@ -330,6 +332,7 @@ export const AddPrescriptionCard = (props: {
           <InputGroup label="Refills" required error={props.store.refillsInput?.error}>
             <Input
               type="number"
+              inputMode="numeric"
               value={props.store.refillsInput?.value ?? undefined}
               min={0}
               max={11}
