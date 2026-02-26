@@ -54,7 +54,7 @@ describe('DoseCalculator', () => {
   it('should calculate "cefdinir 250 mg / 5 ml common dose is 300 mg, 2x per day for 10 days" correctly', async () => {
     const setAutocompleteValuesMock = vi.fn();
 
-    const { getByText, getByLabelText, getByDisplayValue, getAllByRole } = render(() => (
+    const { getByText, getByLabelText, getByDisplayValue } = render(() => (
       <DoseCalculator
         open={true}
         onClose={() => {}}
@@ -66,10 +66,8 @@ describe('DoseCalculator', () => {
     await user.type(getByLabelText('Dose'), '7');
 
     // select dose from the dropdown
-    const dayOrDoseComboInput = getByDisplayValue('day');
-    await user.click(dayOrDoseComboInput);
-    const option = getAllByRole('option').find((option) => option.textContent === 'dose');
-    await user.click(option as HTMLElement);
+    const dayOrDoseSelect = getByDisplayValue('day');
+    await user.selectOptions(dayOrDoseSelect, 'dose');
 
     await user.type(getByLabelText('Patient Weight'), '20');
     await user.type(getByLabelText('Liquid Concentration'), '250');
@@ -93,7 +91,7 @@ describe('DoseCalculator', () => {
   it('should calculate "dexamethasone 1 MG in 1mL concentrate for Oral suspension" correctly', async () => {
     const setAutocompleteValuesMock = vi.fn();
 
-    const { getByText, getByLabelText, getAllByRole, getByDisplayValue } = render(() => (
+    const { getByText, getByLabelText, getByDisplayValue } = render(() => (
       <DoseCalculator
         open={true}
         onClose={() => {}}
@@ -105,10 +103,8 @@ describe('DoseCalculator', () => {
     await user.type(getByLabelText('Dose'), '0.6');
 
     // select dose from the dropdown
-    const dayOrDoseComboInput = getByDisplayValue('day');
-    await user.click(dayOrDoseComboInput);
-    const option = getAllByRole('option').find((option) => option.textContent === 'dose');
-    await user.click(option as HTMLElement);
+    const dayOrDoseSelect = getByDisplayValue('day');
+    await user.selectOptions(dayOrDoseSelect, 'dose');
 
     await user.type(getByLabelText('Patient Weight'), '20');
     await user.type(getByLabelText('Liquid Concentration'), '1');
