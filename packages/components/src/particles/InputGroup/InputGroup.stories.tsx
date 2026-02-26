@@ -1,10 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/html';
-import { ComponentProps, For, createSignal, createMemo } from 'solid-js';
+import { ComponentProps, createMemo, createSignal, For } from 'solid-js';
 import InputGroup, { InputGroupProps } from '.';
 import ComboBox from '../ComboBox';
 import Input from '../Input';
 import { randomNames } from '../../sampleData/randomNames';
-import Badge from '../Badge';
 
 type InputGroupStory = StoryObj<InputGroupProps>;
 
@@ -44,7 +43,7 @@ export const MultipleInputs: InputGroupStory = {
           <Input type="email" placeholder="you@example.com" />
         </InputGroup>
 
-        <InputGroup label="Quantity" contextText="Optional">
+        <InputGroup label="Quantity" showOptionalSubtext>
           <Input type="number" />
         </InputGroup>
 
@@ -52,14 +51,7 @@ export const MultipleInputs: InputGroupStory = {
           <Input type="email" placeholder="you@example.com" />
         </InputGroup>
 
-        <InputGroup
-          label="Disabled Input"
-          contextText={
-            <Badge size="sm" color="yellow">
-              Disabled
-            </Badge>
-          }
-        >
+        <InputGroup label="Disabled Input" disabled>
           <Input placeholder="you@example.com" value="example@example.com" disabled />
         </InputGroup>
 
@@ -94,7 +86,7 @@ export const MultipleInputs: InputGroupStory = {
         <InputGroup
           label="Interactive Input"
           helpText="Type 'yes' to see an error."
-          contextText='Go ahead, try "yes"'
+          subLabel='Go ahead, try "yes"'
           error={value() ? 'Yes, there is an error.' : ''}
         >
           <Input
