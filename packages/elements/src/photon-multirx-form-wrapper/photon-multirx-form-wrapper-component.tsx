@@ -22,7 +22,7 @@ const shouldWarn = (form: any) => {
     form()['doNotFillBeforeDate']?.value ||
     form()['instructions']?.value ||
     form()['notes']?.value ||
-    form()['refillsInput']?.value ||
+    form()['refills']?.value ||
     form()['treatment']?.value
   );
 };

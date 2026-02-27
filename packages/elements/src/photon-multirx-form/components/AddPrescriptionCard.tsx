@@ -39,7 +39,7 @@ const validators = {
     'Please select a dispensing unit'
   ),
   daysSupply: message(min(number(), 0), 'Days Supply must be at least 0'),
-  refillsInput: message(between(0, 11), 'Refills must be 0 to 11'),
+  refills: message(between(0, 11), 'Refills must be 0 to 11'),
   instructions: message(size(string(), 1, Infinity), 'Please enter instructions for the patient'),
   doNotFillBeforeDate: message(
     optional(afterDate(new Date())),
@@ -109,7 +109,7 @@ export const AddPrescriptionCard = (props: {
       daysSupply: props.store.daysSupply.value,
       instructions: props.store.instructions.value,
       notes: props.store.notes.value,
-      fillsAllowed: props.store.refillsInput.value + 1,
+      fillsAllowed: props.store.refills.value + 1,
       // TODO: set this from template-overrides. can we stop using the props.store, with this param as a starting point?
       diagnoseCodes: []
     };
@@ -152,7 +152,7 @@ export const AddPrescriptionCard = (props: {
       'dispenseQuantity',
       'dispenseUnit',
       'daysSupply',
-      'refillsInput',
+      'refills',
       'instructions',
       'notes',
       'templateName',
@@ -376,16 +376,16 @@ export const AddPrescriptionCard = (props: {
               }}
             />
           </InputGroup>
-          <InputGroup label="Refills" required error={props.store.refillsInput?.error}>
+          <InputGroup label="Refills" required error={props.store.refills?.error}>
             <Input
               type="number"
               inputMode="numeric"
-              value={props.store.refillsInput?.value ?? undefined}
+              value={props.store.refills?.value ?? undefined}
               min={0}
               max={11}
               onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
                 props.actions.updateFormValue({
-                  key: 'refillsInput',
+                  key: 'refills',
                   value: Number(e.currentTarget.value)
                 });
               }}

@@ -31,6 +31,8 @@ export const buildFieldSnapshot = (
   fieldNames: readonly string[]
 ): FieldCompletionSnapshot => {
   return Object.fromEntries(
-    fieldNames.map((name) => [name, { completed: Boolean(store[name]?.value) }])
+    fieldNames.map((name) => {
+      return [name, { completed: Boolean(store[name]?.value) }];
+    })
   );
 };
