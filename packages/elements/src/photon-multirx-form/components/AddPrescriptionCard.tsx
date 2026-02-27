@@ -1,4 +1,5 @@
 import {
+  buildFieldSnapshot,
   Button,
   CALENDAR_DATE_FORMAT,
   Card,
@@ -8,6 +9,7 @@ import {
   Icon,
   Input,
   InputGroup,
+  PRESCRIPTION_FORM_FIELDS,
   PrescriptionFormData,
   ScreeningAlerts,
   ScreeningAlertType,
@@ -16,9 +18,7 @@ import {
   triggerToast,
   TryCreatePrescriptionTemplateOptions,
   useDraftPrescriptions,
-  usePrescribeEventDispatch,
-  buildFieldSnapshot,
-  PRESCRIPTION_FORM_FIELDS
+  usePrescribeEventDispatch
 } from '@photonhealth/components';
 import { format } from 'date-fns';
 import { Medication, Prescription } from '@photonhealth/sdk/dist/types';
@@ -280,6 +280,8 @@ export const AddPrescriptionCard = (props: {
                       key: 'dispenseQuantity',
                       value: Number(e.currentTarget.value)
                     });
+                  }}
+                  onBlur={(e) => {
                     dispatchAnalytics({
                       trackEventType: 'prescription_field_interaction',
                       properties: {
@@ -360,6 +362,8 @@ export const AddPrescriptionCard = (props: {
                   key: 'daysSupply',
                   value: Number(e.currentTarget.value)
                 });
+              }}
+              onBlur={(e) => {
                 dispatchAnalytics({
                   trackEventType: 'prescription_field_interaction',
                   properties: {
@@ -382,6 +386,8 @@ export const AddPrescriptionCard = (props: {
                   key: 'refillsInput',
                   value: Number(e.currentTarget.value)
                 });
+              }}
+              onBlur={(e) => {
                 dispatchAnalytics({
                   trackEventType: 'prescription_field_interaction',
                   properties: {
@@ -406,6 +412,8 @@ export const AddPrescriptionCard = (props: {
                 key: 'instructions',
                 value
               });
+            }}
+            onBlur={(value: string) => {
               dispatchAnalytics({
                 trackEventType: 'prescription_field_interaction',
                 properties: { fieldName: 'instructions', hasValue: Boolean(value) }
@@ -422,6 +430,8 @@ export const AddPrescriptionCard = (props: {
                 key: 'notes',
                 value
               });
+            }}
+            onBlur={(value: string) => {
               dispatchAnalytics({
                 trackEventType: 'prescription_field_interaction',
                 properties: { fieldName: 'pharmacy_notes', hasValue: Boolean(value) }
@@ -443,6 +453,8 @@ export const AddPrescriptionCard = (props: {
                 key: 'doNotFillBeforeDate',
                 value: e.currentTarget.value || undefined
               });
+            }}
+            onBlur={(e) => {
               dispatchAnalytics({
                 trackEventType: 'prescription_field_interaction',
                 properties: {
