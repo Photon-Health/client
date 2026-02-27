@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { RX_FORM_EVENT, setupAnalyticsCapture } from './utils/analytics_intercept';
-import { expectFieldInteraction, expectTrackEvent } from './utils/analytics_expect';
+import {
+  expectFieldInteraction,
+  expectTrackEventCount,
+  expectTrackEventProperties
+} from './utils/analytics_expect';
 
 test('user can create patient then add, edit, and delete a draft prescription', async ({
   page
@@ -31,12 +35,20 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   const medSearchInput = page.getByPlaceholder('Type medication');
   await expect(medSearchInput).toBeVisible({ timeout: 30_000 });
 
-  const [openedEvent] = await expectTrackEvent(page, RX_FORM_EVENT, 'prescription_form_opened', 1, {
-    weightUnit: 'lbs',
-    hasPrefillWeight: false,
-    hasPrefillPrescriptionIds: false,
-    hasPrefillTemplateIds: false
-  });
+  await expectTrackEventCount(page, RX_FORM_EVENT, 'prescription_form_opened', 1);
+  const openedEvent = await expectTrackEventProperties(
+    page,
+    RX_FORM_EVENT,
+    'prescription_form_opened',
+    {
+      expectedProperties: {
+        weightUnit: 'lbs',
+        hasPrefillWeight: false,
+        hasPrefillPrescriptionIds: false,
+        hasPrefillTemplateIds: false
+      }
+    }
+  );
   expect(openedEvent.properties.prefillPatientId).toBeTruthy();
 
   // add draft
@@ -62,16 +74,19 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   await expectFieldInteraction(page, RX_FORM_EVENT, 'refills', 1);
   await expectFieldInteraction(page, RX_FORM_EVENT, 'instructions', 1);
   await page.getByRole('button', { name: 'Add to drafts' }).click();
-  await expectTrackEvent(page, RX_FORM_EVENT, 'draft_prescription_added', 1, {
-    snap_treatment: true,
-    snap_dispense_unit: true,
-    snap_dispense_quantity: true,
-    snap_days_supply: true,
-    snap_refills: true,
-    snap_instructions: true,
-    snap_notes: false,
-    snap_do_not_fill_before_date: false,
-    snap_add_to_templates: false
+  await expectTrackEventCount(page, RX_FORM_EVENT, 'draft_prescription_added', 1);
+  await expectTrackEventProperties(page, RX_FORM_EVENT, 'draft_prescription_added', {
+    expectedProperties: {
+      snap_treatment: true,
+      snap_dispense_unit: true,
+      snap_dispense_quantity: true,
+      snap_days_supply: true,
+      snap_refills: true,
+      snap_instructions: true,
+      snap_notes: false,
+      snap_do_not_fill_before_date: false,
+      snap_add_to_templates: false
+    }
   });
   await expect(page.getByText('Draft Prescriptions')).toBeVisible({ timeout: 10_000 });
   await expect(page.getByText(/Amoxicillin/i)).toBeVisible();
@@ -79,7 +94,7 @@ test('user can create patient then add, edit, and delete a draft prescription', 
 
   // edit draft
   await page.getByTitle('Edit').click();
-  await expectTrackEvent(page, RX_FORM_EVENT, 'draft_prescription_edited', 1);
+  await expectTrackEventCount(page, RX_FORM_EVENT, 'draft_prescription_edited', 1);
   await expect(medSearchInput).toHaveValue(/Amoxicillin/i);
   await page.getByLabel('Quantity').fill('60');
   await page.getByRole('button', { name: 'Add to drafts' }).click();
@@ -88,9 +103,13 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   await expect(page.getByText('Draft Prescriptions')).toBeVisible({ timeout: 10_000 });
   await expect(page.getByText(/Amoxicillin/i)).toBeVisible();
 
-  await expectTrackEvent(page, RX_FORM_EVENT, 'draft_prescription_added', 2, {
-    snap_treatment: true,
-    snap_instructions: true
+  await expectTrackEventCount(page, RX_FORM_EVENT, 'draft_prescription_added', 2);
+  await expectTrackEventProperties(page, RX_FORM_EVENT, 'draft_prescription_added', {
+    index: 1,
+    expectedProperties: {
+      snap_treatment: true,
+      snap_instructions: true
+    }
   });
 
   // delete draft
@@ -99,7 +118,7 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   await expect(page.getByText(/Delete pending prescription/i)).not.toBeVisible({ timeout: 5_000 });
   await expect(page.getByText(/Add prescription\(s\) before sending/i)).toBeVisible();
 
-  await expectTrackEvent(page, RX_FORM_EVENT, 'draft_prescription_deleted', 1);
+  await expectTrackEventCount(page, RX_FORM_EVENT, 'draft_prescription_deleted', 1);
 
   // before uncommenting this and sending the order,
   // we need to decide what test patient phone number to use since currently text messages are sent
