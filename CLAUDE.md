@@ -331,7 +331,7 @@ All deprecated primitive elements (`photon-text-input`, `photon-checkbox`, `phot
 
 The `packages/sdk` package has codegen set up against `clinical-api` (run via `npx nx run sdk:codegen:clinical-api`), but there is no codegen support for the lambdas API. As a result, type-safe generated hooks and operation types only exist for `clinical-api` operations; lambdas operations remain hand-typed through `sdk/src/types.ts`.
 
-All GraphQL documents (queries, mutations, fragments) in the SDK should live in `sdk/src/graphql/`, but currently they are scattered across individual domain files. When adding new operations or refactoring existing ones, move GraphQL documents into `sdk/src/graphql/` and run `npx nx run sdk:codegen:clinical-api` to regenerate types.
+All GraphQL documents (queries, mutations, fragments) in the SDK should live in `sdk/src/graphql/clinical-api/`, with the hope that one day we'll also have an `sdk/src/graphql/api/` folder. Documents are currently scattered across individual domain files. When adding new operations or refactoring existing ones, move GraphQL documents into `sdk/src/graphql/clinical-api/` and run `npx nx run sdk:codegen:clinical-api` to regenerate types.
 
 GraphQL documents in the clinical app (`apps/app`) should also eventually leverage types in the SDK.
 

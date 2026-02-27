@@ -52,7 +52,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/sdk",
-        "command": "npx graphql-codegen --config codegen.clinical-api.ts && npx prettier src/graphql/clinical-api/gql --write"
+        "command": "npx graphql-codegen --config codegen.clinical-api.ts"
       }
     }
   }
