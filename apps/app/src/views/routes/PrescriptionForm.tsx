@@ -108,7 +108,7 @@ export const PrescriptionForm = () => {
           );
         } else if (prescriptionFormEventTypes.has(trackEventType)) {
           providerAnalytics.track(
-            'clinicalapp_prescription_form_track_events',
+            'test_clinicalapp_prescription_form_track_events',
             buildPrescriptionFormInteractionPayload(e.detail as PrescriptionFormAnalyticsEvent)
           );
         }
