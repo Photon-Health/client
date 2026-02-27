@@ -104,9 +104,12 @@ type PrescriptionFormSubmitted = {
 type OrderCreated = { trackEventType: 'order_created'; properties: { orderId: string } };
 type AlertAcknowledged = {
   trackEventType: 'alert_acknowledged';
-  properties: { alertCount: number };
+  properties: { screeningAlertCount: number };
 };
-type AlertCanceled = { trackEventType: 'alert_canceled'; properties: { alertCount: number } };
+type AlertCanceled = {
+  trackEventType: 'alert_canceled';
+  properties: { screeningAlertCount: number };
+};
 type PrescriptionFormClosed = {
   trackEventType: 'prescription_form_closed';
   properties: { hadUnsavedWork: boolean; fields?: FieldCompletionSnapshot };

@@ -560,7 +560,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             dispatchClinicalAlertAcknowledge(screeningAlerts());
             dispatchAnalytics({
               trackEventType: 'alert_acknowledged',
-              properties: { alertCount: screeningAlerts().length }
+              properties: { screeningAlertCount: screeningAlerts().length }
             });
           }}
           onRevisitPrescriptions={() => {
@@ -569,7 +569,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             dispatchClinicalAlertCancel(screeningAlerts());
             dispatchAnalytics({
               trackEventType: 'alert_canceled',
-              properties: { alertCount: screeningAlerts().length }
+              properties: { screeningAlertCount: screeningAlerts().length }
             });
           }}
         />

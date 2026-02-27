@@ -60,7 +60,7 @@ export function buildPrescriptionFormInteractionPayload(detail: PrescriptionForm
     prescriptionCount: props.prescriptionCount ?? null,
     enableOrder: props.enableOrder ?? null,
     hadUnsavedWork: props.hadUnsavedWork ?? null,
-    alertCount: props.alertCount ?? null,
+    screeningAlertCount: props.screeningAlertCount ?? null,
     tabSelected: props.tabSelected ?? null,
     hasPreferredPharmacy: props.hasPreferredPharmacy ?? null,
     setAsPreferred: props.setAsPreferred ?? null,
