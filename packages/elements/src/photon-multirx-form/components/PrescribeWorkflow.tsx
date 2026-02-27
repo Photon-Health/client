@@ -483,7 +483,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           fulfillmentType: props.formStore.fulfillmentType?.value || 'SEND_TO_PATIENT',
           hasPreferredPharmacy: hasPreferredPharmacy(),
           setAsPreferred: props.formStore.updatePreferredPharmacy?.value ?? false,
-          pharmacyId: pharmacyId || null
+          pharmacyId: pharmacyId || null,
+          isCombinedOrder: false
         }
       });
     } catch (err) {

@@ -27,6 +27,7 @@ export type PrescriptionFormTrackEventType =
   | 'order_created'
   | 'screening_alert_acknowledged'
   | 'screening_alert_canceled'
+  | 'combine_orders_viewed'
   | 'prescription_form_closed'
   | 'prescription_field_interaction'
   | 'pharmacy_interaction';
@@ -111,6 +112,7 @@ type OrderCreated = {
     hasPreferredPharmacy: boolean;
     setAsPreferred: boolean;
     pharmacyId: string | null;
+    isCombinedOrder: boolean;
   };
 };
 type DraftPrescriptionsActivated = {
@@ -118,6 +120,10 @@ type DraftPrescriptionsActivated = {
   properties: {
     prescriptionCount: number;
   };
+};
+type CombineOrdersViewed = {
+  trackEventType: 'combine_orders_viewed';
+  properties?: never;
 };
 type AlertAcknowledged = {
   trackEventType: 'screening_alert_acknowledged';
@@ -161,6 +167,7 @@ export type PhotonEmbedAnalyticsEventInput =
   | DraftPrescriptionDeleted
   | DraftPrescriptionEdited
   | OrderCreated
+  | CombineOrdersViewed
   | DraftPrescriptionsActivated
   | AlertAcknowledged
   | AlertCanceled

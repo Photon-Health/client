@@ -122,6 +122,7 @@ export const PrescriptionForm = () => {
       'draft_prescription_deleted',
       'draft_prescription_edited',
       'order_created',
+      'combine_orders_viewed',
       'draft_prescriptions_activated',
       'screening_alert_acknowledged',
       'screening_alert_canceled',

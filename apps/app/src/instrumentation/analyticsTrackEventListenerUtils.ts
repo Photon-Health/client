@@ -66,6 +66,7 @@ export function buildPrescriptionFormInteractionPayload(detail: PrescriptionForm
     tabSelected: props.tabSelected ?? null,
     hasPreferredPharmacy: props.hasPreferredPharmacy ?? null,
     setAsPreferred: props.setAsPreferred ?? null,
+    isCombinedOrder: props.isCombinedOrder ?? null,
     prefillPatientId: props.prefillPatientId ?? null,
     prefillPharmacyId: props.prefillPharmacyId ?? null,
     hasPrefillPatientExternalId: props.hasPrefillPatientExternalId ?? null,
