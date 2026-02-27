@@ -67,6 +67,7 @@ npx nx run patient:tsc:boson             # Type check patient app
 ```bash
 npx nx run app:codegen                   # Generate types (boson)
 npx nx run patient:codegen               # Generate types (boson)
+npx nx run sdk:codegen:clinical-api      # Generate types for clinical-api (boson)
 ```
 
 ## Developer Tools
@@ -325,6 +326,14 @@ When migrating a deprecated element to a plain Solid.js component, use an increm
 ### Deprecated elements still bundled
 
 All deprecated primitive elements (`photon-text-input`, `photon-checkbox`, `photon-dropdown`, `photon-patient-select`, etc.) are still imported in `packages/elements/src/index.ts` and included in the production bundle. Since they're only used internally as building blocks, they could be converted to plain Solid.js components in `packages/components` and removed from the web component registry to reduce bundle size.
+
+### SDK codegen is incomplete and GraphQL documents are scattered
+
+The `packages/sdk` package has codegen set up against `clinical-api` (run via `npx nx run sdk:codegen:clinical-api`), but there is no codegen support for the lambdas API. As a result, type-safe generated hooks and operation types only exist for `clinical-api` operations; lambdas operations remain hand-typed through `sdk/src/types.ts`.
+
+All GraphQL documents (queries, mutations, fragments) in the SDK should live in `sdk/src/graphql/`, but currently they are scattered across individual domain files. When adding new operations or refactoring existing ones, move GraphQL documents into `sdk/src/graphql/` and run `npx nx run sdk:codegen:clinical-api` to regenerate types.
+
+GraphQL documents in the clinical app (`apps/app`) should also eventually leverage types in the SDK.
 
 ### CustomEvent types are untyped at the boundary
 
