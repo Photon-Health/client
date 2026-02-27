@@ -20,13 +20,13 @@ export type SignatureAttestationTrackEventType =
 
 export type PrescriptionFormTrackEventType =
   | 'prescription_form_opened'
-  | 'draft_added'
-  | 'draft_deleted'
-  | 'draft_edited'
-  | 'prescription_form_submitted'
+  | 'draft_prescription_added'
+  | 'draft_prescription_deleted'
+  | 'draft_prescription_edited'
+  | 'draft_prescriptions_activated'
   | 'order_created'
-  | 'alert_acknowledged'
-  | 'alert_canceled'
+  | 'screening_alert_acknowledged'
+  | 'screening_alert_canceled'
   | 'prescription_form_closed'
   | 'prescription_field_interaction'
   | 'pharmacy_interaction';
@@ -91,23 +91,38 @@ type PrescriptionFormOpened = {
     weightUnit: string;
   };
 };
-type DraftAdded = {
-  trackEventType: 'draft_added';
+type DraftPrescriptionAdded = {
+  trackEventType: 'draft_prescription_added';
   properties: { fields?: FieldCompletionSnapshot };
 };
-type DraftDeleted = { trackEventType: 'draft_deleted'; properties?: never };
-type DraftEdited = { trackEventType: 'draft_edited'; properties?: never };
-type PrescriptionFormSubmitted = {
-  trackEventType: 'prescription_form_submitted';
-  properties: { prescriptionCount: number; enableOrder: boolean; fields?: FieldCompletionSnapshot };
+type DraftPrescriptionDeleted = {
+  trackEventType: 'draft_prescription_deleted';
+  properties?: never;
 };
-type OrderCreated = { trackEventType: 'order_created'; properties: { orderId: string } };
+type DraftPrescriptionEdited = { trackEventType: 'draft_prescription_edited'; properties?: never };
+type OrderCreated = {
+  trackEventType: 'order_created';
+  properties: {
+    orderId: string;
+    prescriptionCount: number;
+    fulfillmentType: string | null;
+    hasPreferredPharmacy: boolean;
+    setAsPreferred: boolean;
+    pharmacyId: string | null;
+  };
+};
+type DraftPrescriptionsActivated = {
+  trackEventType: 'draft_prescriptions_activated';
+  properties: {
+    prescriptionCount: number;
+  };
+};
 type AlertAcknowledged = {
-  trackEventType: 'alert_acknowledged';
+  trackEventType: 'screening_alert_acknowledged';
   properties: { screeningAlertCount: number };
 };
 type AlertCanceled = {
-  trackEventType: 'alert_canceled';
+  trackEventType: 'screening_alert_canceled';
   properties: { screeningAlertCount: number };
 };
 type PrescriptionFormClosed = {
@@ -140,11 +155,11 @@ export type PhotonEmbedAnalyticsEventInput =
   | SigAttestationAgreed
   | SigAttestationCanceled
   | PrescriptionFormOpened
-  | DraftAdded
-  | DraftDeleted
-  | DraftEdited
-  | PrescriptionFormSubmitted
+  | DraftPrescriptionAdded
+  | DraftPrescriptionDeleted
+  | DraftPrescriptionEdited
   | OrderCreated
+  | DraftPrescriptionsActivated
   | AlertAcknowledged
   | AlertCanceled
   | PrescriptionFormClosed

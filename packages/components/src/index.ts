@@ -66,8 +66,8 @@ import {
 import { dispatchAnalyticsTrackEvent } from './analytics/dispatchAnalyticsTrackEvent';
 import {
   buildFieldSnapshot,
-  PATIENT_FORM_FIELDS,
-  PRESCRIPTION_FORM_FIELDS
+  DRAFT_PRESCRIPTION_FORM_FIELDS,
+  PATIENT_FORM_FIELDS
 } from './analytics/buildFieldSnapshot';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
@@ -130,7 +130,7 @@ export {
   dispatchAnalyticsTrackEvent,
   buildFieldSnapshot,
   PATIENT_FORM_FIELDS,
-  PRESCRIPTION_FORM_FIELDS
+  DRAFT_PRESCRIPTION_FORM_FIELDS
 };
 
 // Export types

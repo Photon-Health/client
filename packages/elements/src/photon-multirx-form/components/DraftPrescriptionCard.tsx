@@ -64,7 +64,7 @@ export const DraftPrescriptionCard = (props: {
       editPrescription();
       onConfirm?.();
       dispatchDraftPrescriptionDeleted();
-      dispatchAnalytics({ trackEventType: 'draft_edited' });
+      dispatchAnalytics({ trackEventType: 'draft_prescription_edited' });
     } else {
       setEditDialogOpen(true);
       setEditDialogConfirm(onConfirm);
@@ -85,7 +85,7 @@ export const DraftPrescriptionCard = (props: {
     editDialogConfirm()?.();
     setEditDialogConfirm(undefined);
     dispatchDraftPrescriptionDeleted();
-    dispatchAnalytics({ trackEventType: 'draft_edited' });
+    dispatchAnalytics({ trackEventType: 'draft_prescription_edited' });
   };
   const handleEditCancel = () => {
     setEditDialogOpen(false);
@@ -98,7 +98,7 @@ export const DraftPrescriptionCard = (props: {
       const deletedRx = draftPrescriptions().find((rx) => rx.id === deletedId);
       deletePrescription(deletedId);
       dispatchDraftPrescriptionDeleted(deletedRx);
-      dispatchAnalytics({ trackEventType: 'draft_deleted' });
+      dispatchAnalytics({ trackEventType: 'draft_prescription_deleted' });
     }
 
     setDeleteDialogOpen(false);

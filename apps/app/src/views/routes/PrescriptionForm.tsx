@@ -112,13 +112,13 @@ export const PrescriptionForm = () => {
 
     const prescriptionFormEventTypes: Set<string> = new Set<PrescriptionFormTrackEventType>([
       'prescription_form_opened',
-      'draft_added',
-      'draft_deleted',
-      'draft_edited',
-      'prescription_form_submitted',
+      'draft_prescription_added',
+      'draft_prescription_deleted',
+      'draft_prescription_edited',
       'order_created',
-      'alert_acknowledged',
-      'alert_canceled',
+      'draft_prescriptions_activated',
+      'screening_alert_acknowledged',
+      'screening_alert_canceled',
       'prescription_form_closed',
       'prescription_field_interaction',
       'pharmacy_interaction'

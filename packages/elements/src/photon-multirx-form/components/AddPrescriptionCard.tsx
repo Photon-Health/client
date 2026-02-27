@@ -9,7 +9,6 @@ import {
   Icon,
   Input,
   InputGroup,
-  PRESCRIPTION_FORM_FIELDS,
   PrescriptionFormData,
   ScreeningAlerts,
   ScreeningAlertType,
@@ -17,6 +16,7 @@ import {
   Textarea,
   triggerToast,
   TryCreatePrescriptionTemplateOptions,
+  DRAFT_PRESCRIPTION_FORM_FIELDS,
   useDraftPrescriptions,
   usePrescribeEventDispatch
 } from '@photonhealth/components';
@@ -30,7 +30,6 @@ import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
 import { DisableList } from './PrescribeWorkflow';
-
 const validators = {
   treatment: message(record(string(), any()), 'Please select a treatment'),
   dispenseQuantity: message(min(number(), 0, { exclusive: true }), 'Quantity must be positive'),
@@ -126,9 +125,9 @@ export const AddPrescriptionCard = (props: {
       if (createdPrescription) {
         props.onDraftPrescriptionCreated();
         dispatchAnalytics({
-          trackEventType: 'draft_added',
+          trackEventType: 'draft_prescription_added',
           properties: {
-            fields: buildFieldSnapshot(props.store, PRESCRIPTION_FORM_FIELDS)
+            fields: buildFieldSnapshot(props.store, DRAFT_PRESCRIPTION_FORM_FIELDS)
           }
         });
       }

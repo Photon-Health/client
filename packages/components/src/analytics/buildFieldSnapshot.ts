@@ -1,13 +1,16 @@
 import { FieldCompletionSnapshot } from '@photonhealth/sdk';
 
-export const PRESCRIPTION_FORM_FIELDS = [
+export const DRAFT_PRESCRIPTION_FORM_FIELDS = [
   'treatment',
   'dispenseQuantity',
   'dispenseUnit',
   'daysSupply',
   'refills',
   'instructions',
-  'fulfillmentType'
+  'notes',
+  'doNotFillBeforeDate',
+  'addToTemplates',
+  'templateName'
 ] as const;
 
 export const PATIENT_FORM_FIELDS = [
@@ -32,7 +35,11 @@ export const buildFieldSnapshot = (
 ): FieldCompletionSnapshot => {
   return Object.fromEntries(
     fieldNames.map((name) => {
-      return [name, { completed: Boolean(store[name]?.value) }];
+      const val = store[name]?.value;
+      return [
+        name,
+        { completed: val !== undefined && val !== null && val !== '' && val !== false }
+      ];
     })
   );
 };
