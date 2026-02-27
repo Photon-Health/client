@@ -8,3 +8,13 @@ export const SearchTreatmentsQuery = graphql(`
     }
   }
 `);
+
+export const SearchTreatmentOptionsQuery = graphql(`
+  query SearchTreatmentOptionsQuery($filter: TreatmentFilter!) {
+    treatments(filter: $filter) {
+      __typename
+      id
+      name
+    }
+  }
+`);
