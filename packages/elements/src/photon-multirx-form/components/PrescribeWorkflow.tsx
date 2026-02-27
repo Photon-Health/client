@@ -10,9 +10,11 @@ import { PharmacyCard } from './PharmacyCard';
 import clearForm from '../util/clearForm';
 import { formatPatientWeight } from '../util/formatPatientWeight';
 import {
-  Alert,
   AddressForm,
+  Alert,
+  buildFieldSnapshot,
   Button,
+  PRESCRIPTION_FORM_FIELDS,
   RecentOrders,
   ScreeningAlertAcknowledgementDialog,
   ScreeningAlertType,
@@ -23,10 +25,8 @@ import {
   useDraftPrescriptions,
   usePhoton,
   usePrescribe,
-  useRecentOrders,
   usePrescribeEventDispatch,
-  buildFieldSnapshot,
-  PRESCRIPTION_FORM_FIELDS
+  useRecentOrders
 } from '@photonhealth/components';
 import { types } from '@photonhealth/sdk';
 import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
@@ -201,11 +201,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   }
 
   onMount(() => {
-    dispatchAnalytics({
-      trackEventType: 'prescription_form_opened',
-      properties: { patientId: props.patientId ?? '' }
-    });
-
     if (props.address) {
       // if manually overriding address, update the store on mount
       props.formActions.updateFormValue({

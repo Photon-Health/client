@@ -73,6 +73,37 @@ export const PrescriptionForm = () => {
     navigate('/prescriptions');
   };
 
+  const prescriptionFormOpenWasTracked = useRef(false);
+  useEffect(() => {
+    if (providerAnalytics.isReady && !prescriptionFormOpenWasTracked.current) {
+      prescriptionFormOpenWasTracked.current = true;
+      providerAnalytics.track(
+        'test_clinicalapp_prescription_form_track_events',
+        buildPrescriptionFormInteractionPayload({
+          trackEventType: 'prescription_form_opened',
+          properties: {
+            prefillPatientId: patientId || '',
+            prefillPharmacyId: pharmacyId || '',
+            hasPrefillPatientExternalId: !!externalId?.trim(),
+            hasPrefillPrescriptionIds: !!prescriptionIds?.trim(),
+            hasPrefillTemplateIds: !!templateIds?.trim(),
+            hasPrefillWeight: !!weight?.trim(),
+            weightUnit: weightUnit
+          }
+        })
+      );
+    }
+  }, [
+    providerAnalytics,
+    patientId,
+    pharmacyId,
+    externalId,
+    prescriptionIds,
+    templateIds,
+    weight,
+    weightUnit
+  ]);
+
   useEffect(() => {
     if (!ref.current) return;
     const abortController = new AbortController();

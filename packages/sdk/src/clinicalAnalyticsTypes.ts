@@ -81,7 +81,15 @@ type SigAttestationCanceled = {
 
 type PrescriptionFormOpened = {
   trackEventType: 'prescription_form_opened';
-  properties: { patientId: string };
+  properties: {
+    prefillPatientId: string;
+    prefillPharmacyId: string;
+    hasPrefillPatientExternalId: boolean;
+    hasPrefillTemplateIds: boolean;
+    hasPrefillPrescriptionIds: boolean;
+    hasPrefillWeight: boolean;
+    weightUnit: string;
+  };
 };
 type DraftAdded = {
   trackEventType: 'draft_added';

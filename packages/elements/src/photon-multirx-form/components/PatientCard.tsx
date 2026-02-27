@@ -13,6 +13,7 @@ import { Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
 import type { Address } from './PrescribeWorkflow';
+
 const hasUsableAddress = (address?: {
   street1?: string;
   city?: string;
@@ -88,15 +89,17 @@ export const PatientCard = (props: {
     }
   });
 
-  const updatePatient = (e: any) => {
+  const updatePatient = (e: any, { trackInteraction = true } = {}) => {
     props.actions.updateFormValue({
       key: 'patient',
       value: e.detail.patient
     });
-    dispatchAnalytics({
-      trackEventType: 'prescription_field_interaction',
-      properties: { fieldName: 'patient', hasValue: Boolean(e.detail.patient) }
-    });
+    if (trackInteraction) {
+      dispatchAnalytics({
+        trackEventType: 'prescription_field_interaction',
+        properties: { fieldName: 'patient', hasValue: Boolean(e.detail.patient) }
+      });
+    }
     if (props.enableOrder && !props.address) {
       // update address when you want to allow send order
       // but the address hasn't been manually overridden
@@ -104,17 +107,16 @@ export const PatientCard = (props: {
         key: 'address',
         value: e.detail.patient.address
       });
-      dispatchAnalytics({
-        trackEventType: 'prescription_field_interaction',
-        properties: { fieldName: 'address', hasValue: Boolean(e.detail.patient.address) }
-      });
     }
   };
 
   createEffect(() => {
     if (store?.selectedPatient?.data && props?.patientId) {
       // update patient when passed-in patient (patientId) is fetched
-      updatePatient({ detail: { patient: store?.selectedPatient?.data } });
+      updatePatient(
+        { detail: { patient: store?.selectedPatient?.data } },
+        { trackInteraction: false }
+      );
     }
   });
 
@@ -236,10 +238,6 @@ export const PatientCard = (props: {
                 ...props.store.patient!.value,
                 address
               }
-            });
-            dispatchAnalytics({
-              trackEventType: 'prescription_field_interaction',
-              properties: { fieldName: 'address', hasValue: Boolean(address) }
             });
           }}
         />

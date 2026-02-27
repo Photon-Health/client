@@ -64,6 +64,13 @@ export function buildPrescriptionFormInteractionPayload(detail: PrescriptionForm
     tabSelected: props.tabSelected ?? null,
     hasPreferredPharmacy: props.hasPreferredPharmacy ?? null,
     setAsPreferred: props.setAsPreferred ?? null,
+    prefillPatientId: props.prefillPatientId ?? null,
+    prefillPharmacyId: props.prefillPharmacyId ?? null,
+    hasPrefillPatientExternalId: props.hasPrefillPatientExternalId ?? null,
+    hasPrefillPrescriptionIds: props.hasPrefillPrescriptionIds ?? null,
+    hasPrefillTemplateIds: props.hasPrefillTemplateIds ?? null,
+    hasPrefillWeight: props.hasPrefillWeight ?? null,
+    weightUnit: props.weightUnit ?? null,
     ...flattenSnapshot(props.fields)
   };
 }

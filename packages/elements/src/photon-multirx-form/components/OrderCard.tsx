@@ -1,11 +1,5 @@
 import { createMemo } from 'solid-js';
-import {
-  Card,
-  PharmacySelect,
-  Text,
-  usePrescribe,
-  usePrescribeEventDispatch
-} from '@photonhealth/components';
+import { Card, PharmacySelect, Text, usePrescribe } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 const hasUsableAddress = (address?: {
@@ -34,7 +28,6 @@ export const OrderCard = (props: {
   mailOrderIds?: string;
 }) => {
   const { setOrderFormData } = usePrescribe();
-  const { dispatchAnalytics } = usePrescribeEventDispatch();
   const patientIds = createMemo(() =>
     props.store['patient']?.value ? [props.store['patient']?.value?.id] : []
   );
@@ -71,10 +64,6 @@ export const OrderCard = (props: {
             props.actions.updateFormValue({
               key: 'fulfillmentType',
               value: type || ''
-            });
-            dispatchAnalytics({
-              trackEventType: 'prescription_field_interaction',
-              properties: { fieldName: 'fulfillmentType', hasValue: Boolean(type) }
             });
           }}
           setPreferredPharmacy={(shouldSet = false) => {
