@@ -52,7 +52,7 @@ export interface ProviderContextData {
 type ClinicalAppTrackEventName =
   | 'clinicalapp_patient_form_track_events'
   | 'clinicalapp_signature_attestation_form_track_events'
-  | 'clinicalapp_prescription_form_track_events';
+  | 'test_clinicalapp_prescription_form_track_events';
 
 interface ProviderAnalyticsContextValue {
   /**
