@@ -60,6 +60,7 @@ export function buildPrescriptionFormInteractionPayload(detail: PrescriptionForm
     prescriptionCount: props.prescriptionCount ?? null,
     fulfillmentType: props.fulfillmentType ?? null,
     pharmacyId: props.pharmacyId ?? null,
+    source: props.source ?? null,
     hadUnsavedWork: props.hadUnsavedWork ?? null,
     screeningAlertCount: props.screeningAlertCount ?? null,
     tabSelected: props.tabSelected ?? null,

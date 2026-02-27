@@ -91,9 +91,11 @@ type PrescriptionFormOpened = {
     weightUnit: string;
   };
 };
+export type DraftPrescriptionSource = 'form' | 'med_history_refill' | 'prefill';
+
 type DraftPrescriptionAdded = {
   trackEventType: 'draft_prescription_added';
-  properties: { fields?: FieldCompletionSnapshot };
+  properties: { source: DraftPrescriptionSource; fields?: FieldCompletionSnapshot };
 };
 type DraftPrescriptionDeleted = {
   trackEventType: 'draft_prescription_deleted';

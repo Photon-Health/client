@@ -480,7 +480,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         properties: {
           orderId: orderData!.createOrder.id,
           prescriptionCount: draftPrescriptions().length,
-          fulfillmentType: props.formStore.fulfillmentType?.value ?? null,
+          fulfillmentType: props.formStore.fulfillmentType?.value || 'SEND_TO_PATIENT',
           hasPreferredPharmacy: hasPreferredPharmacy(),
           setAsPreferred: props.formStore.updatePreferredPharmacy?.value ?? false,
           pharmacyId: pharmacyId || null

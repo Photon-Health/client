@@ -73,6 +73,12 @@ export const PrescriptionForm = () => {
     navigate('/prescriptions');
   };
 
+  // Stable ref so the analytics listener callback always reads the latest providerAnalytics
+  // without being in the useEffect dependency array (which would tear down and re-register
+  // all listeners on every auth/org state change, causing prefill events to be lost).
+  const providerAnalyticsRef = useRef(providerAnalytics);
+  providerAnalyticsRef.current = providerAnalytics;
+
   const prescriptionFormOpenWasTracked = useRef(false);
   useEffect(() => {
     if (providerAnalytics.isReady && !prescriptionFormOpenWasTracked.current) {
@@ -133,12 +139,12 @@ export const PrescriptionForm = () => {
           trackEventType === 'signature_attestation_agreed' ||
           trackEventType === 'signature_attestation_canceled'
         ) {
-          providerAnalytics.track(
+          providerAnalyticsRef.current.track(
             'clinicalapp_signature_attestation_form_track_events',
             buildSignatureAttestationFormInteractionPayload(e.detail)
           );
         } else if (prescriptionFormEventTypes.has(trackEventType)) {
-          providerAnalytics.track(
+          providerAnalyticsRef.current.track(
             'test_clinicalapp_prescription_form_track_events',
             buildPrescriptionFormInteractionPayload(e.detail as PrescriptionFormAnalyticsEvent)
           );
@@ -210,7 +216,7 @@ export const PrescriptionForm = () => {
       listenerOptions
     );
     return () => abortController.abort();
-  }, [navigate, providerAnalytics, patientId, onClose]);
+  }, [navigate, patientId, onClose]);
 
   const enableCoverageCheck = useMemo(() => {
     if (user) {

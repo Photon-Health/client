@@ -29,17 +29,39 @@ export const PATIENT_FORM_FIELDS = [
   'preferredPharmacy'
 ] as const;
 
+const isCompleted = (val: unknown) =>
+  val !== undefined && val !== null && val !== '' && val !== false;
+
 export const buildFieldSnapshot = (
   store: Record<string, { value: unknown } | undefined>,
   fieldNames: readonly string[]
 ): FieldCompletionSnapshot => {
   return Object.fromEntries(
     fieldNames.map((name) => {
-      const val = store[name]?.value;
-      return [
-        name,
-        { completed: val !== undefined && val !== null && val !== '' && val !== false }
-      ];
+      return [name, { completed: isCompleted(store[name]?.value) }];
+    })
+  );
+};
+
+export const buildPrescriptionSnapshot = (
+  data: Record<string, unknown>,
+  options?: { addToTemplates?: boolean; templateName?: string }
+): FieldCompletionSnapshot => {
+  const values: Record<string, unknown> = {
+    treatment: data.treatment,
+    dispenseQuantity: data.dispenseQuantity,
+    dispenseUnit: data.dispenseUnit,
+    daysSupply: data.daysSupply,
+    refills: data.fillsAllowed != null ? Number(data.fillsAllowed) - 1 : undefined,
+    instructions: data.instructions,
+    notes: data.notes,
+    doNotFillBeforeDate: data.doNotFillBeforeDate,
+    addToTemplates: options?.addToTemplates,
+    templateName: options?.templateName
+  };
+  return Object.fromEntries(
+    DRAFT_PRESCRIPTION_FORM_FIELDS.map((name) => {
+      return [name, { completed: isCompleted(values[name]) }];
     })
   );
 };
