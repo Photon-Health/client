@@ -393,4 +393,3 @@ All new utility functions, views, and components must include tests. Match the t
 - **Test files** are excluded from linting (configured in `.eslintrc.json` ignorePatterns)
 - **TypeScript strict mode** enabled; type check with `npx nx run <project>:tsc:boson`
 - **Shared types** belong in `packages/sdk/src/types.ts` since all packages already depend on `@photonhealth/sdk`. For GraphQL response shapes, always use generated types from codegen (`gql/` or `graphql/` directories) rather than defining them manually.
-- **Import types** from `@photonhealth/sdk/dist/types` when only type information is needed (e.g. `import { types } from '@photonhealth/react'` or `import { Env } from '@photonhealth/sdk'`)

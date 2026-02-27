@@ -1,6 +1,7 @@
 /**
  * This file should only contain types for the lambdas api
- * Types for clinical-api  are handled by codegen
+ * which still need to be typed manually.
+ * Types for clinical-api are handled by codegen.
  */
 
 export type Maybe<T> = T | null;
