@@ -312,6 +312,8 @@ export const AddPrescriptionCard = (props: {
                   key: 'dispenseUnit',
                   value: e.currentTarget.value
                 });
+              }}
+              onBlur={(e) => {
                 dispatchAnalytics({
                   trackEventType: 'prescription_field_interaction',
                   properties: {
