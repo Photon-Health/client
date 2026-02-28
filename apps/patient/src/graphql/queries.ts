@@ -147,60 +147,60 @@ export const GET_ORDER = gql`
             name
             strength
             names {
-                brandName
-                genericName
+              brandName
+              genericName
+            }
+            therapeuticClassifications {
+              tc0 {
+                code
+                name
               }
-              therapeuticClassifications {
-                tc0 {
-                  code
-                  name
-                }
-                tc10 {
-                  name
-                  code
-                }
-                tc6 {
-                  name
-                  code
-                }
-                tc4{
-                  name
-                  code
-                }
-                tc2 {
-                  name
-                  code
-                }
+              tc10 {
+                name
+                code
+              }
+              tc6 {
+                name
+                code
+              }
+              tc4 {
+                name
+                code
+              }
+              tc2 {
+                name
+                code
+              }
             }
           }
           ... on MedicalEquipment {
             id
             name
             names {
-                brandName
-                genericName
+              brandName
+              genericName
+            }
+            therapeuticClassifications {
+              tc0 {
+                code
+                name
               }
-              therapeuticClassifications {
-                tc0 {
-                  code
-                  name
-                }
-                tc10 {
-                  name
-                  code
-                }
-                tc6 {
-                  name
-                  code
-                }
-                tc4{
-                  name
-                  code
-                }
-                tc2 {
-                  name
-                  code
-                }
+              tc10 {
+                name
+                code
+              }
+              tc6 {
+                name
+                code
+              }
+              tc4 {
+                name
+                code
+              }
+              tc2 {
+                name
+                code
+              }
             }
           }
           ... on Compound {
@@ -268,16 +268,11 @@ export const GET_ORDER = gql`
               id
               name
               strength
-
-          }
+            }
             ... on MedicalEquipment {
               id
               name
-              names {
-                brandName
-                genericName
-              }
-          }
+            }
             ... on Compound {
               id
               name
