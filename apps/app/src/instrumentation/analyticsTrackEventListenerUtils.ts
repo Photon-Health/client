@@ -1,8 +1,8 @@
 import type {
   FieldCompletionSnapshot,
   PatientFormAnalyticsEvent,
-  SignatureAttestationAnalyticsEvent,
-  PrescriptionFormAnalyticsEvent
+  PrescriptionFormAnalyticsEvent,
+  SignatureAttestationAnalyticsEvent
 } from '@photonhealth/sdk';
 
 function flattenSnapshot(
@@ -47,33 +47,33 @@ export function buildSignatureAttestationFormInteractionPayload(
 }
 
 export function buildPrescriptionFormInteractionPayload(detail: PrescriptionFormAnalyticsEvent) {
-  const { trackEventType } = detail;
-  // Use a plain object to safely extract optional properties without TS narrowing issues
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const props: Record<string, any> = detail.properties ?? {};
+  const { trackEventType, properties } = detail;
+  const p = properties ?? {};
   return {
     trackEventType,
-    fieldName: props.fieldName ?? null,
-    fieldHasValue: props.hasValue ?? null,
-    patientId: props.patientId ?? null,
-    orderId: props.orderId ?? null,
-    prescriptionCount: props.prescriptionCount ?? null,
-    fulfillmentType: props.fulfillmentType ?? null,
-    pharmacyId: props.pharmacyId ?? null,
-    source: props.source ?? null,
-    hadUnsavedWork: props.hadUnsavedWork ?? null,
-    screeningAlertCount: props.screeningAlertCount ?? null,
-    tabSelected: props.tabSelected ?? null,
-    hasPreferredPharmacy: props.hasPreferredPharmacy ?? null,
-    setAsPreferred: props.setAsPreferred ?? null,
-    isCombinedOrder: props.isCombinedOrder ?? null,
-    prefillPatientId: props.prefillPatientId ?? null,
-    prefillPharmacyId: props.prefillPharmacyId ?? null,
-    hasPrefillPatientExternalId: props.hasPrefillPatientExternalId ?? null,
-    hasPrefillPrescriptionIds: props.hasPrefillPrescriptionIds ?? null,
-    hasPrefillTemplateIds: props.hasPrefillTemplateIds ?? null,
-    hasPrefillWeight: props.hasPrefillWeight ?? null,
-    weightUnit: props.weightUnit ?? null,
-    ...flattenSnapshot(props.fields)
+    fieldName: 'fieldName' in p ? p.fieldName : null,
+    fieldHasValue: 'hasValue' in p ? p.hasValue : null,
+    patientId: 'patientId' in p ? p.patientId : null,
+    orderId: 'orderId' in p ? p.orderId : null,
+    prescriptionCount: 'prescriptionCount' in p ? p.prescriptionCount : null,
+    fulfillmentType: 'fulfillmentType' in p ? p.fulfillmentType : null,
+    pharmacyId: 'pharmacyId' in p ? p.pharmacyId : null,
+    source: 'source' in p ? p.source : null,
+    hadUnsavedWork: 'hadUnsavedWork' in p ? p.hadUnsavedWork : null,
+    screeningAlertCount: 'screeningAlertCount' in p ? p.screeningAlertCount : null,
+    tabSelected: 'tabSelected' in p ? p.tabSelected : null,
+    hasPreferredPharmacy: 'hasPreferredPharmacy' in p ? p.hasPreferredPharmacy : null,
+    setAsPreferred: 'setAsPreferred' in p ? p.setAsPreferred : null,
+    isCombinedOrder: 'isCombinedOrder' in p ? p.isCombinedOrder : null,
+    prefillPatientId: 'prefillPatientId' in p ? p.prefillPatientId : null,
+    prefillPharmacyId: 'prefillPharmacyId' in p ? p.prefillPharmacyId : null,
+    hasPrefillPatientExternalId:
+      'hasPrefillPatientExternalId' in p ? p.hasPrefillPatientExternalId : null,
+    hasPrefillPrescriptionIds:
+      'hasPrefillPrescriptionIds' in p ? p.hasPrefillPrescriptionIds : null,
+    hasPrefillTemplateIds: 'hasPrefillTemplateIds' in p ? p.hasPrefillTemplateIds : null,
+    hasPrefillWeight: 'hasPrefillWeight' in p ? p.hasPrefillWeight : null,
+    weightUnit: 'weightUnit' in p ? p.weightUnit : null,
+    ...flattenSnapshot('fields' in p ? p.fields : undefined)
   };
 }

@@ -96,8 +96,8 @@ export const PatientCard = (props: {
     });
     if (trackInteraction) {
       dispatchAnalytics({
-        trackEventType: 'prescription_field_interaction',
-        properties: { fieldName: 'patient', hasValue: Boolean(e.detail.patient) }
+        trackEventType: 'prescription_patient_changed',
+        properties: { patientId: e.detail.patient.id }
       });
     }
     if (props.enableOrder && !props.address) {

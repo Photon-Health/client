@@ -20,6 +20,7 @@ export type SignatureAttestationTrackEventType =
 
 export type PrescriptionFormTrackEventType =
   | 'prescription_form_opened'
+  | 'prescription_patient_changed'
   | 'draft_prescription_added'
   | 'draft_prescription_deleted'
   | 'draft_prescription_edited'
@@ -40,7 +41,7 @@ export type FormTrackEventType =
 // fields lives inside properties for events that support a field snapshot —
 // keeps dispatch calls to a single object and makes clear which events carry
 // snapshot data.
-
+type EmptyProperties = Record<string, never>;
 type PatientFormOpened = { trackEventType: 'patient_form_opened'; properties: { isEdit: boolean } };
 type PatientCreated = {
   trackEventType: 'patient_created';
@@ -77,7 +78,7 @@ type SigAttestationAgreed = {
 };
 type SigAttestationCanceled = {
   trackEventType: 'signature_attestation_canceled';
-  properties?: never;
+  properties?: EmptyProperties;
 };
 
 type PrescriptionFormOpened = {
@@ -92,6 +93,11 @@ type PrescriptionFormOpened = {
     weightUnit: string;
   };
 };
+type PrescriptionPatientChanged = {
+  trackEventType: 'prescription_patient_changed';
+  properties: { patientId: string };
+};
+
 export type DraftPrescriptionSource = 'form' | 'med_history_refill' | 'prefill';
 
 type DraftPrescriptionAdded = {
@@ -100,9 +106,12 @@ type DraftPrescriptionAdded = {
 };
 type DraftPrescriptionDeleted = {
   trackEventType: 'draft_prescription_deleted';
-  properties?: never;
+  properties?: EmptyProperties;
 };
-type DraftPrescriptionEdited = { trackEventType: 'draft_prescription_edited'; properties?: never };
+type DraftPrescriptionEdited = {
+  trackEventType: 'draft_prescription_edited';
+  properties?: EmptyProperties;
+};
 type OrderCreated = {
   trackEventType: 'order_created';
   properties: {
@@ -123,13 +132,13 @@ type DraftPrescriptionsActivated = {
 };
 type CombineOrdersViewed = {
   trackEventType: 'combine_orders_viewed';
-  properties?: never;
+  properties?: EmptyProperties;
 };
-type AlertAcknowledged = {
+type ScreeningAlertAcknowledged = {
   trackEventType: 'screening_alert_acknowledged';
   properties: { screeningAlertCount: number };
 };
-type AlertCanceled = {
+type ScreeningAlertCanceled = {
   trackEventType: 'screening_alert_canceled';
   properties: { screeningAlertCount: number };
 };
@@ -163,14 +172,15 @@ export type PhotonEmbedAnalyticsEventInput =
   | SigAttestationAgreed
   | SigAttestationCanceled
   | PrescriptionFormOpened
+  | PrescriptionPatientChanged
   | DraftPrescriptionAdded
   | DraftPrescriptionDeleted
   | DraftPrescriptionEdited
   | OrderCreated
   | CombineOrdersViewed
   | DraftPrescriptionsActivated
-  | AlertAcknowledged
-  | AlertCanceled
+  | ScreeningAlertAcknowledged
+  | ScreeningAlertCanceled
   | PrescriptionFormClosed
   | PrescriptionFieldInteraction
   | PharmacyInteraction;
