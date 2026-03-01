@@ -705,7 +705,7 @@ export const Order = () => {
                           onClick={async () => {
                             setUpdating(true);
                             try {
-                              track('test_clinicalapp_order_details_track_events', {
+                              track('clinicalapp_order_details_track_events', {
                                 trackEventType: 'select_pharmacy',
                                 orderId: id,
                                 pharmacyId

@@ -84,7 +84,7 @@ export const PrescriptionForm = () => {
     if (providerAnalytics.isReady && !prescriptionFormOpenWasTracked.current) {
       prescriptionFormOpenWasTracked.current = true;
       providerAnalytics.track(
-        'test_clinicalapp_prescription_form_track_events',
+        'clinicalapp_prescription_form_track_events',
         buildPrescriptionFormInteractionPayload({
           trackEventType: 'prescription_form_opened',
           properties: {
@@ -147,7 +147,7 @@ export const PrescriptionForm = () => {
           );
         } else if (prescriptionFormEventTypes.has(trackEventType)) {
           providerAnalyticsRef.current.track(
-            'test_clinicalapp_prescription_form_track_events',
+            'clinicalapp_prescription_form_track_events',
             buildPrescriptionFormInteractionPayload(e.detail as PrescriptionFormAnalyticsEvent)
           );
         }

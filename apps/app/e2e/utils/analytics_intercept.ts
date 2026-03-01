@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-export const RX_FORM_EVENT = 'test_clinicalapp_prescription_form_track_events';
+export const RX_FORM_EVENT = 'clinicalapp_prescription_form_track_events';
 
 /**
  * Intercepts analytics at the JavaScript level by monkey-patching
