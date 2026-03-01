@@ -77,7 +77,7 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   await expectTrackEventCount(page, RX_FORM_EVENT, 'draft_prescription_added', 1);
   await expectTrackEventProperties(page, RX_FORM_EVENT, 'draft_prescription_added', {
     expectedProperties: {
-      source: 'form',
+      draftPrescriptionSource: 'form',
       snap_treatment: true,
       snap_dispense_unit: true,
       snap_dispense_quantity: true,
@@ -108,7 +108,7 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   await expectTrackEventProperties(page, RX_FORM_EVENT, 'draft_prescription_added', {
     index: 1,
     expectedProperties: {
-      source: 'form',
+      draftPrescriptionSource: 'form',
       snap_treatment: true,
       snap_instructions: true
     }

@@ -102,7 +102,10 @@ export type DraftPrescriptionSource = 'form' | 'med_history_refill' | 'prefill';
 
 type DraftPrescriptionAdded = {
   trackEventType: 'draft_prescription_added';
-  properties: { source: DraftPrescriptionSource; fields?: FieldCompletionSnapshot };
+  properties: {
+    draftPrescriptionSource: DraftPrescriptionSource;
+    fields?: FieldCompletionSnapshot;
+  };
 };
 type DraftPrescriptionDeleted = {
   trackEventType: 'draft_prescription_deleted';

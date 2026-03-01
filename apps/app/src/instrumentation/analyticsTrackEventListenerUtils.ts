@@ -58,7 +58,7 @@ export function buildPrescriptionFormInteractionPayload(detail: PrescriptionForm
     prescriptionCount: 'prescriptionCount' in p ? p.prescriptionCount : null,
     fulfillmentType: 'fulfillmentType' in p ? p.fulfillmentType : null,
     pharmacyId: 'pharmacyId' in p ? p.pharmacyId : null,
-    source: 'source' in p ? p.source : null,
+    draftPrescriptionSource: 'draftPrescriptionSource' in p ? p.draftPrescriptionSource : null,
     hadUnsavedWork: 'hadUnsavedWork' in p ? p.hadUnsavedWork : null,
     screeningAlertCount: 'screeningAlertCount' in p ? p.screeningAlertCount : null,
     tabSelected: 'tabSelected' in p ? p.tabSelected : null,

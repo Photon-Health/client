@@ -38,7 +38,7 @@ export type DraftPrescriptionsContextType = {
   tryCreatePrescription: (
     prescriptionFormData: PrescriptionFormData,
     options?: TryCreatePrescriptionTemplateOptions,
-    source?: DraftPrescriptionSource
+    draftPrescriptionSource?: DraftPrescriptionSource
   ) => Promise<Prescription>;
   deletePrescription: (id: string) => void;
   tryUpdatePrescriptionStates: (ids: string[], state: PrescriptionState) => Promise<boolean>;
@@ -196,7 +196,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
             dispatchAnalytics({
               trackEventType: 'draft_prescription_added',
               properties: {
-                source: 'prefill',
+                draftPrescriptionSource: 'prefill',
                 fields: buildPrescriptionSnapshot(rx)
               }
             });
@@ -217,7 +217,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
   const tryCreatePrescription = async (
     prescriptionFormData: PrescriptionFormData,
     options: TryCreatePrescriptionTemplateOptions = { showSuccessToast: true },
-    source: DraftPrescriptionSource = 'form'
+    draftPrescriptionSource: DraftPrescriptionSource = 'form'
   ): Promise<Prescription> => {
     const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
       prescriptionFormData.treatment.id,
@@ -244,7 +244,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       });
     }
 
-    return await createPrescriptionOnApi(prescriptionFormData, options, source);
+    return await createPrescriptionOnApi(prescriptionFormData, options, draftPrescriptionSource);
   };
 
   const createPrescriptionOnApi = async (
@@ -253,7 +253,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       addToTemplates: false,
       showSuccessToast: true
     },
-    source: DraftPrescriptionSource = 'form'
+    draftPrescriptionSource: DraftPrescriptionSource = 'form'
   ): Promise<Prescription> => {
     let createdPrescription: Prescription | null = null;
 
@@ -269,7 +269,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       dispatchAnalytics({
         trackEventType: 'draft_prescription_added',
         properties: {
-          source,
+          draftPrescriptionSource: draftPrescriptionSource,
           fields: buildPrescriptionSnapshot(prescriptionFormData, {
             addToTemplates: options?.addToTemplates,
             templateName: options?.templateName
