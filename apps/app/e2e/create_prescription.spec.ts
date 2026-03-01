@@ -20,7 +20,7 @@ test('user can create patient then add, edit, and delete a draft prescription', 
 
   await page.getByLabel('First name').fill('Jimbob');
   await page.getByLabel('Last name').fill(`McTesterson_${patientNumber}`);
-  await page.locator('input[type="date"]').fill('1980-12-31');
+  await page.getByLabel('Date of birth').fill('1980-12-31');
   await page.getByLabel('Mobile number').fill('8886543210');
   await page.getByLabel('Sex at birth').selectOption('MALE');
   await page.getByLabel('Street 1').fill('1 E2E Test St.');
