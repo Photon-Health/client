@@ -1,5 +1,5 @@
 import { customElement } from 'solid-element';
-import { createEffect, createSignal, Show } from 'solid-js';
+import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import {
   buildFieldSnapshot,
   Button,
@@ -9,6 +9,7 @@ import {
 } from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import gql from 'graphql-tag';
 
 type PatientDialogProps = {
   patientId: string;
@@ -16,6 +17,12 @@ type PatientDialogProps = {
   hideCreatePrescription: boolean;
   optionalPatientAddress: boolean;
 };
+
+const PATIENT_FIELDS = gql`
+  fragment PatientFields on Patient {
+    id
+  }
+`;
 
 const Component = (props: PatientDialogProps) => {
   let ref: any;
@@ -27,6 +34,19 @@ const Component = (props: PatientDialogProps) => {
   const [actions, setActions] = createSignal<any>(undefined);
   const [globalError, setGlobalError] = createSignal<string | undefined>(undefined);
   const [hasAnyAddressField, setHasAnyAddressField] = createSignal<boolean>(false);
+  const [hasPatients, setHasPatients] = createSignal<boolean>(false);
+
+  onMount(async () => {
+    try {
+      const { data } = await client.sdk.clinical.patient.getPatients({
+        fragment: { PatientFields: PATIENT_FIELDS }
+      });
+      setHasPatients(data && data.patients.length > 0);
+    } catch (err) {
+      console.log(err);
+      // We don't want this request failing to cause the entire component to throw
+    }
+  });
 
   const dispatchUpdate = (patientId: string, didClickCreatePatientAndPrescription = false) => {
     const event = new CustomEvent('photon-patient-updated', {
@@ -231,16 +251,18 @@ const Component = (props: PatientDialogProps) => {
                   {props?.patientId ? 'Save' : 'Create'} and start prescription
                 </Button>
               </Show>
-              <Button
-                class="w-full xs:w-fit"
-                size="lg"
-                variant={props?.hideCreatePrescription ? 'primary' : 'secondary'}
-                disabled={loading()}
-                loading={loading() && !isCreatePrescription()}
-                onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
-              >
-                {props?.patientId ? 'Save' : 'Create'}
-              </Button>
+              <Show when={!!hasPatients() || !!props?.hideCreatePrescription}>
+                <Button
+                  class="w-full xs:w-fit"
+                  size="lg"
+                  variant={props?.hideCreatePrescription ? 'primary' : 'secondary'}
+                  disabled={loading()}
+                  loading={loading() && !isCreatePrescription()}
+                  onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
+                >
+                  {props?.patientId ? 'Save' : 'Create'}
+                </Button>
+              </Show>
             </>
           }
           form={
