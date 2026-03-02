@@ -10,8 +10,8 @@ import { PharmacyCard } from './PharmacyCard';
 import clearForm from '../util/clearForm';
 import { formatPatientWeight } from '../util/formatPatientWeight';
 import {
-  Alert,
   AddressForm,
+  Alert,
   Button,
   RecentOrders,
   ScreeningAlertAcknowledgementDialog,
@@ -23,8 +23,8 @@ import {
   useDraftPrescriptions,
   usePhoton,
   usePrescribe,
-  useRecentOrders,
-  usePrescribeEventDispatch
+  usePrescribeEventDispatch,
+  useRecentOrders
 } from '@photonhealth/components';
 import { types } from '@photonhealth/sdk';
 import {
@@ -157,7 +157,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchOrderCreated,
     dispatchOrderError,
     dispatchClinicalAlertAcknowledge,
-    dispatchClinicalAlertCancel
+    dispatchClinicalAlertCancel,
+    dispatchAnalytics
   } = usePrescribeEventDispatch();
   const [needsSupervisor, setNeedsSupervisor] = createSignal<boolean>(false);
 
@@ -420,6 +421,12 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const activatePrescriptionsOnApi = async () => {
     try {
       await tryUpdatePrescriptionStates(prescriptionIds(), PrescriptionState.Active);
+      dispatchAnalytics({
+        trackEventType: 'draft_prescriptions_activated',
+        properties: {
+          prescriptionCount: draftPrescriptions().length
+        }
+      });
     } catch (err) {
       dispatchPrescriptionsError([err as Error]);
     }
@@ -524,10 +531,19 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           return;
         }
         dispatchOrderCreated(orderData!.createOrder);
+        dispatchAnalytics({
+          trackEventType: 'order_created',
+          properties: {
+            orderId: orderData!.createOrder.id,
+            prescriptionCount: draftPrescriptions().length,
+            fulfillmentType: props.formStore.fulfillmentType?.value || 'SEND_TO_PATIENT',
+            hasPreferredPharmacy: hasPreferredPharmacy(),
+            setAsPreferred: props.formStore.updatePreferredPharmacy?.value ?? false,
+            pharmacyId: pharmacyId || null,
+            isCombinedOrder: false
+          }
+        });
       }
-
-      setIsLoading(false);
-      dispatchOrderError([]);
     } catch (err) {
       dispatchOrderError([err as GraphQLFormattedError]);
       setIsLoading(false);
@@ -603,11 +619,19 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             setIsScreeningAlertWarningOpen(false);
             combineOrSubmit();
             dispatchClinicalAlertAcknowledge(screeningAlerts());
+            dispatchAnalytics({
+              trackEventType: 'screening_alert_acknowledged',
+              properties: { screeningAlertCount: screeningAlerts().length }
+            });
           }}
           onRevisitPrescriptions={() => {
             setIsLoading(false);
             setIsScreeningAlertWarningOpen(false);
             dispatchClinicalAlertCancel(screeningAlerts());
+            dispatchAnalytics({
+              trackEventType: 'screening_alert_canceled',
+              properties: { screeningAlertCount: screeningAlerts().length }
+            });
           }}
         />
       </Show>

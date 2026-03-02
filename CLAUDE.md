@@ -69,6 +69,18 @@ npx nx run app:codegen                   # Generate types (boson)
 npx nx run patient:codegen               # Generate types (boson)
 ```
 
+## Developer Tools
+
+### Bookmarklets
+
+Browser bookmarklets for dev/testing workflows live in `tools/bookmarklets/` as `.txt` files. To install, open the file, select all, copy, then paste into a browser bookmark's URL field.
+
+| File | Purpose |
+|------|---------|
+| `patient-form-filler.txt` | Fills the `photon-patient-dialog` patient creation form with randomized test data. Prompts once for a phone number and caches it in `localStorage` under `pf_phone`. |
+| `patient-form-filler-with-address.txt` | Same as above, plus fills address fields with 106 N 7th St, Brooklyn NY 11249. |
+| `reset-form-localstorage.txt` | Clears the cached phone number (`pf_phone`) from `localStorage` so `patient-form-filler` will prompt again on next run. |
+
 ## Architecture
 
 ### Monorepo Structure
@@ -100,6 +112,8 @@ Pure **Solid.js + TypeScript** component library (private, not published to npm)
 - Has Storybook for component development: `npx nx run components:storybook`
 
 When building new UI for Photon Elements, add Solid.js components here and compose them in `packages/elements`.
+
+**Never import from `@photonhealth/components` (or any path into `packages/components/src`) inside `apps/app` or `apps/patient`.** Both apps use React's JSX transform (`"jsx": "react-jsx"`), while `packages/components` uses Solid's (`"jsxImportSource": "solid-js"`). Importing across that boundary causes TypeScript to type-check Solid JSX as React JSX, producing spurious errors (`class` vs `className`, `Show`/`Match` not valid JSX components, etc.). Any types that need to cross this boundary belong in `packages/sdk` — see **Shared types** in Code Conventions.
 
 #### `packages/sdk` — Core JS SDK
 

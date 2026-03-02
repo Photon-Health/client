@@ -70,7 +70,8 @@ type VariablesCreateOrder = {
 export default function RecentOrdersCombineDialog() {
   let ref: Ref<any> | undefined;
   const { draftPrescriptions } = useDraftPrescriptions();
-  const { dispatchOrderCreated, dispatchOrderCombined } = usePrescribeEventDispatch();
+  const { dispatchOrderCreated, dispatchOrderCombined, dispatchAnalytics } =
+    usePrescribeEventDispatch();
 
   const client = usePhotonClient();
   const [state, actions] = useRecentOrders();
@@ -94,6 +95,7 @@ export default function RecentOrdersCombineDialog() {
   createEffect(() => {
     if (state.isCombineDialogOpen) {
       dispatchDatadogAction('prescribe-combine-dialog-open', {}, ref);
+      dispatchAnalytics({ trackEventType: 'combine_orders_viewed' });
     }
   });
 
@@ -130,6 +132,18 @@ export default function RecentOrdersCombineDialog() {
 
       // Trigger message to redirect to order page
       dispatchOrderCombined(updatedOrder.updateOrder as Order);
+      dispatchAnalytics({
+        trackEventType: 'order_created',
+        properties: {
+          orderId: order.id,
+          prescriptionCount: draftPrescriptions().length,
+          fulfillmentType: null,
+          hasPreferredPharmacy: false,
+          setAsPreferred: false,
+          pharmacyId: null,
+          isCombinedOrder: true
+        }
+      });
 
       setIsCombiningOrders(false);
       actions.setIsCombineDialogOpen(false);
@@ -151,6 +165,18 @@ export default function RecentOrdersCombineDialog() {
         });
 
         dispatchOrderCreated(newOrder.createOrder as Order);
+        dispatchAnalytics({
+          trackEventType: 'order_created',
+          properties: {
+            orderId: newOrder.createOrder.id,
+            prescriptionCount: draftPrescriptions().length,
+            fulfillmentType: 'SEND_TO_PATIENT',
+            hasPreferredPharmacy: false,
+            setAsPreferred: false,
+            pharmacyId: null,
+            isCombinedOrder: false
+          }
+        });
         setIsCombiningOrders(false);
       } catch {
         triggerToast({
