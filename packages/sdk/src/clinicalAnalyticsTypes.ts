@@ -33,6 +33,22 @@ export type PrescriptionFormTrackEventType =
   | 'prescription_field_interaction'
   | 'pharmacy_interaction';
 
+export const prescriptionFormEventTypes: Set<string> = new Set<PrescriptionFormTrackEventType>([
+  'prescription_form_opened',
+  'prescription_patient_changed',
+  'draft_prescription_added',
+  'draft_prescription_deleted',
+  'draft_prescription_edited',
+  'order_created',
+  'combine_orders_viewed',
+  'draft_prescriptions_activated',
+  'screening_alert_acknowledged',
+  'screening_alert_canceled',
+  'prescription_form_closed',
+  'prescription_field_interaction',
+  'pharmacy_interaction'
+]);
+
 export type FormTrackEventType =
   | PatientFormTrackEventType
   | SignatureAttestationTrackEventType

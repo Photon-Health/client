@@ -34,6 +34,8 @@ export type {
   DraftPrescriptionSource
 } from './clinicalAnalyticsTypes';
 
+export { prescriptionFormEventTypes } from './clinicalAnalyticsTypes';
+
 const version: string = pkg?.version ?? 'unknown';
 
 export type Env = Environment;

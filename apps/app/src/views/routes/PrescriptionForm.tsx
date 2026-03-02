@@ -13,7 +13,7 @@ import {
 import {
   type PhotonEmbedAnalyticsEventInput,
   type PrescriptionFormAnalyticsEvent,
-  type PrescriptionFormTrackEventType
+  prescriptionFormEventTypes
 } from '@photonhealth/sdk';
 
 declare global {
@@ -115,22 +115,6 @@ export const PrescriptionForm = () => {
     const abortController = new AbortController();
     const { signal: abortControllerSignal } = abortController;
     const listenerOptions = { signal: abortControllerSignal };
-
-    const prescriptionFormEventTypes: Set<string> = new Set<PrescriptionFormTrackEventType>([
-      'prescription_form_opened',
-      'prescription_patient_changed',
-      'draft_prescription_added',
-      'draft_prescription_deleted',
-      'draft_prescription_edited',
-      'order_created',
-      'combine_orders_viewed',
-      'draft_prescriptions_activated',
-      'screening_alert_acknowledged',
-      'screening_alert_canceled',
-      'prescription_form_closed',
-      'prescription_field_interaction',
-      'pharmacy_interaction'
-    ]);
 
     ref.current.addEventListener(
       'photon-analytics-track-event',
