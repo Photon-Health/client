@@ -18,9 +18,9 @@ type PatientDialogProps = {
   optionalPatientAddress: boolean;
 };
 
-const PatientCountQuery = gql`
-  query PatientCountQuery {
-    patientCount
+const PATIENT_FIELDS = gql`
+  fragment PatientFields on Patient {
+    id
   }
 `;
 
@@ -34,13 +34,16 @@ const Component = (props: PatientDialogProps) => {
   const [actions, setActions] = createSignal<any>(undefined);
   const [globalError, setGlobalError] = createSignal<string | undefined>(undefined);
   const [hasAnyAddressField, setHasAnyAddressField] = createSignal<boolean>(false);
-  const [patientCount, setPatientCount] = createSignal<number>();
+  const [hasPatients, setHasPatients] = createSignal<boolean>(false);
 
   onMount(async () => {
     try {
-      const { data } = await client.sdk.apolloClinical.query({ query: PatientCountQuery });
-      setPatientCount(data.patientCount);
-    } catch {
+      const { data } = await client.sdk.clinical.patient.getPatients({
+        fragment: { PatientFields: PATIENT_FIELDS }
+      });
+      setHasPatients(data && data.patients.length > 0);
+    } catch (err) {
+      console.log(err);
       // We don't want this request failing to cause the entire component to throw
     }
   });
@@ -248,7 +251,7 @@ const Component = (props: PatientDialogProps) => {
                   {props?.patientId ? 'Save' : 'Create'} and start prescription
                 </Button>
               </Show>
-              <Show when={!!patientCount() || !!props?.hideCreatePrescription}>
+              <Show when={!!hasPatients() || !!props?.hideCreatePrescription}>
                 <Button
                   class="w-full xs:w-fit"
                   size="lg"
