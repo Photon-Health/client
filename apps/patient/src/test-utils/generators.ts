@@ -103,8 +103,10 @@ export const generateFlattenedFill = (override: Partial<FillWithCount>): FillWit
 export const generateTreatment = (
   override: Partial<FillWithCount['treatment']> = {}
 ): FillWithCount['treatment'] => ({
+  __typename: 'Medication',
   id: 'med_testIdDefault',
   name: 'test-treatment-name',
+  therapeuticClassifications: [],
   ...override
 });
 
