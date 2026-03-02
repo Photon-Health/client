@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [boson]
 
+permissions:
+  contents: read
+
 jobs:
   publish-dry-run:
     name: NPM Publish Dry Run
@@ -17,7 +20,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: "https://registry.npmjs.org"
 
       - name: Clear npm cache
         run: npm cache clean --force
@@ -36,9 +38,9 @@ jobs:
               continue
             fi
 
-            echo "::group::Dry run publish $PACKAGE_NAME"
+            echo "::group::Dry run pack $PACKAGE_NAME"
             cd $PACKAGE_DIR
-            npm publish --dry-run
+            npm pack --dry-run
             cd -
             echo "::endgroup::"
           done
