@@ -8,7 +8,7 @@ export function useWelcomeToast() {
   const toast = useToast();
 
   useEffect(() => {
-    const isInitialLogin = true; //localStorage.getItem('selfSignupInitialLogin') === 'true';
+    const isInitialLogin = localStorage.getItem('selfSignupInitialLogin') === 'true';
 
     if (user && isInitialLogin) {
       toast({
@@ -22,7 +22,7 @@ export function useWelcomeToast() {
         render: ({ onClose }) => (
           <StyledToast
             onClose={onClose}
-            type="error"
+            type="success"
             title={`Welcome ${user.given_name}!`}
             description="Add a patient to get started"
           />
