@@ -13,6 +13,8 @@ import {
   Prescription,
   PrescriptionState
 } from '@photonhealth/sdk/dist/types';
+import { DraftPrescriptionSource, PhotonClient } from '@photonhealth/sdk';
+import { buildPrescriptionSnapshot } from '../../analytics/buildFieldSnapshot';
 import { usePrescribeEventDispatch } from '../PrescribeEventDispatchProvider';
 import { useRecentOrders } from '../RecentOrders';
 import { usePhotonClient } from '../SDKProvider';
@@ -24,7 +26,6 @@ import {
   UpdatePrescriptionStates
 } from '../../fetch';
 import triggerToast from '../../utils/toastTriggers';
-import { PhotonClient } from '@photonhealth/sdk';
 
 export type DraftPrescriptionsContextType = {
   // values
@@ -36,7 +37,8 @@ export type DraftPrescriptionsContextType = {
   setDraftPrescriptions: Setter<Prescription[]>;
   tryCreatePrescription: (
     prescriptionFormData: PrescriptionFormData,
-    options?: TryCreatePrescriptionTemplateOptions
+    options?: TryCreatePrescriptionTemplateOptions,
+    draftPrescriptionSource?: DraftPrescriptionSource
   ) => Promise<Prescription>;
   deletePrescription: (id: string) => void;
   tryUpdatePrescriptionStates: (ids: string[], state: PrescriptionState) => Promise<boolean>;
@@ -161,7 +163,7 @@ const createPrefillPrescriptionsOnApi = async ({
 };
 
 export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps) => {
-  const { dispatchDraftPrescriptionCreated } = usePrescribeEventDispatch();
+  const { dispatchDraftPrescriptionCreated, dispatchAnalytics } = usePrescribeEventDispatch();
   const [, recentOrdersActions] = useRecentOrders();
   const client = usePhotonClient();
   const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
@@ -189,7 +191,16 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
         const newRxs = await createPrefillPrescriptionsOnApi({ client, props });
         if (newRxs) {
           setDraftPrescriptions((prev) => [...prev, ...newRxs]);
-          newRxs.map((rx) => dispatchDraftPrescriptionCreated(rx));
+          newRxs.forEach((rx) => {
+            dispatchDraftPrescriptionCreated(rx);
+            dispatchAnalytics({
+              trackEventType: 'draft_prescription_added',
+              properties: {
+                draftPrescriptionSource: 'prefill',
+                fields: buildPrescriptionSnapshot(rx)
+              }
+            });
+          });
         }
       } catch (error) {
         console.error('Error while trying to create prescriptions from prefill IDs', { error });
@@ -205,7 +216,8 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
 
   const tryCreatePrescription = async (
     prescriptionFormData: PrescriptionFormData,
-    options: TryCreatePrescriptionTemplateOptions = { showSuccessToast: true }
+    options: TryCreatePrescriptionTemplateOptions = { showSuccessToast: true },
+    draftPrescriptionSource: DraftPrescriptionSource = 'form'
   ): Promise<Prescription> => {
     const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
       prescriptionFormData.treatment.id,
@@ -232,7 +244,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       });
     }
 
-    return await createPrescriptionOnApi(prescriptionFormData, options);
+    return await createPrescriptionOnApi(prescriptionFormData, options, draftPrescriptionSource);
   };
 
   const createPrescriptionOnApi = async (
@@ -240,7 +252,8 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
     options: TryCreatePrescriptionTemplateOptions = {
       addToTemplates: false,
       showSuccessToast: true
-    }
+    },
+    draftPrescriptionSource: DraftPrescriptionSource = 'form'
   ): Promise<Prescription> => {
     let createdPrescription: Prescription | null = null;
 
@@ -253,6 +266,16 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       createdPrescription = created;
       setDraftPrescriptions((prev) => [...prev, created]);
       dispatchDraftPrescriptionCreated(created);
+      dispatchAnalytics({
+        trackEventType: 'draft_prescription_added',
+        properties: {
+          draftPrescriptionSource: draftPrescriptionSource,
+          fields: buildPrescriptionSnapshot(prescriptionFormData, {
+            addToTemplates: options?.addToTemplates,
+            templateName: options?.templateName
+          })
+        }
+      });
     } catch (error) {
       console.error('Mutation error:', error);
       triggerToast({

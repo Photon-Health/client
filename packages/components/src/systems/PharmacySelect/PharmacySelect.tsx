@@ -6,6 +6,7 @@ import PickupPharmacySearch from '../PharmacySearch';
 import { MailOrderPharmacy } from './MailOrderPharmacy';
 import { SendToPatient } from './SendToPatient';
 import { usePrescribe } from '../PrescribeProvider';
+import { usePrescribeEventDispatch } from '../PrescribeEventDispatchProvider';
 import { PharmacyRoutingAlert } from '../RoutingConstraints';
 import { Alert } from '../../particles/Alert';
 import { MailOrderPharmacySearch } from '../PharmacySearch/MailOrderPharmacySearch';
@@ -37,6 +38,7 @@ interface PharmacySelectProps {
   mailOrderPharmacyIds?: string[]; // implicitly displays Mail Order tab
   patientIds?: string[];
   address?: string;
+  hasPreferredPharmacy?: boolean;
   setFufillmentType: (type: types.FulfillmentType | undefined) => void;
   setPharmacyId: (id: string | undefined) => void;
   setPatientId?: (id: string | undefined) => void;
@@ -64,6 +66,7 @@ const parseFulfillmentType = (type: FulfillmentType | undefined) => {
 
 export function PharmacySelect(props: PharmacySelectProps) {
   const { orderFormData, selectedCoverageOption, unroutablePharmacyIds } = usePrescribe();
+  const { dispatchAnalytics } = usePrescribeEventDispatch();
   const hasAddress = createMemo(() => Boolean(props.address?.trim()));
 
   const [localPharmId, setLocalPharmId] = createSignal<string | undefined>();
@@ -127,6 +130,14 @@ export function PharmacySelect(props: PharmacySelectProps) {
     const type = fulfillmentOptions.find((option) => option.name === newTab)?.fulfillmentType;
     props.setFufillmentType(parseFulfillmentType(type));
 
+    dispatchAnalytics({
+      trackEventType: 'pharmacy_interaction',
+      properties: {
+        tabSelected: newTab,
+        hasPreferredPharmacy: props.hasPreferredPharmacy ?? false
+      }
+    });
+
     // Preserve the selected pharmacy ID for Local Pickup and Mail Order tabs
     if (newTab === TabNamesEnum.localPickup && localPharmId()) {
       props.setPharmacyId(localPharmId());
@@ -176,9 +187,17 @@ export function PharmacySelect(props: PharmacySelectProps) {
                     props.setPharmacyId(pharmacy.id);
                   }
                 }}
-                setPreferred={(shouldSetPreferred) =>
-                  props?.setPreferredPharmacy?.(shouldSetPreferred)
-                }
+                setPreferred={(shouldSetPreferred) => {
+                  props?.setPreferredPharmacy?.(shouldSetPreferred);
+                  dispatchAnalytics({
+                    trackEventType: 'pharmacy_interaction',
+                    properties: {
+                      tabSelected: TabNamesEnum.localPickup,
+                      hasPreferredPharmacy: props.hasPreferredPharmacy ?? false,
+                      setAsPreferred: shouldSetPreferred
+                    }
+                  });
+                }}
               />
             </Show>
           </div>

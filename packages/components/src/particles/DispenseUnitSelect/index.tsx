@@ -7,6 +7,7 @@ export interface DispenseUnitSelectProps {
   required?: boolean;
   disabled?: boolean;
   onChange?: JSX.EventHandlerUnion<HTMLSelectElement, Event>;
+  onBlur?: JSX.EventHandlerUnion<HTMLSelectElement, Event>;
 }
 
 export default function DispenseUnitSelect(props: DispenseUnitSelectProps) {
@@ -26,6 +27,7 @@ export default function DispenseUnitSelect(props: DispenseUnitSelectProps) {
       required={props.required}
       disabled={props.disabled || isLoading()}
       onChange={props.onChange}
+      onBlur={props.onBlur}
     >
       <option value="" disabled>
         {isLoading() ? 'Loading...' : 'Select a dispense unit'}
