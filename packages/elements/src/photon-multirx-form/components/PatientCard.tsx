@@ -6,12 +6,14 @@ import {
   PatientInfo,
   PatientMedHistory,
   PhotonClientStore,
-  Text
+  Text,
+  usePrescribeEventDispatch
 } from '@photonhealth/components';
 import { Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
 import type { Address } from './PrescribeWorkflow';
+
 const hasUsableAddress = (address?: {
   street1?: string;
   city?: string;
@@ -61,6 +63,7 @@ export const PatientCard = (props: {
   hidePatientCard?: boolean;
   optionalPatientAddress?: boolean;
 }) => {
+  const { dispatchAnalytics } = usePrescribeEventDispatch();
   const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
   const [showEditPatientView, setShowEditPatientView] = createSignal(false);
   const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
@@ -86,11 +89,17 @@ export const PatientCard = (props: {
     }
   });
 
-  const updatePatient = (e: any) => {
+  const updatePatient = (e: any, { trackInteraction = true } = {}) => {
     props.actions.updateFormValue({
       key: 'patient',
       value: e.detail.patient
     });
+    if (trackInteraction) {
+      dispatchAnalytics({
+        trackEventType: 'prescription_patient_changed',
+        properties: { patientId: e.detail.patient.id }
+      });
+    }
     if (props.enableOrder && !props.address) {
       // update address when you want to allow send order
       // but the address hasn't been manually overridden
@@ -104,7 +113,10 @@ export const PatientCard = (props: {
   createEffect(() => {
     if (store?.selectedPatient?.data && props?.patientId) {
       // update patient when passed-in patient (patientId) is fetched
-      updatePatient({ detail: { patient: store?.selectedPatient?.data } });
+      updatePatient(
+        { detail: { patient: store?.selectedPatient?.data } },
+        { trackInteraction: false }
+      );
     }
   });
 
@@ -205,6 +217,9 @@ export const PatientCard = (props: {
             open={showAddMedDialog()}
             on:photon-medication-selected={(e: { detail: { medication: Treatment } }) => {
               setNewMedication(e.detail.medication);
+              dispatchAnalytics({
+                trackEventType: 'add_to_medication_history'
+              });
             }}
             on:photon-medication-closed={() => {
               setShowAddMedDialog(false);

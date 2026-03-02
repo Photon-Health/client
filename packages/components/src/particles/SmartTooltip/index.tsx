@@ -67,7 +67,7 @@ export default function SmartTooltip(props: SmartTooltipProps) {
       onMouseEnter={show}
       onMouseLeave={hide}
       onFocusIn={show}
-      onFocusOut={hide}
+      onBlur={hide}
       onClick={toggle}
     >
       {props.children}
