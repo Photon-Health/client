@@ -1,0 +1,44 @@
+name: NPM Publish Dry Run
+
+on:
+  pull_request:
+    branches: [boson]
+
+jobs:
+  publish-dry-run:
+    name: NPM Publish Dry Run
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Clear npm cache
+        run: npm cache clean --force
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Dry run publish for each package
+        run: |
+          for PACKAGE_DIR in packages/sdk packages/react packages/elements; do
+            PACKAGE_NAME=$(node -p "require('./$PACKAGE_DIR/package.json').name")
+            PRIVATE=$(node -p "require('./$PACKAGE_DIR/package.json').private || false")
+
+            if [ "$PRIVATE" = "true" ]; then
+              echo "Skipping $PACKAGE_NAME (private)"
+              continue
+            fi
+
+            echo "::group::Dry run publish $PACKAGE_NAME"
+            cd $PACKAGE_DIR
+            npm publish --dry-run
+            cd -
+            echo "::endgroup::"
+          done
