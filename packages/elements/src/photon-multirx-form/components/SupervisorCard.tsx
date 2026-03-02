@@ -53,17 +53,15 @@ type MeUserQueryVariables = {
   };
 };
 
-// const SupervisorsQuery = gql`
-//   query SupervisorsQuery {
-//     supervisors {
-//       id
-//       fullName
-//       npi
-//     }
-//   }
-// `;
-
-// type SupervisorsQueryResult = {supervisors: Array<Pick<Supervisor>>}
+const SupervisorsQuery = gql`
+  query SupervisorsQuery {
+    supervisors {
+      id
+      fullName
+      npi
+    }
+  }
+`;
 
 const calculateNeedsSupervisor = ({
   title,
@@ -104,6 +102,14 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
       state: me.address.state
     });
     props.setNeedsSupervisor(needsSupervisor);
+    console.log({ needsSupervisor });
+
+    if (needsSupervisor) {
+      const {
+        data: { supervisors }
+      } = await client.sdk.apolloClinical.query({ query: SupervisorsQuery });
+      console.log({ supervisors });
+    }
   });
 
   createEffect(() => {
