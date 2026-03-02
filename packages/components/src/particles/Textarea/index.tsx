@@ -49,7 +49,7 @@ export default function Textarea(props: TextareaProps) {
       placeholder={merged.placeholder}
       value={merged.value}
       onInput={(e) => props.onInput?.(e.currentTarget.value)}
-      onFocusOut={(e) => props.onBlur?.(e.currentTarget.value)}
+      onBlur={(e) => props.onBlur?.(e.currentTarget.value)}
       class={textareaClass()}
     />
   );
