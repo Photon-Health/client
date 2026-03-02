@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   AlertDescription,
@@ -13,29 +13,29 @@ import {
   Divider,
   HStack,
   Link,
+  LinkBox,
+  LinkOverlay,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Radio,
+  RadioGroup,
+  Show,
   Skeleton,
   SkeletonText,
   Stack,
   Text,
-  VStack,
   useColorMode,
-  LinkBox,
-  LinkOverlay,
   useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Show,
-  RadioGroup,
-  Radio,
   useTheme,
-  useToast
+  useToast,
+  VStack
 } from '@chakra-ui/react';
-import { usePhoton, types } from '@photonhealth/react';
+import { types, usePhoton } from '@photonhealth/react';
 import { FiChevronRight } from 'react-icons/fi';
 import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
@@ -52,6 +52,7 @@ import { CANCEL_ORDER, REROUTE_ORDER } from '../../mutations';
 import { TicketModal } from '../components/TicketModal';
 import { Fill, Order as OrderType } from '@photonhealth/sdk/dist/types';
 import { datadogRum } from '@datadog/browser-rum';
+import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 import { StyledToast } from '../components/StyledToast';
 
 const PHARMACY_FRAGMENT = gql`
@@ -231,6 +232,7 @@ export const Order = () => {
   const params = useParams();
   const id = params.orderId;
   const { getToken } = usePhoton();
+  const { track } = useProviderAnalytics();
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [accessToken, setAccessToken] = useState('');
   const [updating, setUpdating] = useState(false);
@@ -703,6 +705,11 @@ export const Order = () => {
                           onClick={async () => {
                             setUpdating(true);
                             try {
+                              track('clinicalapp_order_details_track_events', {
+                                trackEventType: 'select_pharmacy',
+                                orderId: id,
+                                pharmacyId
+                              });
                               await rerouteOrder({ variables: { id, pharmacyId } });
                               setPharmacyId('');
                               onClose();
