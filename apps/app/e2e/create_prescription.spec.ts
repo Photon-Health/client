@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { RX_FORM_EVENT, setupAnalyticsCapture } from './utils/analytics_intercept';
 import {
-  expectFieldInteraction,
   expectTrackEventCount,
-  expectTrackEventProperties
+  expectTrackEventProperties,
+  expectTrackFieldInteraction
 } from './utils/analytics_expect';
 
 test('user can create patient then add, edit, and delete a draft prescription', async ({
@@ -68,11 +68,11 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   await page.getByLabel('Refills').blur();
   await page.getByLabel('Patient Instructions (SIG)').fill('test-instructions-text');
   await page.getByLabel('Patient Instructions (SIG)').blur();
-  await expectFieldInteraction(page, RX_FORM_EVENT, 'treatment', 1);
-  await expectFieldInteraction(page, RX_FORM_EVENT, 'dispenseQuantity', 1);
-  await expectFieldInteraction(page, RX_FORM_EVENT, 'daysSupply', 1);
-  await expectFieldInteraction(page, RX_FORM_EVENT, 'refills', 1);
-  await expectFieldInteraction(page, RX_FORM_EVENT, 'instructions', 1);
+  await expectTrackFieldInteraction(page, RX_FORM_EVENT, 'treatment', 1);
+  await expectTrackFieldInteraction(page, RX_FORM_EVENT, 'dispenseQuantity', 1);
+  await expectTrackFieldInteraction(page, RX_FORM_EVENT, 'daysSupply', 1);
+  await expectTrackFieldInteraction(page, RX_FORM_EVENT, 'refills', 1);
+  await expectTrackFieldInteraction(page, RX_FORM_EVENT, 'instructions', 1);
   await page.getByRole('button', { name: 'Add to drafts' }).click();
   await expectTrackEventCount(page, RX_FORM_EVENT, 'draft_prescription_added', 1);
   await expectTrackEventProperties(page, RX_FORM_EVENT, 'draft_prescription_added', {
@@ -99,7 +99,7 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   await expect(medSearchInput).toHaveValue(/Amoxicillin/i);
   await page.getByLabel('Quantity').fill('60');
   await page.getByRole('button', { name: 'Add to drafts' }).click();
-  await expectFieldInteraction(page, RX_FORM_EVENT, 'dispenseQuantity', 2);
+  await expectTrackFieldInteraction(page, RX_FORM_EVENT, 'dispenseQuantity', 2);
   await expect(page.getByText(/60 Capsule, 0 Refills - test-instructions-text/i)).toBeVisible();
   await expect(page.getByText('Draft Prescriptions')).toBeVisible({ timeout: 10_000 });
   await expect(page.getByText(/Amoxicillin/i)).toBeVisible();

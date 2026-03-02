@@ -4,7 +4,7 @@ import { getCapturedAnalytics } from './analytics_intercept';
 /**
  * Asserts that a specific field has the expected number of prescription_field_interaction events.
  */
-export async function expectFieldInteraction(
+export async function expectTrackFieldInteraction(
   page: Page,
   eventName: string,
   fieldName: string,
