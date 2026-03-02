@@ -1,8 +1,15 @@
 import { customElement } from 'solid-element';
-import { createSignal, Show } from 'solid-js';
-import { Button, usePhoton } from '@photonhealth/components';
+import { createEffect, createSignal, onMount, Show } from 'solid-js';
+import {
+  buildFieldSnapshot,
+  Button,
+  dispatchAnalyticsTrackEvent,
+  PATIENT_FORM_FIELDS,
+  usePhoton
+} from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import gql from 'graphql-tag';
 
 type PatientDialogProps = {
   patientId: string;
@@ -10,6 +17,12 @@ type PatientDialogProps = {
   hideCreatePrescription: boolean;
   optionalPatientAddress: boolean;
 };
+
+const PATIENT_FIELDS = gql`
+  fragment PatientFields on Patient {
+    id
+  }
+`;
 
 const Component = (props: PatientDialogProps) => {
   let ref: any;
@@ -21,14 +34,27 @@ const Component = (props: PatientDialogProps) => {
   const [actions, setActions] = createSignal<any>(undefined);
   const [globalError, setGlobalError] = createSignal<string | undefined>(undefined);
   const [hasAnyAddressField, setHasAnyAddressField] = createSignal<boolean>(false);
+  const [hasPatients, setHasPatients] = createSignal<boolean>(false);
 
-  const dispatchUpdate = (patientId: string, createPrescription = false) => {
+  onMount(async () => {
+    try {
+      const { data } = await client.sdk.clinical.patient.getPatients({
+        fragment: { PatientFields: PATIENT_FIELDS }
+      });
+      setHasPatients(data && data.patients.length > 0);
+    } catch (err) {
+      console.log(err);
+      // We don't want this request failing to cause the entire component to throw
+    }
+  });
+
+  const dispatchUpdate = (patientId: string, didClickCreatePatientAndPrescription = false) => {
     const event = new CustomEvent('photon-patient-updated', {
       composed: true,
       bubbles: true,
       detail: {
         patientId: patientId,
-        createPrescription
+        didClickCreatePatientAndPrescription
       }
     });
     ref?.dispatchEvent(event);
@@ -55,9 +81,26 @@ const Component = (props: PatientDialogProps) => {
     ref?.dispatchEvent(event);
   };
 
-  const submitForm = async (store: any, actions: any, pStore: any, createPrescription = false) => {
+  createEffect(() => {
+    if (props.open) {
+      dispatchAnalyticsTrackEvent(
+        {
+          trackEventType: 'patient_form_opened',
+          properties: { isEdit: Boolean(props.patientId) }
+        },
+        ref
+      );
+    }
+  });
+
+  const submitForm = async (
+    store: any,
+    actions: any,
+    pStore: any,
+    didClickCreatePatientAndPrescription = false
+  ) => {
     setGlobalError(undefined);
-    setIsCreatePrescription(createPrescription);
+    setIsCreatePrescription(didClickCreatePatientAndPrescription);
     setLoading(true);
 
     // Base keys that are always required
@@ -129,7 +172,18 @@ const Component = (props: PatientDialogProps) => {
         // if patientId is provided, update the patient.
         const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
         await updatePatientMutation({ variables: patientData, awaitRefetchQueries: false });
-        dispatchUpdate(props.patientId, createPrescription);
+        dispatchUpdate(props.patientId, didClickCreatePatientAndPrescription);
+        dispatchAnalyticsTrackEvent(
+          {
+            trackEventType: 'patient_updated',
+            properties: {
+              patientId: props.patientId,
+              didClickCreatePatientAndPrescription,
+              fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS)
+            }
+          },
+          ref
+        );
       } else {
         // otherwise, create a new patient
         const createPatientMutation = client!.getSDK().clinical.patient.createPatient({});
@@ -137,7 +191,19 @@ const Component = (props: PatientDialogProps) => {
           variables: patientData,
           awaitRefetchQueries: false
         });
-        dispatchCreated(patient?.data?.createPatient?.id || '', createPrescription);
+        const patientId = patient?.data?.createPatient?.id || '';
+        dispatchCreated(patientId, didClickCreatePatientAndPrescription);
+        dispatchAnalyticsTrackEvent(
+          {
+            trackEventType: 'patient_created',
+            properties: {
+              patientId,
+              didClickCreatePatientAndPrescription,
+              fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS)
+            }
+          },
+          ref
+        );
       }
       setLoading(false);
       actions.resetStores();
@@ -154,6 +220,18 @@ const Component = (props: PatientDialogProps) => {
       <Show when={props.open}>
         <PhotonFormWrapper
           onClosed={() => {
+            dispatchAnalyticsTrackEvent(
+              {
+                trackEventType: 'patient_form_closed',
+                properties: {
+                  isEdit: Boolean(props.patientId),
+                  fields: formStore()
+                    ? buildFieldSnapshot(formStore(), PATIENT_FORM_FIELDS)
+                    : undefined
+                }
+              },
+              ref
+            );
             dispatchClosed();
             actions().resetStores();
             props.open = false;
@@ -173,16 +251,18 @@ const Component = (props: PatientDialogProps) => {
                   {props?.patientId ? 'Save' : 'Create'} and start prescription
                 </Button>
               </Show>
-              <Button
-                class="w-full xs:w-fit"
-                size="lg"
-                variant={props?.hideCreatePrescription ? 'primary' : 'secondary'}
-                disabled={loading()}
-                loading={loading() && !isCreatePrescription()}
-                onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
-              >
-                {props?.patientId ? 'Save' : 'Create'}
-              </Button>
+              <Show when={!!hasPatients() || !!props?.hideCreatePrescription}>
+                <Button
+                  class="w-full xs:w-fit"
+                  size="lg"
+                  variant={props?.hideCreatePrescription ? 'primary' : 'secondary'}
+                  disabled={loading()}
+                  loading={loading() && !isCreatePrescription()}
+                  onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
+                >
+                  {props?.patientId ? 'Save' : 'Create'}
+                </Button>
+              </Show>
             </>
           }
           form={

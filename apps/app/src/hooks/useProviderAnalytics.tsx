@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, ReactNode, useCallback, useEffect } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { usePhoton } from '@photonhealth/react';
 import { ApiObject } from '@rudderstack/analytics-js';
@@ -48,11 +48,18 @@ export interface ProviderContextData {
   customerName?: string;
 }
 
+// these values map to table names, so please use clinicalapp as a prefix
+type ClinicalAppTrackEventName =
+  | 'clinicalapp_patient_form_track_events'
+  | 'clinicalapp_signature_attestation_form_track_events'
+  | 'clinicalapp_prescription_form_track_events'
+  | 'clinicalapp_order_details_track_events';
+
 interface ProviderAnalyticsContextValue {
   /**
    * Track a user event with automatic context injection
    */
-  track: (eventName: string, properties?: ApiObject) => void;
+  track: (eventName: ClinicalAppTrackEventName, properties?: ApiObject) => void;
 
   /**
    * Current provider context data (user, org info)

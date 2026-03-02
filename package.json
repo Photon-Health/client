@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@babel/preset-react": "^7.14.5",
-    "@datadog/datadog-ci": "^4.4.0",
+    "@datadog/datadog-ci": "^5.8.0",
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/client-preset": "^4.1.0",
     "@graphql-codegen/typescript-graphql-request": "^6.2.0",
@@ -91,7 +91,7 @@
     "s3-deploy": "^1.4.0",
     "storybook": "^7.6.10",
     "tw-colors": "^1.2.6",
-    "vite": "5.4.9",
+    "vite": "^5.4.21",
     "vite-plugin-dts": "^2.3.0",
     "vite-plugin-solid": "^2.11.6",
     "vite-tsconfig-paths": "^5.1.4",
@@ -181,7 +181,9 @@
       "@zag-js/focus-visible": "^1.18.0"
     },
     "react-scripts": {
-      "form-data": "4.0.5"
-    }
+      "form-data": "4.0.5",
+      "rollup": "4.59.0"
+    },
+    "rollup": "4.59.0"
   }
 }

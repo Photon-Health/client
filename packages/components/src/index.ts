@@ -1,8 +1,11 @@
 import AddressForm from './systems/AddressForm';
 import { Alert } from './particles/Alert';
+import Checkbox from './particles/Checkbox';
+import DispenseUnitSelect from './particles/DispenseUnitSelect';
 import Input from './particles/Input';
 import { InputGroup } from './particles/InputGroup';
 import DateInput from './particles/DateInput';
+import Select from './particles/Select';
 import StateSelect from './particles/StateSelect';
 import PhoneInput from './particles/PhoneInput';
 import SexSelect, { SEX_OPTIONS } from './particles/SexSelect';
@@ -30,8 +33,10 @@ import { RecentOrders, useRecentOrders } from './systems/RecentOrders';
 import Dialog from './particles/Dialog';
 import Button from './particles/Button';
 import SDKProvider, { usePhotonClient } from './systems/SDKProvider';
+import SmartTooltip from './particles/SmartTooltip';
 import Table from './particles/Table';
 import Text from './particles/Text';
+import Textarea from './particles/Textarea';
 import Toaster from './particles/Toaster';
 import {
   ScreeningAlertAcknowledgementDialog,
@@ -58,6 +63,12 @@ import {
   PrescribeEventDispatchProvider,
   usePrescribeEventDispatch
 } from './systems/PrescribeEventDispatchProvider';
+import { dispatchAnalyticsTrackEvent } from './analytics/dispatchAnalyticsTrackEvent';
+import {
+  buildFieldSnapshot,
+  DRAFT_PRESCRIPTION_FORM_FIELDS,
+  PATIENT_FORM_FIELDS
+} from './analytics/buildFieldSnapshot';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
 
@@ -65,7 +76,10 @@ export {
   AddressForm,
   Alert,
   Banner,
+  Checkbox,
+  DispenseUnitSelect,
   Input,
+  Select,
   InputGroup,
   DateInput,
   StateSelect,
@@ -93,9 +107,11 @@ export {
   ScreeningAlerts,
   ScreeningAlertAcknowledgementDialog,
   SignatureAttestationModal,
+  SmartTooltip,
   Spinner,
   Table,
   Text,
+  Textarea,
   Toaster,
   createQuery,
   formatDate,
@@ -110,7 +126,11 @@ export {
   useGoogleService,
   CALENDAR_DATE_FORMAT,
   PrescribeEventDispatchProvider,
-  usePrescribeEventDispatch
+  usePrescribeEventDispatch,
+  dispatchAnalyticsTrackEvent,
+  buildFieldSnapshot,
+  PATIENT_FORM_FIELDS,
+  DRAFT_PRESCRIPTION_FORM_FIELDS
 };
 
 // Export types

@@ -24,6 +24,7 @@ import {
 import { createStore } from 'solid-js/store';
 import getLocation from '../../utils/getLocations';
 import { useGoogleService } from '../GoogleServiceProvider';
+import { Env } from '@photonhealth/sdk';
 
 // The order form data will consist of, at least, the list of selected prescription IDs and pharmacy ID.
 // The prescription form data (todo) will consist of a single prescription's data during user input
@@ -190,7 +191,10 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     if (
       !didSelectOtherCoverageOption() && // after an alternate is chosen, stop fetching coverages for this patient
       props.enableCoverageCheck &&
-      prescriptions.length > 0
+      prescriptions.length > 0 &&
+      // This doesn't work while we can't run lambdas locally
+      // bc prescriptions are created in boson while generateCoverageOptions happens in tau
+      (process.env.REACT_APP_ENV_NAME as Env) !== 'tau'
     ) {
       if (preferredId) {
         // check coverage on the preferred pharmacy

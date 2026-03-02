@@ -88,14 +88,28 @@ interface ContextData {
 }
 
 function mapOrderToContextData(order: Order): ContextData {
-  const medications: ContextDataMedication[] = order.fills.map((fill) => ({
-    id: fill.treatment.id,
-    name: fill.treatment.name,
-    strength:
-      'strength' in fill.treatment && fill.treatment.strength ? fill.treatment.strength : '',
-    quantity: fill.prescription?.dispenseQuantity || 0,
-    unit: fill.prescription?.dispenseUnit || ''
-  }));
+  const medications: ContextDataMedication[] = order.fills.map((fill) => {
+    const names =
+      'names' in fill.treatment && Array.isArray(fill.treatment.names)
+        ? fill.treatment.names
+        : undefined;
+    const therapeuticClassifications =
+      'therapeuticClassifications' in fill.treatment &&
+      Array.isArray(fill.treatment.therapeuticClassifications)
+        ? fill.treatment.therapeuticClassifications
+        : undefined;
+
+    return {
+      id: fill.treatment.id,
+      name: fill.treatment.name,
+      strength:
+        'strength' in fill.treatment && fill.treatment.strength ? fill.treatment.strength : '',
+      quantity: fill.prescription?.dispenseQuantity || 0,
+      unit: fill.prescription?.dispenseUnit || '',
+      names,
+      therapeuticClassifications
+    };
+  });
 
   const orderMetadata: ContextDataOrderMetadata = {
     type: order.metadata?.type || '',
