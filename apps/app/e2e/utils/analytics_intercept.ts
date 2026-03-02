@@ -2,53 +2,47 @@ import { Page } from '@playwright/test';
 
 export const RX_FORM_EVENT = 'clinicalapp_prescription_form_track_events';
 
+type CapturedEvent = { event: string; properties: Record<string, unknown> };
+
+const capturedByPage = new WeakMap<Page, CapturedEvent[]>();
+
+function extractEvents(body: any): CapturedEvent[] {
+  const events: CapturedEvent[] = [];
+  // Batched format: { batch: [{ type, event, properties }, ...] }
+  if (Array.isArray(body?.batch)) {
+    for (const item of body.batch) {
+      if (item.type === 'track' && item.event) {
+        events.push({ event: item.event, properties: item.properties ?? {} });
+      }
+    }
+  }
+  // Single event format: { type: "track", event, properties }
+  else if (body?.type === 'track' && body?.event) {
+    events.push({ event: body.event, properties: body.properties ?? {} });
+  }
+  return events;
+}
+
 /**
- * Intercepts analytics at the JavaScript level by monkey-patching
- * the RudderStack SDK's track method before the app loads.
- * This avoids issues with network-level interception (sendBeacon, CORS, glob matching).
+ * Intercepts RudderStack network requests via Playwright's route API.
+ * Extracts track events from the request payload and stores them for assertions.
+ * Must be called before page.goto().
  */
 export async function setupAnalyticsCapture(page: Page) {
-  await page.addInitScript(() => {
-    (window as any).__capturedAnalytics = [];
+  const captured: CapturedEvent[] = [];
+  capturedByPage.set(page, captured);
 
-    // Block RudderStack network requests
-    const originalFetch = window.fetch.bind(window);
-    window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
-      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
-      if (url.includes('rudderstack')) {
-        return Promise.resolve(new Response('{}', { status: 200 }));
-      }
-      return originalFetch(input, init);
-    };
-
-    // Poll for the RudderStack instance and patch its track method
-    let patched = false;
-    const patchInterval = setInterval(() => {
-      const rs = (window as any).rudderanalytics;
-      if (rs && typeof rs.track === 'function' && !patched) {
-        patched = true;
-        const originalTrack = rs.track.bind(rs);
-        rs.track = (eventName: string, properties?: Record<string, unknown>) => {
-          (window as any).__capturedAnalytics.push({
-            event: eventName,
-            properties: properties ?? {}
-          });
-          // Still call original so the app doesn't break — network requests are already blocked
-          originalTrack(eventName, properties);
-        };
-        clearInterval(patchInterval);
-      }
-    }, 50);
-    setTimeout(() => clearInterval(patchInterval), 30_000);
+  await page.route(/dataplane\.rudderstack\.com/, (route) => {
+    try {
+      const body = route.request().postDataJSON();
+      captured.push(...extractEvents(body));
+    } catch {
+      // non-JSON request (e.g. OPTIONS, GET for SDK loading) — ignore
+    }
+    route.fulfill({ status: 200, body: '{}' });
   });
 }
 
-export async function getCapturedAnalytics(page: Page) {
-  return page.evaluate(
-    () =>
-      (window as any).__capturedAnalytics as {
-        event: string;
-        properties: Record<string, unknown>;
-      }[]
-  );
+export async function getCapturedAnalytics(page: Page): Promise<CapturedEvent[]> {
+  return capturedByPage.get(page) ?? [];
 }
