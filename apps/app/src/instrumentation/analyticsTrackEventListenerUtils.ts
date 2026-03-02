@@ -1,6 +1,7 @@
 import type {
   FieldCompletionSnapshot,
   PatientFormAnalyticsEvent,
+  PrescriptionFormAnalyticsEvent,
   SignatureAttestationAnalyticsEvent
 } from '@photonhealth/sdk';
 
@@ -42,5 +43,37 @@ export function buildSignatureAttestationFormInteractionPayload(
       properties != null && 'attestationVersion' in properties
         ? properties.attestationVersion
         : null
+  };
+}
+
+export function buildPrescriptionFormInteractionPayload(detail: PrescriptionFormAnalyticsEvent) {
+  const { trackEventType, properties } = detail;
+  const p = properties ?? {};
+  return {
+    trackEventType,
+    fieldName: 'fieldName' in p ? p.fieldName : null,
+    fieldHasValue: 'hasValue' in p ? p.hasValue : null,
+    patientId: 'patientId' in p ? p.patientId : null,
+    orderId: 'orderId' in p ? p.orderId : null,
+    prescriptionCount: 'prescriptionCount' in p ? p.prescriptionCount : null,
+    fulfillmentType: 'fulfillmentType' in p ? p.fulfillmentType : null,
+    pharmacyId: 'pharmacyId' in p ? p.pharmacyId : null,
+    draftPrescriptionSource: 'draftPrescriptionSource' in p ? p.draftPrescriptionSource : null,
+    hadUnsavedWork: 'hadUnsavedWork' in p ? p.hadUnsavedWork : null,
+    screeningAlertCount: 'screeningAlertCount' in p ? p.screeningAlertCount : null,
+    tabSelected: 'tabSelected' in p ? p.tabSelected : null,
+    hasPreferredPharmacy: 'hasPreferredPharmacy' in p ? p.hasPreferredPharmacy : null,
+    setAsPreferred: 'setAsPreferred' in p ? p.setAsPreferred : null,
+    isCombinedOrder: 'isCombinedOrder' in p ? p.isCombinedOrder : null,
+    prefillPatientId: 'prefillPatientId' in p ? p.prefillPatientId : null,
+    prefillPharmacyId: 'prefillPharmacyId' in p ? p.prefillPharmacyId : null,
+    hasPrefillPatientExternalId:
+      'hasPrefillPatientExternalId' in p ? p.hasPrefillPatientExternalId : null,
+    hasPrefillPrescriptionIds:
+      'hasPrefillPrescriptionIds' in p ? p.hasPrefillPrescriptionIds : null,
+    hasPrefillTemplateIds: 'hasPrefillTemplateIds' in p ? p.hasPrefillTemplateIds : null,
+    hasPrefillWeight: 'hasPrefillWeight' in p ? p.hasPrefillWeight : null,
+    weightUnit: 'weightUnit' in p ? p.weightUnit : null,
+    ...flattenSnapshot('fields' in p ? p.fields : undefined)
   };
 }

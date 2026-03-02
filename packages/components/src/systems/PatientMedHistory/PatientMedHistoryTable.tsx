@@ -53,11 +53,15 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       }
 
       try {
-        await draftPrescriptionsContext.tryCreatePrescription({
-          ...prescription,
-          treatment,
-          diagnoseCodes: prescription.diagnoses?.map((diagnosis) => diagnosis.code) || []
-        });
+        await draftPrescriptionsContext.tryCreatePrescription(
+          {
+            ...prescription,
+            treatment,
+            diagnoseCodes: prescription.diagnoses?.map((diagnosis) => diagnosis.code) || []
+          },
+          undefined,
+          'med_history_refill'
+        );
       } finally {
         setIsCreatingPrescriptionId(undefined);
       }

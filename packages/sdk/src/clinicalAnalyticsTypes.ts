@@ -18,19 +18,38 @@ export type SignatureAttestationTrackEventType =
   | 'signature_attestation_agreed'
   | 'signature_attestation_canceled';
 
-// below PrescriptionFormTrackEventType is a temporary placeholder
-// and should be reviewed and updated in work during PHO-271
 export type PrescriptionFormTrackEventType =
   | 'prescription_form_opened'
-  | 'draft_added'
-  | 'draft_deleted'
-  | 'draft_edited'
-  | 'prescription_form_submitted'
+  | 'prescription_patient_changed'
+  | 'add_to_medication_history'
+  | 'draft_prescription_added'
+  | 'draft_prescription_deleted'
+  | 'draft_prescription_edited'
+  | 'draft_prescriptions_activated'
   | 'order_created'
-  | 'alert_acknowledged'
-  | 'alert_canceled'
+  | 'screening_alert_acknowledged'
+  | 'screening_alert_canceled'
+  | 'combine_orders_viewed'
   | 'prescription_form_closed'
-  | 'prescription_field_interaction';
+  | 'prescription_field_interaction'
+  | 'pharmacy_interaction';
+
+export const prescriptionFormEventTypes: Set<string> = new Set<PrescriptionFormTrackEventType>([
+  'prescription_form_opened',
+  'prescription_patient_changed',
+  'add_to_medication_history',
+  'draft_prescription_added',
+  'draft_prescription_deleted',
+  'draft_prescription_edited',
+  'order_created',
+  'combine_orders_viewed',
+  'draft_prescriptions_activated',
+  'screening_alert_acknowledged',
+  'screening_alert_canceled',
+  'prescription_form_closed',
+  'prescription_field_interaction',
+  'pharmacy_interaction'
+]);
 
 export type FormTrackEventType =
   | PatientFormTrackEventType
@@ -40,7 +59,7 @@ export type FormTrackEventType =
 // fields lives inside properties for events that support a field snapshot —
 // keeps dispatch calls to a single object and makes clear which events carry
 // snapshot data.
-
+type EmptyProperties = Record<string, never>;
 type PatientFormOpened = { trackEventType: 'patient_form_opened'; properties: { isEdit: boolean } };
 type PatientCreated = {
   trackEventType: 'patient_created';
@@ -77,29 +96,78 @@ type SigAttestationAgreed = {
 };
 type SigAttestationCanceled = {
   trackEventType: 'signature_attestation_canceled';
-  properties?: never;
+  properties?: EmptyProperties;
 };
 
 type PrescriptionFormOpened = {
   trackEventType: 'prescription_form_opened';
+  properties: {
+    prefillPatientId: string;
+    prefillPharmacyId: string;
+    hasPrefillPatientExternalId: boolean;
+    hasPrefillTemplateIds: boolean;
+    hasPrefillPrescriptionIds: boolean;
+    hasPrefillWeight: boolean;
+    weightUnit: string;
+  };
+};
+type PrescriptionPatientChanged = {
+  trackEventType: 'prescription_patient_changed';
   properties: { patientId: string };
 };
-type DraftAdded = {
-  trackEventType: 'draft_added';
-  properties: { treatmentName: string; fields?: FieldCompletionSnapshot };
+
+type AddToMedicationHistory = {
+  trackEventType: 'add_to_medication_history';
+  properties?: EmptyProperties;
 };
-type DraftDeleted = { trackEventType: 'draft_deleted'; properties: { treatmentName: string } };
-type DraftEdited = { trackEventType: 'draft_edited'; properties: { treatmentName: string } };
-type PrescriptionFormSubmitted = {
-  trackEventType: 'prescription_form_submitted';
-  properties: { prescriptionCount: number; enableOrder: boolean; fields?: FieldCompletionSnapshot };
+
+export type DraftPrescriptionSource = 'form' | 'med_history_refill' | 'prefill';
+
+type DraftPrescriptionAdded = {
+  trackEventType: 'draft_prescription_added';
+  properties: {
+    draftPrescriptionSource: DraftPrescriptionSource;
+    fields?: FieldCompletionSnapshot;
+  };
 };
-type OrderCreated = { trackEventType: 'order_created'; properties: { orderId: string } };
-type AlertAcknowledged = {
-  trackEventType: 'alert_acknowledged';
-  properties: { alertCount: number };
+type DraftPrescriptionDeleted = {
+  trackEventType: 'draft_prescription_deleted';
+  properties?: EmptyProperties;
 };
-type AlertCanceled = { trackEventType: 'alert_canceled'; properties: { alertCount: number } };
+type DraftPrescriptionEdited = {
+  trackEventType: 'draft_prescription_edited';
+  properties?: EmptyProperties;
+};
+type OrderCreated = {
+  trackEventType: 'order_created';
+  properties: {
+    orderId: string;
+    prescriptionCount: number;
+    fulfillmentType: string | null;
+    hasPreferredPharmacy: boolean;
+    setAsPreferred: boolean;
+    pharmacyId: string | null;
+    isCombinedOrder: boolean;
+  };
+};
+type DraftPrescriptionsActivated = {
+  trackEventType: 'draft_prescriptions_activated';
+  properties: {
+    prescriptionCount: number;
+  };
+};
+type CombineOrdersViewed = {
+  trackEventType: 'combine_orders_viewed';
+  properties?: EmptyProperties;
+};
+type ScreeningAlertAcknowledged = {
+  trackEventType: 'screening_alert_acknowledged';
+  properties: { screeningAlertCount: number };
+};
+type ScreeningAlertCanceled = {
+  trackEventType: 'screening_alert_canceled';
+  properties: { screeningAlertCount: number };
+};
 type PrescriptionFormClosed = {
   trackEventType: 'prescription_form_closed';
   properties: { hadUnsavedWork: boolean; fields?: FieldCompletionSnapshot };
@@ -107,6 +175,14 @@ type PrescriptionFormClosed = {
 type PrescriptionFieldInteraction = {
   trackEventType: 'prescription_field_interaction';
   properties: { fieldName: string; hasValue: boolean };
+};
+type PharmacyInteraction = {
+  trackEventType: 'pharmacy_interaction';
+  properties: {
+    tabSelected: string;
+    hasPreferredPharmacy: boolean;
+    setAsPreferred?: boolean;
+  };
 };
 
 // Input type passed to dispatchAnalyticsTrackEvent — no timestamp (added by the dispatch fn).
@@ -122,15 +198,19 @@ export type PhotonEmbedAnalyticsEventInput =
   | SigAttestationAgreed
   | SigAttestationCanceled
   | PrescriptionFormOpened
-  | DraftAdded
-  | DraftDeleted
-  | DraftEdited
-  | PrescriptionFormSubmitted
+  | PrescriptionPatientChanged
+  | AddToMedicationHistory
+  | DraftPrescriptionAdded
+  | DraftPrescriptionDeleted
+  | DraftPrescriptionEdited
   | OrderCreated
-  | AlertAcknowledged
-  | AlertCanceled
+  | CombineOrdersViewed
+  | DraftPrescriptionsActivated
+  | ScreeningAlertAcknowledged
+  | ScreeningAlertCanceled
   | PrescriptionFormClosed
-  | PrescriptionFieldInteraction;
+  | PrescriptionFieldInteraction
+  | PharmacyInteraction;
 
 export type PatientFormAnalyticsEvent = Extract<
   PhotonEmbedAnalyticsEventInput,
@@ -140,4 +220,9 @@ export type PatientFormAnalyticsEvent = Extract<
 export type SignatureAttestationAnalyticsEvent = Extract<
   PhotonEmbedAnalyticsEventInput,
   { trackEventType: SignatureAttestationTrackEventType }
+>;
+
+export type PrescriptionFormAnalyticsEvent = Extract<
+  PhotonEmbedAnalyticsEventInput,
+  { trackEventType: PrescriptionFormTrackEventType }
 >;
