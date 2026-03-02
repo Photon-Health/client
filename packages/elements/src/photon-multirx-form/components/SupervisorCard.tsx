@@ -1,10 +1,9 @@
 import * as zod from 'zod';
 import { Card, Input, InputGroup, Text, usePhoton } from '@photonhealth/components';
-import { Address, Name } from '@photonhealth/sdk/dist/types';
-import { createEffect, onMount, Setter, Show } from 'solid-js';
-import gql from 'graphql-tag';
+import { createEffect, onMount } from 'solid-js';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
+import gql from 'graphql-tag';
 
 const supervisorSchema = zod
   .object({
@@ -33,26 +32,6 @@ const supervisorSchema = zod
 
 export const supervisorValidatorKeys = ['supervisorFullName', 'supervisorNpi'];
 
-const MeUserQuery = gql`
-  query MeUserQuery {
-    me {
-      name {
-        title
-      }
-      address {
-        state
-      }
-    }
-  }
-`;
-
-type MeUserQueryVariables = {
-  me: {
-    name: Pick<Name, 'title'>;
-    address: Pick<Address, 'state'>;
-  };
-};
-
 const SupervisorsQuery = gql`
   query SupervisorsQuery {
     supervisors {
@@ -63,53 +42,25 @@ const SupervisorsQuery = gql`
   }
 `;
 
-const calculateNeedsSupervisor = ({
-  title,
-  state
-}: {
-  title: Name['title'];
-  state: Address['state'];
-}) =>
-  !!title &&
-  ['NP', 'PA'].includes(title) &&
-  ['CA', 'FL', 'GA', 'MI', 'MO', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA'].includes(state.toUpperCase());
-
 interface SupervisorCardProps {
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
-  needsSupervisor: boolean;
-  setNeedsSupervisor: Setter<boolean>;
 }
 
 export const SupervisorCard = (props: SupervisorCardProps) => {
   const client = usePhoton();
 
+  onMount(async () => {
+    const {
+      data: { supervisors }
+    } = await client.sdk.apolloClinical.query({ query: SupervisorsQuery });
+    console.log({ supervisors });
+  });
   const { form, data, errors, validate } = createForm({
     onSubmit: () => {
       // form only handles validation and state management
     },
     extend: validator({ schema: supervisorSchema })
-  });
-
-  onMount(async () => {
-    const {
-      data: { me }
-    } = await client.sdk.apolloClinical.query<MeUserQueryVariables>({
-      query: MeUserQuery
-    });
-    const needsSupervisor = calculateNeedsSupervisor({
-      title: me.name.title,
-      state: me.address.state
-    });
-    props.setNeedsSupervisor(needsSupervisor);
-    console.log({ needsSupervisor });
-
-    if (needsSupervisor) {
-      const {
-        data: { supervisors }
-      } = await client.sdk.apolloClinical.query({ query: SupervisorsQuery });
-      console.log({ supervisors });
-    }
   });
 
   createEffect(() => {
@@ -133,22 +84,20 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
   });
 
   return (
-    <Show when={props.needsSupervisor}>
-      <Card addChildrenDivider={true} class="pb-2">
-        <Text color="gray">Supervising Physician</Text>
-        <form ref={form}>
-          <Text size="sm" color="black">
-            Some pharmacies require supervising physician information for this prescription. Adding
-            it here can help avoid callbacks and delays.
-          </Text>
-          <InputGroup label="Full Name" error={errors().supervisorFullName?.[0]}>
-            <Input name="supervisorFullName" onInput={validate} />
-          </InputGroup>
-          <InputGroup label="NPI" error={errors().supervisorNpi?.[0]}>
-            <Input name="supervisorNpi" onInput={validate} />
-          </InputGroup>
-        </form>
-      </Card>
-    </Show>
+    <Card addChildrenDivider={true} class="pb-2">
+      <Text color="gray">Supervising Physician</Text>
+      <form ref={form}>
+        <Text size="sm" color="black">
+          Some pharmacies require supervising physician information for this prescription. Adding it
+          here can help avoid callbacks and delays.
+        </Text>
+        <InputGroup label="Full Name" error={errors().supervisorFullName?.[0]}>
+          <Input name="supervisorFullName" onInput={validate} />
+        </InputGroup>
+        <InputGroup label="NPI" error={errors().supervisorNpi?.[0]}>
+          <Input name="supervisorNpi" onInput={validate} />
+        </InputGroup>
+      </form>
+    </Card>
   );
 };

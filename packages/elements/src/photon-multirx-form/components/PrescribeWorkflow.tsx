@@ -143,6 +143,31 @@ const CreateSupervisorMutation = gql`
 
 type CreateSupervisorMutationResult = { createSupervisor: Pick<Supervisor, 'id'> };
 
+const MeUserQuery = gql`
+  query MeUserQuery {
+    me {
+      name {
+        title
+      }
+      address {
+        state
+      }
+    }
+  }
+`;
+
+type MeUserQueryResult = {
+  me: {
+    name: { title: string | null };
+    address: { state: string };
+  };
+};
+
+const calculateNeedsSupervisor = ({ title, state }: { title: string | null; state: string }) =>
+  !!title &&
+  ['NP', 'PA'].includes(title) &&
+  ['CA', 'FL', 'GA', 'MI', 'MO', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA'].includes(state.toUpperCase());
+
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
   let prescriptionRef: HTMLDivElement | undefined;
@@ -215,7 +240,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     prefillNotes = `${prefillNotes}${formatPatientWeight(props.weight, props?.weightUnit)}`;
   }
 
-  onMount(() => {
+  onMount(async () => {
     if (props.address) {
       // if manually overriding address, update the store on mount
       props.formActions.updateFormValue({
@@ -227,6 +252,18 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     ref.addEventListener('photon-ticket-created-duplicate', () => {
       clearForm(props.formActions, prefillNotes ? { notes: prefillNotes } : undefined);
     });
+
+    const {
+      data: { me }
+    } = await client.sdk.apolloClinical.query<MeUserQueryResult>({
+      query: MeUserQuery
+    });
+    const needsSupervisorResult = calculateNeedsSupervisor({
+      title: me.name.title,
+      state: me.address.state
+    });
+    setNeedsSupervisor(needsSupervisorResult);
+    console.log({ needsSupervisor: needsSupervisorResult });
   });
 
   createEffect(() => {
@@ -728,13 +765,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   routingConstraints={routingConstraints()}
                   enableOrder={props.enableOrder}
                 />
-                <Show when={props.enableOrder}>
-                  <SupervisorCard
-                    actions={props.formActions}
-                    store={props.formStore}
-                    needsSupervisor={needsSupervisor()}
-                    setNeedsSupervisor={setNeedsSupervisor}
-                  />
+                <Show when={props.enableOrder && needsSupervisor()}>
+                  <SupervisorCard actions={props.formActions} store={props.formStore} />
                 </Show>
                 <Show when={props.enableOrder && !autoRoutedPharmacyId()}>
                   <OrderCard
