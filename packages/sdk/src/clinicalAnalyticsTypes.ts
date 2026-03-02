@@ -21,6 +21,7 @@ export type SignatureAttestationTrackEventType =
 export type PrescriptionFormTrackEventType =
   | 'prescription_form_opened'
   | 'prescription_patient_changed'
+  | 'add_to_medication_history'
   | 'draft_prescription_added'
   | 'draft_prescription_deleted'
   | 'draft_prescription_edited'
@@ -36,6 +37,7 @@ export type PrescriptionFormTrackEventType =
 export const prescriptionFormEventTypes: Set<string> = new Set<PrescriptionFormTrackEventType>([
   'prescription_form_opened',
   'prescription_patient_changed',
+  'add_to_medication_history',
   'draft_prescription_added',
   'draft_prescription_deleted',
   'draft_prescription_edited',
@@ -112,6 +114,11 @@ type PrescriptionFormOpened = {
 type PrescriptionPatientChanged = {
   trackEventType: 'prescription_patient_changed';
   properties: { patientId: string };
+};
+
+type AddToMedicationHistory = {
+  trackEventType: 'add_to_medication_history';
+  properties?: EmptyProperties;
 };
 
 export type DraftPrescriptionSource = 'form' | 'med_history_refill' | 'prefill';
@@ -192,6 +199,7 @@ export type PhotonEmbedAnalyticsEventInput =
   | SigAttestationCanceled
   | PrescriptionFormOpened
   | PrescriptionPatientChanged
+  | AddToMedicationHistory
   | DraftPrescriptionAdded
   | DraftPrescriptionDeleted
   | DraftPrescriptionEdited

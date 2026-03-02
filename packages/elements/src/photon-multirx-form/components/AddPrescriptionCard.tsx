@@ -175,8 +175,7 @@ export const AddPrescriptionCard = (props: {
             value: e.detail.medication
           });
           dispatchAnalytics({
-            trackEventType: 'prescription_field_interaction',
-            properties: { fieldName: 'treatment', hasValue: true }
+            trackEventType: 'add_to_medication_history'
           });
 
           props.draftedPrescriptionChanged();
