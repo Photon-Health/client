@@ -166,21 +166,7 @@ export const AddPrescriptionCard = (props: {
   return (
     <Card addChildrenDivider={true}>
       <Text color="gray">Add Prescription</Text>
-      <div
-        class="flex flex-col gap-1"
-        on:photon-medication-selected={(e: any) => {
-          setOffCatalog(e.detail.medication);
-          props.actions.updateFormValue({
-            key: 'treatment',
-            value: e.detail.medication
-          });
-          dispatchAnalytics({
-            trackEventType: 'add_to_medication_history'
-          });
-
-          props.draftedPrescriptionChanged();
-        }}
-      >
+      <div class="flex flex-col gap-1">
         <photon-medication-search
           label="Search for Treatment"
           catalog-id={props.catalogId}

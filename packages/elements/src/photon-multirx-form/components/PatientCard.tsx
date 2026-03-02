@@ -217,6 +217,9 @@ export const PatientCard = (props: {
             open={showAddMedDialog()}
             on:photon-medication-selected={(e: { detail: { medication: Treatment } }) => {
               setNewMedication(e.detail.medication);
+              dispatchAnalytics({
+                trackEventType: 'add_to_medication_history'
+              });
             }}
             on:photon-medication-closed={() => {
               setShowAddMedDialog(false);
