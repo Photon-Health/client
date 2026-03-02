@@ -6,8 +6,15 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
-import { buildSignatureAttestationFormInteractionPayload } from '../../instrumentation/analyticsTrackEventListenerUtils';
-import { type PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
+import {
+  buildPrescriptionFormInteractionPayload,
+  buildSignatureAttestationFormInteractionPayload
+} from '../../instrumentation/analyticsTrackEventListenerUtils';
+import {
+  type PhotonEmbedAnalyticsEventInput,
+  type PrescriptionFormAnalyticsEvent,
+  prescriptionFormEventTypes
+} from '@photonhealth/sdk';
 
 declare global {
   namespace JSX {
@@ -66,13 +73,42 @@ export const PrescriptionForm = () => {
     navigate('/prescriptions');
   };
 
+  // Stable ref so the analytics listener callback always reads the latest providerAnalytics
+  // without being in the useEffect dependency array (which would tear down and re-register
+  // all listeners on every auth/org state change, causing prefill events to be lost).
+  const providerAnalyticsRef = useRef(providerAnalytics);
+  providerAnalyticsRef.current = providerAnalytics;
+
   const prescriptionFormOpenWasTracked = useRef(false);
   useEffect(() => {
     if (providerAnalytics.isReady && !prescriptionFormOpenWasTracked.current) {
       prescriptionFormOpenWasTracked.current = true;
-      providerAnalytics.track('prescription_form_opened', { patientId: patientId || undefined });
+      providerAnalytics.track(
+        'clinicalapp_prescription_form_track_events',
+        buildPrescriptionFormInteractionPayload({
+          trackEventType: 'prescription_form_opened',
+          properties: {
+            prefillPatientId: patientId || '',
+            prefillPharmacyId: pharmacyId || '',
+            hasPrefillPatientExternalId: !!externalId?.trim(),
+            hasPrefillPrescriptionIds: !!prescriptionIds?.trim(),
+            hasPrefillTemplateIds: !!templateIds?.trim(),
+            hasPrefillWeight: !!weight?.trim(),
+            weightUnit: weightUnit
+          }
+        })
+      );
     }
-  }, [providerAnalytics, patientId]);
+  }, [
+    providerAnalytics,
+    patientId,
+    pharmacyId,
+    externalId,
+    prescriptionIds,
+    templateIds,
+    weight,
+    weightUnit
+  ]);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -89,9 +125,14 @@ export const PrescriptionForm = () => {
           trackEventType === 'signature_attestation_agreed' ||
           trackEventType === 'signature_attestation_canceled'
         ) {
-          providerAnalytics.track(
+          providerAnalyticsRef.current.track(
             'clinicalapp_signature_attestation_form_track_events',
             buildSignatureAttestationFormInteractionPayload(e.detail)
+          );
+        } else if (prescriptionFormEventTypes.has(trackEventType)) {
+          providerAnalyticsRef.current.track(
+            'clinicalapp_prescription_form_track_events',
+            buildPrescriptionFormInteractionPayload(e.detail as PrescriptionFormAnalyticsEvent)
           );
         }
       },
@@ -108,12 +149,6 @@ export const PrescriptionForm = () => {
     ref.current.addEventListener(
       'photon-prescriptions-created',
       (e: any) => {
-        providerAnalytics.track('prescription_form_created', {
-          patientId: e.detail.patientId,
-          prescriptionIds: e.detail.prescriptionIds,
-          createOrder: e.detail.createOrder
-        });
-
         if (!e.detail.createOrder) {
           onClose();
         }
@@ -167,7 +202,7 @@ export const PrescriptionForm = () => {
       listenerOptions
     );
     return () => abortController.abort();
-  }, [navigate, providerAnalytics, patientId, onClose]);
+  }, [navigate, patientId, onClose]);
 
   const enableCoverageCheck = useMemo(() => {
     if (user) {
