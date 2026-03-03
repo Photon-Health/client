@@ -67,6 +67,7 @@ npx nx run patient:tsc:boson             # Type check patient app
 ```bash
 npx nx run app:codegen                   # Generate types (boson)
 npx nx run patient:codegen               # Generate types (boson)
+npx nx run sdk:codegen:clinical-api      # Generate types for clinical-api (boson)
 ```
 
 ## Developer Tools
@@ -177,6 +178,8 @@ const mailOrderProviders = getOrgMailOrderPharms(user?.org_id)?.provider;
 | photon   | Production       | `.env.photon`     |
 
 Environment is selected via `env-cmd -f .env.<name>` in Nx targets.
+
+**Nx automatic `.env` loading:** Nx automatically loads `.env.local` (and other `.env` files) from the project root before running any target. Variables loaded first take precedence — Nx won't overwrite a variable already set in the process. This means `.env.local` values are available to all Nx targets without explicit `env-cmd` references. For example, Playwright credentials (`PLAYWRIGHT_E2E_ACCOUNT_USERNAME`, `PLAYWRIGHT_E2E_ACCOUNT_PASSWORD`) and `PLAYWRIGHT_BASE_URL` stored in `apps/app/.env.local` are automatically available when running `nx run app:e2e`, even though that target only explicitly loads `.env.boson` via `env-cmd`.
 
 ### Backend APIs
 
@@ -326,6 +329,14 @@ When migrating a deprecated element to a plain Solid.js component, use an increm
 
 All deprecated primitive elements (`photon-text-input`, `photon-checkbox`, `photon-dropdown`, `photon-patient-select`, etc.) are still imported in `packages/elements/src/index.ts` and included in the production bundle. Since they're only used internally as building blocks, they could be converted to plain Solid.js components in `packages/components` and removed from the web component registry to reduce bundle size.
 
+### SDK codegen is incomplete and GraphQL documents are scattered
+
+The `packages/sdk` package has codegen set up against `clinical-api` (run via `npx nx run sdk:codegen:clinical-api`), but there is no codegen support for the lambdas API. As a result, type-safe generated hooks and operation types only exist for `clinical-api` operations; lambdas operations remain hand-typed through `sdk/src/types.ts`.
+
+All GraphQL documents (queries, mutations, fragments) in the SDK should live in `sdk/src/graphql/clinical-api/`, with the hope that one day we'll also have an `sdk/src/graphql/api/` folder. Documents are currently scattered across individual domain files. When adding new operations or refactoring existing ones, move GraphQL documents into `sdk/src/graphql/clinical-api/` and run `npx nx run sdk:codegen:clinical-api` to regenerate types.
+
+GraphQL documents in the clinical app (`apps/app`) should also eventually leverage types in the SDK.
+
 ### CustomEvent types are untyped at the boundary
 
 The React clinical app listens for element events with `addEventListener` and types all event payloads as `any` (e.g. `(e: any) => { e.detail.patientId }`). There are no shared TypeScript interfaces for event detail shapes, making the React-to-Solid boundary fragile.
@@ -384,4 +395,3 @@ All new utility functions, views, and components must include tests. Match the t
 - **Test files** are excluded from linting (configured in `.eslintrc.json` ignorePatterns)
 - **TypeScript strict mode** enabled; type check with `npx nx run <project>:tsc:boson`
 - **Shared types** belong in `packages/sdk/src/types.ts` since all packages already depend on `@photonhealth/sdk`. For GraphQL response shapes, always use generated types from codegen (`gql/` or `graphql/` directories) rather than defining them manually.
-- **Import types** from `@photonhealth/sdk/dist/types` when only type information is needed (e.g. `import { types } from '@photonhealth/react'` or `import { Env } from '@photonhealth/sdk'`)
