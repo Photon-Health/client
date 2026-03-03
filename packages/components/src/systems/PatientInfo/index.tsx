@@ -120,6 +120,8 @@ export default function PatientInfo(props: PatientInfoProps) {
           openLabel="Show less"
           closedLabel="Show more"
           // On larger screens, force component open and hide control
+          // Can't use alwaysOpen prop until there is a way to
+          // get screen breakpoint programatically
           class="sm:block"
           buttonClass="mt-2 sm:hidden"
         >

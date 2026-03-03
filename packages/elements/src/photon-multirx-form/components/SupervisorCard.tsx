@@ -10,15 +10,7 @@ import {
   triggerToast,
   usePhoton
 } from '@photonhealth/components';
-import {
-  createEffect,
-  createMemo,
-  createSignal,
-  createUniqueId,
-  For,
-  onMount,
-  Show
-} from 'solid-js';
+import { createMemo, createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
 import gql from 'graphql-tag';
@@ -111,6 +103,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
           </InputGroup>
         </Show>
         <NewSupervisorForm
+          hasSupervisors={supervisors().length > 0}
           onCreated={(supervisor) => {
             setSupervisors((prev) => sortSupervisors([...prev, supervisor]));
             props.actions.updateFormValue({ key: 'supervisorId', value: supervisor.id });
@@ -159,6 +152,7 @@ const CreateSupervisorMutation = gql`
 type CreateSupervisorResult = { createSupervisor: Supervisor };
 
 interface NewSupervisorFormProps {
+  hasSupervisors: boolean;
   onCreated: (supervisor: Supervisor) => void;
 }
 
@@ -183,6 +177,7 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
         if (data?.createSupervisor) {
           props.onCreated(data.createSupervisor);
           setIsOpen(false);
+          reset();
         }
       } catch (e) {
         triggerToast({
@@ -197,19 +192,17 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
     extend: validator({ schema: supervisorSchema })
   });
 
-  createEffect(() => {
-    if (!isOpen()) {
-      reset();
-    }
-  });
-
   return (
     <Collapsible
       closedLabel="Add new"
       openLabel="Cancel"
+      alwaysOpen={!props.hasSupervisors}
       isOpen={isOpen()}
       onOpenChange={(value) => {
         setIsOpen(value);
+        if (!isOpen()) {
+          reset();
+        }
       }}
     >
       <form ref={form} id={formId}>
