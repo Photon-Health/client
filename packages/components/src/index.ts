@@ -27,6 +27,7 @@ import Icon from './particles/Icon';
 import PatientInfo from './systems/PatientInfo';
 import PatientMedHistory from './systems/PatientMedHistory';
 import PickupPharmacySearch from './systems/PharmacySearch';
+import type { PharmacyOption } from './systems/PharmacySearch/PharmacySearch';
 import { PharmacySelect } from './systems/PharmacySelect';
 import Spinner from './particles/Spinner';
 import RadioGroupCards from './particles/RadioGroupCards';
@@ -137,6 +138,7 @@ export {
 
 // Export types
 export type {
+  PharmacyOption,
   ScreeningAlertType,
   RoutingConstraint,
   TemplateOverrides,

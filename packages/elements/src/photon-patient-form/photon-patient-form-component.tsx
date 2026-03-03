@@ -1,6 +1,7 @@
 import { customElement } from 'solid-element';
 import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
+import type { PharmacyOption } from '@photonhealth/components';
 import {
   Card,
   DateInput,
@@ -25,7 +26,6 @@ import { email, empty, message, notFutureDate, zipString } from '../validators';
 
 import { isZip } from '../utils';
 import { PhotonAuthorized } from '../photon-authorized';
-import { PharmacyOption } from '@photonhealth/components/dist/packages/components/src/systems/PharmacySearch/PharmacySearch';
 
 const getPatientAddress = (pStore: any, store: any) => {
   const patientAddress = pStore.selectedPatient.data?.address;

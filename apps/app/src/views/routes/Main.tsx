@@ -7,6 +7,7 @@ import { SelectOrg } from './SelectOrg';
 import { auth0Config } from '../../configs/auth';
 import useQueryParams from '../../hooks/useQueryParams';
 import { Env } from '@photonhealth/sdk';
+import { useWelcomeToast } from '../../hooks/useWelcomeToast';
 
 declare global {
   namespace JSX {
@@ -24,6 +25,8 @@ export const Main = () => {
   const { user, isAuthenticated, isLoading, error } = usePhoton();
   const location = useLocation();
   const navigate = useNavigate();
+
+  useWelcomeToast();
 
   useEffect(() => {
     if (!isLoading && error) {
