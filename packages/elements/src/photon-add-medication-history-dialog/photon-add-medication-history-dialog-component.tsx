@@ -1,9 +1,6 @@
-import { Treatment } from '@photonhealth/sdk/dist/types';
-
 import { Button, Dialog, usePhoton } from '@photonhealth/components';
 import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
-import { gql } from '@apollo/client';
 import { debounce } from '@solid-primitives/scheduled';
 import { boldSubstring } from '../photon-medication-search/photon-medication-search-component';
 
@@ -24,15 +21,8 @@ import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?in
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import tailwind from '../tailwind.css?inline';
 import styles from './styles.css?inline';
-
-const SEARCH_TREATMENTS = gql`
-  query SearchTreatments($filter: TreatmentFilter!) {
-    treatments(filter: $filter) {
-      id
-      name
-    }
-  }
-`;
+import { SearchTreatmentsQuery } from '@photonhealth/sdk';
+import { Treatment } from '@photonhealth/sdk/dist/graphql/clinical-api/gql/graphql';
 
 type AddMedicationHistoryDialogProps = {
   open: boolean;
@@ -57,7 +47,7 @@ const Component = (props: AddMedicationHistoryDialogProps) => {
     try {
       setIsLoading(true);
       const { data } = await store!.sdk.apolloClinical.query({
-        query: SEARCH_TREATMENTS,
+        query: SearchTreatmentsQuery,
         variables: { filter: { term } },
         fetchPolicy: 'no-cache'
       });
