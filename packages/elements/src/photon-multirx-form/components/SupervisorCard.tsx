@@ -2,6 +2,7 @@ import * as zod from 'zod';
 import {
   Button,
   Card,
+  Collapsible,
   ComboBox,
   Input,
   InputGroup,
@@ -9,7 +10,15 @@ import {
   triggerToast,
   usePhoton
 } from '@photonhealth/components';
-import { createMemo, createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  createUniqueId,
+  For,
+  onMount,
+  Show
+} from 'solid-js';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
 import gql from 'graphql-tag';
@@ -123,7 +132,7 @@ const supervisorSchema = zod
     if (!!data.supervisorFullName && !data.supervisorNpi) {
       ctx.addIssue({
         code: 'custom',
-        message: 'NPI is required when Full Name is filled out',
+        message: 'NPI is required',
         path: ['supervisorNpi']
       });
     }
@@ -131,7 +140,7 @@ const supervisorSchema = zod
     if (!data.supervisorFullName && !!data.supervisorNpi) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Full Name is required when NPI is filled out',
+        message: 'Full Name is required',
         path: ['supervisorFullName']
       });
     }
@@ -157,10 +166,12 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
   const client = usePhoton();
   const formId = createUniqueId();
   const [submitting, setSubmitting] = createSignal(false);
+  const [isOpen, setIsOpen] = createSignal(false);
 
-  const { form, errors, validate, isValid } = createForm({
+  const { form, errors, validate, isValid, reset } = createForm({
     onSubmit: async (values) => {
       setSubmitting(true);
+      validate();
       try {
         const { data } = await client.sdk.apolloClinical.mutate<CreateSupervisorResult>({
           mutation: CreateSupervisorMutation,
@@ -171,6 +182,7 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
         });
         if (data?.createSupervisor) {
           props.onCreated(data.createSupervisor);
+          setIsOpen(false);
         }
       } catch (e) {
         triggerToast({
@@ -185,25 +197,40 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
     extend: validator({ schema: supervisorSchema })
   });
 
+  createEffect(() => {
+    if (!isOpen()) {
+      reset();
+    }
+  });
+
   return (
-    <form ref={form} id={formId}>
-      <InputGroup label="Full Name" error={errors().supervisorFullName?.[0]}>
-        <Input name="supervisorFullName" onInput={validate} />
-      </InputGroup>
-      <InputGroup label="NPI" error={errors().supervisorNpi?.[0]}>
-        <Input name="supervisorNpi" onInput={validate} />
-      </InputGroup>
-      <div class="flex justify-end">
-        <Button
-          type="submit"
-          form={formId}
-          variant={'secondary'}
-          disabled={submitting() || !isValid()}
-          loading={submitting()}
-        >
-          Add supervisor
-        </Button>
-      </div>
-    </form>
+    <Collapsible
+      closedLabel="Add new"
+      openLabel="Cancel"
+      isOpen={isOpen()}
+      onOpenChange={(value) => {
+        setIsOpen(value);
+      }}
+    >
+      <form ref={form} id={formId}>
+        <InputGroup label="Full Name" error={errors().supervisorFullName?.[0]}>
+          <Input name="supervisorFullName" onInput={validate} />
+        </InputGroup>
+        <InputGroup label="NPI" error={errors().supervisorNpi?.[0]}>
+          <Input name="supervisorNpi" onInput={validate} />
+        </InputGroup>
+        <div class="flex justify-end">
+          <Button
+            type="submit"
+            form={formId}
+            variant={'secondary'}
+            disabled={submitting() || !isValid()}
+            loading={submitting()}
+          >
+            Add supervisor
+          </Button>
+        </div>
+      </form>
+    </Collapsible>
   );
 };
