@@ -29,8 +29,12 @@ export type {
   FormTrackEventType,
   PhotonEmbedAnalyticsEventInput,
   PatientFormAnalyticsEvent,
-  SignatureAttestationAnalyticsEvent
+  SignatureAttestationAnalyticsEvent,
+  PrescriptionFormAnalyticsEvent,
+  DraftPrescriptionSource
 } from './clinicalAnalyticsTypes';
+
+export { prescriptionFormEventTypes } from './clinicalAnalyticsTypes';
 
 const version: string = pkg?.version ?? 'unknown';
 

@@ -32,7 +32,7 @@ const repopulateForm = (actions: Record<string, (...args: any) => any>, draft: a
   if (draft.fillsAllowed !== undefined && draft.fillsAllowed !== null) {
     const fillsAllowed = Number(draft.fillsAllowed);
     actions.updateFormValue({
-      key: 'refillsInput',
+      key: 'refills',
       value: fillsAllowed > 0 ? fillsAllowed - 1 : 0
     });
   }

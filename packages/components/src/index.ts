@@ -26,6 +26,7 @@ import Icon from './particles/Icon';
 import PatientInfo from './systems/PatientInfo';
 import PatientMedHistory from './systems/PatientMedHistory';
 import PickupPharmacySearch from './systems/PharmacySearch';
+import type { PharmacyOption } from './systems/PharmacySearch/PharmacySearch';
 import { PharmacySelect } from './systems/PharmacySelect';
 import Spinner from './particles/Spinner';
 import RadioGroupCards from './particles/RadioGroupCards';
@@ -64,7 +65,11 @@ import {
   usePrescribeEventDispatch
 } from './systems/PrescribeEventDispatchProvider';
 import { dispatchAnalyticsTrackEvent } from './analytics/dispatchAnalyticsTrackEvent';
-import { buildFieldSnapshot, PATIENT_FORM_FIELDS } from './analytics/buildFieldSnapshot';
+import {
+  buildFieldSnapshot,
+  DRAFT_PRESCRIPTION_FORM_FIELDS,
+  PATIENT_FORM_FIELDS
+} from './analytics/buildFieldSnapshot';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
 
@@ -125,11 +130,13 @@ export {
   usePrescribeEventDispatch,
   dispatchAnalyticsTrackEvent,
   buildFieldSnapshot,
-  PATIENT_FORM_FIELDS
+  PATIENT_FORM_FIELDS,
+  DRAFT_PRESCRIPTION_FORM_FIELDS
 };
 
 // Export types
 export type {
+  PharmacyOption,
   ScreeningAlertType,
   RoutingConstraint,
   TemplateOverrides,
