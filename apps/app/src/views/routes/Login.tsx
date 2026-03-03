@@ -14,6 +14,7 @@ import {
 import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 
 import { usePhoton } from '@photonhealth/react';
+import type { LoginOptions } from '@photonhealth/sdk';
 import { Logo } from '../components/Logo';
 import useQueryParams from '../../hooks/useQueryParams';
 
@@ -27,6 +28,7 @@ export const Login = () => {
   const [searchParams] = useSearchParams();
   const invite = searchParams.get('invitation');
   const org = searchParams.get('organization');
+  const connection = searchParams.get('connection');
 
   if (invite && org) {
     login({
@@ -40,7 +42,20 @@ export const Login = () => {
   }
 
   const onLoginClick = () => {
-    login({ appState: { returnTo: location.state?.returnToAfterLogin } });
+    const loginOptions: LoginOptions = {
+      appState: { returnTo: location.state?.returnToAfterLogin }
+    };
+
+    // only including the e2e connection because we want it to be easy for the automated
+    // e2e tests to get to an auth0 login page with only the username/password fields.
+    // When not specifying a connection in Neutron, for example, auth0 shows email/password by default
+    // since we have an email/password db connection for some customer testing.
+    const allowedConnections = ['e2e-test-users'];
+    if (connection && allowedConnections.includes(connection)) {
+      loginOptions.connection = connection;
+    }
+
+    login(loginOptions);
   };
 
   const presentedError = presentError(error);
