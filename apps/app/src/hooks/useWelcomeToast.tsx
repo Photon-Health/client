@@ -8,9 +8,11 @@ export function useWelcomeToast() {
   const toast = useToast();
 
   useEffect(() => {
+    console.log('Checked selfSignupInitialLogin', localStorage.getItem('selfSignupInitialLogin'));
     const isInitialLogin = localStorage.getItem('selfSignupInitialLogin') === 'true';
 
     if (user && isInitialLogin) {
+      console.log('Got user and its the first login!');
       toast({
         position: 'top',
         duration: 5_000,
@@ -29,6 +31,7 @@ export function useWelcomeToast() {
         )
       });
 
+      console.log('Clearing the local storage value!');
       localStorage.removeItem('selfSignupInitialLogin');
     }
   }, [toast, user]);

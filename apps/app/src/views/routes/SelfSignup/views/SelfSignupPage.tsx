@@ -54,10 +54,15 @@ export const SelfSignupPage = () => {
       sessionToken
     );
 
-    await wait(100);
-
     // set a flag in local storage to signify this is the inital login from self signup
     localStorage.setItem('selfSignupInitialLogin', 'true');
+
+    console.log(
+      'Successfully set selfSignupInitialLogin',
+      localStorage.getItem('selfSignupInitialLogin')
+    );
+
+    await wait(100);
 
     const queryParams = buildSignupContinueParams(state, values);
     window.location.href = `https://${auth0Config.domain}/continue?${queryParams}`;
