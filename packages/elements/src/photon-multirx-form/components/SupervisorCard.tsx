@@ -49,7 +49,9 @@ const SupervisorsQuery = gql`
 `;
 
 const displaySupervisor = (supervisor?: Supervisor) =>
-  `${supervisor?.fullName}, ${supervisor?.npi}`;
+  supervisor?.fullName && supervisor?.npi
+    ? `${supervisor.fullName}, ${supervisor.npi}`
+    : 'Select a supervisor';
 
 interface SupervisorCardProps {
   actions: Record<string, (...args: any) => any>;
@@ -59,7 +61,20 @@ interface SupervisorCardProps {
 export const SupervisorCard = (props: SupervisorCardProps) => {
   const client = usePhoton();
   const [supervisors, setSupervisors] = createSignal<Supervisor[]>([]);
+  const [query, setQuery] = createSignal<string>('');
   const supervisorMap = createMemo(() => Object.fromEntries(supervisors().map((s) => [s.id, s])));
+  const filteredSupervisors = createMemo(() => {
+    const q = query().toLowerCase();
+    if (!q) {
+      return supervisors();
+    }
+    return supervisors().filter(
+      (s) =>
+        s.fullName.toLowerCase().includes(q) ||
+        s.npi.toLowerCase().includes(q) ||
+        displaySupervisor(s).toLowerCase().includes(q)
+    );
+  });
 
   const { form, data, errors, validate } = createForm({
     onSubmit: () => {
@@ -74,11 +89,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
     } = await client.sdk.apolloClinical.query({ query: SupervisorsQuery });
 
     setSupervisors(supervisorsResult);
-    // TODO: use most recent supervisor instead
-    props.actions.updateFormValue({
-      key: 'supervisorId',
-      value: supervisorsResult[0]?.id
-    });
+    // TODO: set most recent supervisor if there is one
   });
 
   createEffect(() => {
@@ -113,16 +124,19 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
           <InputGroup label="Supervisor">
             <ComboBox
               value={supervisorMap()[props.store.supervisorId?.value]}
-              setSelected={(value: Supervisor) => {
+              setSelected={(value?: Supervisor) => {
                 props.actions.updateFormValue({
                   key: 'supervisorId',
-                  value: value.id
+                  value: value?.id || undefined
                 });
               }}
             >
-              <ComboBox.Input displayValue={(value) => displaySupervisor(value)} />
+              <ComboBox.Input
+                onInput={(e) => setQuery(e.currentTarget.value || '')}
+                displayValue={(value) => displaySupervisor(value)}
+              />
               <ComboBox.Options>
-                <For each={supervisors()}>
+                <For each={filteredSupervisors()}>
                   {(sup: Supervisor) => (
                     <ComboBox.Option key={sup.id} value={sup}>
                       {displaySupervisor(sup)}
