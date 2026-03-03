@@ -5,7 +5,8 @@ import * as path from 'path';
 const authFile = path.join(__dirname, './.auth/user.json');
 
 setup('authenticate', async ({ page }) => {
-  await page.goto(`/`);
+  // both boson and neutron have Auth0 connections named "e2e-test-users"
+  await page.goto(`/login?connection=e2e-test-users`);
   await expect(page).toHaveTitle(/Photon/);
   await page.getByRole('button', { name: 'Log in' }).click();
   await expect(page.getByText('Log in to continue to Photon Clinical App')).toBeVisible();
