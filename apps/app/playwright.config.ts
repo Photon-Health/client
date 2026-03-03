@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -14,7 +16,7 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL,
+    baseURL: baseUrl,
     trace: 'on-first-retry'
   },
   projects: [
@@ -28,10 +30,18 @@ export default defineConfig({
       dependencies: ['setup']
     }
   ],
-  webServer: {
-    command: 'nx start',
-    url: process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000
-  }
+  ...localDevServer()
 });
+
+function localDevServer(): { webServer: ReturnType<typeof defineConfig>['webServer'] } | {} {
+  if (!baseUrl.includes('localhost')) return {};
+  // for local dev, start (or re-use if running) the already running app
+  return {
+    webServer: {
+      command: 'nx start',
+      url: baseUrl,
+      reuseExistingServer: !process.env.CI,
+      timeout: 180_000
+    }
+  };
+}

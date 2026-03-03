@@ -5,6 +5,13 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "targets": {
+    "codegen:clinical-api": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/sdk",
+        "command": "npx graphql-codegen --config codegen.clinical-api.ts"
+      }
+    },
     "build": {
       "executor": "nx:run-commands",
       "options": {
@@ -13,18 +20,20 @@
           "rimraf dist",
           "tsc --emitDeclarationOnly --outDir dist",
           "vite build",
-          "cp src/types.ts dist/types.ts"
+          "cp src/types.ts dist/types.ts",
+          "cp src/graphql/clinical-api/gql/* dist/graphql/clinical-api/gql"
         ],
         "parallel": false
       },
-      "outputs": ["{workspaceRoot}/dist/packages/sdk"]
+      "dependsOn": ["codegen:clinical-api"]
     },
     "start": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/sdk",
         "command": "vite --port 3000"
-      }
+      },
+      "dependsOn": ["codegen:clinical-api"]
     },
     "lint": {
       "executor": "nx:run-commands",
@@ -45,7 +54,8 @@
       "options": {
         "cwd": "packages/sdk",
         "command": "npx tsc --noEmit"
-      }
+      },
+      "dependsOn": ["codegen:clinical-api"]
     }
   }
 }

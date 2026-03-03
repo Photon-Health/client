@@ -1,3 +1,4 @@
 node_modules
 dist
 *.tgz
+src/graphql/clinical-api/gql

@@ -1,31 +1,28 @@
 name: Playwright Smoke Tests
 on:
   repository_dispatch:
-    types:
-#      - codebuild-complete
-# todo: discuss with team when to run this workflow. (e.g. after client/backend deployments? before?)
+    types: [ smoke-test ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to test against'
+        type: choice
+        options:
+          - boson
+          - neutron
+        default: boson
 
 jobs:
   test:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    environment: ${{ github.event.client_payload.environment || inputs.environment || 'boson' }}
+    env:
+      TARGET_ENV: ${{ github.event.client_payload.environment || inputs.environment || 'boson' }}
 
     steps:
-      - name: Print CodeBuild completion event payload
-        run: |
-          echo "CodeBuild deployment completed"
-          echo "Branch Name: ${{ github.event.client_payload.branchName }}"
-
-      - name: Set playwright base url
-        uses: actions/github-script@v5
-        with:
-          script: |
-            const branchName = "${{github.event.client_payload.branchName}}"
-            const ref = branchName.replace(/\//g, "_")
-            const baseUrl = `https://app-${ref}.boson.health`
-            core.exportVariable('PLAYWRIGHT_BASE_URL', baseUrl);
-
       - uses: actions/checkout@v4
+
       - name: Use Node.js 20.x
         uses: actions/setup-node@v4
         with:
@@ -40,8 +37,12 @@ jobs:
 
       - name: Run Playwright tests
         run: |
-          echo "Running tests against $PLAYWRIGHT_BASE_URL"
+          echo "Running smoke tests against https://app.${TARGET_ENV}.health"
           npx nx run app:e2e:ci
+        env:
+          PLAYWRIGHT_BASE_URL: https://app.${{ env.TARGET_ENV }}.health
+          PLAYWRIGHT_E2E_ACCOUNT_USERNAME: ${{ secrets.PLAYWRIGHT_E2E_ACCOUNT_USERNAME }}
+          PLAYWRIGHT_E2E_ACCOUNT_PASSWORD: ${{ secrets.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
