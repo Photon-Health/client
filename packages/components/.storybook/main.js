@@ -1,7 +1,10 @@
-const { mergeConfig } = require('vite');
-const path = require('path');
+import { mergeConfig } from 'vite';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports = {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export default {
   async viteFinal(config, { configType }) {
     return mergeConfig(config, {
       define: { 'process.env': {} },
@@ -13,12 +16,7 @@ module.exports = {
     });
   },
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
-  addons: [
-    '@storybook/addon-actions',
-    '@storybook/addon-links',
-    '@storybook/addon-essentials',
-    '@storybook/addon-interactions'
-  ],
+  addons: [],
   framework: '@storybook/html-vite',
   docs: {
     autodocs: 'tag'
