@@ -41,7 +41,7 @@ jobs:
           npx nx run app:e2e:ci
         env:
           PLAYWRIGHT_BASE_URL: https://app.${{ env.TARGET_ENV }}.health
-          PLAYWRIGHT_E2E_ACCOUNT_USERNAME: ${{ secrets.PLAYWRIGHT_E2E_ACCOUNT_USERNAME }}
+          PLAYWRIGHT_E2E_ACCOUNT_USERNAME: ${{ vars.PLAYWRIGHT_E2E_ACCOUNT_USERNAME }}
           PLAYWRIGHT_E2E_ACCOUNT_PASSWORD: ${{ secrets.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD }}
 
       - uses: actions/upload-artifact@v4
