@@ -245,5 +245,9 @@ const organizationSettings: {
   // openloop
   org_Oxc0CSPfdiyWW3VM: {
     provider: [NOVOCARE_PHARMACY_ID]
+  },
+  // Form Health
+  org_vhFRkpsq7JXLxjXr: {
+    provider: [GIFTHEALTH_PHARMACY_ID]
   }
 };
