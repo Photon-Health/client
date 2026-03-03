@@ -178,6 +178,8 @@ const mailOrderProviders = getOrgMailOrderPharms(user?.org_id)?.provider;
 
 Environment is selected via `env-cmd -f .env.<name>` in Nx targets.
 
+**Nx automatic `.env` loading:** Nx automatically loads `.env.local` (and other `.env` files) from the project root before running any target. Variables loaded first take precedence — Nx won't overwrite a variable already set in the process. This means `.env.local` values are available to all Nx targets without explicit `env-cmd` references. For example, Playwright credentials (`PLAYWRIGHT_E2E_ACCOUNT_USERNAME`, `PLAYWRIGHT_E2E_ACCOUNT_PASSWORD`) and `PLAYWRIGHT_BASE_URL` stored in `apps/app/.env.local` are automatically available when running `nx run app:e2e`, even though that target only explicitly loads `.env.boson` via `env-cmd`.
+
 ### Backend APIs
 
 The platform has two backend API layers. The SDK (`packages/sdk`) maintains separate Apollo clients for each:
