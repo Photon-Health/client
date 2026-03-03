@@ -27,15 +27,10 @@ import {
   useRecentOrders
 } from '@photonhealth/components';
 import { types } from '@photonhealth/sdk';
-import {
-  Prescription,
-  PrescriptionState,
-  Supervisor,
-  SupervisorInput
-} from '@photonhealth/sdk/dist/types';
+import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
-import { SupervisorCard, supervisorValidatorKeys } from './SupervisorCard';
+import { SupervisorCard } from './SupervisorCard';
 
 const hasUsableAddress = (address?: {
   street1?: string;
@@ -132,16 +127,6 @@ export const ScreenDraftedPrescriptionsQuery = gql`
     }
   }
 `;
-
-const CreateSupervisorMutation = gql`
-  mutation CreateSupervisorMutation($fullName: String!, $npi: String!) {
-    createSupervisor(input: { fullName: $fullName, npi: $npi }) {
-      id
-    }
-  }
-`;
-
-type CreateSupervisorMutationResult = { createSupervisor: Pick<Supervisor, 'id'> };
 
 const MeUserQuery = gql`
   query MeUserQuery {
@@ -263,7 +248,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       state: me.address.state
     });
     setNeedsSupervisor(needsSupervisorResult);
-    console.log({ needsSupervisor: needsSupervisorResult });
   });
 
   createEffect(() => {
@@ -419,12 +403,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
     const requiresAddress =
       props.enableOrder && (!props.optionalPatientAddress || hasPreferredPharmacy());
-    const requiresSupervisor = props.enableOrder && needsSupervisor();
-    const keys = [
-      'patient',
-      ...(requiresAddress ? ['address'] : []),
-      ...(requiresSupervisor ? supervisorValidatorKeys : [])
-    ];
+    const keys = ['patient', ...(requiresAddress ? ['address'] : [])];
     props.formActions.validate(keys);
     const errors = props.formActions.getErrors(keys);
     console.log(errors);
@@ -516,27 +495,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         pharmacyId = '';
       }
 
-      let supervisorId: string | undefined;
-      if (needsSupervisor() && props.formStore.supervisorId?.value) {
-        supervisorId = props.formStore.supervisorId.value;
-      } else if (
-        needsSupervisor() &&
-        props.formStore.supervisorFullName?.value &&
-        props.formStore.supervisorNpi?.value
-      ) {
-        const { data } = await clinicalClient.mutate<
-          CreateSupervisorMutationResult,
-          SupervisorInput
-        >({
-          mutation: CreateSupervisorMutation,
-          variables: {
-            fullName: props.formStore.supervisorFullName.value,
-            npi: props.formStore.supervisorNpi.value
-          }
-        });
-        supervisorId = data?.createSupervisor.id;
-      }
-
+      const supervisorId =
+        needsSupervisor() && props.formStore.supervisorId?.value
+          ? props.formStore.supervisorId.value
+          : undefined;
       console.log({ supervisorId });
 
       const testing = true;
@@ -556,7 +518,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             fills: prescriptionIds().map((id) => ({
               prescriptionId: id
             })),
-            supervisorId: supervisorId || undefined
+            supervisorId: supervisorId
           },
           refetchQueries: [],
           awaitRefetchQueries: false

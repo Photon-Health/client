@@ -1,42 +1,19 @@
 import * as zod from 'zod';
-import { Card, ComboBox, Input, InputGroup, Text, usePhoton } from '@photonhealth/components';
-import { createEffect, createMemo, createSignal, For, onMount, Show } from 'solid-js';
+import {
+  Button,
+  Card,
+  ComboBox,
+  Input,
+  InputGroup,
+  Text,
+  triggerToast,
+  usePhoton
+} from '@photonhealth/components';
+import { createMemo, createSignal, For, onMount, Show } from 'solid-js';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
 import gql from 'graphql-tag';
-
-type Supervisor = {
-  id: string;
-  fullName: string;
-  npi: string;
-};
-
-const supervisorSchema = zod
-  .object({
-    supervisorFullName: zod.string().optional(),
-    supervisorNpi: zod
-      .union([zod.literal(''), zod.string().regex(/^[0-9]+$/, 'Enter a valid NPI')])
-      .optional()
-  })
-  .superRefine((data, ctx) => {
-    if (!!data.supervisorFullName && !data.supervisorNpi) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'NPI is required when Full Name is filled out',
-        path: ['supervisorNpi']
-      });
-    }
-
-    if (!data.supervisorFullName && !!data.supervisorNpi) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Full Name is required when NPI is filled out',
-        path: ['supervisorFullName']
-      });
-    }
-  });
-
-export const supervisorValidatorKeys = ['supervisorFullName', 'supervisorNpi'];
+import { Supervisor } from '@photonhealth/sdk/dist/types';
 
 const SupervisorsQuery = gql`
   query SupervisorsQuery {
@@ -76,40 +53,12 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
     );
   });
 
-  const { form, data, errors, validate } = createForm({
-    onSubmit: () => {
-      // form only handles validation and state management
-    },
-    extend: validator({ schema: supervisorSchema })
-  });
-
   onMount(async () => {
     const {
       data: { supervisors: supervisorsResult }
     } = await client.sdk.apolloClinical.query({ query: SupervisorsQuery });
-
     setSupervisors(supervisorsResult);
     // TODO: set most recent supervisor if there is one
-  });
-
-  createEffect(() => {
-    props.actions.updateFormValue({
-      key: 'supervisorFullName',
-      value: data().supervisorFullName
-    });
-    props.actions.updateFormError({
-      key: 'supervisorFullName',
-      error: errors().supervisorFullName?.[0]
-    });
-
-    props.actions.updateFormValue({
-      key: 'supervisorNpi',
-      value: data().supervisorNpi
-    });
-    props.actions.updateFormError({
-      key: 'supervisorNpi',
-      error: errors().supervisorNpi?.[0]
-    });
   });
 
   return (
@@ -147,15 +96,109 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
             </ComboBox>
           </InputGroup>
         </Show>
-        <form ref={form}>
-          <InputGroup label="Full Name" error={errors().supervisorFullName?.[0]}>
-            <Input name="supervisorFullName" onInput={validate} />
-          </InputGroup>
-          <InputGroup label="NPI" error={errors().supervisorNpi?.[0]}>
-            <Input name="supervisorNpi" onInput={validate} />
-          </InputGroup>
-        </form>
+        <NewSupervisorForm
+          onCreated={(supervisor) => {
+            setSupervisors((prev) => [...prev, supervisor]);
+            props.actions.updateFormValue({ key: 'supervisorId', value: supervisor.id });
+          }}
+        />
       </div>
     </Card>
+  );
+};
+
+const supervisorSchema = zod
+  .object({
+    supervisorFullName: zod.string().optional(),
+    supervisorNpi: zod
+      .union([zod.literal(''), zod.string().regex(/^[0-9]+$/, 'Enter a valid NPI')])
+      .optional()
+  })
+  .superRefine((data, ctx) => {
+    if (!!data.supervisorFullName && !data.supervisorNpi) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'NPI is required when Full Name is filled out',
+        path: ['supervisorNpi']
+      });
+    }
+
+    if (!data.supervisorFullName && !!data.supervisorNpi) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Full Name is required when NPI is filled out',
+        path: ['supervisorFullName']
+      });
+    }
+  });
+
+const CreateSupervisorMutation = gql`
+  mutation CreateSupervisorMutation($fullName: String!, $npi: String!) {
+    createSupervisor(input: { fullName: $fullName, npi: $npi }) {
+      id
+      fullName
+      npi
+    }
+  }
+`;
+
+type CreateSupervisorResult = { createSupervisor: Supervisor };
+
+interface NewSupervisorFormProps {
+  onCreated: (supervisor: Supervisor) => void;
+}
+
+const NewSupervisorForm = (props: NewSupervisorFormProps) => {
+  const client = usePhoton();
+  const formId = 'new-supervisor-form';
+  const [submitting, setSubmitting] = createSignal(false);
+
+  const { form, errors, validate, isValid } = createForm({
+    onSubmit: async (values) => {
+      setSubmitting(true);
+      try {
+        const { data } = await client.sdk.apolloClinical.mutate<CreateSupervisorResult>({
+          mutation: CreateSupervisorMutation,
+          variables: {
+            fullName: values.supervisorFullName,
+            npi: values.supervisorNpi
+          }
+        });
+        if (data?.createSupervisor) {
+          props.onCreated(data.createSupervisor);
+        }
+      } catch (e) {
+        triggerToast({
+          header: 'Error creating supervisor',
+          body: 'Please try again.',
+          status: 'error'
+        });
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    extend: validator({ schema: supervisorSchema })
+  });
+
+  return (
+    <form ref={form} id={formId}>
+      <InputGroup label="Full Name" error={errors().supervisorFullName?.[0]}>
+        <Input name="supervisorFullName" onInput={validate} />
+      </InputGroup>
+      <InputGroup label="NPI" error={errors().supervisorNpi?.[0]}>
+        <Input name="supervisorNpi" onInput={validate} />
+      </InputGroup>
+      <div class="flex justify-end">
+        <Button
+          type="submit"
+          form={formId}
+          variant={'secondary'}
+          disabled={submitting() || !isValid()}
+          loading={submitting()}
+        >
+          Add supervisor
+        </Button>
+      </div>
+    </form>
   );
 };
