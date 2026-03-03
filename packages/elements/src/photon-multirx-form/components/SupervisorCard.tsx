@@ -9,7 +9,7 @@ import {
   triggerToast,
   usePhoton
 } from '@photonhealth/components';
-import { createMemo, createSignal, For, onMount, Show } from 'solid-js';
+import { createMemo, createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
 import gql from 'graphql-tag';
@@ -25,6 +25,9 @@ const SupervisorsQuery = gql`
   }
 `;
 
+const sortSupervisors = (supervisors: Supervisor[]) =>
+  [...supervisors].sort((a, b) => a.fullName.localeCompare(b.fullName));
+
 const displaySupervisor = (supervisor?: Supervisor) =>
   supervisor?.fullName && supervisor?.npi
     ? `${supervisor.fullName}, ${supervisor.npi}`
@@ -39,7 +42,9 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
   const client = usePhoton();
   const [supervisors, setSupervisors] = createSignal<Supervisor[]>([]);
   const [query, setQuery] = createSignal<string>('');
-  const supervisorMap = createMemo(() => Object.fromEntries(supervisors().map((s) => [s.id, s])));
+  const currentSupervisor = createMemo(() =>
+    supervisors().find((s) => s.id === props.store.supervisorId?.value)
+  );
   const filteredSupervisors = createMemo(() => {
     const q = query().toLowerCase();
     if (!q) {
@@ -57,7 +62,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
     const {
       data: { supervisors: supervisorsResult }
     } = await client.sdk.apolloClinical.query({ query: SupervisorsQuery });
-    setSupervisors(supervisorsResult);
+    setSupervisors(sortSupervisors(supervisorsResult));
     // TODO: set most recent supervisor if there is one
   });
 
@@ -72,7 +77,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
         <Show when={supervisors().length > 0}>
           <InputGroup label="Supervisor">
             <ComboBox
-              value={supervisorMap()[props.store.supervisorId?.value]}
+              value={currentSupervisor()}
               setSelected={(value?: Supervisor) => {
                 props.actions.updateFormValue({
                   key: 'supervisorId',
@@ -98,7 +103,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
         </Show>
         <NewSupervisorForm
           onCreated={(supervisor) => {
-            setSupervisors((prev) => [...prev, supervisor]);
+            setSupervisors((prev) => sortSupervisors([...prev, supervisor]));
             props.actions.updateFormValue({ key: 'supervisorId', value: supervisor.id });
           }}
         />
@@ -150,7 +155,7 @@ interface NewSupervisorFormProps {
 
 const NewSupervisorForm = (props: NewSupervisorFormProps) => {
   const client = usePhoton();
-  const formId = 'new-supervisor-form';
+  const formId = createUniqueId();
   const [submitting, setSubmitting] = createSignal(false);
 
   const { form, errors, validate, isValid } = createForm({
