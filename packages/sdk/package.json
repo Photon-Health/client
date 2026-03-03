@@ -1,6 +1,6 @@
 {
   "name": "@photonhealth/sdk",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "main": "dist/lib.js",
   "scripts": {
     "build": "npx nx run sdk:build",
@@ -37,6 +37,10 @@
     },
     "./dist/types": {
       "import": "./dist/types.ts"
+    },
+    "./dist/graphql/clinical-api/gql/*": {
+      "types": "./dist/graphql/clinical-api/gql/*.d.ts",
+      "import": "./dist/graphql/clinical-api/gql/*"
     }
   },
   "types": "./dist/lib.d.ts",

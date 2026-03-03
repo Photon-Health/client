@@ -18,9 +18,9 @@ import {
   lambdasApiUrl
 } from './utils';
 import pkg from '../package.json';
-
 export * as types from './types';
 export * as fragments from './fragments';
+export * from './graphql/clinical-api/query';
 export type {
   FieldCompletionSnapshot,
   PatientFormTrackEventType,

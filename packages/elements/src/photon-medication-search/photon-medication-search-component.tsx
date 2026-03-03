@@ -4,22 +4,18 @@ import { createEffect, createMemo, createSignal, onMount, Show } from 'solid-js'
 
 // Photon
 import { usePhoton } from '@photonhealth/components';
+import { SearchTreatmentOptionsQuery } from '@photonhealth/sdk';
+import { Treatment } from '@photonhealth/sdk/dist/graphql/clinical-api/gql/graphql';
 import { PhotonMedicationDropdownFullWidth } from '../photon-medication-dropdown-full-width';
 import { PhotonMedicationDropdown } from '../photon-medication-dropdown';
 import { PhotonDropdown } from '../photon-dropdown';
 
 // Types
-import {
-  Medication,
-  PrescriptionTemplate,
-  Treatment,
-  TreatmentOption
-} from '@photonhealth/sdk/dist/types';
+import { Medication, PrescriptionTemplate, TreatmentOption } from '@photonhealth/sdk/dist/types';
 import { CatalogStore } from '../stores/catalog';
 import { DisableList } from '../photon-multirx-form/components/PrescribeWorkflow';
 
 import { ApolloClient } from '@apollo/client';
-import gql from 'graphql-tag';
 
 // Utility Functions
 
@@ -85,16 +81,6 @@ type DataReturn<Type> = {
   error?: any;
   errors?: readonly any[];
 };
-
-const SearchTreatmentOptionsQuery = gql`
-  query SearchTreatments($filter: TreatmentFilter!) {
-    treatments(filter: $filter) {
-      __typename
-      id
-      name
-    }
-  }
-`;
 
 const searchTreatmentOptions = async (
   client: ApolloClient<any>,
