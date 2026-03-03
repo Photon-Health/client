@@ -8,7 +8,7 @@ import {
   PrescriptionState,
   SexType,
   Treatment
-} from '@photonhealth/sdk/src/types';
+} from '@photonhealth/sdk/dist/types';
 import { MedHistoryPrescription } from '../systems/PatientMedHistory';
 
 export function createTestPatient(): Patient {

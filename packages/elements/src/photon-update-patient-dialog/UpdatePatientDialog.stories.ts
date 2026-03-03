@@ -1,4 +1,4 @@
-import { Story, Meta } from '@storybook/html';
+import { Meta, StoryFn } from '@storybook/html';
 import '../photon-client';
 import '.';
 
@@ -9,7 +9,7 @@ export default {
   argTypes: {}
 } as Meta;
 
-const Template: Story = ({ open }) => {
+const Template: StoryFn = ({ open }) => {
   const div = document.createElement('div');
   div.innerHTML = `
     <photon-client

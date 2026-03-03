@@ -1,4 +1,4 @@
-import { Story, Meta } from '@storybook/html';
+import { StoryFn, Meta } from '@storybook/html';
 import '../photon-client';
 import '.';
 
@@ -14,7 +14,7 @@ export default {
   }
 } as Meta;
 
-const Template: Story = ({
+const Template: StoryFn = ({
   label = undefined,
   required = false,
   invalid = false,
