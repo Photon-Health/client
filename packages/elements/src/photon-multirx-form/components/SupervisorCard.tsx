@@ -1,9 +1,15 @@
 import * as zod from 'zod';
-import { Card, Input, InputGroup, Text, usePhoton } from '@photonhealth/components';
-import { createEffect, onMount } from 'solid-js';
+import { Card, ComboBox, Input, InputGroup, Text, usePhoton } from '@photonhealth/components';
+import { createEffect, createMemo, createSignal, For, onMount, Show } from 'solid-js';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
 import gql from 'graphql-tag';
+
+type Supervisor = {
+  id: string;
+  fullName: string;
+  npi: string;
+};
 
 const supervisorSchema = zod
   .object({
@@ -42,6 +48,9 @@ const SupervisorsQuery = gql`
   }
 `;
 
+const displaySupervisor = (supervisor?: Supervisor) =>
+  `${supervisor?.fullName}, ${supervisor?.npi}`;
+
 interface SupervisorCardProps {
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
@@ -49,18 +58,27 @@ interface SupervisorCardProps {
 
 export const SupervisorCard = (props: SupervisorCardProps) => {
   const client = usePhoton();
+  const [supervisors, setSupervisors] = createSignal<Supervisor[]>([]);
+  const supervisorMap = createMemo(() => Object.fromEntries(supervisors().map((s) => [s.id, s])));
 
-  onMount(async () => {
-    const {
-      data: { supervisors }
-    } = await client.sdk.apolloClinical.query({ query: SupervisorsQuery });
-    console.log({ supervisors });
-  });
   const { form, data, errors, validate } = createForm({
     onSubmit: () => {
       // form only handles validation and state management
     },
     extend: validator({ schema: supervisorSchema })
+  });
+
+  onMount(async () => {
+    const {
+      data: { supervisors: supervisorsResult }
+    } = await client.sdk.apolloClinical.query({ query: SupervisorsQuery });
+
+    setSupervisors(supervisorsResult);
+    // TODO: use most recent supervisor instead
+    props.actions.updateFormValue({
+      key: 'supervisorId',
+      value: supervisorsResult[0]?.id
+    });
   });
 
   createEffect(() => {
@@ -86,18 +104,44 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
   return (
     <Card addChildrenDivider={true} class="pb-2">
       <Text color="gray">Supervising Physician</Text>
-      <form ref={form}>
-        <Text size="sm" color="black">
+      <div>
+        <Text size="sm" color="black" class="pb-2">
           Some pharmacies require supervising physician information for this prescription. Adding it
           here can help avoid callbacks and delays.
         </Text>
-        <InputGroup label="Full Name" error={errors().supervisorFullName?.[0]}>
-          <Input name="supervisorFullName" onInput={validate} />
-        </InputGroup>
-        <InputGroup label="NPI" error={errors().supervisorNpi?.[0]}>
-          <Input name="supervisorNpi" onInput={validate} />
-        </InputGroup>
-      </form>
+        <Show when={supervisors().length > 0}>
+          <InputGroup label="Supervisor">
+            <ComboBox
+              value={supervisorMap()[props.store.supervisorId?.value]}
+              setSelected={(value: Supervisor) => {
+                props.actions.updateFormValue({
+                  key: 'supervisorId',
+                  value: value.id
+                });
+              }}
+            >
+              <ComboBox.Input displayValue={(value) => displaySupervisor(value)} />
+              <ComboBox.Options>
+                <For each={supervisors()}>
+                  {(sup: Supervisor) => (
+                    <ComboBox.Option key={sup.id} value={sup}>
+                      {displaySupervisor(sup)}
+                    </ComboBox.Option>
+                  )}
+                </For>
+              </ComboBox.Options>
+            </ComboBox>
+          </InputGroup>
+        </Show>
+        <form ref={form}>
+          <InputGroup label="Full Name" error={errors().supervisorFullName?.[0]}>
+            <Input name="supervisorFullName" onInput={validate} />
+          </InputGroup>
+          <InputGroup label="NPI" error={errors().supervisorNpi?.[0]}>
+            <Input name="supervisorNpi" onInput={validate} />
+          </InputGroup>
+        </form>
+      </div>
     </Card>
   );
 };
