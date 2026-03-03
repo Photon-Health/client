@@ -50,6 +50,7 @@ export const Login = () => {
     // e2e tests to get to an auth0 login page with only the username/password fields.
     // When not specifying a connection in Neutron, for example, auth0 shows email/password by default
     // since we have an email/password db connection for some customer testing.
+    // Doing an allowList because we aren't necessarily ready to open up connection-based login for the whole world.
     const allowedConnections = ['e2e-test-users'];
     if (connection && allowedConnections.includes(connection)) {
       loginOptions.connection = connection;
