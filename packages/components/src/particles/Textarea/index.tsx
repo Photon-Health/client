@@ -10,6 +10,7 @@ type TextareaProps = {
   value?: string;
   disabled?: boolean;
   onInput?: (value: string) => void;
+  onBlur?: (value: string) => void;
 };
 
 export default function Textarea(props: TextareaProps) {
@@ -48,6 +49,7 @@ export default function Textarea(props: TextareaProps) {
       placeholder={merged.placeholder}
       value={merged.value}
       onInput={(e) => props.onInput?.(e.currentTarget.value)}
+      onBlur={(e) => props.onBlur?.(e.currentTarget.value)}
       class={textareaClass()}
     />
   );
