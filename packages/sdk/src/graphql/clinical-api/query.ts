@@ -18,3 +18,27 @@ export const SearchTreatmentOptionsQuery = graphql(`
     }
   }
 `);
+
+graphql(`
+  fragment SupervisorCard on Supervisor {
+    id
+    fullName
+    npi
+  }
+`);
+
+export const SupervisorsQuery = graphql(`
+  query SupervisorsQuery {
+    supervisors {
+      ...SupervisorCard
+    }
+  }
+`);
+
+export const CreateSupervisorMutation = graphql(`
+  mutation CreateSupervisorMutation($fullName: String!, $npi: String!) {
+    createSupervisor(input: { fullName: $fullName, npi: $npi }) {
+      ...SupervisorCard
+    }
+  }
+`);

@@ -970,16 +970,3 @@ const PERMISSIONS_ARR = [
 ] as const;
 
 export type Permission = (typeof PERMISSIONS_ARR)[number];
-
-export type Supervisor = {
-  __typename?: 'Supervisor';
-  fullName: Scalars['String'];
-  id: Scalars['ID'];
-  npi: Scalars['String'];
-  orgId: Scalars['String'];
-};
-
-export type SupervisorInput = {
-  fullName: Scalars['String'];
-  npi: Scalars['String'];
-};

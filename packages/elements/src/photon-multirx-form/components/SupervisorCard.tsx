@@ -13,23 +13,13 @@ import {
 import { createMemo, createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
-import gql from 'graphql-tag';
-import { Supervisor } from '@photonhealth/sdk/dist/types';
+import { CreateSupervisorMutation, SupervisorsQuery } from '@photonhealth/sdk';
+import { SupervisorCardFragment } from '@photonhealth/sdk/dist/clinical-api/types';
 
-const SupervisorsQuery = gql`
-  query SupervisorsQuery {
-    supervisors {
-      id
-      fullName
-      npi
-    }
-  }
-`;
-
-const sortSupervisors = (supervisors: Supervisor[]) =>
+const sortSupervisors = (supervisors: SupervisorCardFragment[]) =>
   [...supervisors].sort((a, b) => a.fullName.localeCompare(b.fullName));
 
-const displaySupervisor = (supervisor?: Supervisor) =>
+const displaySupervisor = (supervisor?: SupervisorCardFragment) =>
   supervisor?.fullName && supervisor?.npi
     ? `${supervisor.fullName}, ${supervisor.npi}`
     : 'Select a supervisor';
@@ -41,7 +31,7 @@ interface SupervisorCardProps {
 
 export const SupervisorCard = (props: SupervisorCardProps) => {
   const client = usePhoton();
-  const [supervisors, setSupervisors] = createSignal<Supervisor[]>([]);
+  const [supervisors, setSupervisors] = createSignal<SupervisorCardFragment[]>([]);
   const [query, setQuery] = createSignal<string>('');
   const currentSupervisor = createMemo(() =>
     supervisors().find((s) => s.id === props.store.supervisorId?.value)
@@ -60,9 +50,8 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
   });
 
   onMount(async () => {
-    const {
-      data: { supervisors: supervisorsResult }
-    } = await client.sdk.apolloClinical.query({ query: SupervisorsQuery });
+    const { data } = await client.sdk.apolloClinical.query({ query: SupervisorsQuery });
+    const supervisorsResult = data.supervisors.filter((s) => !!s);
     setSupervisors(sortSupervisors(supervisorsResult));
     // TODO: set most recent supervisor if there is one
   });
@@ -79,7 +68,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
           <InputGroup label="Supervisor">
             <ComboBox
               value={currentSupervisor()}
-              setSelected={(value?: Supervisor) => {
+              setSelected={(value?: SupervisorCardFragment) => {
                 props.actions.updateFormValue({
                   key: 'supervisorId',
                   value: value?.id || undefined
@@ -92,7 +81,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
               />
               <ComboBox.Options>
                 <For each={filteredSupervisors()}>
-                  {(sup: Supervisor) => (
+                  {(sup: SupervisorCardFragment) => (
                     <ComboBox.Option key={sup.id} value={sup}>
                       {displaySupervisor(sup)}
                     </ComboBox.Option>
@@ -139,21 +128,9 @@ const supervisorSchema = zod
     }
   });
 
-const CreateSupervisorMutation = gql`
-  mutation CreateSupervisorMutation($fullName: String!, $npi: String!) {
-    createSupervisor(input: { fullName: $fullName, npi: $npi }) {
-      id
-      fullName
-      npi
-    }
-  }
-`;
-
-type CreateSupervisorResult = { createSupervisor: Supervisor };
-
 interface NewSupervisorFormProps {
   hasSupervisors: boolean;
-  onCreated: (supervisor: Supervisor) => void;
+  onCreated: (supervisor: SupervisorCardFragment) => void;
 }
 
 const NewSupervisorForm = (props: NewSupervisorFormProps) => {
@@ -167,7 +144,7 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
       setSubmitting(true);
       validate();
       try {
-        const { data } = await client.sdk.apolloClinical.mutate<CreateSupervisorResult>({
+        const { data } = await client.sdk.apolloClinical.mutate({
           mutation: CreateSupervisorMutation,
           variables: {
             fullName: values.supervisorFullName,
