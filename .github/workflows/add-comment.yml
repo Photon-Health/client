@@ -2,7 +2,10 @@ name: Post Testing Link in Comment
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [ opened, reopened ]
+
+permissions:
+  pull-requests: write
 
 jobs:
   comment:
@@ -23,11 +26,11 @@ jobs:
 
             const message = `
               To see this branch's clinical app [click here](https://app-${ref}.boson.health)
-              
-              To see this branch's patient app [click here](https://orders-${ref}.boson.health). 
+
+              To see this branch's patient app [click here](https://orders-${ref}.boson.health).
               Then open a boson test text from \`#test-text\` and copy the url
             `.trim()
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
