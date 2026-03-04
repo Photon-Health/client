@@ -13,6 +13,7 @@ import GenderSelect, { GENDER_OPTIONS } from './particles/GenderSelect';
 import Banner from './particles/Banner';
 import DoseCalculator from './systems/DoseCalculator';
 import Card from './particles/Card';
+import Collapsible from './particles/Collapsible';
 import ComboBox from './particles/ComboBox';
 import {
   DraftPrescriptionList,
@@ -91,6 +92,7 @@ export {
   GENDER_OPTIONS,
   Button,
   Card,
+  Collapsible,
   ComboBox,
   Dialog,
   DoseCalculator,
