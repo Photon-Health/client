@@ -9,7 +9,14 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/sdk",
-        "command": "npx graphql-codegen --config codegen.clinical-api.ts"
+        "command": "env-cmd -f .env.boson npx graphql-codegen --config codegen.clinical-api.ts"
+      }
+    },
+    "codegen:clinical-api:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/sdk",
+        "command": "env-cmd -f .env.tau npx graphql-codegen --config codegen.clinical-api.ts"
       }
     },
     "build": {
@@ -21,7 +28,7 @@
           "tsc --emitDeclarationOnly --outDir dist",
           "vite build",
           "cp src/types.ts dist/types.ts",
-          "cp src/graphql/clinical-api/gql/* dist/graphql/clinical-api/gql"
+          "cp src/graphql/clinical-api/gql/graphql.ts dist/graphql/clinical-api/gql/graphql.ts"
         ],
         "parallel": false
       },
