@@ -22,7 +22,7 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import tailwind from '../tailwind.css?inline';
 import styles from './styles.css?inline';
 import { SearchTreatmentsQuery } from '@photonhealth/sdk';
-import { Treatment } from '@photonhealth/sdk/dist/graphql/clinical-api/gql/graphql';
+import { Treatment } from '@photonhealth/sdk/dist/clinical-api/types';
 
 type AddMedicationHistoryDialogProps = {
   open: boolean;
