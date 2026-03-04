@@ -175,9 +175,9 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
       openLabel="Cancel"
       alwaysOpen={!props.hasSupervisors}
       isOpen={isOpen()}
-      onOpenChange={(value) => {
-        setIsOpen(value);
-        if (!isOpen()) {
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) {
           reset();
         }
       }}

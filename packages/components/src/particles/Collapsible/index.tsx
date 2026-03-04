@@ -16,10 +16,12 @@ export interface CollapsibleProps {
 
 export default function Collapsible(preProps: CollapsibleProps) {
   const props = mergeProps({ defaultOpen: false }, preProps);
-  const [internalOpen, setInternalOpen] = createSignal(props.defaultOpen);
+  const [internalOpen, setInternalOpen] = createSignal<boolean>(props.defaultOpen);
   const contentId = createUniqueId();
 
-  const isOpen = () => props.alwaysOpen || props.isOpen || internalOpen();
+  // Use nullish operator so controlled props.isOpen
+  // always takes precedence over uncontrolled internalOpen
+  const isOpen = () => props.alwaysOpen || (props.isOpen ?? internalOpen());
 
   return (
     <>
@@ -32,8 +34,8 @@ export default function Collapsible(preProps: CollapsibleProps) {
           )}
           onClick={() => {
             const result = !isOpen();
-            setInternalOpen(result);
             props.onOpenChange?.(result);
+            setInternalOpen(result);
           }}
           aria-expanded={isOpen() ? 'true' : 'false'}
           aria-controls={contentId}
