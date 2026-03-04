@@ -38,9 +38,8 @@
     "./dist/types": {
       "import": "./dist/types.ts"
     },
-    "./dist/graphql/clinical-api/gql/*": {
-      "types": "./dist/graphql/clinical-api/gql/*.d.ts",
-      "import": "./dist/graphql/clinical-api/gql/*"
+    "./dist/clinical-api/types": {
+      "import": "./dist/graphql/clinical-api/gql/graphql.ts"
     }
   },
   "types": "./dist/lib.d.ts",
