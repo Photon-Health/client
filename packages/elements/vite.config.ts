@@ -2,7 +2,6 @@
 import path from 'path';
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 import typescript from '@rollup/plugin-typescript';
 import replace from '@rollup/plugin-replace';
 
@@ -12,14 +11,6 @@ const resolvePath = (str: string) => path.resolve(__dirname, str);
 export default defineConfig({
   plugins: [
     solidPlugin(),
-    viteStaticCopy({
-      targets: [
-        {
-          src: resolvePath('node_modules/@shoelace-style/shoelace/dist/assets'),
-          dest: resolvePath('dist/shoelace')
-        }
-      ]
-    }),
     typescript({
       target: 'esnext',
       rootDir: resolvePath('./src'),
