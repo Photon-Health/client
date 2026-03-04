@@ -5,7 +5,7 @@ import { createEffect, createMemo, createSignal, onMount, Show } from 'solid-js'
 // Photon
 import { usePhoton } from '@photonhealth/components';
 import { SearchTreatmentOptionsQuery } from '@photonhealth/sdk';
-import { Treatment } from '@photonhealth/sdk/dist/graphql/clinical-api/gql/graphql';
+import { Treatment } from '@photonhealth/sdk/dist/clinical-api/types';
 import { PhotonMedicationDropdownFullWidth } from '../photon-medication-dropdown-full-width';
 import { PhotonMedicationDropdown } from '../photon-medication-dropdown';
 import { PhotonDropdown } from '../photon-dropdown';
