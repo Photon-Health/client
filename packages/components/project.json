@@ -12,18 +12,16 @@
         "command": "vite build && npx tailwindcss -i ./src/index.css -o ./dist/style.css"
       }
     },
-    "test-watch": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "packages/components",
-        "command": "vitest"
-      }
-    },
     "test": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/components",
-        "command": "vitest run"
+        "commands": [
+          "npx tailwindcss -i ./src/index.css -o ./src/style.css",
+          "vitest run",
+          "rimraf ./src/style.css"
+        ],
+        "parallel": false
       }
     },
     "build-storybook": {
