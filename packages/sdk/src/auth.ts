@@ -4,7 +4,6 @@ import {
   GetTokenSilentlyOptions,
   GetTokenWithPopupOptions,
   RedirectLoginOptions,
-  RedirectLoginResult,
   User
 } from '@auth0/auth0-spa-js';
 
@@ -227,7 +226,7 @@ export class AuthManager {
    * @param url - The url which contains the code and state parameters (defaults to window.location.href)
    * @returns
    */
-  public async handleRedirect(url?: string): Promise<RedirectLoginResult<any> | undefined> {
+  public async handleRedirect(url?: string) {
     try {
       return this.authentication.handleRedirectCallback(url);
     } catch (err) {
