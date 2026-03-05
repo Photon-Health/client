@@ -293,7 +293,7 @@ export class PhotonClientStore {
           const token = await this.sdk.authentication.getAccessToken();
           const decoded: { permissions: Permission[] } = jwtDecode(token);
           permissions = decoded?.permissions || [];
-        } catch (err) {
+        } catch (_err) {
           permissions = [];
         }
       }
@@ -308,7 +308,7 @@ export class PhotonClientStore {
         isInOrg: isInOrg,
         permissions: permissions || []
       });
-    } catch (e) {
+    } catch (_e) {
       this.setStore('authentication', {
         ...this.store.authentication,
         isLoading: false

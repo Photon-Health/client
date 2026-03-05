@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default {
-  async viteFinal(config, { configType }) {
+  async viteFinal(config, { configType: _configType }) {
     return mergeConfig(config, {
       define: { 'process.env': {} },
       resolve: {
