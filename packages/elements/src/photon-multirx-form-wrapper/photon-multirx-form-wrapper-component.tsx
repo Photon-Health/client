@@ -1,8 +1,8 @@
 import {
   Button,
+  dispatchAnalyticsTrackEvent,
   triggerToast,
-  usePhoton,
-  dispatchAnalyticsTrackEvent
+  usePhoton
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { types } from '@photonhealth/sdk';

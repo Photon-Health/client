@@ -1,8 +1,8 @@
 import {
   DraftPrescriptionsProvider,
+  PrescribeEventDispatchProvider,
   PrescribeProvider,
   RecentOrders,
-  PrescribeEventDispatchProvider,
   TemplateOverrides
 } from '@photonhealth/components';
 import { customElement } from 'solid-element';
