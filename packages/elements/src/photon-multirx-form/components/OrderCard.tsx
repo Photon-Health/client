@@ -1,6 +1,6 @@
 import { createMemo } from 'solid-js';
 import { Card, PharmacySelect, Text, usePrescribe } from '@photonhealth/components';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import photonStyles from '@photonhealth/components/dist/index.css?inline';
 
 const hasUsableAddress = (address?: {
   street1?: string;

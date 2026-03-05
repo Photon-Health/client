@@ -8,7 +8,7 @@ import {
   usePhoton
 } from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import gql from 'graphql-tag';
 
 type PatientDialogProps = {
