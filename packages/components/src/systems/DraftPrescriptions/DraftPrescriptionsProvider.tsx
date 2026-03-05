@@ -276,14 +276,17 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
           })
         }
       });
-    } catch (error) {
-      console.error('Mutation error:', error);
+    } catch (e) {
+      console.error('Mutation error:', e);
+      const message = (e as Error).message;
       triggerToast({
         status: 'error',
         header: 'Error Adding Prescription',
-        body: 'There was an issue adding the prescription. Please try again.'
+        body: message.includes('controlled substance')
+          ? message
+          : 'There was an issue adding the prescription. Please try again.'
       });
-      throw error;
+      throw e;
     }
 
     if (options?.addToTemplates && options?.catalogId != null) {
