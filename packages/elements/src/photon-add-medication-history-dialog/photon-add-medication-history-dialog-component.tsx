@@ -2,27 +2,27 @@ import { Button, Dialog, usePhoton } from '@photonhealth/components';
 import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
 import { debounce } from '@solid-primitives/scheduled';
-import { boldSubstring } from '../photon-medication-search/photon-medication-search-component';
+import { boldSubstring } from '../photon-medication-search';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/dropdown/dropdown';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/input/input';
 import '@shoelace-style/shoelace/dist/components/menu-item/menu-item';
-import '@shoelace-style/shoelace/dist/components/menu/menu';
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
-
 //Styles
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import tailwind from '../tailwind.css?inline';
 import styles from './styles.css?inline';
 import { SearchTreatmentsQuery } from '@photonhealth/sdk';
 import { Treatment } from '@photonhealth/sdk/dist/clinical-api/types';
+
+import '@shoelace-style/shoelace/dist/components/menu/menu';
+
+setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 type AddMedicationHistoryDialogProps = {
   open: boolean;

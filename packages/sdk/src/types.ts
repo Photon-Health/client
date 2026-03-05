@@ -943,30 +943,27 @@ export type WebhookConfig = {
   url?: Maybe<Scalars['String']>;
 };
 
-const PERMISSIONS_ARR = [
-  'create:order',
-  'edit:profile',
-  'manage:organization',
-  'manage:user_roles',
-  'read:client',
-  'read:invite',
-  'read:order',
-  'read:organization',
-  'read:patient',
-  'read:prescription',
-  'read:profile',
-  'read:user_roles',
-  'read:webhook_config',
-  'update:client_keys',
-  'update:order',
-  'update:patient',
-  'update:prescription',
-  'write:client',
-  'write:invite',
-  'write:order',
-  'write:patient',
-  'write:prescription',
-  'write:webhook_config'
-] as const;
-
-export type Permission = (typeof PERMISSIONS_ARR)[number];
+export type Permission =
+  | 'create:order'
+  | 'edit:profile'
+  | 'manage:organization'
+  | 'manage:user_roles'
+  | 'read:client'
+  | 'read:invite'
+  | 'read:order'
+  | 'read:organization'
+  | 'read:patient'
+  | 'read:prescription'
+  | 'read:profile'
+  | 'read:user_roles'
+  | 'read:webhook_config'
+  | 'update:client_keys'
+  | 'update:order'
+  | 'update:patient'
+  | 'update:prescription'
+  | 'write:client'
+  | 'write:invite'
+  | 'write:order'
+  | 'write:patient'
+  | 'write:prescription'
+  | 'write:webhook_config';

@@ -21,7 +21,7 @@ import {
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import { email, empty, message, notFutureDate, zipString } from '../validators';
 
 import { isZip } from '../utils';
