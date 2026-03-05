@@ -4,7 +4,7 @@ import {
   triggerToast,
   usePhoton
 } from '@photonhealth/components';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import { types } from '@photonhealth/sdk';
 import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
