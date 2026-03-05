@@ -12,19 +12,19 @@ export default defineConfig({
     __COMMIT_HASH__: JSON.stringify(commitHash)
   },
   server: {
-    port: 3001,
+    port: 3000,
     open: true
   },
   build: {
-    outDir: '../../dist/apps/patient',
+    outDir: '../../dist/apps/app',
     sourcemap: true,
     emptyOutDir: true
   },
   test: {
-    globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/setupTests.ts'],
+    globals: true,
+    setupFiles: './src/setupTests.ts',
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    exclude: ['node_modules', 'dist', '.git', '.cache']
+    exclude: ['node_modules', 'dist', '.git', '.cache', 'e2e']
   }
 });
