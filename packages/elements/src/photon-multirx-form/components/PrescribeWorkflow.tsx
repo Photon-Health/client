@@ -26,7 +26,7 @@ import {
   usePrescribeEventDispatch,
   useRecentOrders
 } from '@photonhealth/components';
-import { types } from '@photonhealth/sdk';
+import { MeUserQuery, types } from '@photonhealth/sdk';
 import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
@@ -128,28 +128,9 @@ export const ScreenDraftedPrescriptionsQuery = gql`
   }
 `;
 
-const MeUserQuery = gql`
-  query MeUserQuery {
-    me {
-      name {
-        title
-      }
-      address {
-        state
-      }
-    }
-  }
-`;
-
-type MeUserQueryResult = {
-  me: {
-    name: { title: string | null };
-    address: { state: string };
-  };
-};
-
-const calculateNeedsSupervisor = ({ title, state }: { title: string | null; state: string }) =>
+const calculateNeedsSupervisor = ({ title, state }: { title?: string; state?: string }) =>
   !!title &&
+  !!state &&
   ['NP', 'PA'].includes(title) &&
   ['CA', 'FL', 'GA', 'MI', 'MO', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA'].includes(state.toUpperCase());
 
@@ -240,12 +221,12 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
     const {
       data: { me }
-    } = await client.sdk.apolloClinical.query<MeUserQueryResult>({
+    } = await client.sdk.apolloClinical.query({
       query: MeUserQuery
     });
     const needsSupervisorResult = calculateNeedsSupervisor({
-      title: me.name.title,
-      state: me.address.state
+      title: me.name?.title || undefined,
+      state: me.address?.state || undefined
     });
     setNeedsSupervisor(needsSupervisorResult);
   });
