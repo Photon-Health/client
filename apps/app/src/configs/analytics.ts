@@ -12,7 +12,7 @@ export async function trackSelfSignupEvent(
   properties: Record<string, unknown> = {},
   sessionToken?: string
 ): Promise<void> {
-  const environment = (process.env.REACT_APP_ENV_NAME || 'photon') as Env;
+  const environment = (import.meta.env.VITE_ENV_NAME || 'photon') as Env;
   const baseUrl = clinicalApiUrl[environment];
   const url = `${baseUrl}/auth0/track-event`;
 

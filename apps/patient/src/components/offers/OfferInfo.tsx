@@ -75,7 +75,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
   const retailAmount = retailIsSameOrLower ? undefined : offer.retailAmount;
   const retailAmountTitle = retailIsSameOrLower ? undefined : offer.retailAmountTitle;
 
-  const isAmazonPharmacy = pharmacy.id === process.env.REACT_APP_AMAZON_PHARMACY_ID;
+  const isAmazonPharmacy = pharmacy.id === import.meta.env.VITE_AMAZON_PHARMACY_ID;
 
   return (
     <VStack data-testid="pharmacy-info" align="start" w="full">

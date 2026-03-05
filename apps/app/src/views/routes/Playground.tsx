@@ -32,7 +32,7 @@ export const Playground = () => {
     if (!token) return; // Do not create fetcher if token is not available
 
     return async (graphQLParams: any) => {
-      const resp = await fetch(process.env.REACT_APP_GRAPHQL_URI as string, {
+      const resp = await fetch(import.meta.env.VITE_GRAPHQL_URI as string, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
