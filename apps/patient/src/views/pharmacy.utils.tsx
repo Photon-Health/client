@@ -15,7 +15,7 @@ function getNovocareOffers(order: Order): Offer[] {
         deliveryEstimate: novocareExperimentSegment,
         tags: ['Delivers in 3-5 days'],
         pharmacy: {
-          id: process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string,
+          id: import.meta.env.VITE_NOVOCARE_PHARMACY_ID as string,
           name: 'Novocare',
           fulfillmentTypes: ['MAIL_ORDER']
         }
@@ -41,7 +41,7 @@ export async function fetchOffers(order: Order): Promise<Offer[] | undefined> {
       retailAmount: offer.cost?.retailAmount,
       retailAmountTitle: offer.cost?.retailAmountTitle,
       pharmacy: {
-        id: process.env.REACT_APP_AMAZON_PHARMACY_ID as string,
+        id: import.meta.env.VITE_AMAZON_PHARMACY_ID as string,
         name: 'Amazon Pharmacy',
         fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[],
         logo: PHARMACY_BRANDING['phr_demoAmazon'].logo
@@ -143,22 +143,22 @@ export function getPharmacy(
   if (selectedId in capsulePharmacyIdLookup) {
     type = 'COURIER';
     selectedPharmacy = { id: selectedId, name: 'Capsule Pharmacy' };
-  } else if (selectedId === process.env.REACT_APP_ALTO_PHARMACY_ID) {
+  } else if (selectedId === import.meta.env.VITE_ALTO_PHARMACY_ID) {
     type = 'COURIER';
     selectedPharmacy = { id: selectedId, name: 'Alto Pharmacy' };
-  } else if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
+  } else if (selectedId === import.meta.env.VITE_AMAZON_PHARMACY_ID) {
     type = 'MAIL_ORDER';
     selectedPharmacy = { id: selectedId, name: 'Amazon Pharmacy' };
-  } else if (selectedId === process.env.REACT_APP_COST_PLUS_PHARMACY_ID) {
+  } else if (selectedId === import.meta.env.VITE_COST_PLUS_PHARMACY_ID) {
     type = 'MAIL_ORDER';
     selectedPharmacy = { id: selectedId, name: 'Cost Plus Pharmacy' };
-  } else if (selectedId === process.env.REACT_APP_WALMART_MAIL_ORDER_PHARMACY_ID) {
+  } else if (selectedId === import.meta.env.VITE_WALMART_MAIL_ORDER_PHARMACY_ID) {
     type = 'MAIL_ORDER';
     selectedPharmacy = { id: selectedId, name: 'Walmart Pharmacy' };
-  } else if (selectedId === process.env.REACT_APP_COSTCO_PHARMACY_ID) {
+  } else if (selectedId === import.meta.env.VITE_COSTCO_PHARMACY_ID) {
     type = 'MAIL_ORDER';
     selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
-  } else if (selectedId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID) {
+  } else if (selectedId === import.meta.env.VITE_NOVOCARE_PHARMACY_ID) {
     type = 'MAIL_ORDER';
     selectedPharmacy = { id: selectedId, name: 'Novocare' };
   } else {

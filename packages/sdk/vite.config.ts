@@ -1,4 +1,4 @@
-import path from 'path';
+import * as path from 'path';
 import { defineConfig } from 'vite';
 import typescript from '@rollup/plugin-typescript';
 
@@ -9,7 +9,6 @@ const isExternal = (id: string) => !id.startsWith('.') && !path.isAbsolute(id);
 
 export default defineConfig({
   plugins: [
-    // @ts-ignore TODO vite should have first class typescript support ...
     typescript({
       target: 'es6',
       rootDir: resolvePath('./src'),

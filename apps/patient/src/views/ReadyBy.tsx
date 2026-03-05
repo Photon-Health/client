@@ -156,7 +156,7 @@ export const ReadyBy = () => {
         bgColor="white"
         style={{
           position: 'sticky',
-          top: process.env.REACT_APP_ENV_NAME === 'photon' ? 55 : 90,
+          top: import.meta.env.VITE_ENV_NAME === 'photon' ? 55 : 90,
           // z-index set here to sit above ready by options but still below nav so shadow looks good
           zIndex: 1
         }}
