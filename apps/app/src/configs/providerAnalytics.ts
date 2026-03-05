@@ -1,8 +1,8 @@
 import { ApiObject, RudderAnalytics } from '@rudderstack/analytics-js';
 
-const RUDDERSTACK_WRITE_KEY = process.env.REACT_APP_RUDDERSTACK_WRITE_KEY;
-const RUDDERSTACK_DATA_PLANE_URL = process.env.REACT_APP_RUDDERSTACK_DATA_PLANE_URL;
-const ENVIRONMENT = process.env.REACT_APP_ENV_NAME || 'development';
+const RUDDERSTACK_WRITE_KEY = import.meta.env.VITE_RUDDERSTACK_WRITE_KEY;
+const RUDDERSTACK_DATA_PLANE_URL = import.meta.env.VITE_RUDDERSTACK_DATA_PLANE_URL;
+const ENVIRONMENT = import.meta.env.VITE_ENV_NAME || 'development';
 
 export class ProviderAnalytics {
   private rudderanalytics?: RudderAnalytics;

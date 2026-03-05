@@ -194,7 +194,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
       prescriptions.length > 0 &&
       // This doesn't work while we can't run lambdas locally
       // bc prescriptions are created in boson while generateCoverageOptions happens in tau
-      (process.env.REACT_APP_ENV_NAME as Env) !== 'tau'
+      (import.meta.env.VITE_ENV_NAME as Env) !== 'tau'
     ) {
       if (preferredId) {
         // check coverage on the preferred pharmacy

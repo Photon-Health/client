@@ -1,5 +1,5 @@
 // Set environment variable BEFORE any imports
-process.env.REACT_APP_AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
+import.meta.env.VITE_AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
 import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, MockedFunction, vi } from 'vitest';

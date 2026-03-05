@@ -265,7 +265,7 @@ export const triggerDemoNotification = async (
   pharmacyName?: string,
   pharmacyAddress?: string
 ): Promise<boolean> => {
-  const url = process.env.REACT_APP_THIRD_PARTY_REST_API_ENDPOINT;
+  const url = import.meta.env.VITE_THIRD_PARTY_REST_API_ENDPOINT;
   const data = {
     phoneNumber,
     eventName,

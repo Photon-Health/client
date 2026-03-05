@@ -29,7 +29,7 @@ import { UpdatePatientForm } from './views/routes/UpdatePatientForm';
 import { Env } from '@photonhealth/sdk';
 import { SelfSignupPage } from './views/routes/SelfSignup';
 
-const env = process.env.REACT_APP_ENV_NAME as Env;
+const env = import.meta.env.VITE_ENV_NAME as Env;
 
 const client = new PhotonClient({
   env,
