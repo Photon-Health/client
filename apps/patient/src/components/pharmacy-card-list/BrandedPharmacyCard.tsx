@@ -26,32 +26,32 @@ export const PHARMACY_BRANDING = {
     name: 'Amazon Pharmacy',
     description: 'Delivers in 2-5 days'
   },
-  [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]: {
+  [import.meta.env.VITE_AMAZON_PHARMACY_ID as string]: {
     logo: amazonPharmacyLogo,
     name: 'Amazon Pharmacy',
     description: 'Delivers in 2-5 days'
   },
-  [process.env.REACT_APP_ALTO_PHARMACY_ID as string]: {
+  [import.meta.env.VITE_ALTO_PHARMACY_ID as string]: {
     logo: altoLogo,
     name: 'Alto Pharmacy',
     description: 'Delivers as soon as today'
   },
-  [process.env.REACT_APP_COSTCO_PHARMACY_ID as string]: {
+  [import.meta.env.VITE_COSTCO_PHARMACY_ID as string]: {
     logo: costcoLogo,
     name: 'Costco Pharmacy',
     description: 'Delivers in 1-2 days'
   },
-  [process.env.REACT_APP_COST_PLUS_PHARMACY_ID as string]: {
+  [import.meta.env.VITE_COST_PLUS_PHARMACY_ID as string]: {
     logo: costPlusLogo,
     name: 'Cost Plus Pharmacy',
     description: 'Delivery starting at $5'
   },
-  [process.env.REACT_APP_WALMART_MAIL_ORDER_PHARMACY_ID as string]: {
+  [import.meta.env.VITE_WALMART_MAIL_ORDER_PHARMACY_ID as string]: {
     logo: walmartLogo,
     name: 'Walmart Pharmacy',
     description: 'Overnight shipping available'
   },
-  [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]: {
+  [import.meta.env.VITE_NOVOCARE_PHARMACY_ID as string]: {
     logo: novocareLogo,
     name: 'NovoCare',
     description: 'Delivers in 3-5 days'

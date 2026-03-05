@@ -5,7 +5,7 @@ import { ApiObject } from '@rudderstack/analytics-js';
 import { getProviderAnalytics } from '../configs/providerAnalytics';
 import { setInstrumentationUserContext } from '../instrumentation/setInstrumentationUserContext';
 
-const ENVIRONMENT = process.env.REACT_APP_ENV_NAME || 'development';
+const ENVIRONMENT = import.meta.env.VITE_ENV_NAME || 'development';
 
 const ANALYTICS_CONTEXT_QUERY = gql`
   query AnalyticsContextQuery {

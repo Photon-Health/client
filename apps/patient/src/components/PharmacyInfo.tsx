@@ -289,11 +289,11 @@ export const PharmacyInfo = ({
   const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
   const directionsUrl = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
 
-  const isAmazonPharmacy = pharmacy.id === process.env.REACT_APP_AMAZON_PHARMACY_ID;
+  const isAmazonPharmacy = pharmacy.id === import.meta.env.VITE_AMAZON_PHARMACY_ID;
   const showAmazonTagline =
     isAmazonPharmacy && brandedOptionOverride?.amazonPharmacyOverride?.deliveryEstimate;
 
-  const isNovocarePharmacy = pharmacy.id === process.env.REACT_APP_NOVOCARE_PHARMACY_ID;
+  const isNovocarePharmacy = pharmacy.id === import.meta.env.VITE_NOVOCARE_PHARMACY_ID;
   const showNovocareTagline =
     isNovocarePharmacy && brandedOptionOverride?.novocareExperimentOverride;
 
