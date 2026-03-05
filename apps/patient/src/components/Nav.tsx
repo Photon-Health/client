@@ -8,7 +8,7 @@ import { patientAnalytics } from '../configs/analytics';
 export const Nav = () => {
   const [searchParams] = useSearchParams();
   const isDemo = searchParams.get('demo');
-  const isProd = process.env.REACT_APP_ENV_NAME === 'photon';
+  const isProd = import.meta.env.VITE_ENV_NAME === 'photon';
 
   const { order, flattenedFills, logo, setFaqModalIsOpen } = useOrderContext();
 

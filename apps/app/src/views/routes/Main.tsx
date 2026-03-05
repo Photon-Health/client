@@ -72,9 +72,9 @@ export const Main = () => {
           org={user.org_id}
           domain={auth0Config.domain}
           audience={auth0Config.audience}
-          uri={process.env.REACT_APP_GRAPHQL_URI as string}
+          uri={import.meta.env.VITE_GRAPHQL_URI as string}
           auto-login="false"
-          env={process.env.REACT_APP_ENV_NAME as Env}
+          env={import.meta.env.VITE_ENV_NAME as Env}
         >
           <Nav />
           <Box as="main" marginTop="16">
