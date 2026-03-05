@@ -47,7 +47,6 @@ interface GroupTitle {
 }
 
 // Typescript and solid are annoying
-// eslint-disable-next-line @typescript-eslint/ban-types
 type ThisisNotAFunction<T> = Exclude<T, Function>;
 
 export const PhotonDropdown = <T extends { id: string }>(props: {

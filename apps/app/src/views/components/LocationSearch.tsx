@@ -1,18 +1,18 @@
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
   Button,
   Divider,
   HStack,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
   ModalBody,
   ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   Text,
-  VStack,
-  useToast
+  useToast,
+  VStack
 } from '@chakra-ui/react';
 
 import { FiTarget } from 'react-icons/fi';
@@ -159,7 +159,7 @@ export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
       const result = await searchForLocations(inputValue);
       callback(result);
       return result;
-    } catch (e) {
+    } catch (_e) {
       handleLocationError();
       return [];
     }

@@ -18,7 +18,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/settings",
-        "command": "npx eslint . --ext .tsx,.ts --quiet"
+        "command": "npx eslint . --quiet"
       }
     },
     "lint:fix": {

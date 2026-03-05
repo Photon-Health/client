@@ -160,7 +160,7 @@ export default function RecentOrdersIssueDialog() {
     onSubmit: async (values) => {
       try {
         createTicket({ ...values });
-      } catch (e) {
+      } catch (_e) {
         triggerToast({
           header: 'Error Creating Issue',
           body: 'A ticket for this order has not been sent.',
