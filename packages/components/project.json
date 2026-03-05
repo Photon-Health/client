@@ -9,14 +9,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/components",
-        "command": "vite build && npx tailwindcss -i ./src/index.css -o ./dist/style.css"
-      }
-    },
-    "test-watch": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "packages/components",
-        "command": "vitest"
+        "command": "vite build"
       }
     },
     "test": {
@@ -37,7 +30,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/components",
-        "command": "npx eslint . --ext .tsx,.ts --quiet"
+        "command": "npx eslint . --quiet"
       }
     },
     "lint:fix": {

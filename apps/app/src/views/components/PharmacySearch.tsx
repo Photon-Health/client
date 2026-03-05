@@ -101,7 +101,7 @@ export const PharmacySearch = (props: FieldAttributes<any>) => {
         setIsHidden(true);
         setIsLoading(false);
       }
-    } catch (e) {
+    } catch (_e) {
       setCustomError('Something unexpected occured');
       setTouched(true);
       setShowDefaultPharmacy(false);
@@ -122,7 +122,7 @@ export const PharmacySearch = (props: FieldAttributes<any>) => {
         setIsHidden(true);
         setIsLoading(false);
       }
-    } catch (e) {
+    } catch (_e) {
       setCustomError('Please enter a valid zip code or address...');
       setTouched(true);
       setIsGeocoding(false);

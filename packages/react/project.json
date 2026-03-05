@@ -31,7 +31,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/react",
-        "command": "npx eslint . --ext .tsx,.ts --quiet"
+        "command": "npx eslint . --quiet"
       }
     },
     "lint:fix": {
