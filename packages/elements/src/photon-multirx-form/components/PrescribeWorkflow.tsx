@@ -26,10 +26,11 @@ import {
   usePrescribeEventDispatch,
   useRecentOrders
 } from '@photonhealth/components';
-import { types } from '@photonhealth/sdk';
+import { MeUserQuery, types } from '@photonhealth/sdk';
 import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
+import { SupervisorCard } from './SupervisorCard';
 
 const hasUsableAddress = (address?: {
   street1?: string;
@@ -127,6 +128,12 @@ export const ScreenDraftedPrescriptionsQuery = gql`
   }
 `;
 
+const calculateNeedsSupervisor = ({ title, state }: { title?: string; state?: string }) =>
+  !!title &&
+  !!state &&
+  ['NP', 'PA'].includes(title) &&
+  ['CA', 'FL', 'GA', 'MI', 'MO', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA'].includes(state.toUpperCase());
+
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
   let prescriptionRef: HTMLDivElement | undefined;
@@ -144,6 +151,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchClinicalAlertCancel,
     dispatchAnalytics
   } = usePrescribeEventDispatch();
+  const [needsSupervisor, setNeedsSupervisor] = createSignal<boolean>(false);
 
   const autoRoutedPharmacyId = createMemo(() => {
     if (props.pharmacyId) {
@@ -198,7 +206,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     prefillNotes = `${prefillNotes}${formatPatientWeight(props.weight, props?.weightUnit)}`;
   }
 
-  onMount(() => {
+  onMount(async () => {
     if (props.address) {
       // if manually overriding address, update the store on mount
       props.formActions.updateFormValue({
@@ -210,6 +218,17 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     ref.addEventListener('photon-ticket-created-duplicate', () => {
       clearForm(props.formActions, prefillNotes ? { notes: prefillNotes } : undefined);
     });
+
+    const {
+      data: { me }
+    } = await client.sdk.apolloClinical.query({
+      query: MeUserQuery
+    });
+    const needsSupervisorResult = calculateNeedsSupervisor({
+      title: me.name?.title || undefined,
+      state: me.address?.state || undefined
+    });
+    setNeedsSupervisor(needsSupervisorResult);
   });
 
   createEffect(() => {
@@ -322,14 +341,14 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const displayCombineDialog = () => {
     return recentOrdersActions.setIsCombineDialogOpen(
       true,
-      () => submitForm(props.enableOrder),
+      () => submitForm(),
       addressId(),
       formattedAddress()
     );
   };
 
   // submits the form to create a new order
-  const submitForm = async (enableOrder: boolean) => {
+  const submitForm = async () => {
     if (isLoading()) {
       return;
     }
@@ -364,7 +383,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     }
 
     const requiresAddress =
-      enableOrder && (!props.optionalPatientAddress || hasPreferredPharmacy());
+      props.enableOrder && (!props.optionalPatientAddress || hasPreferredPharmacy());
     const keys = requiresAddress ? ['patient', 'address'] : ['patient'];
     props.formActions.validate(keys);
     const errors = props.formActions.getErrors(keys);
@@ -385,6 +404,13 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       dispatchPrescriptionsCreated(draftPrescriptions());
     } else {
       setErrors(errors);
+      dispatchOrderError(errors);
+      setIsLoading(false);
+      triggerToast({
+        status: 'error',
+        header: 'Error Creating Order',
+        body: 'Please check your order details'
+      });
     }
   };
 
@@ -449,6 +475,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         pharmacyId = '';
       }
 
+      // const supervisorId =
+      //   needsSupervisor() && props.formStore.supervisorId?.value
+      //     ? props.formStore.supervisorId.value
+      //     : undefined;
+
       const { data: orderData, errors } = await orderMutation({
         variables: {
           ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
@@ -464,6 +495,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           fills: prescriptionIds().map((id) => ({
             prescriptionId: id
           }))
+          // supervisorId: supervisorId
         },
         refetchQueries: [],
         awaitRefetchQueries: false
@@ -510,7 +542,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       return displayCombineDialog();
     }
 
-    return submitForm(props.enableOrder);
+    return submitForm();
   };
 
   createEffect(() => {
@@ -655,7 +687,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       screeningAlerts={screeningAlerts()}
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
-                      enableOrder={props.enableOrder}
                       disableList={props.disableList}
                     />
                   </div>
@@ -672,6 +703,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   routingConstraints={routingConstraints()}
                   enableOrder={props.enableOrder}
                 />
+                <Show when={props.enableOrder && needsSupervisor()}>
+                  <SupervisorCard actions={props.formActions} store={props.formStore} />
+                </Show>
                 <Show when={props.enableOrder && !autoRoutedPharmacyId()}>
                   <OrderCard
                     store={props.formStore}
