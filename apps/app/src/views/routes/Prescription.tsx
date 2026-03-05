@@ -54,7 +54,7 @@ import { CANCEL_PRESCRIPTION } from '../../mutations';
 import { datadogRum } from '@datadog/browser-rum';
 import { Fill, Maybe } from 'packages/sdk/dist/types';
 
-export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
+export const graphQLClient = new GraphQLClient(import.meta.env.VITE_GRAPHQL_URI as string, {
   jsonSerializer: {
     parse: JSON.parse,
     stringify: JSON.stringify

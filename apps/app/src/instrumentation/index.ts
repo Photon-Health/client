@@ -4,11 +4,11 @@ import pkg from '../../package.json';
 
 export const initializeInstrumentation = () => {
   datadogRum.init({
-    applicationId: process.env.REACT_APP_DATADOG_RUM_APPLICATION_ID as string,
-    clientToken: process.env.REACT_APP_DATADOG_RUM_CLIENT_TOKEN as string,
+    applicationId: import.meta.env.VITE_DATADOG_RUM_APPLICATION_ID as string,
+    clientToken: import.meta.env.VITE_DATADOG_RUM_CLIENT_TOKEN as string,
     site: 'datadoghq.com',
     service: pkg.name,
-    env: process.env.REACT_APP_ENV_NAME,
+    env: import.meta.env.VITE_ENV_NAME,
     version: __COMMIT_HASH__,
     sessionSampleRate: 100,
     sessionReplaySampleRate: 100,

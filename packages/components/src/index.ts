@@ -1,3 +1,4 @@
+import './index.css';
 import AddressForm from './systems/AddressForm';
 import { Alert } from './particles/Alert';
 import Checkbox from './particles/Checkbox';

@@ -1,8 +1,8 @@
 import {
   DraftPrescriptionsProvider,
+  PrescribeEventDispatchProvider,
   PrescribeProvider,
   RecentOrders,
-  PrescribeEventDispatchProvider,
   TemplateOverrides
 } from '@photonhealth/components';
 import { customElement } from 'solid-element';
@@ -12,7 +12,7 @@ import { onCleanup } from 'solid-js';
 import { PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
 import '@shoelace-style/shoelace/dist/components/icon/icon';

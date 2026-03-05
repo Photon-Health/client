@@ -936,7 +936,7 @@ export const Pharmacy = () => {
         .replace(/[^a-z0-9_]/g, '')
         .replace(/_+/g, '_')
         .replace(/^_+|_+$/g, '');
-      if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
+      if (selectedId === import.meta.env.VITE_AMAZON_PHARMACY_ID) {
         datadogRum.addAction('amazon_pharmacy_offer_active_and_selected', {
           orderId: order.id,
           organizationId: order.organization.id,
@@ -966,7 +966,7 @@ export const Pharmacy = () => {
     }
 
     if (brandedOptionsOverride?.novocareExperimentOverride) {
-      if (selectedId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID) {
+      if (selectedId === import.meta.env.VITE_NOVOCARE_PHARMACY_ID) {
         datadogRum.addAction('novocare_experiment_offer_active_and_selected', {
           orderId: order.id,
           organizationId: order.organization.id,
@@ -1051,10 +1051,10 @@ export const Pharmacy = () => {
     // the destructuring for novo and amazon can be removed once we remove brandedOptionsOverrides
     // and switch fully over the offers-based approach
     ...(brandedOptionsOverride?.novocareExperimentOverride
-      ? [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]
+      ? [import.meta.env.VITE_NOVOCARE_PHARMACY_ID as string]
       : []),
     ...(brandedOptionsOverride?.amazonPharmacyOverride
-      ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
+      ? [import.meta.env.VITE_AMAZON_PHARMACY_ID as string]
       : []),
     ...(enableMailOrder ? mailOrderPharmacies : [])
   ]).filter((id) => !filteredOffers?.map((offer) => offer.pharmacy.id).includes(id));

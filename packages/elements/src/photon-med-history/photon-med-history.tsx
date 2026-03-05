@@ -1,6 +1,6 @@
 import { customElement } from 'solid-element';
 import { PatientMedHistory } from '@photonhealth/components';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import photonStyles from '@photonhealth/components/dist/index.css?inline';
 
 interface PatientMedProps {
   patientId: string;

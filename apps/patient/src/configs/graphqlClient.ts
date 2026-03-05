@@ -65,7 +65,7 @@ export const gqlSerializer = {
   }
 };
 
-const client = new GraphQLClient((process.env as any).REACT_APP_GRAPHQL_API_ENDPOINT, {
+const client = new GraphQLClient(import.meta.env.VITE_GRAPHQL_API_ENDPOINT, {
   jsonSerializer: gqlSerializer
 });
 

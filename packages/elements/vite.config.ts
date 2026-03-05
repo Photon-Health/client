@@ -1,5 +1,5 @@
 /// <reference types="vitest" />
-import path from 'path';
+import * as path from 'path';
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 import typescript from '@rollup/plugin-typescript';
