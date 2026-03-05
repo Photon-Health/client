@@ -5,8 +5,8 @@ import type {
 } from '@datadog/browser-rum';
 
 const photonApiHostnames = [
-  process.env.REACT_APP_GRAPHQL_URI as string,
-  process.env.REACT_APP_CLINICAL_GRAPHQL_URI as string
+  import.meta.env.VITE_GRAPHQL_URI as string,
+  import.meta.env.VITE_CLINICAL_GRAPHQL_URI as string
 ].map(getHostnameFromUrl);
 
 export const beforeSendHandler = (event: RumEvent, context: RumEventDomainContext) => {

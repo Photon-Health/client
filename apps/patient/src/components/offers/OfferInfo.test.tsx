@@ -276,7 +276,7 @@ describe('OfferInfo', () => {
 
   test('shows Sponsored text when pharmacy is Amazon', () => {
     const amazonPharmacyId = 'amazon-pharmacy-id';
-    vi.stubEnv('REACT_APP_AMAZON_PHARMACY_ID', amazonPharmacyId);
+    vi.stubEnv('VITE_AMAZON_PHARMACY_ID', amazonPharmacyId);
 
     const amazonPharmacy = { ...baseOffer.pharmacy, id: amazonPharmacyId };
 

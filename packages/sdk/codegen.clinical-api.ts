@@ -1,7 +1,7 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-  schema: process.env.REACT_APP_CLINICAL_GRAPHQL_URI,
+  schema: process.env.VITE_CLINICAL_GRAPHQL_URI,
   // Only include documents that use clinical-api
   documents: ['./src/graphql/clinical-api/*.ts'],
   ignoreNoDocuments: true, // for better experience with the watcher
