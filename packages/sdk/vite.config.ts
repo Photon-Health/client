@@ -1,4 +1,4 @@
-import path from 'path';
+import * as path from 'path';
 import { defineConfig } from 'vite';
 import typescript from '@rollup/plugin-typescript';
 
