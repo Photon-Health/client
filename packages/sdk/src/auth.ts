@@ -251,7 +251,7 @@ export class AuthManager {
     try {
       await this.authentication.checkSession();
       return await this.authentication.isAuthenticated();
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
