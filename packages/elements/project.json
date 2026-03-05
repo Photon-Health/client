@@ -17,7 +17,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/elements",
-        "command": "npx eslint . --ext .tsx,.ts --quiet"
+        "command": "npx eslint . --quiet"
       }
     },
     "build": {
@@ -39,7 +39,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/elements",
-        "command": "npx eslint . --ext .tsx,.ts --fix && npx prettier --write src/**/*.{ts,tsx}"
+        "command": "npx eslint . --fix && npx prettier --write src/**/*.{ts,tsx}"
       }
     },
     "tsc": {

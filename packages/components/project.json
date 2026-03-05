@@ -30,7 +30,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/components",
-        "command": "npx eslint . --ext .tsx,.ts --quiet"
+        "command": "npx eslint . --quiet"
       }
     },
     "lint:fix": {
