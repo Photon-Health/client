@@ -18,8 +18,8 @@ export default tseslint.config(
       '**/*.stories.tsx',
       '**/storybook-static/*',
       '**/playwright-report/**',
-      '**/coverage/**',
-    ],
+      '**/coverage/**'
+    ]
   },
 
   // Base: eslint recommended + typescript-eslint recommended
@@ -38,8 +38,8 @@ export default tseslint.config(
         PropertyIndexedKeyframes: 'readonly',
         KeyframeAnimationOptions: 'readonly',
         GeolocationPosition: 'readonly',
-        __COMMIT_HASH__: 'readonly',
-      },
+        __COMMIT_HASH__: 'readonly'
+      }
     },
     rules: {
       '@typescript-eslint/ban-ts-comment': 'off',
@@ -50,8 +50,8 @@ export default tseslint.config(
         {
           argsIgnorePattern: '^_',
           caughtErrorsIgnorePattern: '^_',
-          ignoreRestSiblings: true,
-        },
+          ignoreRestSiblings: true
+        }
       ],
       'no-template-curly-in-string': 'error',
       'prefer-const': ['error'],
@@ -60,8 +60,8 @@ export default tseslint.config(
       '@typescript-eslint/no-require-imports': 'off',
       '@typescript-eslint/no-unsafe-function-type': 'off',
       '@typescript-eslint/no-wrapper-object-types': 'off',
-      '@typescript-eslint/no-empty-object-type': 'off',
-    },
+      '@typescript-eslint/no-empty-object-type': 'off'
+    }
   },
 
   // React apps (apps/app, apps/patient)
@@ -70,10 +70,10 @@ export default tseslint.config(
     ...reactPlugin.configs.flat.recommended,
     plugins: {
       react: reactPlugin,
-      'react-hooks': reactHooksPlugin,
+      'react-hooks': reactHooksPlugin
     },
     settings: {
-      react: { version: 'detect' },
+      react: { version: 'detect' }
     },
     rules: {
       ...reactPlugin.configs.flat.recommended.rules,
@@ -86,16 +86,13 @@ export default tseslint.config(
       'no-empty': 'off',
       'no-nested-ternary': 'off',
       '@typescript-eslint/no-empty-function': 'off',
-      '@typescript-eslint/no-namespace': 'off',
-    },
+      '@typescript-eslint/no-namespace': 'off'
+    }
   },
 
   // Solid packages (components, elements)
   {
-    files: [
-      'packages/components/**/*.{ts,tsx}',
-      'packages/elements/**/*.{ts,tsx}',
-    ],
-    ...solidPlugin,
-  },
+    files: ['packages/components/**/*.{ts,tsx}', 'packages/elements/**/*.{ts,tsx}'],
+    ...solidPlugin
+  }
 );
