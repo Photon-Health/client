@@ -1,7 +1,7 @@
 import { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-  schema: process.env.REACT_APP_CLINICAL_GRAPHQL_URI,
+  schema: process.env.VITE_CLINICAL_GRAPHQL_URI,
   documents: [
     'src/**/Settings/**/*.tsx',
     'src/views/routes/PrescriptionForm.tsx',
