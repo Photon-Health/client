@@ -26,13 +26,6 @@ export const createFormStore = (initalValue?: Record<string, any>) => {
     });
   };
 
-  const updateFormError = ({ key, error }: { key: string; error: any }) => {
-    setStore(key, {
-      value: store[key]?.value,
-      error: error
-    });
-  };
-
   const hasErrors = (keys: string[]) => {
     let errors = 0;
     for (const member in store) {
@@ -105,7 +98,6 @@ export const createFormStore = (initalValue?: Record<string, any>) => {
     store,
     actions: {
       updateFormValue,
-      updateFormError,
       clearKeys,
       registerValidator,
       unRegisterValidator,

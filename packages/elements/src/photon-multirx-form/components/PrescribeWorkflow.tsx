@@ -384,10 +384,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
     const requiresAddress =
       props.enableOrder && (!props.optionalPatientAddress || hasPreferredPharmacy());
-    const keys = ['patient', ...(requiresAddress ? ['address'] : [])];
+    const keys = requiresAddress ? ['patient', 'address'] : ['patient'];
     props.formActions.validate(keys);
     const errors = props.formActions.getErrors(keys);
-    console.log(errors);
     if (errors.length === 0) {
       setIsLoading(true);
       props.formActions.updateFormValue({
@@ -476,54 +475,50 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         pharmacyId = '';
       }
 
-      const supervisorId =
-        needsSupervisor() && props.formStore.supervisorId?.value
-          ? props.formStore.supervisorId.value
-          : undefined;
-      console.log({ supervisorId });
+      // const supervisorId =
+      //   needsSupervisor() && props.formStore.supervisorId?.value
+      //     ? props.formStore.supervisorId.value
+      //     : undefined;
 
-      const testing = true;
-      if (!testing) {
-        const { data: orderData, errors } = await orderMutation({
-          variables: {
-            ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
-            ...(props.groupId ? { groupId: props.groupId } : {}),
-            patientId: props.formStore.patient?.value.id,
-            pharmacyId,
-            fulfillmentType: props.formStore.fulfillmentType?.value || '',
-            ...(addressId()
-              ? { addressId: addressId() }
-              : hasValidAddress()
-              ? { address: formattedAddress() }
-              : {}),
-            fills: prescriptionIds().map((id) => ({
-              prescriptionId: id
-            })),
-            supervisorId: supervisorId
-          },
-          refetchQueries: [],
-          awaitRefetchQueries: false
-        });
+      const { data: orderData, errors } = await orderMutation({
+        variables: {
+          ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
+          ...(props.groupId ? { groupId: props.groupId } : {}),
+          patientId: props.formStore.patient?.value.id,
+          pharmacyId,
+          fulfillmentType: props.formStore.fulfillmentType?.value || '',
+          ...(addressId()
+            ? { addressId: addressId() }
+            : hasValidAddress()
+            ? { address: formattedAddress() }
+            : {}),
+          fills: prescriptionIds().map((id) => ({
+            prescriptionId: id
+          }))
+          // supervisorId: supervisorId
+        },
+        refetchQueries: [],
+        awaitRefetchQueries: false
+      });
 
-        setIsLoading(false);
-        if (errors) {
-          dispatchOrderError(errors);
-          return;
-        }
-        dispatchOrderCreated(orderData!.createOrder);
-        dispatchAnalytics({
-          trackEventType: 'order_created',
-          properties: {
-            orderId: orderData!.createOrder.id,
-            prescriptionCount: draftPrescriptions().length,
-            fulfillmentType: props.formStore.fulfillmentType?.value || 'SEND_TO_PATIENT',
-            hasPreferredPharmacy: hasPreferredPharmacy(),
-            setAsPreferred: props.formStore.updatePreferredPharmacy?.value ?? false,
-            pharmacyId: pharmacyId || null,
-            isCombinedOrder: false
-          }
-        });
+      setIsLoading(false);
+      if (errors) {
+        dispatchOrderError(errors);
+        return;
       }
+      dispatchOrderCreated(orderData!.createOrder);
+      dispatchAnalytics({
+        trackEventType: 'order_created',
+        properties: {
+          orderId: orderData!.createOrder.id,
+          prescriptionCount: draftPrescriptions().length,
+          fulfillmentType: props.formStore.fulfillmentType?.value || 'SEND_TO_PATIENT',
+          hasPreferredPharmacy: hasPreferredPharmacy(),
+          setAsPreferred: props.formStore.updatePreferredPharmacy?.value ?? false,
+          pharmacyId: pharmacyId || null,
+          isCombinedOrder: false
+        }
+      });
     } catch (err) {
       dispatchOrderError([err as GraphQLFormattedError]);
       setIsLoading(false);
