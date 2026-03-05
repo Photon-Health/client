@@ -7,7 +7,7 @@ import Button from '../../particles/Button';
 import Text from '../../particles/Text';
 import Card from '../../particles/Card';
 import formatDate from '../../utils/formatDate';
-import Icon from '../../particles/Icon';
+import Collapsible from '../../particles/Collapsible';
 
 const GET_PATIENT = gql`
   query GetPatient($id: ID!) {
@@ -73,7 +73,6 @@ type PatientInfoProps = {
 export default function PatientInfo(props: PatientInfoProps) {
   const client = usePhotonClient();
   const [patient, setPatient] = createSignal<Patient | undefined>(undefined);
-  const [isExpanded, setIsExpanded] = createSignal(false);
 
   const fetchPatient = async () => {
     const { data } = await client!.apollo.query({
@@ -114,86 +113,81 @@ export default function PatientInfo(props: PatientInfoProps) {
         </Show>
       </div>
       <div class="pt-2" data-dd-privacy="mask">
-        <div>
-          <Text size="lg" bold loading={!patient()} sampleLoadingText="Sally Patient">
-            {patient()?.name.full || 'N/A'}
-          </Text>
-          <button
-            type="button"
-            class="sm:hidden flex items-center gap-1 text-gray-400 hover:text-gray-500 mt-3"
-            onClick={() => setIsExpanded(!isExpanded())}
-            aria-expanded={isExpanded() ? 'true' : 'false'}
-          >
-            <span class="text-xs">{isExpanded() ? 'Show Less' : 'Show More'}</span>
-            <Icon name={isExpanded() ? 'chevronUp' : 'chevronDown'} size="sm" />
-          </button>
-        </div>
-        <div
-          class={`pt-4 sm:grid sm:grid-cols-2 sm:gap-2 ${
-            isExpanded() ? 'block' : 'hidden sm:grid'
-          }`}
+        <Text size="lg" bold loading={!patient()} sampleLoadingText="Sally Patient">
+          {patient()?.name.full || 'N/A'}
+        </Text>
+        <Collapsible
+          openLabel="Show less"
+          closedLabel="Show more"
+          // On larger screens, force component open and hide control
+          // Can't use alwaysOpen prop until there is a way to
+          // get screen breakpoint programatically
+          class="sm:block"
+          buttonClass="mt-2 sm:hidden"
         >
-          <table class="table-auto">
-            <tbody>
-              <InfoRow label="Email">
-                <Text size="sm" loading={!patient()} sampleLoadingText="fake@email.com">
-                  {patient()?.email || 'N/A'}
-                </Text>
-              </InfoRow>
-              <InfoRow label="Phone">
-                <Text size="sm" loading={!patient()} sampleLoadingText="555-555-5555">
-                  {phoneNumber() || 'N/A'}
-                </Text>
-              </InfoRow>
-              <InfoRow label="Address">
-                <Show when={!patient() || address()} fallback={<div>N/A</div>}>
-                  <div>
-                    <Text size="sm" loading={!patient()} sampleLoadingText="123 Fake St">
-                      {address()?.street1}
-                    </Text>
-                  </div>
-                  <Show when={!patient() || address()?.street2}>
+          <div class="sm:grid sm:grid-cols-2 sm:gap-2">
+            <table class="table-auto">
+              <tbody>
+                <InfoRow label="Email">
+                  <Text size="sm" loading={!patient()} sampleLoadingText="fake@email.com">
+                    {patient()?.email || 'N/A'}
+                  </Text>
+                </InfoRow>
+                <InfoRow label="Phone">
+                  <Text size="sm" loading={!patient()} sampleLoadingText="555-555-5555">
+                    {phoneNumber() || 'N/A'}
+                  </Text>
+                </InfoRow>
+                <InfoRow label="Address">
+                  <Show when={!patient() || address()} fallback={<div>N/A</div>}>
                     <div>
-                      <Text size="sm" loading={!patient()} sampleLoadingText="Apt 3">
-                        {address()?.street2}
+                      <Text size="sm" loading={!patient()} sampleLoadingText="123 Fake St">
+                        {address()?.street1}
+                      </Text>
+                    </div>
+                    <Show when={!patient() || address()?.street2}>
+                      <div>
+                        <Text size="sm" loading={!patient()} sampleLoadingText="Apt 3">
+                          {address()?.street2}
+                        </Text>
+                      </div>
+                    </Show>
+                    <div>
+                      <Text size="sm" loading={!patient()} sampleLoadingText="Brooklyn, NY 11221">
+                        {address()?.city}, {address()?.state} {address()?.postalCode}
                       </Text>
                     </div>
                   </Show>
-                  <div>
-                    <Text size="sm" loading={!patient()} sampleLoadingText="Brooklyn, NY 11221">
-                      {address()?.city}, {address()?.state} {address()?.postalCode}
-                    </Text>
-                  </div>
-                </Show>
-              </InfoRow>
-            </tbody>
-          </table>
+                </InfoRow>
+              </tbody>
+            </table>
 
-          <table class="table-auto">
-            <tbody>
-              <InfoRow label="DOB">
-                <Text size="sm" loading={!patient()} sampleLoadingText="female">
-                  {formatDate(patient()?.dateOfBirth || 'N/A')}
-                </Text>
-              </InfoRow>
-              <InfoRow label="Weight">
-                <Text size="sm" loading={!patient()} sampleLoadingText="150 lbs">
-                  {props?.weight ? `${props.weight} ${props.weightUnit}` : 'N/A'}
-                </Text>
-              </InfoRow>
-              <InfoRow label="Sex">
-                <Text size="sm" loading={!patient()} sampleLoadingText="female">
-                  {patient()?.sex || 'N/A'}
-                </Text>
-              </InfoRow>
-              <InfoRow label="Gender">
-                <Text size="sm" loading={!patient()} sampleLoadingText="female">
-                  {patient()?.gender || 'N/A'}
-                </Text>
-              </InfoRow>
-            </tbody>
-          </table>
-        </div>
+            <table class="table-auto">
+              <tbody>
+                <InfoRow label="DOB">
+                  <Text size="sm" loading={!patient()} sampleLoadingText="female">
+                    {formatDate(patient()?.dateOfBirth || 'N/A')}
+                  </Text>
+                </InfoRow>
+                <InfoRow label="Weight">
+                  <Text size="sm" loading={!patient()} sampleLoadingText="150 lbs">
+                    {props?.weight ? `${props.weight} ${props.weightUnit}` : 'N/A'}
+                  </Text>
+                </InfoRow>
+                <InfoRow label="Sex">
+                  <Text size="sm" loading={!patient()} sampleLoadingText="female">
+                    {patient()?.sex || 'N/A'}
+                  </Text>
+                </InfoRow>
+                <InfoRow label="Gender">
+                  <Text size="sm" loading={!patient()} sampleLoadingText="female">
+                    {patient()?.gender || 'N/A'}
+                  </Text>
+                </InfoRow>
+              </tbody>
+            </table>
+          </div>
+        </Collapsible>
       </div>
     </Card>
   );

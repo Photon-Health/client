@@ -811,7 +811,7 @@ export const Pharmacy = () => {
           }, 1000)
         );
         setSubmitting(false);
-      } catch (error: any) {
+      } catch (_error: any) {
         showToastWarning();
         setSubmitting(false);
         if (isReroute) {

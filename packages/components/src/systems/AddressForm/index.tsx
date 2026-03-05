@@ -81,7 +81,7 @@ export default function AddressForm(props: AddressFormProps) {
       setSubmitting(true);
       try {
         await updatePatientAddress({ country: 'US', ...values });
-      } catch (e) {
+      } catch (_e) {
         setSubmitting(false);
         triggerToast({
           header: 'Error Updating Patient',
