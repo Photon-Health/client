@@ -51,7 +51,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.boson react-app-rewired start"
+        "command": "env-cmd -f .env.boson vite"
       },
       "dependsOn": ["^build", "codegen"]
     },
@@ -59,7 +59,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.tau react-app-rewired start"
+        "command": "env-cmd -f .env.tau vite"
       },
       "dependsOn": ["^build", "codegen:tau"]
     },
@@ -67,7 +67,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.neutron react-app-rewired start"
+        "command": "env-cmd -f .env.neutron vite"
       },
       "dependsOn": ["^build", "codegen:neutron"]
     },
@@ -76,7 +76,7 @@
       "options": {
         "cwd": "apps/app",
         "commands": [
-          "env-cmd -f .env.boson react-app-rewired start",
+          "env-cmd -f .env.boson vite",
           "nx watch --projects=app --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=app"
         ]
       },
@@ -87,7 +87,7 @@
       "options": {
         "cwd": "apps/app",
         "commands": [
-          "env-cmd -f .env.tau react-app-rewired start",
+          "env-cmd -f .env.tau vite",
           "nx watch --projects=app --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=app"
         ]
       },
@@ -95,28 +95,28 @@
     },
     "build:boson": {
       "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/apps/app"],
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.boson react-app-rewired build",
-        "outputs": "dist/apps/app"
+        "command": "env-cmd -f .env.boson vite build"
       },
       "dependsOn": ["^build", "codegen"]
     },
     "build:neutron": {
       "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/apps/app"],
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.neutron react-app-rewired build",
-        "outputs": "dist/apps/app"
+        "command": "env-cmd -f .env.neutron vite build"
       },
       "dependsOn": ["^build", "codegen:neutron"]
     },
     "build:photon": {
       "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/apps/app"],
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.photon react-app-rewired build",
-        "outputs": "dist/apps/app"
+        "command": "env-cmd -f .env.photon vite build"
       },
       "dependsOn": ["^build", "codegen:photon"]
     },
@@ -124,7 +124,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "react-app-rewired test --watchAll=false"
+        "command": "vitest run"
       }
     },
     "e2e": {

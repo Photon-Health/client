@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
-import path from 'node:path';
+import * as path from 'path';
 import dts from 'vite-plugin-dts';
 
 export default defineConfig({

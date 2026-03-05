@@ -51,7 +51,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.boson react-app-rewired start"
+        "command": "env-cmd -f .env.boson vite"
       },
       "dependsOn": ["^build", "codegen"]
     },
@@ -59,7 +59,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.tau react-app-rewired start"
+        "command": "env-cmd -f .env.tau vite"
       },
       "dependsOn": ["^build", "codegen:tau"]
     },
@@ -68,7 +68,7 @@
       "options": {
         "cwd": "apps/patient",
         "commands": [
-          "env-cmd -f .env.boson react-app-rewired start",
+          "env-cmd -f .env.boson vite",
           "nx watch --projects=patient --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=patient"
         ]
       },
@@ -79,7 +79,7 @@
       "options": {
         "cwd": "apps/patient",
         "commands": [
-          "env-cmd -f .env.tau react-app-rewired start",
+          "env-cmd -f .env.tau vite",
           "nx watch --projects=patient --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=patient"
         ]
       },
@@ -87,28 +87,28 @@
     },
     "build:boson": {
       "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/apps/patient"],
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.boson react-app-rewired build",
-        "outputs": "dist/apps/patient"
+        "command": "env-cmd -f .env.boson vite build"
       },
       "dependsOn": ["^build", "codegen"]
     },
     "build:neutron": {
       "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/apps/patient"],
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.neutron react-app-rewired build",
-        "outputs": "dist/apps/patient"
+        "command": "env-cmd -f .env.neutron vite build"
       },
       "dependsOn": ["^build", "codegen:neutron"]
     },
     "build:photon": {
       "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/apps/patient"],
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.photon react-app-rewired build",
-        "outputs": "dist/apps/patient"
+        "command": "env-cmd -f .env.photon vite build"
       },
       "dependsOn": ["^build", "codegen:photon"]
     },

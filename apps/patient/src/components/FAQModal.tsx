@@ -88,7 +88,7 @@ export const FAQModal = ({
                           as="a"
                           variant="outline"
                           color="blue.500"
-                          href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
+                          href={`sms:${import.meta.env.VITE_TWILIO_SMS_NUMBER}`}
                           w="full"
                           onClick={handleMessageSupport}
                         >
