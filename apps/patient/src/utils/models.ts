@@ -20,6 +20,15 @@ export type Pharmacy = NotMaybe<GetPharmaciesByLocationQuery['pharmaciesByLocati
 
 export type OrderFulfillment = NotMaybe<Order['fulfillment']>;
 
+export const OfferType = {
+  RxSense: 'RxSense',
+  GoodRx: 'GoodRx',
+  AmazonPharmacy: 'Amazon Pharmacy'
+} as const;
+
+export type OfferTypes = keyof typeof OfferType;
+export type OfferLabels = (typeof OfferType)[keyof typeof OfferType];
+
 export type EnrichedPharmacy = Pharmacy & {
   logo?: string | null;
   showReadyIn30Min?: boolean;
