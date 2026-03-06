@@ -13,7 +13,7 @@ import {
 import { createMemo, createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
-import { CreateSupervisorMutation, SupervisorsQuery } from '@photonhealth/sdk';
+import { CreateSupervisorMutation, SupervisorCardQuery } from '@photonhealth/sdk';
 import { SupervisorCardFragment } from '@photonhealth/sdk/dist/clinical-api/types';
 
 const sortSupervisors = (supervisors: SupervisorCardFragment[]) =>
@@ -50,10 +50,18 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
   });
 
   onMount(async () => {
-    const { data } = await client.sdk.apolloClinical.query({ query: SupervisorsQuery });
-    const supervisorsResult = data.supervisors.filter((s) => !!s);
+    const {
+      data: { supervisors, mostRecentSupervisor }
+    } = await client.sdk.apolloClinical.query({ query: SupervisorCardQuery });
+
+    const supervisorsResult = supervisors.filter((s) => !!s);
     setSupervisors(sortSupervisors(supervisorsResult));
-    // TODO: set most recent supervisor if there is one
+    if (mostRecentSupervisor) {
+      props.actions.updateFormValue({
+        key: 'supervisorId',
+        value: mostRecentSupervisor.id
+      });
+    }
   });
 
   return (
@@ -156,7 +164,7 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
           setIsOpen(false);
           reset();
         }
-      } catch (e) {
+      } catch {
         triggerToast({
           header: 'Error creating supervisor',
           body: 'Please try again.',
