@@ -1,16 +1,13 @@
 import { Alert, Box, Button, Container, HStack, Image, Link, Spacer, Text } from '@chakra-ui/react';
-import { useSearchParams } from 'react-router-dom';
 import { text as t } from '../utils/text';
 import { useOrderContext } from '../views/Main';
 import { Logo as PhotonLogo } from './Logo';
 import { patientAnalytics } from '../configs/analytics';
 
 export const Nav = () => {
-  const [searchParams] = useSearchParams();
-  const isDemo = searchParams.get('demo');
   const isProd = import.meta.env.VITE_ENV_NAME === 'photon';
 
-  const { order, flattenedFills, logo, setFaqModalIsOpen } = useOrderContext();
+  const { order, flattenedFills, logo, setFaqModalIsOpen, isDemo } = useOrderContext();
 
   function getNavigationBannerTitle() {
     if (isDemo) return t.demoTitle;

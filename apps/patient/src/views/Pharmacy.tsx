@@ -63,6 +63,7 @@ import { patientAnalytics } from '../configs/analytics';
 import { OffersList } from '../components/offers/OffersList';
 import { MailOrderSelectModal } from '../components/mail-order-select';
 import { MailOrderPharmacyOption } from '../components/mail-order-select/MailOrderSelectCard';
+import { buildDemoQuery } from '../utils/demoQueryParams';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -78,6 +79,8 @@ export const Pharmacy = () => {
     flattenedFills,
     setOrder,
     isDemo,
+    phone,
+    demoToken,
     fetchOrder,
     showPriceToggle,
     enablePrice,
@@ -98,7 +101,6 @@ export const Pharmacy = () => {
   const token = searchParams.get('token');
   const isReroute = searchParams.get('reroute');
   const openNow = searchParams.get('openNow');
-  const phone = searchParams.get('phone');
 
   // preferred pharmacy
   const [newPreferredPharmacyId, setNewPreferredPharmacyId] = useState<string>('');
@@ -905,10 +907,10 @@ export const Pharmacy = () => {
     );
 
     if (isMailOrderPharmacy(selectedPharmacy)) {
-      const query = queryString.stringify({ demo: true, phone });
+      const query = buildDemoQuery(demoToken, token, phone);
       navigate(`/status?${query}`);
     } else {
-      const query = queryString.stringify({ demo: true, phone });
+      const query = buildDemoQuery(demoToken, token, phone);
       navigate(`/readyBy?${query}`);
     }
 

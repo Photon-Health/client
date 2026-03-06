@@ -263,14 +263,18 @@ export const triggerDemoNotification = async (
     | 'photon:order_fulfillment:received'
     | 'photon:order_fulfillment:ready',
   pharmacyName?: string,
-  pharmacyAddress?: string
+  pharmacyAddress?: string,
+  userName?: string,
+  userTitle?: string
 ): Promise<boolean> => {
   const url = import.meta.env.VITE_THIRD_PARTY_REST_API_ENDPOINT;
   const data = {
     phoneNumber,
     eventName,
     pharmacyName,
-    pharmacyAddress
+    pharmacyAddress,
+    ...(userName && { userName }),
+    ...(userTitle && { userTitle })
   };
 
   const response = await fetch(url!, {

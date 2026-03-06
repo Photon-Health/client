@@ -15,6 +15,7 @@ import { Nav } from '../components';
 import { setAuthHeader } from '../configs/graphqlClient';
 import theme from '../configs/theme';
 import { demoOrder } from '../data/demoOrder';
+import { demoPharmacies } from '../data/demoPharmacies';
 import { countFillsAndRemoveDuplicates, FillWithCount } from '../utils/general';
 import { Order } from '../utils/models';
 import { Pharmacy } from '../__generated__/graphql';
@@ -38,6 +39,8 @@ export interface OrderContextType {
   setEnablePrice: (enablePrice: boolean) => void;
   logo: any;
   isDemo: boolean;
+  phone: string | null;
+  demoToken: DemoTokenPayload | undefined;
   fetchOrder: (
     currentPharmacy?: Pharmacy,
     options?: FetchOrderOptions
@@ -78,18 +81,48 @@ export type TokenPayload = {
   sub: string; // the subject is the patient id
 };
 
+export type DemoTokenPayload = {
+  demo: true;
+  phoneNumber: string;
+  context: 'demo-select-pharmacy' | 'demo-order-status';
+  iat: number;
+  exp: number;
+};
+
+function isDemoToken(payload: any): payload is DemoTokenPayload {
+  return payload?.demo === true;
+}
+
 export const Main = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const isDemo = searchParams.get('demo');
+  const legacyIsDemo = searchParams.get('demo');
   const orderId = searchParams.get('orderId');
-  const phone = searchParams.get('phone');
+  const legacyPhone = searchParams.get('phone');
   const location = useLocation();
+
+  // Parse JWT if present — detect demo tokens
+  let demoToken: DemoTokenPayload | undefined;
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (isDemoToken(payload)) {
+        demoToken = payload;
+      }
+    } catch (e) {
+      console.error('Failed to parse demo JWT token', e);
+    }
+  }
+
+  // Unified demo state — JWT takes priority, legacy params as fallback
+  const isDemo = !!demoToken || legacyIsDemo != null;
+  const phone = demoToken?.phoneNumber ?? legacyPhone;
+  const demoContext = demoToken?.context;
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
   // This is used to track whether the patient has enabled price on the pharmacy page
   const [showPriceToggle, setShowPriceToggle] = useState<boolean>(false);
-  const [enablePrice, setEnablePrice] = useState<boolean>(!!isDemo);
+  const [enablePrice, setEnablePrice] = useState<boolean>(isDemo);
 
   const [logo, setLogo] = useState<any>(undefined);
   const [loadingLogo, setLoadingLogo] = useState(true);
@@ -130,13 +163,20 @@ export const Main = () => {
       if (location.pathname === '/' && token) {
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
-          datadogRum.addAction('shortlink-opened', {
-            orderId: payload.orderId,
-            patientId: payload.sub,
-            organizationId: payload.organizationId,
-            context: payload.context,
-            metadata: payload.metadata
-          });
+          if (payload.demo) {
+            datadogRum.addAction('shortlink-opened', {
+              demo: true,
+              context: payload.context
+            });
+          } else {
+            datadogRum.addAction('shortlink-opened', {
+              orderId: payload.orderId,
+              patientId: payload.sub,
+              organizationId: payload.organizationId,
+              context: payload.context,
+              metadata: payload.metadata
+            });
+          }
         } catch (e) {
           console.error('Failed to parse JWT token', e);
         }
@@ -150,7 +190,11 @@ export const Main = () => {
     let tokenData: TokenPayload | undefined;
     try {
       const base64TokenData = token?.split('.')?.[1];
-      tokenData = base64TokenData ? JSON.parse(atob(base64TokenData)) : undefined;
+      const parsed = base64TokenData ? JSON.parse(atob(base64TokenData)) : undefined;
+      // Only treat as TokenPayload if it's not a demo token
+      if (parsed && !parsed.demo) {
+        tokenData = parsed;
+      }
     } catch (err) {
       console.error('failed to parse token data', { err });
     }
@@ -255,11 +299,24 @@ export const Main = () => {
   );
 
   useEffect(() => {
-    if (isDemo && (orderId || order?.id !== demoOrder.id || location.pathname === '/')) {
-      const query = queryString.stringify({ demo: true, phone });
-      navigate(`/review?${query}`, { replace: true });
+    if (!isDemo) return;
+    if (orderId || order?.id !== demoOrder.id || location.pathname === '/') {
+      const query = demoToken
+        ? queryString.stringify({ token })
+        : queryString.stringify({ demo: true, phone });
+
+      if (demoContext === 'demo-order-status') {
+        // Pre-select a demo pharmacy and go straight to status
+        if (!order?.pharmacy) {
+          setOrder({ ...demoOrder, pharmacy: demoPharmacies[0] });
+        }
+        navigate(`/status?${query}`, { replace: true });
+      } else {
+        // demo-select-pharmacy or legacy — start at review
+        navigate(`/review?${query}`, { replace: true });
+      }
     }
-  }, [isDemo, location.pathname, navigate, order, orderId, phone]);
+  }, [isDemo, demoContext, location.pathname, navigate, order, orderId, phone, token, demoToken]);
 
   useEffect(() => {
     // it's valid to not have an orderId since we're notifying patients of controlled substances in athena
@@ -312,7 +369,9 @@ export const Main = () => {
   }
 
   const orderContextValue = {
-    isDemo: isDemo != null,
+    isDemo,
+    phone,
+    demoToken,
     order,
     flattenedFills,
     setOrder,

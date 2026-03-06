@@ -30,6 +30,7 @@ import { FiCheck } from 'react-icons/fi';
 import { capitalize } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
+import { buildDemoQuery } from '../utils/demoQueryParams';
 
 dayjs.extend(timezone);
 
@@ -41,13 +42,12 @@ const checkDisabled = (option: string): boolean => {
 };
 
 export const ReadyBy = () => {
-  const { order, flattenedFills, enablePrice, fetchOrder } = useOrderContext();
+  const { order, flattenedFills, enablePrice, fetchOrder, isDemo, phone, demoToken } =
+    useOrderContext();
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const isDemo = searchParams.get('demo');
-  const phone = searchParams.get('phone');
 
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
   const [selectedDay, setSelectedDay] = useState<string | undefined>(undefined);
@@ -63,7 +63,7 @@ export const ReadyBy = () => {
 
   const handleSubmit = async () => {
     if (isDemo) {
-      const query = queryString.stringify({ demo: true, phone });
+      const query = buildDemoQuery(demoToken, token, phone);
       navigate(`/status?${query}`);
       return;
     }

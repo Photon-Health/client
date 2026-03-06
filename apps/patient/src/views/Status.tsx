@@ -25,13 +25,12 @@ import { Pharmacy } from '../utils/models';
 
 export const Status = () => {
   const navigate = useNavigate();
-  const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
+  const { order, setOrder, isDemo, phone, setFaqModalIsOpen } = useOrderContext();
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') ?? undefined;
   const type = searchParams.get('type') ?? undefined;
-  const phone = searchParams.get('phone') ?? undefined;
 
   const { fulfillment, pharmacy, readyBy, readyByTime } = order;
 

@@ -51,6 +51,8 @@ const renderReadyBy = (orderContextValueOverride: Partial<OrderContextType> = {}
     },
     flattenedFills: [],
     isDemo: false,
+    phone: null,
+    demoToken: undefined,
     logo: undefined,
     order: generateOrder(),
     setFaqModalIsOpen(isOpen: boolean): void {},

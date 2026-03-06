@@ -10,16 +10,15 @@ import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { patientAnalytics } from '..//configs/analytics';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
+import { buildDemoQuery } from '../utils/demoQueryParams';
 
 export const Review = () => {
-  const { order, flattenedFills, fetchOrder } = useOrderContext();
+  const { order, flattenedFills, fetchOrder, isDemo, phone, demoToken } = useOrderContext();
 
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const isDemo = searchParams.get('demo');
-  const phone = searchParams.get('phone');
 
   const { patient } = order;
 
@@ -56,7 +55,7 @@ export const Review = () => {
 
     // Proceed to pharmacy page
     const query = isDemo
-      ? queryString.stringify({ demo: true, phone })
+      ? buildDemoQuery(demoToken, token, phone)
       : queryString.stringify({ orderId: order.id, token });
     navigate(`/pharmacy?${query}`);
   };
