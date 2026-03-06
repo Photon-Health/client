@@ -12,6 +12,9 @@ on:
           - neutron
         default: boson
 
+permissions:
+  contents: read
+
 jobs:
   test:
     timeout-minutes: 10

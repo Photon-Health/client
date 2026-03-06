@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: ['boson']
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Vitest
