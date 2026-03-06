@@ -1,7 +1,7 @@
 name: Playwright e2e Tests
 on:
   pull_request:
-    branches: [boson]
+    branches: [ boson ]
 
 permissions:
   contents: read
@@ -10,6 +10,8 @@ jobs:
   test:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    env:
+      TARGET_ENV: 'boson'
     steps:
       - uses: actions/checkout@v4
 
@@ -31,8 +33,10 @@ jobs:
       - name: Run Playwright tests
         env:
           PLAYWRIGHT_BASE_URL: 'http://localhost:3000'
-          PLAYWRIGHT_E2E_ACCOUNT_USERNAME: ${{ secrets.PLAYWRIGHT_E2E_ACCOUNT_USERNAME }}
+          PLAYWRIGHT_E2E_ACCOUNT_USERNAME: ${{ vars.PLAYWRIGHT_E2E_ACCOUNT_USERNAME }}
           PLAYWRIGHT_E2E_ACCOUNT_PASSWORD: ${{ secrets.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD }}
+          PLAYWRIGHT_E2E_SSO_ACCOUNT_USERNAME: ${{ vars.PLAYWRIGHT_E2E_SSO_ACCOUNT_USERNAME }}
+          PLAYWRIGHT_E2E_SSO_ACCOUNT_PASSWORD: ${{ secrets.PLAYWRIGHT_E2E_SSO_ACCOUNT_PASSWORD }}
         run: npx nx run app:e2e
 
       - uses: actions/upload-artifact@v4
