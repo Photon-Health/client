@@ -4,6 +4,10 @@ on:
   push:
     branches: [boson]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   bumpAndOpen:
     name: Bump neutron
