@@ -8,6 +8,10 @@ on:
       - unlabeled
     branches: [neutron, photon]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   merge:
     name: Merge

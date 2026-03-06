@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [boson, neutron, photon]
 
+permissions:
+  contents: read
+
 jobs:
   prettier:
     name: Prettier
