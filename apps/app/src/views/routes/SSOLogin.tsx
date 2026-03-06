@@ -16,15 +16,10 @@ export const SSOLogin = () => {
 
   const alreadyLoggedOut = searchParams.get('loggedOut') === '1';
 
-  // Guard against duplicate login() calls. loginWithRedirect() starts a PKCE transaction
-  // and initiates a redirect — calling it multiple times concurrently can corrupt Auth0 SDK
-  // internal state, leading to failed auth callbacks or infinite spinners.
   const loginInitiated = useRef(false);
 
-  // On iOS, backgrounding the app suspends WKWebView network activity and iframes.
-  // If checkSession() (which uses a hidden iframe for silent auth) was in progress when the
-  // app was backgrounded, it may never resolve, leaving isLoading stuck as true forever.
-  // When the webview becomes visible again, reload to restart the auth flow cleanly.
+  // iOS WKWebView suspends iframes when backgrounded, which can leave checkSession()
+  // (and thus isLoading) stuck forever. Reload on foreground to recover.
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && isLoading) {
@@ -42,12 +37,8 @@ export const SSOLogin = () => {
     }
     if (isAuthenticated && !alreadyLoggedOut) {
       datadogRum.addAction('SSOLogin-Debug', { state: 'isAuthenticated' });
-      // Logout before attempting a login, in case user has existing session with another org
-      // that doesn't use the SSO connection. We append loggedOut=1 to the returnTo URL so
-      // that when Auth0 redirects back after logout, we skip this branch and proceed to
-      // login(). Without this, non-federated logout + an active IDP session
-      // causes Auth0 checkSession() to silently re-authenticate on every page load, creating
-      // a logout→re-auth→logout loop (~3s per cycle).
+      // Logout first in case user has a session with a different org/connection.
+      // loggedOut=1 prevents a logout→silent-reauth→logout loop when the IDP session persists.
       const url = new URL(window.location.href);
       url.searchParams.set('loggedOut', '1');
       logout({ federated: false, returnTo: url.toString() });
@@ -60,6 +51,7 @@ export const SSOLogin = () => {
       }
     }
 
+    // help guarantee no extra login call causes shenanigans during SSO
     if (loginInitiated.current) return;
     loginInitiated.current = true;
 
@@ -67,12 +59,9 @@ export const SSOLogin = () => {
     login({
       connection
     });
-    // login and logout are not memoized in PhotonProvider — they are recreated on every
-    // render. Including them in the dependency array would re-fire this effect on any
-    // provider re-render, potentially calling login() or logout() again mid-redirect.
-    // TODO: Wrapping login/logout in useCallback(fn, [client]) in PhotonProvider would make
-    // them referentially stable and remove the need for this dep omission and the
-    // loginInitiated ref guard.
+    // login/logout are not memoized in PhotonProvider — omitting from deps to prevent
+    // re-fires on every provider render. TODO: wrap them in useCallback(fn, [client]) in
+    // PhotonProvider, which would also remove the need for the loginInitiated ref guard.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, isAuthenticated, alreadyLoggedOut, connection, returnTo]);
 
