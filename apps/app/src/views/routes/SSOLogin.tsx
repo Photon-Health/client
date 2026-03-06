@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { usePhoton } from '@photonhealth/react';
 import { Logo } from '../components/Logo';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { datadogRum } from '@datadog/browser-rum';
 
 export const SSOLogin = () => {
@@ -16,6 +16,20 @@ export const SSOLogin = () => {
 
   const alreadyLoggedOut = searchParams.get('loggedOut') === '1';
 
+  const loginInitiated = useRef(false);
+
+  // iOS WKWebView suspends iframes when backgrounded, which can leave checkSession()
+  // (and thus isLoading) stuck forever. Reload on foreground to recover.
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && isLoading) {
+        window.location.reload();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isLoading]);
+
   useEffect(() => {
     if (isLoading) {
       datadogRum.addAction('SSOLogin-Debug', { state: 'isLoading' });
@@ -23,11 +37,11 @@ export const SSOLogin = () => {
     }
     if (isAuthenticated && !alreadyLoggedOut) {
       datadogRum.addAction('SSOLogin-Debug', { state: 'isAuthenticated' });
+      // Logout first in case user has a session with a different org/connection.
+      // loggedOut=1 prevents a logout→silent-reauth→logout loop when the IDP session persists.
       const url = new URL(window.location.href);
       url.searchParams.set('loggedOut', '1');
-      // logout before attempting a login, in case user has existing session with another org
-      // that doesn't use the SSO connection
-      logout({ federated: false, returnTo: window.location.href });
+      logout({ federated: false, returnTo: url.toString() });
       return;
     }
 
@@ -37,11 +51,19 @@ export const SSOLogin = () => {
       }
     }
 
+    // help guarantee no extra login call causes shenanigans during SSO
+    if (loginInitiated.current) return;
+    loginInitiated.current = true;
+
     datadogRum.addAction('SSOLogin-Debug', { state: 'login' });
     login({
       connection
     });
-  }, [isLoading, isAuthenticated, login, logout, connection, returnTo, alreadyLoggedOut]);
+    // login/logout are not memoized in PhotonProvider — omitting from deps to prevent
+    // re-fires on every provider render. TODO: wrap them in useCallback(fn, [client]) in
+    // PhotonProvider, which would also remove the need for the loginInitiated ref guard.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, isAuthenticated, alreadyLoggedOut, connection, returnTo]);
 
   return (
     <Container maxW="md" py={{ base: '12', md: '24' }}>
