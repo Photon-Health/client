@@ -23,7 +23,7 @@ import { FixedFooter, LocationModal, PoweredBy } from '../components';
 import { CouponModal } from '../components/coupons';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy, wait } from '../utils/general';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { Pharmacy as EnrichedPharmacy, OfferDetails } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -45,7 +45,8 @@ import { datadogRum } from '@datadog/browser-rum';
 import {
   FulfillmentType,
   GetPharmaciesByLocationQuery,
-  Pharmacy as PharmacyType
+  Pharmacy as PharmacyType,
+  Prescription
 } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchOffers, getPharmacy } from './pharmacy.utils';
@@ -54,7 +55,6 @@ import {
   BrandedOptionOverrides,
   BrandedOptions,
   BrandedOptionsHeader,
-  Offer,
   PickupPharmacyCardList
 } from '../components/pharmacy-card-list';
 import { formatAddress } from '../utils/formatters';
@@ -63,6 +63,7 @@ import { patientAnalytics } from '../configs/analytics';
 import { OffersList } from '../components/offers/OffersList';
 import { MailOrderSelectModal } from '../components/mail-order-select';
 import { MailOrderPharmacyOption } from '../components/mail-order-select/MailOrderSelectCard';
+import { getOfferType } from '../utils/offers';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -156,8 +157,8 @@ export const Pharmacy = () => {
     BrandedOptionOverrides | undefined
   >(undefined);
 
-  const [offers, setOffers] = useState<Offer[] | undefined>(undefined);
-  const [filteredOffers, setFilteredOffers] = useState<Offer[] | undefined>(undefined);
+  const [offers, setOffers] = useState<OfferDetails[] | undefined>(undefined);
+  const [filteredOffers, setFilteredOffers] = useState<OfferDetails[] | undefined>(undefined);
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
@@ -239,7 +240,7 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     const getOffers = async () => {
-      let fetchedOffers: Offer[] | undefined;
+      let fetchedOffers: OfferDetails[] | undefined;
 
       // only fetch offers if we don't have any
       if (!offers) {
@@ -749,7 +750,7 @@ export const Pharmacy = () => {
       ? override.type
       : selectedPharmacy.fulfillmentTypes?.[0];
 
-    handleSubmitSuccessAnalytics(overridePharmacy);
+    handleSubmitSuccessAnalytics(overridePharmacy, allPharmaciesIncludingOffers);
 
     // If it's a mail order pharmacy, submit the pharmacy to the order
     // Otherwise, just navigate to ready by selection
@@ -916,9 +917,23 @@ export const Pharmacy = () => {
   };
 
   const handleSubmitSuccessAnalytics = (
-    selectedPharmacy: { id: string; name: string } | PharmacyType | undefined
+    selectedPharmacy: { id: string; name: string } | PharmacyType | undefined,
+    allPharmaciesIncludingOffers: EnrichedPharmacy[]
   ) => {
     const extraOfferMetadata: Record<string, any> = {};
+
+    const selectedOffer = offers?.find((o) => o.pharmacy.id == selectedPharmacy?.id);
+    const selectedOfferPharmacy =
+      selectedPharmacy && allPharmaciesIncludingOffers.find((p) => p.id === selectedPharmacy.id);
+
+    const offerType = getOfferType({ offer: selectedOffer, pharmacy: selectedOfferPharmacy });
+
+    const medCount = new Set(
+      order.fills
+        .map((f) => f.prescription)
+        .filter((p): p is Prescription => !!p)
+        .map(({ id }) => id)
+    ).size;
 
     if (brandedOptionsOverride?.amazonPharmacyOverride) {
       const sawPrice = brandedOptionsOverride?.amazonPharmacyOverride?.costAmount !== undefined;
@@ -991,10 +1006,16 @@ export const Pharmacy = () => {
           id: o.pharmacy.id
         })) || [];
 
+      extraOfferMetadata.offerType = offerType;
+      extraOfferMetadata.buttonText = t.selectPharmacy;
+      extraOfferMetadata.medCount = medCount;
+      extraOfferMetadata.multiMedOffer = medCount > 1;
+
       patientAnalytics.track('Offer Selected', order, {
         ...selectedPharmacy,
         ...extraOfferMetadata,
         pharmacyId: selectedId,
+        pharmacyType: selectedOfferPharmacy?.fulfillmentTypes?.[0],
         // allPharmacies does not included branded options so we must combine them
         ordinalPosition:
           [...offersArray, ...brandedOptionObjects, ...allPharmacies].findIndex(

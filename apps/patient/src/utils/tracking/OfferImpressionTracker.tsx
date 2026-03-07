@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
 import { patientAnalytics } from '../../configs/analytics';
-import { EnrichedPharmacy, OfferType } from '../models';
+import { EnrichedPharmacy } from '../models';
 import { useOrderContext } from '../../views/Main';
-import { Offer } from '../../components/pharmacy-card-list';
+import { OfferDetails } from '../models';
+import { getOfferType } from '../offers';
 
 const OfferImpressionTracker = ({
   children,
@@ -14,7 +15,7 @@ const OfferImpressionTracker = ({
   enabled
 }: {
   children: React.ReactNode;
-  offer: Offer | undefined;
+  offer: OfferDetails | undefined;
   pharmacy: EnrichedPharmacy;
   ordinalPosition: number;
   isAlreadySelected: boolean;
@@ -35,15 +36,7 @@ const OfferImpressionTracker = ({
         }, new Set<string>());
 
         const price = offer?.costAmount || pharmacy.price;
-
-        let offerType: string | null = null;
-        if (offer?.costType) {
-          offerType = OfferType.AmazonPharmacy;
-        } else if (pharmacy.source === 'goodrx') {
-          offerType = OfferType.GoodRx;
-        } else if (pharmacy.source === 'rxsense') {
-          offerType = OfferType.RxSense;
-        }
+        const offerType = getOfferType({ pharmacy, offer });
 
         patientAnalytics.track('Offer Impression', order, {
           offerType,
