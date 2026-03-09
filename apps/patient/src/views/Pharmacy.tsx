@@ -705,7 +705,7 @@ export const Pharmacy = () => {
 
   const handleSubmit = async (
     selectedPharmacy: EnrichedPharmacy,
-    opts: {
+    analyticsDetails: {
       selectedFrom: 'Main List' | 'Mail Order List';
       buttonText: string;
     }
@@ -715,7 +715,7 @@ export const Pharmacy = () => {
       return;
     }
     setSubmitting(true);
-    const { selectedFrom = 'Main List', buttonText } = opts;
+    const { selectedFrom = 'Main List', buttonText } = analyticsDetails;
 
     const selectedOffer = filteredOffers?.find((o) => o.pharmacy.id === selectedPharmacy.id);
     const isMailOrder = isMailOrderPharmacy(selectedPharmacy);
@@ -930,8 +930,8 @@ export const Pharmacy = () => {
 
   const handleSubmitSuccessAnalytics = ({
     selectedPharmacy,
-    selectedFrom = 'Main List',
     allPharmaciesIncludingOffers,
+    selectedFrom = 'Main List',
     buttonText
   }: {
     selectedPharmacy: { id: string; name: string } | PharmacyType | undefined;
@@ -1028,7 +1028,7 @@ export const Pharmacy = () => {
 
       extraOfferMetadata.offerType = offerType;
       extraOfferMetadata.buttonText = t.selectPharmacy;
-      extraOfferMetadata.numberOfMeds = medCount;
+      extraOfferMetadata.numPrescriptions = medCount;
       extraOfferMetadata.multiMedOffer = medCount > 1;
       extraOfferMetadata.hasRefills = medCount < order.fills.length;
       extraOfferMetadata.selectedFrom = selectedFrom;

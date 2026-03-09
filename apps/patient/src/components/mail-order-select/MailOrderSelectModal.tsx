@@ -25,7 +25,7 @@ type MailOrderSelectModalProps = Omit<ModalProps, 'children'> & {
   options?: MailOrderPharmacyOption[];
   onConfirm: (
     val: MailOrderPharmacyOption,
-    analytics: { selectedFrom: 'Mail Order List'; buttonText: string }
+    analyticsDetails: { selectedFrom: 'Mail Order List'; buttonText: string }
   ) => unknown;
 };
 

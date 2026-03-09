@@ -58,7 +58,7 @@ const OfferImpressionTracker = ({
           costAmountTitle: offer?.costAmountTitle,
           retailAmount: offer?.retailAmount,
           retailAmountTitle: offer?.retailAmountTitle,
-          numberOfMeds: rxIds.size,
+          numPrescriptions: rxIds.size,
           multiMedOffer: rxIds.size > 1,
           hasRefills: rxIds.size < order.fills.length,
           tags: offer?.tags
