@@ -703,12 +703,18 @@ export const Pharmacy = () => {
     }
   };
 
-  const handleSubmit = async (selectedPharmacy: EnrichedPharmacy) => {
+  const handleSubmit = async (
+    selectedPharmacy: EnrichedPharmacy,
+    opts: {
+      selectedFrom: 'Main List' | 'Mail Order List';
+    }
+  ) => {
     if (!order) {
       console.error('No order present');
       return;
     }
     setSubmitting(true);
+    const { selectedFrom = 'Main List' } = opts;
 
     const selectedOffer = filteredOffers?.find((o) => o.pharmacy.id === selectedPharmacy.id);
     const isMailOrder = isMailOrderPharmacy(selectedPharmacy);
@@ -750,7 +756,13 @@ export const Pharmacy = () => {
       ? override.type
       : selectedPharmacy.fulfillmentTypes?.[0];
 
-    handleSubmitSuccessAnalytics(overridePharmacy, allPharmaciesIncludingOffers);
+    handleSubmitSuccessAnalytics({
+      selectedPharmacy: overridePharmacy,
+      allPharmaciesIncludingOffers,
+      selectedFrom
+    });
+
+    return;
 
     // If it's a mail order pharmacy, submit the pharmacy to the order
     // Otherwise, just navigate to ready by selection
@@ -916,10 +928,15 @@ export const Pharmacy = () => {
     setSubmitting(false);
   };
 
-  const handleSubmitSuccessAnalytics = (
-    selectedPharmacy: { id: string; name: string } | PharmacyType | undefined,
-    allPharmaciesIncludingOffers: EnrichedPharmacy[]
-  ) => {
+  const handleSubmitSuccessAnalytics = ({
+    selectedPharmacy,
+    selectedFrom = 'Main List',
+    allPharmaciesIncludingOffers
+  }: {
+    selectedPharmacy: { id: string; name: string } | PharmacyType | undefined;
+    selectedFrom: 'Main List' | 'Mail Order List';
+    allPharmaciesIncludingOffers: EnrichedPharmacy[];
+  }) => {
     const extraOfferMetadata: Record<string, any> = {};
 
     const selectedOffer = offers?.find((o) => o.pharmacy.id == selectedPharmacy?.id);
@@ -1010,6 +1027,7 @@ export const Pharmacy = () => {
       extraOfferMetadata.buttonText = t.selectPharmacy;
       extraOfferMetadata.medCount = medCount;
       extraOfferMetadata.multiMedOffer = medCount > 1;
+      extraOfferMetadata.selectedFrom = selectedFrom;
 
       patientAnalytics.track('Offer Selected', order, {
         ...selectedPharmacy,
@@ -1138,7 +1156,7 @@ export const Pharmacy = () => {
       <MailOrderSelectModal
         isOpen={mailOrderModalOpen}
         onClose={() => setMailOrderModalOpen(false)}
-        onConfirm={handleSubmit}
+        onConfirm={(val) => handleSubmit(val, { selectedFrom: 'Mail Order List' })}
         options={patientMailOrderOptions}
       />
 
@@ -1289,7 +1307,7 @@ export const Pharmacy = () => {
                 return;
               }
 
-              await handleSubmit(selectedPharmacy);
+              await handleSubmit(selectedPharmacy, { selectedFrom: 'Main List' });
             }}
           >
             {successfullySubmitted ? t.thankYou : t.selectPharmacy}
