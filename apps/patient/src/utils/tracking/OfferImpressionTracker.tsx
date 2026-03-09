@@ -37,7 +37,7 @@ const OfferImpressionTracker = ({
         );
 
         const price = offer?.costAmount || pharmacy.price;
-        const offerType = getOfferType({ pharmacy, offer });
+        const offerType = getOfferType({ pharmacy, offer }) ?? 'None';
 
         patientAnalytics.track('Offer Impression', order, {
           offerType,

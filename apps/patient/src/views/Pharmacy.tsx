@@ -943,7 +943,8 @@ export const Pharmacy = () => {
     const selectedOfferPharmacy =
       selectedPharmacy && allPharmaciesIncludingOffers.find((p) => p.id === selectedPharmacy.id);
 
-    const offerType = getOfferType({ offer: selectedOffer, pharmacy: selectedOfferPharmacy });
+    const offerType =
+      getOfferType({ offer: selectedOffer, pharmacy: selectedOfferPharmacy }) ?? 'None';
 
     const medCount = new Set(
       order.fills
