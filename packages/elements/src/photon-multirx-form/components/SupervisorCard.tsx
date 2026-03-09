@@ -86,6 +86,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
               <ComboBox.Input
                 onInput={(e) => setQuery(e.currentTarget.value || '')}
                 displayValue={(value) => displaySupervisor(value)}
+                showClear={true}
               />
               <ComboBox.Options>
                 <For each={filteredSupervisors()}>
