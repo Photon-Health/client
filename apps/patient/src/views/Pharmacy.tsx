@@ -1025,7 +1025,7 @@ export const Pharmacy = () => {
 
       extraOfferMetadata.offerType = offerType;
       extraOfferMetadata.buttonText = t.selectPharmacy;
-      extraOfferMetadata.medCount = medCount;
+      extraOfferMetadata.numberOfMeds = medCount;
       extraOfferMetadata.multiMedOffer = medCount > 1;
       extraOfferMetadata.selectedFrom = selectedFrom;
 

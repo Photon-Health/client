@@ -57,7 +57,7 @@ const OfferImpressionTracker = ({
           costAmountTitle: offer?.costAmountTitle,
           retailAmount: offer?.retailAmount,
           retailAmountTitle: offer?.retailAmountTitle,
-          medCount: rxIds.size,
+          numberOfMeds: rxIds.size,
           multiMedOffer: rxIds.size > 1,
           tags: offer?.tags
         });
