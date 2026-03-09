@@ -707,6 +707,7 @@ export const Pharmacy = () => {
     selectedPharmacy: EnrichedPharmacy,
     opts: {
       selectedFrom: 'Main List' | 'Mail Order List';
+      buttonText: string;
     }
   ) => {
     if (!order) {
@@ -714,7 +715,7 @@ export const Pharmacy = () => {
       return;
     }
     setSubmitting(true);
-    const { selectedFrom = 'Main List' } = opts;
+    const { selectedFrom = 'Main List', buttonText } = opts;
 
     const selectedOffer = filteredOffers?.find((o) => o.pharmacy.id === selectedPharmacy.id);
     const isMailOrder = isMailOrderPharmacy(selectedPharmacy);
@@ -759,10 +760,9 @@ export const Pharmacy = () => {
     handleSubmitSuccessAnalytics({
       selectedPharmacy: overridePharmacy,
       allPharmaciesIncludingOffers,
-      selectedFrom
+      selectedFrom,
+      buttonText
     });
-
-    return;
 
     // If it's a mail order pharmacy, submit the pharmacy to the order
     // Otherwise, just navigate to ready by selection
@@ -931,11 +931,13 @@ export const Pharmacy = () => {
   const handleSubmitSuccessAnalytics = ({
     selectedPharmacy,
     selectedFrom = 'Main List',
-    allPharmaciesIncludingOffers
+    allPharmaciesIncludingOffers,
+    buttonText
   }: {
     selectedPharmacy: { id: string; name: string } | PharmacyType | undefined;
-    selectedFrom: 'Main List' | 'Mail Order List';
     allPharmaciesIncludingOffers: EnrichedPharmacy[];
+    selectedFrom: 'Main List' | 'Mail Order List';
+    buttonText: string;
   }) => {
     const extraOfferMetadata: Record<string, any> = {};
 
@@ -1030,6 +1032,7 @@ export const Pharmacy = () => {
       extraOfferMetadata.multiMedOffer = medCount > 1;
       extraOfferMetadata.hasRefills = medCount < order.fills.length;
       extraOfferMetadata.selectedFrom = selectedFrom;
+      extraOfferMetadata.buttonText = buttonText;
 
       patientAnalytics.track('Offer Selected', order, {
         ...selectedPharmacy,
@@ -1158,7 +1161,7 @@ export const Pharmacy = () => {
       <MailOrderSelectModal
         isOpen={mailOrderModalOpen}
         onClose={() => setMailOrderModalOpen(false)}
-        onConfirm={(val) => handleSubmit(val, { selectedFrom: 'Mail Order List' })}
+        onConfirm={handleSubmit}
         options={patientMailOrderOptions}
       />
 
@@ -1309,7 +1312,10 @@ export const Pharmacy = () => {
                 return;
               }
 
-              await handleSubmit(selectedPharmacy, { selectedFrom: 'Main List' });
+              await handleSubmit(selectedPharmacy, {
+                selectedFrom: 'Main List',
+                buttonText: t.selectPharmacy
+              });
             }}
           >
             {successfullySubmitted ? t.thankYou : t.selectPharmacy}
