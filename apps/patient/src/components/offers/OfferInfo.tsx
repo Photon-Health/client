@@ -2,9 +2,8 @@ import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@c
 import { FiInfo, FiStar } from 'react-icons/fi';
 import { Tooltip } from './Tooltip';
 import { text as t } from '../../utils/text';
-
+import { OfferDetails } from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';
-import { Offer } from '../pharmacy-card-list/BrandedOptions';
 
 const PreferredTag = () => {
   return (
@@ -33,8 +32,8 @@ const CurrentPharmacyTag = () => {
 };
 
 interface OfferInfoProps {
-  pharmacy?: Pick<Offer['pharmacy'], 'id' | 'name' | 'logo'>;
-  offer: Offer;
+  pharmacy?: Pick<OfferDetails['pharmacy'], 'id' | 'name' | 'logo'>;
+  offer: OfferDetails;
   isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
 }
