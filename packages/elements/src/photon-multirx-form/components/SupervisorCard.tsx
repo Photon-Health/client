@@ -32,6 +32,7 @@ interface SupervisorCardProps {
 export const SupervisorCard = (props: SupervisorCardProps) => {
   const client = usePhoton();
   const [supervisors, setSupervisors] = createSignal<SupervisorCardFragment[]>([]);
+  const [hasMostRecentSupervisor, setHasMostRecentSupervisor] = createSignal<boolean>(false);
   const [query, setQuery] = createSignal<string>('');
   const currentSupervisor = createMemo(() =>
     supervisors().find((s) => s.id === props.store.supervisorId?.value)
@@ -61,6 +62,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
         key: 'supervisorId',
         value: mostRecentSupervisor.id
       });
+      setHasMostRecentSupervisor(true);
     }
   });
 
@@ -68,12 +70,14 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
     <Card addChildrenDivider={true} class="pb-2">
       <Text color="gray">Supervising Physician</Text>
       <div>
-        <Text size="sm" color="black" class="pb-2">
-          Some pharmacies require supervising physician information for this prescription. Adding it
-          here can help avoid callbacks and delays.
-        </Text>
+        <Show when={!hasMostRecentSupervisor()}>
+          <Text size="sm" color="black" class="pb-2">
+            Some pharmacies require supervising physician information for this prescription. Adding
+            it here can help avoid callbacks and delays.
+          </Text>
+        </Show>
         <Show when={supervisors().length > 0}>
-          <InputGroup label="Supervisor">
+          <InputGroup label="Supervisor" showOptionalSubtext={true}>
             <ComboBox
               value={currentSupervisor()}
               setSelected={(value?: SupervisorCardFragment) => {
@@ -116,7 +120,7 @@ const supervisorSchema = zod
   .object({
     supervisorFullName: zod.string().optional(),
     supervisorNpi: zod
-      .union([zod.literal(''), zod.string().regex(/^[0-9]+$/, 'Enter a valid NPI')])
+      .union([zod.literal(''), zod.string().regex(/^[0-9]{10}$/, 'Enter a valid 10-digit NPI')])
       .optional()
   })
   .superRefine((data, ctx) => {
