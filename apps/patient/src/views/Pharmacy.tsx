@@ -1027,6 +1027,7 @@ export const Pharmacy = () => {
       extraOfferMetadata.buttonText = t.selectPharmacy;
       extraOfferMetadata.numberOfMeds = medCount;
       extraOfferMetadata.multiMedOffer = medCount > 1;
+      extraOfferMetadata.hasRefills = medCount < order.fills.length;
       extraOfferMetadata.selectedFrom = selectedFrom;
 
       patientAnalytics.track('Offer Selected', order, {

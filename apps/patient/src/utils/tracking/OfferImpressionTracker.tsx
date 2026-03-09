@@ -5,6 +5,7 @@ import { EnrichedPharmacy } from '../models';
 import { useOrderContext } from '../../views/Main';
 import { OfferDetails } from '../models';
 import { getOfferType } from '../offers';
+import { Prescription } from '../../__generated__/graphql';
 
 const OfferImpressionTracker = ({
   children,
@@ -28,12 +29,12 @@ const OfferImpressionTracker = ({
     rootMargin: '-100px',
     onChange: (inView) => {
       if (inView && enabled) {
-        const rxIds = order.fills.reduce((acc, cur) => {
-          if (cur.prescription) {
-            acc.add(cur.prescription.id);
-          }
-          return acc;
-        }, new Set<string>());
+        const rxIds = new Set(
+          order.fills
+            .map((f) => f.prescription)
+            .filter((p): p is Prescription => !!p)
+            .map((p) => p.id)
+        );
 
         const price = offer?.costAmount || pharmacy.price;
         const offerType = getOfferType({ pharmacy, offer });
@@ -59,6 +60,7 @@ const OfferImpressionTracker = ({
           retailAmountTitle: offer?.retailAmountTitle,
           numberOfMeds: rxIds.size,
           multiMedOffer: rxIds.size > 1,
+          hasRefills: rxIds.size < order.fills.length,
           tags: offer?.tags
         });
       }
