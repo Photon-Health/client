@@ -27,7 +27,15 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         storageState: 'e2e/.auth/user.json'
       },
-      dependencies: ['setup']
+      dependencies: ['setup'],
+      testIgnore: /sso_/
+    },
+    {
+      // SSO tests use a fresh context and authenticate as part of the test flow,
+      // so no setup project or stored auth state is needed.
+      name: 'sso',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /sso_.*\.spec\.ts/
     }
   ],
   ...localDevServer()

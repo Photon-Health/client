@@ -1,6 +1,6 @@
 {
   "name": "@photonhealth/elements",
-  "version": "0.20.3",
+  "version": "0.20.4",
   "description": "",
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
@@ -10,11 +10,6 @@
     "build:prod": "npx nx run elements:build",
     "build:watch": "rimraf dist && vite build --watch",
     "prepublishOnly": "npm run build:prod",
-    "upload-s3": "npm run upload-s3:package-json && npm run upload-s3:dist && npm run upload-s3:package-json-latest && npm run upload-s3:dist-latest",
-    "upload-s3:package-json": "s3-deploy './package.json' --cwd './' --region 'us-east-1' --bucket 'cdn.rx.dev' --filePrefix $PREFIX",
-    "upload-s3:dist": "s3-deploy './dist/**' --cwd './dist/' --region 'us-east-1' --bucket 'cdn.rx.dev' --filePrefix $PREFIX/dist",
-    "upload-s3:package-json-latest": "s3-deploy './package.json' --cwd './' --region 'us-east-1' --bucket 'cdn.rx.dev' --filePrefix $PREFIX_LATEST",
-    "upload-s3:dist-latest": "s3-deploy './dist/**' --cwd './dist/' --region 'us-east-1' --bucket 'cdn.rx.dev' --filePrefix $PREFIX_LATEST/dist",
     "lint": "eslint src",
     "lint:only-errors": "eslint src --quiet",
     "lint:fix": "eslint src --fix"
@@ -41,6 +36,7 @@
     "@types/node": "^18.7.18",
     "autoprefixer": "^10.4.13",
     "babel-loader": "^8.2.5",
+    "@csstools/selector-specificity": "^2.0.1",
     "css-has-pseudo": "^4.0.1",
     "fast-glob": "^3.2.12",
     "open-props": "^1.4.16",
