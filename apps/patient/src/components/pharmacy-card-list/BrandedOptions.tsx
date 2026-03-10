@@ -3,7 +3,7 @@ import { SlideFade } from '@chakra-ui/react';
 import { BrandedPharmacyCard } from './BrandedPharmacyCard';
 import { OfferImpressionTracker } from '../../utils/tracking/OfferImpressionTracker';
 import { getPharmacy } from '../../views/pharmacy.utils';
-import { FulfillmentType } from '../../__generated__/graphql';
+import { OfferDetails } from '../../utils/models';
 
 interface Props {
   options: string[];
@@ -16,24 +16,8 @@ interface Props {
   numberOfOffers?: number;
 }
 
-export interface Offer {
-  deliveryEstimate?: string;
-  costType?: string;
-  costAmount?: number;
-  costAmountTitle?: string;
-  retailAmount?: number;
-  retailAmountTitle?: string;
-  pharmacy: {
-    id: string;
-    name: string;
-    fulfillmentTypes: FulfillmentType[];
-    logo?: string;
-  };
-  tags: string[];
-}
-
 export interface BrandedOptionOverrides {
-  amazonPharmacyOverride?: Offer;
+  amazonPharmacyOverride?: OfferDetails;
   novocareExperimentOverride?: string;
 }
 

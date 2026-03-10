@@ -186,6 +186,7 @@ export const text = {
   ),
   selectPaymentMethod: 'Select a payment method',
   selectPharmacy: 'Select pharmacy',
+  placeOrder: 'Place Order',
   sendToNew: (isPlural: boolean, originalPharmacyName: string) =>
     `We'll cancel your ${
       isPlural ? 'prescriptions' : 'prescription'

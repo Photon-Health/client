@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, test, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { OffersList } from './OffersList';
-import { Offer } from '../pharmacy-card-list';
+import { OfferDetails } from '../../utils/models';
 
 // Mock the OfferImpressionTracker component
 vi.mock('../../utils/tracking/OfferImpressionTracker', () => ({
@@ -35,7 +35,7 @@ vi.mock('./OfferCard', () => ({
 }));
 
 describe('OffersList', () => {
-  const mockOffers: Offer[] = [
+  const mockOffers: OfferDetails[] = [
     {
       pharmacy: {
         id: 'amazon-pharmacy',
