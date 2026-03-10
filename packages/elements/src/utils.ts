@@ -1,8 +1,6 @@
 import { Permission } from '@photonhealth/sdk/dist/types';
 import queryString from 'query-string';
 
-export {{{;
-
 export const validateProps = (props: Record<string, any>, required: string[]) => {
   const errors: string[] = [];
   required.forEach((r) => {
