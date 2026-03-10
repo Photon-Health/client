@@ -30,6 +30,10 @@ interface PrescribeWorkflowComponentProps extends Omit<PrescribeProps, 'initialS
   prescriptionIds?: string;
   enableCoverageCheck: boolean;
   pharmacyId?: string;
+  enableLocalPickup: boolean;
+  enableSendToPatient: boolean;
+  enableDeliveryPharmacies: boolean;
+  mailOrderIds?: string;
 }
 
 const Component = (props: PrescribeWorkflowComponentProps) => {
@@ -64,6 +68,10 @@ const Component = (props: PrescribeWorkflowComponentProps) => {
           >
             <PharmacySelectionProvider
               pharmacyIdProp={props.pharmacyId}
+              enableLocalPickup={props.enableLocalPickup}
+              enableSendToPatient={props.enableSendToPatient}
+              enableDeliveryPharmacies={props.enableDeliveryPharmacies}
+              mailOrderIds={props.mailOrderIds}
               onFulfillmentTypeChange={(ft) => {
                 actions.updateFormValue({ key: 'fulfillmentType', value: ft || '' });
               }}
@@ -82,15 +90,11 @@ const Component = (props: PrescribeWorkflowComponentProps) => {
                 hideTemplates={props.hideTemplates}
                 hidePatientCard={props.hidePatientCard}
                 enableOrder={props.enableOrder}
-                enableLocalPickup={props.enableLocalPickup}
-                enableSendToPatient={props.enableSendToPatient}
-                enableDeliveryPharmacies={props.enableDeliveryPharmacies}
                 enableMedHistory={props.enableMedHistory}
                 enableMedHistoryLinks={props.enableMedHistoryLinks}
                 enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
                 enableCombineAndDuplicate={props.enableCombineAndDuplicate}
                 optionalPatientAddress={props.optionalPatientAddress}
-                mailOrderIds={props.mailOrderIds}
                 address={props.address}
                 weight={props.weight}
                 weightUnit={props.weightUnit}

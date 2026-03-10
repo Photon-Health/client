@@ -82,15 +82,11 @@ export type PrescribeProps = {
   hideTemplates: boolean;
   hidePatientCard: boolean;
   enableOrder: boolean;
-  enableLocalPickup: boolean;
-  enableSendToPatient: boolean;
   enableMedHistory: boolean;
   enableMedHistoryLinks: boolean;
   enableMedHistoryRefillButton: boolean;
   enableCombineAndDuplicate: boolean;
-  enableDeliveryPharmacies: boolean;
   optionalPatientAddress: boolean;
-  mailOrderIds?: string;
   address?: Address;
   weight?: number;
   weightUnit?: string;
@@ -672,13 +668,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   enableOrder={props.enableOrder}
                 />
                 <Show when={props.enableOrder && !pharmacySelectionContext.isAutoRouted()}>
-                  <OrderCard
-                    store={props.formStore}
-                    enableLocalPickup={props.enableLocalPickup}
-                    enableSendToPatient={props.enableSendToPatient}
-                    enableDeliveryPharmacies={props.enableDeliveryPharmacies}
-                    mailOrderIds={props.mailOrderIds}
-                  />
+                  <OrderCard store={props.formStore} />
                 </Show>
                 <Show when={forceAddressForm() && props.formStore.patient?.value?.id}>
                   <AddressForm

@@ -33,10 +33,6 @@ export type FulfillmentOption = {
 export type FulfillmentOptions = FulfillmentOption[];
 
 interface PharmacySelectProps {
-  enableSendToPatient?: boolean;
-  enableLocalPickup?: boolean;
-  enableDeliveryPharmacies?: boolean;
-  mailOrderPharmacyIds?: string[];
   patientIds?: string[];
   address?: string;
   hasPreferredPharmacy?: boolean;
@@ -75,7 +71,9 @@ export function PharmacySelect(props: PharmacySelectProps) {
   const [activeTab, setActiveTab] = createSignal<TabNamesEnum>(TabNamesEnum.sendToPatient);
 
   const routableMailOrderPharmacyIds = createMemo(() => {
-    return props.mailOrderPharmacyIds?.filter((id) => !unroutablePharmacyIds().has(id));
+    return pharmacySelectionContext
+      .mailOrderPharmacyIds()
+      ?.filter((id) => !unroutablePharmacyIds().has(id));
   });
 
   const initMailOrderPharmacyId = createMemo(() => {
@@ -93,9 +91,9 @@ export function PharmacySelect(props: PharmacySelectProps) {
   onMount(() => {
     // add the tabs to tabs
     setTabs([
-      ...(props.enableSendToPatient ? [TabNamesEnum.sendToPatient] : []),
-      ...(props.enableLocalPickup ? [TabNamesEnum.localPickup] : []),
-      ...(props.enableDeliveryPharmacies ? [TabNamesEnum.mailOrder] : [])
+      ...(pharmacySelectionContext.enableSendToPatient() ? [TabNamesEnum.sendToPatient] : []),
+      ...(pharmacySelectionContext.enableLocalPickup() ? [TabNamesEnum.localPickup] : []),
+      ...(pharmacySelectionContext.enableDeliveryPharmacies() ? [TabNamesEnum.mailOrder] : [])
     ]);
 
     // Fulfillment option from the first tab name
@@ -224,7 +222,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
                     }
                   }}
                 />
-                {(props.mailOrderPharmacyIds?.length ?? 0) > 0 && (
+                {(pharmacySelectionContext.mailOrderPharmacyIds()?.length ?? 0) > 0 && (
                   <div class="space-y-2">
                     <label>Choose a partner pharmacy</label>
                     <RadioGroupCards
@@ -239,7 +237,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
                       }}
                       contextRef={(context) => (radioGroupContext = context)}
                     >
-                      <For each={props?.mailOrderPharmacyIds || []}>
+                      <For each={pharmacySelectionContext.mailOrderPharmacyIds() || []}>
                         {(id) => (
                           <RadioGroupCards.Option
                             value={id}

@@ -19,13 +19,7 @@ const hasUsableAddress = (address?: {
   );
 };
 
-export const OrderCard = (props: {
-  store: Record<string, any>;
-  enableLocalPickup: boolean;
-  enableSendToPatient: boolean;
-  enableDeliveryPharmacies: boolean;
-  mailOrderIds?: string;
-}) => {
+export const OrderCard = (props: { store: Record<string, any> }) => {
   const patientIds = createMemo(() =>
     props.store['patient']?.value ? [props.store['patient']?.value?.id] : []
   );
@@ -48,13 +42,6 @@ export const OrderCard = (props: {
           <Text color="gray">Select Pharmacy</Text>
         </div>
         <PharmacySelect
-          enableSendToPatient={props.enableSendToPatient}
-          enableDeliveryPharmacies={props.enableDeliveryPharmacies}
-          // Defaults to Local Pickup if nothing is set
-          enableLocalPickup={
-            props.enableLocalPickup || (!props?.enableSendToPatient && !props?.mailOrderIds)
-          }
-          mailOrderPharmacyIds={props.mailOrderIds ? props.mailOrderIds.split(',') : undefined}
           patientIds={patientIds()}
           address={address()}
           hasPreferredPharmacy={Boolean(props.store['patient']?.value?.preferredPharmacies?.length)}

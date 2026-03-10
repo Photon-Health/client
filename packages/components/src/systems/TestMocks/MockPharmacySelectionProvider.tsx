@@ -14,6 +14,10 @@ export const mockPharmacySelectionContextValues = (): PharmacySelectionContextTy
     updatePreferredPharmacy,
     autoRoutedPharmacyId: () => undefined,
     isAutoRouted: () => false,
+    enableLocalPickup: () => true,
+    enableSendToPatient: () => true,
+    enableDeliveryPharmacies: () => true,
+    mailOrderPharmacyIds: () => undefined,
     setPharmacyId,
     setFulfillmentType,
     setUpdatePreferredPharmacy
@@ -22,10 +26,20 @@ export const mockPharmacySelectionContextValues = (): PharmacySelectionContextTy
 
 interface MockPharmacySelectionProviderProps {
   children: JSXElement;
+  enableLocalPickup?: boolean;
+  enableSendToPatient?: boolean;
+  enableDeliveryPharmacies?: boolean;
+  mailOrderPharmacyIds?: string[];
 }
 
 export function MockPharmacySelectionProvider(props: MockPharmacySelectionProviderProps) {
-  const mocks = untrack(() => mockPharmacySelectionContextValues());
+  const mocks = untrack(() => ({
+    ...mockPharmacySelectionContextValues(),
+    enableLocalPickup: () => props.enableLocalPickup ?? true,
+    enableSendToPatient: () => props.enableSendToPatient ?? true,
+    enableDeliveryPharmacies: () => props.enableDeliveryPharmacies ?? true,
+    mailOrderPharmacyIds: () => props.mailOrderPharmacyIds
+  }));
 
   return (
     <MockPharmacySelectionContext.Provider value={mocks}>

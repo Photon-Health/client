@@ -55,14 +55,12 @@ test('prevents pharmacy selection when address is missing', () => {
   render(() => (
     <MockPrescribeProvider>
       <MockPrescribeEventDispatchProvider>
-        <MockPharmacySelectionProvider>
-          <PharmacySelect
-            enableSendToPatient={false}
-            enableLocalPickup={true}
-            enableDeliveryPharmacies={false}
-            address=""
-            patientIds={['pat_123']}
-          />
+        <MockPharmacySelectionProvider
+          enableSendToPatient={false}
+          enableLocalPickup={true}
+          enableDeliveryPharmacies={false}
+        >
+          <PharmacySelect address="" patientIds={['pat_123']} />
         </MockPharmacySelectionProvider>
       </MockPrescribeEventDispatchProvider>
     </MockPrescribeProvider>
@@ -85,16 +83,14 @@ test('tab switching updates fulfillment type and preserves pharmacy selection pe
   render(() => (
     <MockPrescribeProvider>
       <MockPrescribeEventDispatchProvider>
-        <MockPharmacySelectionProvider>
+        <MockPharmacySelectionProvider
+          enableSendToPatient={true}
+          enableLocalPickup={true}
+          enableDeliveryPharmacies={true}
+          mailOrderPharmacyIds={['phr_mail_1', 'phr_mail_2']}
+        >
           <ContextSpy />
-          <PharmacySelect
-            enableSendToPatient={true}
-            enableLocalPickup={true}
-            enableDeliveryPharmacies={true}
-            address="123 Main St, New York, NY 10001"
-            patientIds={['pat_123']}
-            mailOrderPharmacyIds={['phr_mail_1', 'phr_mail_2']}
-          />
+          <PharmacySelect address="123 Main St, New York, NY 10001" patientIds={['pat_123']} />
         </MockPharmacySelectionProvider>
       </MockPrescribeEventDispatchProvider>
     </MockPrescribeProvider>

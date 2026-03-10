@@ -18,6 +18,12 @@ export interface PharmacySelectionContextType {
   autoRoutedPharmacyId: Accessor<string | undefined>;
   isAutoRouted: Accessor<boolean>;
 
+  // Config
+  enableLocalPickup: Accessor<boolean>;
+  enableSendToPatient: Accessor<boolean>;
+  enableDeliveryPharmacies: Accessor<boolean>;
+  mailOrderPharmacyIds: Accessor<string[] | undefined>;
+
   // Actions
   setPharmacyId: (id: string | undefined) => void;
   setFulfillmentType: (type: types.FulfillmentType | undefined) => void;
@@ -29,6 +35,10 @@ const PharmacySelectionContext = createContext<PharmacySelectionContextType>();
 interface PharmacySelectionProviderProps {
   children: JSXElement;
   pharmacyIdProp?: string;
+  enableLocalPickup?: boolean;
+  enableSendToPatient?: boolean;
+  enableDeliveryPharmacies?: boolean;
+  mailOrderIds?: string;
   onFulfillmentTypeChange?: (type: types.FulfillmentType | undefined) => void;
   onPreferredPharmacyChange?: (shouldSet: boolean) => void;
 }
@@ -55,6 +65,15 @@ export const PharmacySelectionProvider = (props: PharmacySelectionProviderProps)
 
   const isAutoRouted = createMemo(() => Boolean(autoRoutedPharmacyId()));
 
+  const enableLocalPickup = createMemo(
+    () => props.enableLocalPickup || (!props.enableSendToPatient && !props.mailOrderIds)
+  );
+  const enableSendToPatient = createMemo(() => props.enableSendToPatient ?? false);
+  const enableDeliveryPharmacies = createMemo(() => props.enableDeliveryPharmacies ?? false);
+  const mailOrderPharmacyIds = createMemo(() =>
+    props.mailOrderIds ? props.mailOrderIds.split(',') : undefined
+  );
+
   // Sync coverage option selection to pharmacyId
   createEffect(() => {
     const coverageOption = selectedCoverageOption();
@@ -78,6 +97,11 @@ export const PharmacySelectionProvider = (props: PharmacySelectionProviderProps)
     updatePreferredPharmacy,
     autoRoutedPharmacyId,
     isAutoRouted,
+
+    enableLocalPickup,
+    enableSendToPatient,
+    enableDeliveryPharmacies,
+    mailOrderPharmacyIds,
 
     setPharmacyId,
     setFulfillmentType,
