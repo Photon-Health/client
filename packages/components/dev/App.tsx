@@ -168,13 +168,7 @@ const App = () => {
 
         <h2>Pharmacy Select</h2>
         <Card>
-          <PharmacySelect
-            patientIds={patientIds()}
-            enableLocalPickup
-            enableSendToPatient
-            setFufillmentType={(t) => console.log('fulfillmentType: ', t)}
-            setPharmacyId={(p) => console.log('pharmacyId: ', p)}
-          />
+          <PharmacySelect patientIds={patientIds()} enableLocalPickup enableSendToPatient />
         </Card>
         <h4 class="mt-8">With Mail Order</h4>
         <Card>
@@ -187,8 +181,6 @@ const App = () => {
               'phr_01GCA54GVKA06C905DETQ9SY98'
             ]}
             address="11221"
-            setPharmacyId={(p) => console.log('pharmacyId! ', p)}
-            setFufillmentType={(t) => console.log('fulfillmentType! ', t)}
           />
         </Card>
 

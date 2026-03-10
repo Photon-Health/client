@@ -21,17 +21,9 @@ import {
   getRoutingConstraint,
   RoutingConstraint
 } from '../RoutingConstraints';
-import { createStore } from 'solid-js/store';
 import getLocation from '../../utils/getLocations';
 import { useGoogleService } from '../GoogleServiceProvider';
 import { Env } from '@photonhealth/sdk';
-
-// The order form data will consist of, at least, the list of selected prescription IDs and pharmacy ID.
-// The prescription form data (todo) will consist of a single prescription's data during user input
-// Note: Multiple prescription "sub" forms can be opened/completed within a single order form
-interface PrescribeOrderFormData {
-  pharmacyId?: string;
-}
 
 export type PrescribeContextType = {
   // values
@@ -39,15 +31,10 @@ export type PrescribeContextType = {
   routingConstraints: Accessor<RoutingConstraint[]>;
   combinedRoutingConstraint: Accessor<RoutingConstraint>;
   unroutablePharmacyIds: Accessor<Set<string>>;
-  orderFormData: PrescribeOrderFormData;
   selectedCoverageOption: Accessor<CoverageOption | undefined>;
 
   // actions
   selectOtherCoverageOption: (value: CoverageOption) => void;
-  setOrderFormData: <K extends keyof PrescribeOrderFormData>(
-    key: K,
-    value: PrescribeOrderFormData[K]
-  ) => void;
 };
 
 const PrescribeContext = createContext<PrescribeContextType>();
@@ -102,8 +89,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const [selectedCoverageOption, setSelectedCoverageOption] = createSignal<
     CoverageOption | undefined
   >();
-
-  const [orderFormData, setOrderFormData] = createStore<PrescribeOrderFormData>();
 
   const routingConstraints = createMemo((): RoutingConstraint[] => {
     return draftPrescriptions().map((prescription: Prescription) =>
@@ -270,7 +255,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   };
 
   const selectOtherCoverageOption = (value: CoverageOption) => {
-    setOrderFormData('pharmacyId', value.pharmacy.id);
     setSelectedCoverageOption(value);
     setDidSelectOtherCoverageOption(true);
   };
@@ -281,12 +265,10 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     routingConstraints,
     combinedRoutingConstraint,
     unroutablePharmacyIds,
-    orderFormData,
     selectedCoverageOption,
 
     // actions
-    selectOtherCoverageOption,
-    setOrderFormData
+    selectOtherCoverageOption
   };
 
   return <PrescribeContext.Provider value={value}>{props.children}</PrescribeContext.Provider>;

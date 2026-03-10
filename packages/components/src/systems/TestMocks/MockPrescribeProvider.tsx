@@ -20,9 +20,7 @@ export const mockPrescribeContextValues = () => {
     unroutablePharmacyIds: () => new Set(),
     selectedCoverageOption: () => undefined,
     // mock actions
-    selectOtherCoverageOption: vi.fn(),
-    orderFormData: { pharmacyId: 'test-pharmacy-id' },
-    setOrderFormData: () => undefined
+    selectOtherCoverageOption: vi.fn()
   } as PrescribeContextType;
 };
 

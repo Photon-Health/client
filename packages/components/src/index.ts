@@ -59,6 +59,10 @@ import { SignatureAttestationModal } from './systems/SignatureAttestation';
 import { PhotonContext, usePhoton } from './context';
 import { PhotonClientStore } from './store';
 import { CoverageOption, PrescribeProvider, usePrescribe } from './systems/PrescribeProvider';
+import {
+  PharmacySelectionProvider,
+  usePharmacySelectionContext
+} from './systems/PharmacySelectionProvider';
 
 import { GoogleServiceProvider, useGoogleService } from './systems/GoogleServiceProvider';
 
@@ -125,8 +129,10 @@ export {
   useRecentOrders,
   formatPrescriptionDetails,
   PrescribeProvider,
+  PharmacySelectionProvider,
   GoogleServiceProvider,
   usePrescribe,
+  usePharmacySelectionContext,
   useGoogleService,
   CALENDAR_DATE_FORMAT,
   PrescribeEventDispatchProvider,

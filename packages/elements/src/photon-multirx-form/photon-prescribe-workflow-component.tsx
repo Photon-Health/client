@@ -1,5 +1,6 @@
 import {
   DraftPrescriptionsProvider,
+  PharmacySelectionProvider,
   PrescribeEventDispatchProvider,
   PrescribeProvider,
   RecentOrders,
@@ -28,6 +29,7 @@ interface PrescribeWorkflowComponentProps extends Omit<PrescribeProps, 'initialS
   templateOverrides?: TemplateOverrides;
   prescriptionIds?: string;
   enableCoverageCheck: boolean;
+  pharmacyId?: string;
 }
 
 const Component = (props: PrescribeWorkflowComponentProps) => {
@@ -60,43 +62,52 @@ const Component = (props: PrescribeWorkflowComponentProps) => {
             patientId={store.patient?.value?.id}
             enableCoverageCheck={props.enableCoverageCheck}
           >
-            <style>{tailwind}</style>
-            <style>{shoelaceDarkStyles}</style>
-            <style>{shoelaceLightStyles}</style>
-            <style>{styles}</style>
-            <style>{photonStyles}</style>
-            <PrescribeWorkflow
-              patientId={props.patientId}
-              hideSubmit={props.hideSubmit}
-              hideTemplates={props.hideTemplates}
-              hidePatientCard={props.hidePatientCard}
-              enableOrder={props.enableOrder}
-              enableLocalPickup={props.enableLocalPickup}
-              enableSendToPatient={props.enableSendToPatient}
-              enableDeliveryPharmacies={props.enableDeliveryPharmacies}
-              enableMedHistory={props.enableMedHistory}
-              enableMedHistoryLinks={props.enableMedHistoryLinks}
-              enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
-              enableCombineAndDuplicate={props.enableCombineAndDuplicate}
-              optionalPatientAddress={props.optionalPatientAddress}
-              mailOrderIds={props.mailOrderIds}
-              pharmacyId={props.pharmacyId}
-              address={props.address}
-              weight={props.weight}
-              weightUnit={props.weightUnit}
-              additionalNotes={props.additionalNotes}
-              triggerSubmit={props.triggerSubmit}
-              toastBuffer={props.toastBuffer}
-              formStore={store}
-              formActions={actions}
-              externalOrderId={props.externalOrderId}
-              catalogId={props.catalogId}
-              allowOffCatalogSearch={props.allowOffCatalogSearch}
-              disableList={props.disableList}
-              groupId={props.groupId}
-              // this logic keeps the rx form closed when refilling a particular template/prescription
-              initialShowForm={!props.templateIds && !props.prescriptionIds}
-            />
+            <PharmacySelectionProvider
+              pharmacyIdProp={props.pharmacyId}
+              onFulfillmentTypeChange={(ft) => {
+                actions.updateFormValue({ key: 'fulfillmentType', value: ft || '' });
+              }}
+              onPreferredPharmacyChange={(shouldSet) => {
+                actions.updateFormValue({ key: 'updatePreferredPharmacy', value: shouldSet });
+              }}
+            >
+              <style>{tailwind}</style>
+              <style>{shoelaceDarkStyles}</style>
+              <style>{shoelaceLightStyles}</style>
+              <style>{styles}</style>
+              <style>{photonStyles}</style>
+              <PrescribeWorkflow
+                patientId={props.patientId}
+                hideSubmit={props.hideSubmit}
+                hideTemplates={props.hideTemplates}
+                hidePatientCard={props.hidePatientCard}
+                enableOrder={props.enableOrder}
+                enableLocalPickup={props.enableLocalPickup}
+                enableSendToPatient={props.enableSendToPatient}
+                enableDeliveryPharmacies={props.enableDeliveryPharmacies}
+                enableMedHistory={props.enableMedHistory}
+                enableMedHistoryLinks={props.enableMedHistoryLinks}
+                enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
+                enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+                optionalPatientAddress={props.optionalPatientAddress}
+                mailOrderIds={props.mailOrderIds}
+                address={props.address}
+                weight={props.weight}
+                weightUnit={props.weightUnit}
+                additionalNotes={props.additionalNotes}
+                triggerSubmit={props.triggerSubmit}
+                toastBuffer={props.toastBuffer}
+                formStore={store}
+                formActions={actions}
+                externalOrderId={props.externalOrderId}
+                catalogId={props.catalogId}
+                allowOffCatalogSearch={props.allowOffCatalogSearch}
+                disableList={props.disableList}
+                groupId={props.groupId}
+                // this logic keeps the rx form closed when refilling a particular template/prescription
+                initialShowForm={!props.templateIds && !props.prescriptionIds}
+              />
+            </PharmacySelectionProvider>
           </PrescribeProvider>
         </DraftPrescriptionsProvider>
       </RecentOrders>
