@@ -19,11 +19,17 @@ import { MailOrderPharmacyOption } from './MailOrderSelectCard';
 import { datadogRum } from '@datadog/browser-rum';
 import { patientAnalytics } from '../../configs/analytics';
 import { useOrderContext } from '../../views/Main';
+import { text } from '../../utils/text';
 
 type MailOrderSelectModalProps = Omit<ModalProps, 'children'> & {
   options?: MailOrderPharmacyOption[];
-  onConfirm: (val: MailOrderPharmacyOption) => unknown;
+  onConfirm: (
+    val: MailOrderPharmacyOption,
+    analyticsDetails: { selectedFrom: 'Mail Order List'; buttonText: string }
+  ) => unknown;
 };
+
+const submitButtonText = text.placeOrder;
 
 export function MailOrderSelectModal({
   options,
@@ -54,7 +60,10 @@ export function MailOrderSelectModal({
 
     setConfirming(true);
     try {
-      await onConfirm(selectedOption);
+      await onConfirm(selectedOption, {
+        selectedFrom: 'Mail Order List',
+        buttonText: submitButtonText
+      });
       datadogRum.addAction('patient_mail_order_pharmacy_confirmed', {
         pharmacyId: selectedOption.id
       });
@@ -144,7 +153,7 @@ export function MailOrderSelectModal({
                 leftIcon={confirming ? <Spinner h="4" w="4" /> : undefined}
               >
                 <Text as="span" lineHeight="none">
-                  Place Order
+                  {submitButtonText}
                 </Text>
               </Button>
               <PoweredBy />

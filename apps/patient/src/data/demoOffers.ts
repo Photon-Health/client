@@ -1,6 +1,7 @@
-import { Offer, PHARMACY_BRANDING } from '../components/pharmacy-card-list';
+import { PHARMACY_BRANDING } from '../components/pharmacy-card-list';
+import { OfferDetails } from '../utils/models';
 
-export const demoOffers: Offer[] = [
+export const demoOffers: OfferDetails[] = [
   {
     tags: [],
     deliveryEstimate: '2-3 days',

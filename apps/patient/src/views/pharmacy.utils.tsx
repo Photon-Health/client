@@ -1,11 +1,11 @@
 import { getOffers } from '../api';
-import { Offer, PHARMACY_BRANDING } from '../components/pharmacy-card-list';
-import { EnrichedPharmacy, ExtendedFulfillmentType, Order } from '../utils/models';
+import { PHARMACY_BRANDING } from '../components/pharmacy-card-list';
+import { EnrichedPharmacy, ExtendedFulfillmentType, OfferDetails, Order } from '../utils/models';
 import { FulfillmentType, Pharmacy as PharmacyType } from '../__generated__/graphql';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
-function getNovocareOffers(order: Order): Offer[] {
+function getNovocareOffers(order: Order): OfferDetails[] {
   const novocareExperimentSegment = determineNovocareExperimentSegment(order);
 
   if (novocareExperimentSegment) {
@@ -27,7 +27,7 @@ function getNovocareOffers(order: Order): Offer[] {
 }
 
 // this function will return the offers available for the given order
-export async function fetchOffers(order: Order): Promise<Offer[] | undefined> {
+export async function fetchOffers(order: Order): Promise<OfferDetails[] | undefined> {
   const offers = await getOffers(order.id);
 
   const amazonOffers = offers
