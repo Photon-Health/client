@@ -1,8 +1,8 @@
 import { graphql } from './gql';
 
 export const CreateSupervisorMutation = graphql(`
-  mutation CreateSupervisorMutation($fullName: String!, $npi: String!) {
-    createSupervisor(input: { fullName: $fullName, npi: $npi }) {
+  mutation CreateSupervisorMutation($firstName: String!, $lastName: String!, $npi: String!) {
+    createSupervisor(input: { firstName: $firstName, lastName: $lastName, npi: $npi }) {
       ...SupervisorCard
     }
   }

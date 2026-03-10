@@ -17,11 +17,13 @@ import { CreateSupervisorMutation, SupervisorCardQuery } from '@photonhealth/sdk
 import { SupervisorCardFragment } from '@photonhealth/sdk/dist/clinical-api/types';
 
 const sortSupervisors = (supervisors: SupervisorCardFragment[]) =>
-  [...supervisors].sort((a, b) => a.fullName.localeCompare(b.fullName));
+  [...supervisors].sort(
+    (a, b) => a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName)
+  );
 
 const displaySupervisor = (supervisor?: SupervisorCardFragment) =>
-  supervisor?.fullName && supervisor?.npi
-    ? `${supervisor.fullName}, ${supervisor.npi}`
+  supervisor?.id
+    ? `${supervisor.firstName} ${supervisor.lastName}, ${supervisor.npi}`
     : 'Select a supervisor';
 
 interface SupervisorCardProps {
@@ -32,31 +34,29 @@ interface SupervisorCardProps {
 export const SupervisorCard = (props: SupervisorCardProps) => {
   const client = usePhoton();
   const [supervisors, setSupervisors] = createSignal<SupervisorCardFragment[]>([]);
+  const [filteredSupervisors, setFilteredSupervisors] = createSignal<SupervisorCardFragment[]>([]);
   const [hasMostRecentSupervisor, setHasMostRecentSupervisor] = createSignal<boolean>(false);
-  const [query, setQuery] = createSignal<string>('');
   const currentSupervisor = createMemo(() =>
     supervisors().find((s) => s.id === props.store.supervisorId?.value)
   );
-  const filteredSupervisors = createMemo(() => {
-    const q = query().toLowerCase();
+
+  const filterSupervisors = (query: string) => {
+    const q = query.toLowerCase();
     if (!q) {
       return supervisors();
     }
-    return supervisors().filter(
-      (s) =>
-        s.fullName.toLowerCase().includes(q) ||
-        s.npi.toLowerCase().includes(q) ||
-        displaySupervisor(s).toLowerCase().includes(q)
-    );
-  });
+    const filtered = supervisors().filter((s) => displaySupervisor(s).toLowerCase().includes(q));
+    return filtered;
+  };
 
   onMount(async () => {
     const {
       data: { supervisors, mostRecentSupervisor }
     } = await client.sdk.apolloClinical.query({ query: SupervisorCardQuery });
 
-    const supervisorsResult = supervisors.filter((s) => !!s);
-    setSupervisors(sortSupervisors(supervisorsResult));
+    const supervisorsResult = sortSupervisors(supervisors.filter((s) => !!s));
+    setSupervisors(supervisorsResult);
+    setFilteredSupervisors(supervisorsResult);
     if (mostRecentSupervisor) {
       props.actions.updateFormValue({
         key: 'supervisorId',
@@ -65,6 +65,11 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
       setHasMostRecentSupervisor(true);
     }
   });
+
+  const handleSupervisorCreated = (supervisor: SupervisorCardFragment) => {
+    setSupervisors((prev) => sortSupervisors([...prev, supervisor]));
+    props.actions.updateFormValue({ key: 'supervisorId', value: supervisor.id });
+  };
 
   return (
     <Card addChildrenDivider={true} class="pb-2">
@@ -85,10 +90,13 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
                   key: 'supervisorId',
                   value: value?.id || undefined
                 });
+                setFilteredSupervisors(supervisors());
               }}
             >
               <ComboBox.Input
-                onInput={(e) => setQuery(e.currentTarget.value || '')}
+                onInput={(e) =>
+                  setFilteredSupervisors(filterSupervisors(e.currentTarget.value || ''))
+                }
                 displayValue={(value) => displaySupervisor(value)}
                 showClear={true}
               />
@@ -106,40 +114,22 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
         </Show>
         <NewSupervisorForm
           hasSupervisors={supervisors().length > 0}
-          onCreated={(supervisor) => {
-            setSupervisors((prev) => sortSupervisors([...prev, supervisor]));
-            props.actions.updateFormValue({ key: 'supervisorId', value: supervisor.id });
-          }}
+          onCreated={handleSupervisorCreated}
         />
       </div>
     </Card>
   );
 };
 
-const supervisorSchema = zod
-  .object({
-    supervisorFullName: zod.string().optional(),
-    supervisorNpi: zod
-      .union([zod.literal(''), zod.string().regex(/^[0-9]{10}$/, 'Enter a valid 10-digit NPI')])
-      .optional()
-  })
-  .superRefine((data, ctx) => {
-    if (!!data.supervisorFullName && !data.supervisorNpi) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'NPI is required',
-        path: ['supervisorNpi']
-      });
-    }
-
-    if (!data.supervisorFullName && !!data.supervisorNpi) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Full Name is required',
-        path: ['supervisorFullName']
-      });
-    }
-  });
+const supervisorSchema = zod.object({
+  firstName: zod
+    .string({ required_error: 'First name is required' })
+    .min(1, 'First name is required'),
+  lastName: zod.string({ required_error: 'Last name is required' }).min(1, 'Last name is required'),
+  npi: zod
+    .string({ required_error: 'NPI is required' })
+    .regex(/^[0-9]{10}$/, 'Enter a valid 10-digit NPI')
+});
 
 interface NewSupervisorFormProps {
   hasSupervisors: boolean;
@@ -155,13 +145,17 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
   const { form, errors, validate, isValid, reset } = createForm({
     onSubmit: async (values) => {
       setSubmitting(true);
-      validate();
       try {
+        validate();
+        if (!isValid) {
+          throw new Error();
+        }
         const { data } = await client.sdk.apolloClinical.mutate({
           mutation: CreateSupervisorMutation,
           variables: {
-            fullName: values.supervisorFullName,
-            npi: values.supervisorNpi
+            firstName: values.firstName,
+            lastName: values.lastName,
+            npi: values.npi
           }
         });
         if (data?.createSupervisor) {
@@ -171,7 +165,7 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
         }
       } catch {
         triggerToast({
-          header: 'Error creating supervisor',
+          header: 'Error creating new supervisor',
           body: 'Please try again.',
           status: 'error'
         });
@@ -196,18 +190,21 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
       }}
     >
       <form ref={form} id={formId}>
-        <InputGroup label="Full Name" error={errors().supervisorFullName?.[0]}>
-          <Input name="supervisorFullName" onInput={validate} />
+        <InputGroup label="First Name" error={errors().firstName?.[0]}>
+          <Input name="firstName" />
         </InputGroup>
-        <InputGroup label="NPI" error={errors().supervisorNpi?.[0]}>
-          <Input name="supervisorNpi" onInput={validate} />
+        <InputGroup label="Last Name" error={errors().lastName?.[0]}>
+          <Input name="lastName" />
+        </InputGroup>
+        <InputGroup label="NPI" error={errors().npi?.[0]}>
+          <Input name="npi" />
         </InputGroup>
         <div class="flex justify-end">
           <Button
             type="submit"
             form={formId}
             variant={'secondary'}
-            disabled={submitting() || !isValid()}
+            disabled={submitting()}
             loading={submitting()}
           >
             Add supervisor
