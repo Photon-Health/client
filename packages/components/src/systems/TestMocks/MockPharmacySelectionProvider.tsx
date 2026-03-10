@@ -1,5 +1,5 @@
 import { createContext, createSignal, JSXElement, untrack } from 'solid-js';
-import { PharmacySelectionContextType } from '../PharmacySelectionProvider';
+import { PharmacySelectionContextType } from '../PharmacySelect';
 
 export const MockPharmacySelectionContext = createContext<PharmacySelectionContextType>();
 

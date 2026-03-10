@@ -14,7 +14,7 @@ import {
 import { GetPatientPreferredPharmaciesAndAddress } from '../../fetch';
 import { usePhotonClient } from '../SDKProvider';
 import { usePrescribe } from '../PrescribeProvider';
-import { usePharmacySelectionContext } from '../PharmacySelectionProvider';
+import { usePharmacySelectionContext } from '../PharmacySelect';
 
 type STPState = {
   badgeColor: BadgeColor;

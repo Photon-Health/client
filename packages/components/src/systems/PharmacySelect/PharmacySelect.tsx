@@ -6,7 +6,7 @@ import PickupPharmacySearch from '../PharmacySearch';
 import { MailOrderPharmacy } from './MailOrderPharmacy';
 import { SendToPatient } from './SendToPatient';
 import { usePrescribe } from '../PrescribeProvider';
-import { usePharmacySelectionContext } from '../PharmacySelectionProvider';
+import { usePharmacySelectionContext } from '../PharmacySelect';
 import { usePrescribeEventDispatch } from '../PrescribeEventDispatchProvider';
 import { PharmacyRoutingAlert } from '../RoutingConstraints';
 import { Alert } from '../../particles/Alert';

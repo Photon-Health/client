@@ -11,7 +11,7 @@ import {
   MockPharmacySelectionContext,
   MockPharmacySelectionProvider
 } from '../TestMocks/MockPharmacySelectionProvider';
-import { PharmacySelectionContextType } from '../PharmacySelectionProvider';
+import { PharmacySelectionContextType } from '../PharmacySelect';
 import { PharmacySelect } from './PharmacySelect';
 
 vi.mock('../PrescribeProvider', () => {
@@ -26,7 +26,7 @@ vi.mock('../PrescribeEventDispatchProvider', () => {
   };
 });
 
-vi.mock('../PharmacySelectionProvider', () => {
+vi.mock('../PharmacySelect', () => {
   return {
     usePharmacySelectionContext: () => useContext(MockPharmacySelectionContext)
   };

@@ -198,7 +198,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     }
 
     ref.addEventListener('photon-ticket-created-duplicate', () => {
+      // need to reset all the form data
       clearForm(props.formActions, prefillNotes ? { notes: prefillNotes } : undefined);
+      pharmacySelectionContext.setFulfillmentType(undefined);
+      pharmacySelectionContext.setPharmacyId(undefined);
+      pharmacySelectionContext.setUpdatePreferredPharmacy(false);
     });
   });
 

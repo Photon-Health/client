@@ -29,7 +29,11 @@ import PatientInfo from './systems/PatientInfo';
 import PatientMedHistory from './systems/PatientMedHistory';
 import PickupPharmacySearch from './systems/PharmacySearch';
 import type { PharmacyOption } from './systems/PharmacySearch/PharmacySearch';
-import { PharmacySelect } from './systems/PharmacySelect';
+import {
+  PharmacySelect,
+  PharmacySelectionProvider,
+  usePharmacySelectionContext
+} from './systems/PharmacySelect';
 import Spinner from './particles/Spinner';
 import RadioGroupCards from './particles/RadioGroupCards';
 import { RecentOrders, useRecentOrders } from './systems/RecentOrders';
@@ -59,10 +63,6 @@ import { SignatureAttestationModal } from './systems/SignatureAttestation';
 import { PhotonContext, usePhoton } from './context';
 import { PhotonClientStore } from './store';
 import { CoverageOption, PrescribeProvider, usePrescribe } from './systems/PrescribeProvider';
-import {
-  PharmacySelectionProvider,
-  usePharmacySelectionContext
-} from './systems/PharmacySelectionProvider';
 
 import { GoogleServiceProvider, useGoogleService } from './systems/GoogleServiceProvider';
 
