@@ -62,22 +62,22 @@ const Component = (props: PrescribeWorkflowComponentProps) => {
           prescriptionIdsPrefill={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
           enableCombineAndDuplicate={props.enableCombineAndDuplicate}
         >
-          <PrescribeProvider
-            patientId={store.patient?.value?.id}
-            enableCoverageCheck={props.enableCoverageCheck}
+          <PharmacySelectionProvider
+            pharmacyIdProp={props.pharmacyId}
+            enableLocalPickup={props.enableLocalPickup}
+            enableSendToPatient={props.enableSendToPatient}
+            enableDeliveryPharmacies={props.enableDeliveryPharmacies}
+            mailOrderIds={props.mailOrderIds}
+            onFulfillmentTypeChange={(ft) => {
+              actions.updateFormValue({ key: 'fulfillmentType', value: ft || '' });
+            }}
+            onPreferredPharmacyChange={(shouldSet) => {
+              actions.updateFormValue({ key: 'updatePreferredPharmacy', value: shouldSet });
+            }}
           >
-            <PharmacySelectionProvider
-              pharmacyIdProp={props.pharmacyId}
-              enableLocalPickup={props.enableLocalPickup}
-              enableSendToPatient={props.enableSendToPatient}
-              enableDeliveryPharmacies={props.enableDeliveryPharmacies}
-              mailOrderIds={props.mailOrderIds}
-              onFulfillmentTypeChange={(ft) => {
-                actions.updateFormValue({ key: 'fulfillmentType', value: ft || '' });
-              }}
-              onPreferredPharmacyChange={(shouldSet) => {
-                actions.updateFormValue({ key: 'updatePreferredPharmacy', value: shouldSet });
-              }}
+            <PrescribeProvider
+              patientId={store.patient?.value?.id}
+              enableCoverageCheck={props.enableCoverageCheck}
             >
               <style>{tailwind}</style>
               <style>{shoelaceDarkStyles}</style>
@@ -111,8 +111,8 @@ const Component = (props: PrescribeWorkflowComponentProps) => {
                 // this logic keeps the rx form closed when refilling a particular template/prescription
                 initialShowForm={!props.templateIds && !props.prescriptionIds}
               />
-            </PharmacySelectionProvider>
-          </PrescribeProvider>
+            </PrescribeProvider>
+          </PharmacySelectionProvider>
         </DraftPrescriptionsProvider>
       </RecentOrders>
     </PrescribeEventDispatchProvider>

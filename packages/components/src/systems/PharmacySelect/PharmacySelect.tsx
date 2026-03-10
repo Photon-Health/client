@@ -58,8 +58,9 @@ const parseFulfillmentType = (type: FulfillmentType | undefined) => {
 };
 
 export function PharmacySelect(props: PharmacySelectProps) {
-  const { selectedCoverageOption, unroutablePharmacyIds } = usePrescribe();
+  const { selectedCoverageOption } = usePrescribe();
   const pharmacySelectionContext = usePharmacySelectionContext();
+  const unroutablePharmacyIds = () => pharmacySelectionContext.unroutablePharmacyIds();
   const { dispatchAnalytics } = usePrescribeEventDispatch();
   const hasAddress = createMemo(() => Boolean(props.address?.trim()));
 

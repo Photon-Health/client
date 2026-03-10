@@ -23,7 +23,6 @@ import {
   useDraftPrescriptions,
   usePharmacySelectionContext,
   usePhoton,
-  usePrescribe,
   usePrescribeEventDispatch,
   useRecentOrders
 } from '@photonhealth/components';
@@ -129,7 +128,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   const { draftPrescriptions, prescriptionIds, tryUpdatePrescriptionStates, isLoadingPrefills } =
     useDraftPrescriptions();
-  const { routingConstraints } = usePrescribe();
   const pharmacySelectionContext = usePharmacySelectionContext();
   const {
     dispatchFormValidate,
@@ -664,7 +662,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     screenDraftedPrescriptions();
                   }}
                   screeningAlerts={screeningAlerts()}
-                  routingConstraints={routingConstraints()}
+                  routingConstraints={pharmacySelectionContext.routingConstraints()}
                   enableOrder={props.enableOrder}
                 />
                 <Show when={props.enableOrder && !pharmacySelectionContext.isAutoRouted()}>

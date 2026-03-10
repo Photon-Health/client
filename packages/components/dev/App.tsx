@@ -92,27 +92,29 @@ const App = () => {
               prescriptionIdsPrefill={prescriptionIds()}
               enableCombineAndDuplicate={true}
             >
-              <PrescribeProvider patientId={patientId} enableCoverageCheck={true}>
-                <div class="mb-10">
-                  <h2>Patient Info</h2>
-                  <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
-                </div>
+              <PharmacySelectionProvider>
+                <PrescribeProvider patientId={patientId} enableCoverageCheck={true}>
+                  <div class="mb-10">
+                    <h2>Patient Info</h2>
+                    <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
+                  </div>
 
-                <div class="mb-10">
-                  <h2>Draft Prescriptions</h2>
-                </div>
-                <DraftPrescriptionList
-                  handleDelete={(id) =>
-                    setPrescriptionIds(prescriptionIds().filter((p) => p !== id))
-                  }
-                  handleEdit={(rx) =>
-                    setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))
-                  }
-                  handleSwapToOtherPrescription={(_) => _}
-                  screeningAlerts={[]}
-                  routingConstraints={[]}
-                />
-              </PrescribeProvider>
+                  <div class="mb-10">
+                    <h2>Draft Prescriptions</h2>
+                  </div>
+                  <DraftPrescriptionList
+                    handleDelete={(id) =>
+                      setPrescriptionIds(prescriptionIds().filter((p) => p !== id))
+                    }
+                    handleEdit={(rx) =>
+                      setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))
+                    }
+                    handleSwapToOtherPrescription={(_) => _}
+                    screeningAlerts={[]}
+                    routingConstraints={[]}
+                  />
+                </PrescribeProvider>
+              </PharmacySelectionProvider>
             </DraftPrescriptionsProvider>
           </RecentOrders>
         </PrescribeEventDispatchProvider>

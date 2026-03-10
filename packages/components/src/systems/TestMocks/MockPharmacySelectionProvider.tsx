@@ -14,13 +14,21 @@ export const mockPharmacySelectionContextValues = (): PharmacySelectionContextTy
     updatePreferredPharmacy,
     autoRoutedPharmacyId: () => undefined,
     isAutoRouted: () => false,
+    routingConstraints: () => [],
+    combinedRoutingConstraint: () => ({
+      prescriptions: [],
+      routing_constraint_type: 'exclude' as const,
+      constraint_pharmacies: []
+    }),
+    unroutablePharmacyIds: () => new Set<string>(),
     enableLocalPickup: () => true,
     enableSendToPatient: () => true,
     enableDeliveryPharmacies: () => true,
     mailOrderPharmacyIds: () => undefined,
     setPharmacyId,
     setFulfillmentType,
-    setUpdatePreferredPharmacy
+    setUpdatePreferredPharmacy,
+    fetchLocalPharmacies: async () => []
   };
 };
 

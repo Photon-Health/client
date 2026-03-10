@@ -8,7 +8,25 @@ import {
   useContext
 } from 'solid-js';
 import { types } from '@photonhealth/sdk';
-import { usePrescribe } from '../PrescribeProvider';
+import { Prescription } from '@photonhealth/sdk/dist/types';
+import { usePhotonClient } from '../SDKProvider';
+import { GetPharmaciesQuery } from '../../fetch';
+import { useGoogleService } from '../GoogleServiceProvider';
+import getLocation from '../../utils/getLocations';
+import { useDraftPrescriptions } from '../DraftPrescriptions';
+import {
+  combineAllRoutingConstraints,
+  getRoutingConstraint,
+  RoutingConstraint
+} from '../RoutingConstraints';
+
+export type Address = {
+  street1: string;
+  street2: string;
+  city: string;
+  state: string;
+  postalCode: string;
+};
 
 export interface PharmacySelectionContextType {
   // Readable state
@@ -17,6 +35,11 @@ export interface PharmacySelectionContextType {
   updatePreferredPharmacy: Accessor<boolean>;
   autoRoutedPharmacyId: Accessor<string | undefined>;
   isAutoRouted: Accessor<boolean>;
+
+  // Routing
+  routingConstraints: Accessor<RoutingConstraint[]>;
+  combinedRoutingConstraint: Accessor<RoutingConstraint>;
+  unroutablePharmacyIds: Accessor<Set<string>>;
 
   // Config
   enableLocalPickup: Accessor<boolean>;
@@ -28,6 +51,7 @@ export interface PharmacySelectionContextType {
   setPharmacyId: (id: string | undefined) => void;
   setFulfillmentType: (type: types.FulfillmentType | undefined) => void;
   setUpdatePreferredPharmacy: (shouldSet: boolean) => void;
+  fetchLocalPharmacies: (address: Address) => Promise<{ id: string; name: string }[]>;
 }
 
 const PharmacySelectionContext = createContext<PharmacySelectionContextType>();
@@ -44,11 +68,56 @@ interface PharmacySelectionProviderProps {
 }
 
 export const PharmacySelectionProvider = (props: PharmacySelectionProviderProps) => {
-  const { combinedRoutingConstraint, selectedCoverageOption } = usePrescribe();
+  const { draftPrescriptions } = useDraftPrescriptions();
+  const { googleMapsServices } = useGoogleService();
+  const client = usePhotonClient();
 
   const [pharmacyId, setPharmacyId] = createSignal<string | undefined>();
   const [fulfillmentType, setFulfillmentType] = createSignal<types.FulfillmentType | undefined>();
   const [updatePreferredPharmacy, setUpdatePreferredPharmacy] = createSignal(false);
+
+  // Routing constraints derived from draft prescriptions
+  const routingConstraints = createMemo((): RoutingConstraint[] => {
+    return draftPrescriptions().map((prescription: Prescription) =>
+      getRoutingConstraint(prescription)
+    );
+  });
+
+  const combinedRoutingConstraint = createMemo(() => {
+    return combineAllRoutingConstraints(routingConstraints());
+  });
+
+  const unroutablePharmacyIds = createMemo(() => {
+    const combinedExcludeRoutingConstraint = combineAllRoutingConstraints(routingConstraints(), [
+      'exclude'
+    ]);
+    return new Set(
+      combinedExcludeRoutingConstraint.constraint_pharmacies?.map((pharmacy) => pharmacy.id) || []
+    );
+  });
+
+  async function fetchPharmacies(location: { latitude: number; longitude: number }) {
+    const { data } = await client!.apollo.query({
+      query: GetPharmaciesQuery,
+      variables: {
+        location: { latitude: location?.latitude, longitude: location?.longitude }
+      }
+    });
+    if (!data?.pharmacies) {
+      return [];
+    }
+    return data.pharmacies;
+  }
+
+  async function fetchLocalPharmacies(address: Address) {
+    const { geocoder } = googleMapsServices();
+    if (!geocoder) throw new Error('Geocoder not loaded');
+
+    const stringAddress = `${address?.street1}, ${address?.city}, ${address?.state} ${address?.postalCode}`;
+    const locations = await getLocation(stringAddress, geocoder);
+    const pharmacies = await fetchPharmacies(locations[0]);
+    return pharmacies;
+  }
 
   const autoRoutedPharmacyId = createMemo(() => {
     if (props.pharmacyIdProp) {
@@ -74,14 +143,6 @@ export const PharmacySelectionProvider = (props: PharmacySelectionProviderProps)
     props.mailOrderIds ? props.mailOrderIds.split(',') : undefined
   );
 
-  // Sync coverage option selection to pharmacyId
-  createEffect(() => {
-    const coverageOption = selectedCoverageOption();
-    if (coverageOption) {
-      setPharmacyId(coverageOption.pharmacy.id);
-    }
-  });
-
   // Notify parent when fulfillment type or preferred pharmacy changes
   createEffect(() => {
     props.onFulfillmentTypeChange?.(fulfillmentType());
@@ -98,6 +159,10 @@ export const PharmacySelectionProvider = (props: PharmacySelectionProviderProps)
     autoRoutedPharmacyId,
     isAutoRouted,
 
+    routingConstraints,
+    combinedRoutingConstraint,
+    unroutablePharmacyIds,
+
     enableLocalPickup,
     enableSendToPatient,
     enableDeliveryPharmacies,
@@ -105,7 +170,8 @@ export const PharmacySelectionProvider = (props: PharmacySelectionProviderProps)
 
     setPharmacyId,
     setFulfillmentType,
-    setUpdatePreferredPharmacy
+    setUpdatePreferredPharmacy,
+    fetchLocalPharmacies
   };
 
   return (
