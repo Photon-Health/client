@@ -53,17 +53,17 @@ vi.mock('./MailOrderPharmacy', () => ({
 
 test('prevents pharmacy selection when address is missing', () => {
   render(() => (
-    <MockPrescribeProvider>
-      <MockPrescribeEventDispatchProvider>
-        <MockPharmacySelectionProvider
-          enableSendToPatient={false}
-          enableLocalPickup={true}
-          enableDeliveryPharmacies={false}
-        >
+    <MockPrescribeEventDispatchProvider>
+      <MockPharmacySelectionProvider
+        enableSendToPatient={false}
+        enableLocalPickup={true}
+        enableDeliveryPharmacies={false}
+      >
+        <MockPrescribeProvider>
           <PharmacySelect address="" patientIds={['pat_123']} />
-        </MockPharmacySelectionProvider>
-      </MockPrescribeEventDispatchProvider>
-    </MockPrescribeProvider>
+        </MockPrescribeProvider>
+      </MockPharmacySelectionProvider>
+    </MockPrescribeEventDispatchProvider>
   ));
 
   expect(
@@ -81,19 +81,19 @@ test('tab switching updates fulfillment type and preserves pharmacy selection pe
   };
 
   render(() => (
-    <MockPrescribeProvider>
-      <MockPrescribeEventDispatchProvider>
-        <MockPharmacySelectionProvider
-          enableSendToPatient={true}
-          enableLocalPickup={true}
-          enableDeliveryPharmacies={true}
-          mailOrderPharmacyIds={['phr_mail_1', 'phr_mail_2']}
-        >
+    <MockPrescribeEventDispatchProvider>
+      <MockPharmacySelectionProvider
+        enableSendToPatient={true}
+        enableLocalPickup={true}
+        enableDeliveryPharmacies={true}
+        mailOrderPharmacyIds={['phr_mail_1', 'phr_mail_2']}
+      >
+        <MockPrescribeProvider>
           <ContextSpy />
           <PharmacySelect address="123 Main St, New York, NY 10001" patientIds={['pat_123']} />
-        </MockPharmacySelectionProvider>
-      </MockPrescribeEventDispatchProvider>
-    </MockPrescribeProvider>
+        </MockPrescribeProvider>
+      </MockPharmacySelectionProvider>
+    </MockPrescribeEventDispatchProvider>
   ));
 
   expect(ctxRef.fulfillmentType()).toBeUndefined();
