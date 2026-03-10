@@ -11,7 +11,12 @@
     "jsxImportSource": "solid-js",
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@photonhealth/components": ["../../packages/components/src/index.ts"],
+      "@photonhealth/components/*": ["../../packages/components/src/*"]
+    }
   },
   "include": ["src/**/*", "types.d.ts"],
   "exclude": ["node_modules"]
