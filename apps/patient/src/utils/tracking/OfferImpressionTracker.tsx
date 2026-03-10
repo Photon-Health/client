@@ -3,7 +3,9 @@ import { useInView } from 'react-intersection-observer';
 import { patientAnalytics } from '../../configs/analytics';
 import { EnrichedPharmacy } from '../models';
 import { useOrderContext } from '../../views/Main';
-import { Offer } from '../../components/pharmacy-card-list';
+import { OfferDetails } from '../models';
+import { getOfferType } from '../offers';
+import { Prescription } from '../../__generated__/graphql';
 
 const OfferImpressionTracker = ({
   children,
@@ -14,7 +16,7 @@ const OfferImpressionTracker = ({
   enabled
 }: {
   children: React.ReactNode;
-  offer: Offer | undefined;
+  offer: OfferDetails | undefined;
   pharmacy: EnrichedPharmacy;
   ordinalPosition: number;
   isAlreadySelected: boolean;
@@ -27,7 +29,19 @@ const OfferImpressionTracker = ({
     rootMargin: '-100px',
     onChange: (inView) => {
       if (inView && enabled) {
+        const rxIds = new Set(
+          order.fills
+            .map((f) => f.prescription)
+            .filter((p): p is Prescription => !!p)
+            .map((p) => p.id)
+        );
+
+        const price = offer?.costAmount || pharmacy.price;
+        const offerType = getOfferType({ pharmacy, offer }) ?? 'None';
+
         patientAnalytics.track('Offer Impression', order, {
+          offerType,
+          offerShown: !!price,
           pharmacy_id: pharmacy.id,
           pharmacy_name: pharmacy.name,
           ordinal_position: ordinalPosition,
@@ -44,6 +58,9 @@ const OfferImpressionTracker = ({
           costAmountTitle: offer?.costAmountTitle,
           retailAmount: offer?.retailAmount,
           retailAmountTitle: offer?.retailAmountTitle,
+          numPrescriptions: rxIds.size,
+          multiMedOffer: rxIds.size > 1,
+          hasRefills: rxIds.size < order.fills.length,
           tags: offer?.tags
         });
       }

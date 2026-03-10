@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { OfferInfo } from './OfferInfo';
-import { Offer } from '../pharmacy-card-list';
+import { OfferDetails } from '../../utils/models';
 
 // Mock the text utility
 vi.mock('../../utils/text', () => ({
@@ -15,7 +15,7 @@ describe('OfferInfo', () => {
     vi.unstubAllEnvs();
   });
 
-  const baseOffer: Offer = {
+  const baseOffer: OfferDetails = {
     pharmacy: {
       id: 'test-pharmacy-id',
       name: 'Test Pharmacy',
