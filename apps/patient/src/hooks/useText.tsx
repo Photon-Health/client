@@ -278,8 +278,7 @@ export function useText() {
     sent: (isPlural: boolean) => pl(isPlural, 'sent_singular', 'sent_plural'),
     sentWithOrderSms: (isPlural: boolean) =>
       pl(isPlural, 'sentWithOrderSms_singular', 'sentWithOrderSms_plural'),
-    sentWithSms: (isPlural: boolean) =>
-      pl(isPlural, 'sentWithSms_singular', 'sentWithSms_plural'),
+    sentWithSms: (isPlural: boolean) => pl(isPlural, 'sentWithSms_singular', 'sentWithSms_plural'),
     showCouponToPharmacy: (isPlural: boolean) =>
       pl(isPlural, 'showCouponToPharmacy_singular', 'showCouponToPharmacy_plural'),
     weSent: (isPlural: boolean) => pl(isPlural, 'weSent_singular', 'weSent_plural'),

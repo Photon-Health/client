@@ -191,13 +191,17 @@ const es = {
     'Puede redirigir su receta usando el enlace de seguimiento de Photon que se le proporcionó, siempre que no haya sido confirmada en la farmacia. Si la receta ha sido confirmada, debe comunicarse con el soporte de Photon directamente por mensaje de texto al',
   faqA1_post: 'para obtener asistencia.',
   faqQ2: '¿Puedo pagar a Photon directamente por mi receta?',
-  faqA2: 'No, no puede pagar a Photon Health directamente por sus recetas. Los pagos se realizan en la farmacia local al recoger los medicamentos, o directamente a la organización proveedora o farmacia si usa un servicio de pedido por correo.',
+  faqA2:
+    'No, no puede pagar a Photon Health directamente por sus recetas. Los pagos se realizan en la farmacia local al recoger los medicamentos, o directamente a la organización proveedora o farmacia si usa un servicio de pedido por correo.',
   faqQ3: '¿Puede Photon pedirle a mi médico que actualice mi receta?',
-  faqA3: 'Podemos transmitir problemas a su proveedor con respecto a su receta. Sin embargo, para cualquier problema clínico, incluidas las solicitudes de nuevas recetas, recomendamos comunicarse directamente con su organización proveedora.',
+  faqA3:
+    'Podemos transmitir problemas a su proveedor con respecto a su receta. Sin embargo, para cualquier problema clínico, incluidas las solicitudes de nuevas recetas, recomendamos comunicarse directamente con su organización proveedora.',
   faqQ4: '¿Photon escribe recetas?',
-  faqA4: 'No, Photon Health no escribe ni proporciona recetas. Somos una empresa de enrutamiento de recetas y todas las recetas son escritas por proveedores de atención médica usando nuestras herramientas. Nuestro papel es gestionar la experiencia en la farmacia para los pacientes.',
+  faqA4:
+    'No, Photon Health no escribe ni proporciona recetas. Somos una empresa de enrutamiento de recetas y todas las recetas son escritas por proveedores de atención médica usando nuestras herramientas. Nuestro papel es gestionar la experiencia en la farmacia para los pacientes.',
   faqQ5: '¿Cómo funciona Photon Health?',
-  faqA5: 'Photon Health proporciona herramientas de prescripción que ayudan a enviar recetas a la farmacia preferida del paciente. Los consultorios médicos manejan todos los aspectos clínicos y abordan las consultas relacionadas con la empresa. Photon Health apoya el proceso asegurando que las recetas se reciban y procesen con prontitud, actualizando a los pacientes y resolviendo cualquier problema coordinando con la farmacia y el proveedor.',
+  faqA5:
+    'Photon Health proporciona herramientas de prescripción que ayudan a enviar recetas a la farmacia preferida del paciente. Los consultorios médicos manejan todos los aspectos clínicos y abordan las consultas relacionadas con la empresa. Photon Health apoya el proceso asegurando que las recetas se reciban y procesen con prontitud, actualizando a los pacientes y resolviendo cualquier problema coordinando con la farmacia y el proveedor.',
   faqStillNeedHelp: '¿Aún necesita ayuda?',
   faqSupportText:
     'Si tiene otras preguntas relacionadas con la farmacia, estamos disponibles las 24 horas del día, los 7 días de la semana para brindarle soporte. Generalmente respondemos en 30 minutos.',
@@ -323,7 +327,8 @@ const es = {
   subPharmacyUnreachable:
     'No podemos obtener actualizaciones de su pedido. Puede llamar a su farmacia actual o cambiar de farmacia a continuación.',
   subPharmacyClosed: 'Su farmacia está cerrada. Puede cambiarla si necesita su pedido antes.',
-  subOrderError: 'No se pudo enviar a la farmacia. Por favor seleccione una nueva farmacia a continuación.',
+  subOrderError:
+    'No se pudo enviar a la farmacia. Por favor seleccione una nueva farmacia a continuación.',
   subDemographicMismatch:
     'Por favor comuníquese con su proveedor con el nombre legal correcto / fecha de nacimiento / dirección para que le escriba una nueva receta.',
   subExternalTransfer: 'Por favor contacte a su farmacia original si tiene preguntas.',
@@ -353,7 +358,7 @@ const es = {
   // OfferInfo
   sponsored: 'Patrocinado',
   sponsoredTooltip:
-    'Esta farmacia ha pagado por colocación preferida. Photon Health no respalda esta farmacia sobre otras. Otras farmacias pueden ofrecer este medicamento al mismo precio o similar.',
+    'Esta farmacia ha pagado por colocación preferida. Photon Health no respalda esta farmacia sobre otras. Otras farmacias pueden ofrecer este medicamento al mismo precio o similar.'
 };
 
 export default es;

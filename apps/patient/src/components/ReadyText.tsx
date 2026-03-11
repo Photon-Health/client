@@ -57,7 +57,10 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
   } else if (readyAtDayjs.isTomorrow()) {
     return (
       <Text>
-        {t.readyPrefix} <b>{t.tomorrowAt} {readyAtDayjs.format(timeFormat)}</b>
+        {t.readyPrefix}{' '}
+        <b>
+          {t.tomorrowAt} {readyAtDayjs.format(timeFormat)}
+        </b>
       </Text>
     );
   } else {

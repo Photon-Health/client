@@ -136,10 +136,8 @@ const en = {
     "We'll cancel your prescription at {{pharmacyName}} and send it to your new pharmacy to be filled.",
   sendToNew_plural:
     "We'll cancel your prescriptions at {{pharmacyName}} and send them to your new pharmacy to be filled.",
-  sendToSelected_singular:
-    "We'll send your prescription to your selected pharmacy to be filled.",
-  sendToSelected_plural:
-    "We'll send your prescriptions to your selected pharmacy to be filled.",
+  sendToSelected_singular: "We'll send your prescription to your selected pharmacy to be filled.",
+  sendToSelected_plural: "We'll send your prescriptions to your selected pharmacy to be filled.",
   sent_singular: 'Your prescription was sent to the pharmacy.',
   sent_plural: 'Your prescriptions were sent to the pharmacy.',
   sentWithOrderSms_singular:
@@ -166,7 +164,7 @@ const en = {
   usingWithInsurance_pre:
     'Anyone can use the coupon. The coupon may be lower than your health insurance co-pay. You can use it',
   instead: 'instead',
-  usingWithInsurance_post: "of your co-pay and it does not apply to your deductible.",
+  usingWithInsurance_post: 'of your co-pay and it does not apply to your deductible.',
   showDiscountCardPrices_main: 'Show lowest cash prices',
   showDiscountCardPrices_sub: 'May be cheaper than your insurance',
   shipTo: 'Ship to {{address}}',
@@ -192,13 +190,17 @@ const en = {
     'You can reroute your prescription using the Photon tracking link provided to you, as long as it has not been confirmed at the pharmacy. If the prescription has been confirmed, you need to contact Photon Support directly via text at',
   faqA1_post: 'for assistance.',
   faqQ2: 'Can I pay Photon directly for my prescription?',
-  faqA2: 'No, you cannot pay Photon Health directly for your prescriptions. Payments are made at the local pharmacy when picking up medications, or directly to the provider organization or pharmacy if using a mail order service.',
+  faqA2:
+    'No, you cannot pay Photon Health directly for your prescriptions. Payments are made at the local pharmacy when picking up medications, or directly to the provider organization or pharmacy if using a mail order service.',
   faqQ3: 'Can Photon ask my doctor to update my prescription?',
-  faqA3: 'We can relay issues to your provider regarding your prescription. However, for any clinical issues, including requests for new prescriptions, we recommend contacting your provider organization directly.',
+  faqA3:
+    'We can relay issues to your provider regarding your prescription. However, for any clinical issues, including requests for new prescriptions, we recommend contacting your provider organization directly.',
   faqQ4: 'Does Photon write prescriptions?',
-  faqA4: 'No, Photon Health does not write or provide prescriptions. We are a prescription routing company, and all prescriptions are written by healthcare providers using our tools. Our role is to manage the pharmacy experience for patients.',
+  faqA4:
+    'No, Photon Health does not write or provide prescriptions. We are a prescription routing company, and all prescriptions are written by healthcare providers using our tools. Our role is to manage the pharmacy experience for patients.',
   faqQ5: 'How does Photon Health work?',
-  faqA5: "Photon Health provides prescribing tools that help send prescriptions to a patient's preferred pharmacy. Doctor's offices handle all clinical aspects and address company-related inquiries. Photon Health supports the process by ensuring prescriptions are received and processed promptly, updating patients, and resolving any issues by coordinating with the pharmacy and the provider.",
+  faqA5:
+    "Photon Health provides prescribing tools that help send prescriptions to a patient's preferred pharmacy. Doctor's offices handle all clinical aspects and address company-related inquiries. Photon Health supports the process by ensuring prescriptions are received and processed promptly, updating patients, and resolving any issues by coordinating with the pharmacy and the provider.",
   faqStillNeedHelp: 'Still need help?',
   faqSupportText:
     'If you have other pharmacy related questions, we are available 24/7 for support. We typically respond within 30 minutes.',
@@ -354,7 +356,7 @@ const en = {
   // OfferInfo
   sponsored: 'Sponsored',
   sponsoredTooltip:
-    'This pharmacy has paid for preferred placement. Photon Health does not endorse this pharmacy over others. Other pharmacies may offer this medication at the same or similar price.',
+    'This pharmacy has paid for preferred placement. Photon Health does not endorse this pharmacy over others. Other pharmacies may offer this medication at the same or similar price.'
 };
 
 export default en;

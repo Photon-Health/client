@@ -237,9 +237,7 @@ const CostWidget = ({ costAmount, costType }: CostWidgetProps) => {
 
   return (
     <VStack spacing={0} align="flex-end" minW="fit-content">
-      <Text fontSize="sm">
-        {costType === 'INSURANCE_ESTIMATE' ? t.avgCopayPrice : t.asLowAs}
-      </Text>
+      <Text fontSize="sm">{costType === 'INSURANCE_ESTIMATE' ? t.avgCopayPrice : t.asLowAs}</Text>
       <Text fontWeight="bold">${formatPrice(costAmount)}</Text>
     </VStack>
   );

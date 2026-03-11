@@ -27,7 +27,6 @@ import { useText } from '../hooks/useText';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
 import { FiCheck } from 'react-icons/fi';
-import { capitalize } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
 

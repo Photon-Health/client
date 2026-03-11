@@ -1,6 +1,5 @@
 import { PrescriptionFulfillmentState } from '../../__generated__/graphql';
 import { getLatestReadyTime } from '../../utils/fulfillmentsHelpers';
-import { Order } from '../../utils/models';
 import { useOrderContext } from '../../views/Main';
 import { Card } from '../Card';
 import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
@@ -66,9 +65,7 @@ const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
       case 'BACKORDERED':
         return t.exMsg.BACKORDERED();
       case 'PA_REQUIRED':
-        return t.exMsg.PA_REQUIRED(
-          organization.settings?.priorAuthorizationExceptionMessage
-        );
+        return t.exMsg.PA_REQUIRED(organization.settings?.priorAuthorizationExceptionMessage);
       case 'REFILL_TOO_SOON':
         return t.exMsg.REFILL_TOO_SOON();
       case 'NOT_COVERED':
@@ -132,14 +129,16 @@ const BlockWithHeader = ({
     const isTomorrow = readyByTimeDayJs.isTomorrow();
     return (
       <Text as="b">
-        {t.readyPrefix} {isToday ? t.readyToday : isTomorrow ? t.readyTomorrow : readyByTimeDayJs.format('MMM D')}{' '}
+        {t.readyPrefix}{' '}
+        {isToday ? t.readyToday : isTomorrow ? t.readyTomorrow : readyByTimeDayJs.format('MMM D')}{' '}
         at {readyByTimeDayJs.format('h:mma')}
       </Text>
     );
   };
 
   const stateLabel = getStateLabel();
-  const readyAtText = state === 'Ready' ? undefined : formatReadyText(getLatestReadyTime(fulfillments));
+  const readyAtText =
+    state === 'Ready' ? undefined : formatReadyText(getLatestReadyTime(fulfillments));
 
   return (
     <VStack w="full" alignItems={'start'} spacing={3}>

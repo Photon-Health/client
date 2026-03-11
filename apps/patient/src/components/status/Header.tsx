@@ -223,7 +223,10 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
   } else if (readyAtDayjs.isTomorrow()) {
     return (
       <Text>
-        {t.readyPrefix} <b>{t.tomorrowAt} {readyAtDayjs.format(timeFormat)}</b>
+        {t.readyPrefix}{' '}
+        <b>
+          {t.tomorrowAt} {readyAtDayjs.format(timeFormat)}
+        </b>
       </Text>
     );
   } else {
@@ -276,7 +279,8 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
 
   const header = headerText(derivedProps, t);
   const displayProgressBar = props.exception !== 'EXTERNAL_TRANSFER';
-  const subheader = props.subHeaderOverride || subheaderText(derivedProps, t, pharmacyEstimatedReadyAtNode);
+  const subheader =
+    props.subHeaderOverride || subheaderText(derivedProps, t, pharmacyEstimatedReadyAtNode);
   const color = progressLevel(derivedProps);
   const progressBar = progress(derivedProps);
 
