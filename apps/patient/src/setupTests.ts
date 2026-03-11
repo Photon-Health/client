@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import './i18n';
 
 vi.mock('react-ga4', () => ({
   event: vi.fn()

@@ -16,6 +16,7 @@ import { Card } from './Card';
 import { FAQContents } from './FAQ';
 import { useOrderContext } from '../views/Main';
 import { patientAnalytics } from '../configs/analytics';
+import { useText } from '../hooks/useText';
 
 export const FAQModal = ({
   isOpen,
@@ -28,6 +29,7 @@ export const FAQModal = ({
 }) => {
   const { order, isDemo } = useOrderContext();
   const toast = useToast();
+  const t = useText();
 
   const handleClose = () => {
     onClose();
@@ -36,8 +38,8 @@ export const FAQModal = ({
   const handleMessageSupport = () => {
     if (isDemo) {
       toast({
-        title: 'Feature unavailable',
-        description: 'Support is disabled for the patient demo',
+        title: t.faqFeatureUnavailable,
+        description: t.faqSupportDisabled,
         status: 'warning',
         position: 'top',
         duration: 4000,
@@ -54,7 +56,7 @@ export const FAQModal = ({
     <Modal onClose={handleClose} isOpen={isOpen} size="full">
       <ModalOverlay />
       <ModalContent backgroundColor="gray.100" alignItems="center" w="full">
-        <ModalHeader>Frequently Asked Questions</ModalHeader>
+        <ModalHeader>{t.faqTitle}</ModalHeader>
         <ModalCloseButton />
         <ModalBody w="full" alignItems="center" px={0}>
           <Container>
@@ -66,14 +68,11 @@ export const FAQModal = ({
               {allowMessageSupport && (
                 <VStack w="full" alignItems="stretch" spacing={4}>
                   <Heading as="h4" size="md">
-                    Still need help?
+                    {t.faqStillNeedHelp}
                   </Heading>
                   <Card>
                     <VStack spacing={1} w="full">
-                      <Box>
-                        If you have other pharmacy related questions, we are available 24/7 for
-                        support. We typically respond within 30 minutes.
-                      </Box>
+                      <Box>{t.faqSupportText}</Box>
                       {isDemo ? (
                         <Button
                           variant="outline"
@@ -81,7 +80,7 @@ export const FAQModal = ({
                           w="full"
                           onClick={handleMessageSupport}
                         >
-                          Message support
+                          {t.faqMessageSupport}
                         </Button>
                       ) : (
                         <Button
@@ -92,7 +91,7 @@ export const FAQModal = ({
                           w="full"
                           onClick={handleMessageSupport}
                         >
-                          Message support
+                          {t.faqMessageSupport}
                         </Button>
                       )}
                     </VStack>

@@ -24,7 +24,7 @@ import { CouponModal } from '../components/coupons';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy, wait } from '../utils/general';
 import { Pharmacy as EnrichedPharmacy, OfferDetails } from '../utils/models';
-import { text as t } from '../utils/text';
+import { useText } from '../hooks/useText';
 import { useOrderContext } from './Main';
 
 import {
@@ -74,6 +74,7 @@ function isMailOrderPharmacy(pharmacy: EnrichedPharmacy): boolean {
 }
 
 export const Pharmacy = () => {
+  const t = useText();
   const {
     order,
     flattenedFills,
@@ -298,10 +299,8 @@ export const Pharmacy = () => {
 
   const showToastWarning = () =>
     toast({
-      title: isReroute ? 'Unable to change pharmacies' : 'Unable to submit pharmacy selection',
-      description: isReroute
-        ? 'Your order is already being processed. Text us if you need it sent to a different pharmacy.'
-        : 'Please refresh and try again',
+      title: isReroute ? t.toastUnableChange : t.toastUnableSubmit,
+      description: isReroute ? t.toastAlreadyProcessing : t.pleaseRefresh,
       ...TOAST_CONFIG.WARNING
     });
 
@@ -372,8 +371,8 @@ export const Pharmacy = () => {
         setCleanAddress(locationData.address);
       } catch (e: any) {
         toast({
-          title: 'Invalid location',
-          description: 'Please update your location and try again.',
+          title: t.toastInvalidLocation,
+          description: t.toastUpdateLocation,
           ...TOAST_CONFIG.ERROR
         });
         setShowingAllPharmacies(true);
@@ -536,11 +535,11 @@ export const Pharmacy = () => {
               setTopRankedPharmacies(topRankedPharmacies);
               setPharmacyResults(pharmaciesReSearch);
             } else {
-              toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
+              toast({ ...TOAST_CONFIG.WARNING, title: t.toastNoPharmaciesNear });
               setShowingAllPharmacies(true);
             }
           } else {
-            toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
+            toast({ ...TOAST_CONFIG.WARNING, title: t.toastNoPharmaciesNear });
           }
         } else {
           setTopRankedPharmacies(topRankedPharmacies);
@@ -550,7 +549,7 @@ export const Pharmacy = () => {
           }
         }
       } catch (error: any) {
-        toast({ ...TOAST_CONFIG.WARNING, title: 'Unable to get pharmacies' });
+        toast({ ...TOAST_CONFIG.WARNING, title: t.toastUnableGetPharmacies });
         console.log('Get pharmacies error: ', error);
       }
       setLoadingPharmacies(false);
@@ -867,7 +866,7 @@ export const Pharmacy = () => {
     if (isDemo) {
       setTimeout(() => {
         setNewPreferredPharmacyId(pharmacyId);
-        toast({ ...TOAST_CONFIG.SUCCESS, title: 'Set preferred pharmacy' });
+        toast({ ...TOAST_CONFIG.SUCCESS, title: t.toastSetPreferred });
         setSavingPreferred(false);
       }, 750);
       return;
@@ -878,11 +877,11 @@ export const Pharmacy = () => {
       setTimeout(() => {
         if (result) {
           setNewPreferredPharmacyId(pharmacyId);
-          toast({ ...TOAST_CONFIG.SUCCESS, title: 'Set preferred pharmacy' });
+          toast({ ...TOAST_CONFIG.SUCCESS, title: t.toastSetPreferred });
         } else {
           toast({
-            title: 'Unable to set preferred pharmacy',
-            description: 'Please refresh and try again',
+            title: t.toastUnableSetPreferred,
+            description: t.pleaseRefresh,
             ...TOAST_CONFIG.ERROR
           });
         }
@@ -891,8 +890,8 @@ export const Pharmacy = () => {
     } catch (error: any) {
       toast({
         ...TOAST_CONFIG.ERROR,
-        title: 'Unable to set preferred pharmacy',
-        description: 'Please refresh and try again'
+        title: t.toastUnableSetPreferred,
+        description: t.pleaseRefresh
       });
 
       setSavingPreferred(false);
@@ -1210,8 +1209,8 @@ export const Pharmacy = () => {
                 {enablePrice ? (
                   <Box p={3} bgColor="blue.100" borderRadius="lg">
                     <Text fontSize="sm">
-                      Coupon will be generated after you select a pharmacy.{' '}
-                      <Link onClick={() => setCouponModalOpen(true)}>More info</Link>
+                      {t.couponGeneratedAfterSelect}{' '}
+                      <Link onClick={() => setCouponModalOpen(true)}>{t.moreInfo}</Link>
                     </Text>
                   </Box>
                 ) : null}
@@ -1264,9 +1263,9 @@ export const Pharmacy = () => {
                   padding="2"
                   borderRadius="md"
                 >
-                  <Text fontSize="sm">Don't see your pharmacy?</Text>
+                  <Text fontSize="sm">{t.dontSeePharmacy}</Text>
                   <Link as="button" onClick={() => setMailOrderModalOpen(true)} fontSize="sm">
-                    See all mail orders
+                    {t.seeAllMailOrders}
                   </Link>
                 </HStack>
               )}

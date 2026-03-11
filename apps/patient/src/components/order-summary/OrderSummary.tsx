@@ -6,6 +6,7 @@ import { Card } from '../Card';
 import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import { groupBy } from 'lodash';
+import { useText } from '../../hooks/useText';
 
 export interface ExceptionData {
   message?: string;
@@ -52,75 +53,42 @@ function groupFulfillments(fulfillments: FulfillmentData[]) {
   return groupedByDerivedState;
 }
 
-function formatReadyText(d: Date | undefined) {
-  if (d == null) {
-    return <Text as="i">No ready time available</Text>;
-  }
-
-  if (d < new Date()) {
-    return <Text>Should be ready</Text>;
-  }
-
-  const readyByTimeDayJs = dayjs(d);
-  const isToday = readyByTimeDayJs.isToday();
-  const isTomorrow = readyByTimeDayJs.isTomorrow();
-
-  return (
-    <Text as="b">
-      Ready {isToday ? 'today' : isTomorrow ? 'tomorrow' : readyByTimeDayJs.format('MMM D')} at{' '}
-      {readyByTimeDayJs.format('h:mma')}
-    </Text>
-  );
-}
-
-const MESSAGE: { [key in ExceptionData['exceptionType']]: (order: Order) => string } = {
-  OOS: ({ isReroutable }) =>
-    `Pharmacy does not have your medication in stock but is able to order it. ${
-      isReroutable ? 'You can change your pharmacy below' : 'Contact us'
-    } if you need it sooner.`,
-  BACKORDERED: () =>
-    `The pharmacy can’t order the medication. Contact your provider for alternatives or change your pharmacy.`,
-  PA_REQUIRED: ({ organization }) => {
-    const paExceptionMessage = organization.settings?.priorAuthorizationExceptionMessage?.trim();
-    const defaultPaExceptionMessage =
-      'Your insurance needs information from your provider to cover this medication. Contact your provider for alternatives or pay the cash price.';
-    return paExceptionMessage || defaultPaExceptionMessage;
-  },
-  REFILL_TOO_SOON: () =>
-    `Your insurance informed the pharmacy that it's too soon for a refill. You can wait, or you can pay cash or use a discount card if you need it sooner.`,
-  NOT_COVERED: () =>
-    `This prescription may not be covered by your insurance. You can still pay cash or use a discount card. Your provider may also be able to help you find a covered alternative.`,
-  HIGH_COPAY: () =>
-    `This medication may have a high out of pocket cost. You may be able to use a discount card and pay significantly less.`,
-  RX_CLARIFICATION: () =>
-    `Your pharmacy needs to speak with your provider before they can fill your prescription. We’ve reached out to them.`,
-  OTC: () =>
-    `Your pharmacy has informed us that the medication you were prescribed is available over the counter and can be picked up from the relevant aisle at your local pharmacy.`,
-  MEDICAL_DEVICE: () =>
-    `This pharmacy does not keep this device in stock and cannot fill your prescription. This product is available without a prescription at a medical supply or online store.`
-};
-
-const TITLE: Partial<{ [key in ExceptionData['exceptionType']]: string }> = {
-  BACKORDERED: 'Backordered',
-  OOS: 'Out of stock',
-  PA_REQUIRED: 'Insurance approval needed',
-  REFILL_TOO_SOON: 'Refill too soon',
-  HIGH_COPAY: 'High cost alert',
-  NOT_COVERED: 'Not covered by insurance',
-  RX_CLARIFICATION: 'Needs Clarification',
-  OTC: 'Over the Counter',
-  MEDICAL_DEVICE: 'Medical Device'
-};
-
 const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
-  const exceptionName = TITLE[exception.exceptionType];
   const { order } = useOrderContext();
+  const t = useText();
+  const exceptionName = t.exTitle[exception.exceptionType];
+
+  const getMessage = () => {
+    const { isReroutable, organization } = order;
+    switch (exception.exceptionType) {
+      case 'OOS':
+        return t.exMsg.OOS(!!isReroutable);
+      case 'BACKORDERED':
+        return t.exMsg.BACKORDERED();
+      case 'PA_REQUIRED':
+        return t.exMsg.PA_REQUIRED(
+          organization.settings?.priorAuthorizationExceptionMessage
+        );
+      case 'REFILL_TOO_SOON':
+        return t.exMsg.REFILL_TOO_SOON();
+      case 'NOT_COVERED':
+        return t.exMsg.NOT_COVERED();
+      case 'HIGH_COPAY':
+        return t.exMsg.HIGH_COPAY();
+      case 'RX_CLARIFICATION':
+        return t.exMsg.RX_CLARIFICATION();
+      case 'OTC':
+        return t.exMsg.OTC();
+      case 'MEDICAL_DEVICE':
+        return t.exMsg.MEDICAL_DEVICE();
+      default:
+        return exception.message ?? t.letUsKnow;
+    }
+  };
+
   return (
     <Box bg="orange.100" borderRadius={'xl'} p={3}>
-      <Text as="b">{exceptionName}</Text>:{' '}
-      {MESSAGE[exception.exceptionType](order) ??
-        exception.message ??
-        'Let us know if you have an issue'}
+      <Text as="b">{exceptionName}</Text>: {getMessage()}
     </Box>
   );
 };
@@ -143,11 +111,39 @@ const BlockWithHeader = ({
   state: 'Delayed' | 'Preparing' | 'Ready' | undefined;
   fulfillments: FulfillmentData[];
 }) => {
-  const readyAtText =
-    state === 'Ready' ? undefined : formatReadyText(getLatestReadyTime(fulfillments));
+  const t = useText();
+
+  const getStateLabel = () => {
+    if (state === 'Delayed') return t.stateDelayed;
+    if (state === 'Preparing') return t.statePreparing;
+    if (state === 'Ready') return t.stateReady;
+    return undefined;
+  };
+
+  const formatReadyText = (d: Date | undefined) => {
+    if (d == null) {
+      return <Text as="i">{t.noReadyTime}</Text>;
+    }
+    if (d < new Date()) {
+      return <Text>{t.shouldBeReady}</Text>;
+    }
+    const readyByTimeDayJs = dayjs(d);
+    const isToday = readyByTimeDayJs.isToday();
+    const isTomorrow = readyByTimeDayJs.isTomorrow();
+    return (
+      <Text as="b">
+        {t.readyPrefix} {isToday ? t.readyToday : isTomorrow ? t.readyTomorrow : readyByTimeDayJs.format('MMM D')}{' '}
+        at {readyByTimeDayJs.format('h:mma')}
+      </Text>
+    );
+  };
+
+  const stateLabel = getStateLabel();
+  const readyAtText = state === 'Ready' ? undefined : formatReadyText(getLatestReadyTime(fulfillments));
+
   return (
     <VStack w="full" alignItems={'start'} spacing={3}>
-      {state && (
+      {stateLabel && (
         <HStack
           w="full"
           justifyContent={'space-between'}
@@ -156,13 +152,13 @@ const BlockWithHeader = ({
           pb={2}
         >
           <Text as="b" textColor={state === 'Delayed' ? 'orange.400' : 'blue.500'}>
-            {state}
+            {stateLabel}
           </Text>
           {readyAtText}
         </HStack>
       )}
       {fulfillments.map((f) => (
-        <FulfillmentBlock key={`${state}-${readyAtText}-${f.rxName}`} fulfillment={f} />
+        <FulfillmentBlock key={`${stateLabel}-${f.rxName}`} fulfillment={f} />
       ))}
     </VStack>
   );
@@ -207,13 +203,15 @@ export const OrderSummary = (props: {
   fulfillments: FulfillmentData[];
   onViewDetails: () => void;
 }) => {
+  const t = useText();
+
   const header = (
     <HStack justifyContent="space-between" w="full">
       <Heading as="h4" size="md">
-        Order Summary
+        {t.orderSummaryTitle}
       </Heading>
       <Button variant="solid" bg="gray.300" onClick={props.onViewDetails} size="sm">
-        View Details
+        {t.viewDetails}
       </Button>
     </HStack>
   );

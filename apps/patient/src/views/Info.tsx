@@ -18,7 +18,7 @@ import { Organization, Patient, Pharmacy } from '../__generated__/graphql';
 import { PharmacyInfo } from '../components';
 import { Card } from '../components/Card';
 import { FiMapPin, FiPhone } from 'react-icons/fi';
-import { text } from '../utils/text';
+import { useText } from '../hooks/useText';
 import { formatAddress } from '../utils/formatters';
 import theme from '../configs/theme';
 import { OrderStatusHeader } from '../components/status/Header';
@@ -27,6 +27,7 @@ import { OrderDetailsModal, PrescriptionData } from '../components/order-details
 import { Helmet } from 'react-helmet';
 
 export function InfoPage() {
+  const t = useText();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [tokenPayload, setTokenPayload] = useState<TokenPayload>();
@@ -129,7 +130,7 @@ export function InfoPage() {
   return (
     <ChakraProvider theme={theme({ accentColor: organization?.settings?.brandColor })}>
       <Helmet>
-        <title>Order was sent</title>
+        <title>{t.orderSent}</title>
       </Helmet>
       <ScrollRestoration />
       {logo && (
@@ -152,11 +153,11 @@ export function InfoPage() {
             status="SENT"
             fulfillmentType={pharmacy.fulfillmentTypes?.[0]}
             integrated={false}
-            subHeaderOverride="Your order was sent to the pharmacy"
+            subHeaderOverride={t.yourOrderSentToPharmacy}
           />
           <Text mt={6}>
             <Text as="span" color="gray.500">
-              Patient{' '}
+              {t.patient}{' '}
             </Text>
             <Text as="span">{me.name.full}</Text>
           </Text>
@@ -167,7 +168,7 @@ export function InfoPage() {
           {pharmacy && (
             <VStack w="full" alignItems="stretch" spacing={3}>
               <Heading as="h4" size="md">
-                Pharmacy
+                {t.pharmacy}
               </Heading>
               <Card>
                 <VStack w="full" spacing={4}>
@@ -184,7 +185,7 @@ export function InfoPage() {
                       colorScheme="blue"
                       color="white"
                     >
-                      {text.callPharmacy}
+                      {t.callPharmacy}
                     </Button>
                     <Button
                       as="a"
@@ -197,7 +198,7 @@ export function InfoPage() {
                       colorScheme="blue"
                       borderColor="blue.300"
                     >
-                      {text.directions}
+                      {t.directions}
                     </Button>
                   </VStack>
                 </VStack>
@@ -207,7 +208,7 @@ export function InfoPage() {
           <VStack w="full" spacing={3} alignItems="start">
             <HStack w="full" justifyContent="space-between">
               <Heading as="h4" size="md">
-                Order Summary
+                {t.orderSummaryTitle}
               </Heading>
               <Button
                 onClick={() => setDetailsModalOpen(true)}
@@ -215,7 +216,7 @@ export function InfoPage() {
                 bg="gray.300"
                 size="sm"
               >
-                View Details
+                {t.viewDetails}
               </Button>
             </HStack>
             <Card>

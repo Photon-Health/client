@@ -9,7 +9,9 @@
     "@rudderstack/analytics-js": "^3.22.0",
     "chakra-react-select": "^4.6.0",
     "dayjs": "^1.11.7",
+    "i18next": "^25.8.18",
     "react-helmet": "^6.1.0",
+    "react-i18next": "^16.5.8",
     "tinycolor2": "^1.6.0"
   },
   "browserslist": {

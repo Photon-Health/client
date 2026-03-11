@@ -11,6 +11,7 @@ import StateSelect from './particles/StateSelect';
 import PhoneInput from './particles/PhoneInput';
 import SexSelect, { SEX_OPTIONS } from './particles/SexSelect';
 import GenderSelect, { GENDER_OPTIONS } from './particles/GenderSelect';
+import LanguageSelect from './particles/LanguageSelect';
 import Banner from './particles/Banner';
 import DoseCalculator from './systems/DoseCalculator';
 import Card from './particles/Card';
@@ -89,6 +90,7 @@ export {
   PhoneInput,
   SexSelect,
   GenderSelect,
+  LanguageSelect,
   SEX_OPTIONS,
   GENDER_OPTIONS,
   Button,

@@ -23,7 +23,7 @@ import timezone from 'dayjs/plugin/timezone';
 import queryString from 'query-string';
 import { convertReadyByToUTCTimestamp } from '../utils/general';
 import { FixedFooter, PoweredBy } from '../components';
-import { text as t } from '../utils/text';
+import { useText } from '../hooks/useText';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
 import { FiCheck } from 'react-icons/fi';
@@ -41,6 +41,7 @@ const checkDisabled = (option: string): boolean => {
 };
 
 export const ReadyBy = () => {
+  const t = useText();
   const { order, flattenedFills, enablePrice, fetchOrder } = useOrderContext();
   const navigate = useNavigate();
 
@@ -52,7 +53,7 @@ export const ReadyBy = () => {
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
   const [selectedDay, setSelectedDay] = useState<string | undefined>(undefined);
 
-  const [activeTab, setActiveTab] = useState<keyof (typeof t)['readyByOptions']>('Today');
+  const [activeTab, setActiveTab] = useState<'Today' | 'Tomorrow'>('Today');
 
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
@@ -191,7 +192,7 @@ export const ReadyBy = () => {
                 }}
                 borderRadius="xl"
               >
-                {capitalize(day)}
+                {t.readyByDayLabel(day)}
               </Button>
             ))}
           </HStack>
@@ -246,7 +247,7 @@ export const ReadyBy = () => {
                               {option.icon ? (
                                 <Icon as={RxLightningBolt} color="yellow.500" />
                               ) : null}
-                              <Text fontWeight="medium">{option.label}</Text>
+                              <Text fontWeight="medium">{option.displayLabel ?? option.label}</Text>
                             </HStack>
                             {option.description ? (
                               option.badge ? (

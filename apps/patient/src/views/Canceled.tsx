@@ -2,11 +2,12 @@ import { Box, Container, Heading, Text, VStack } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet';
 
 import { PrescriptionsList } from '../components';
-import { text as t } from '../utils/text';
+import { useText } from '../hooks/useText';
 import { useOrderContext } from './Main';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 
 export const Canceled = () => {
+  const t = useText();
   const {
     order: { patient }
   } = useOrderContext();
@@ -34,7 +35,7 @@ export const Canceled = () => {
 
       <Container>
         <Text align="left" mt={4} fontSize="md" color="gray.500">
-          Patient{' '}
+          {t.patient}{' '}
           <Text as="span" color="gray.700">
             {patient.name.full}
           </Text>

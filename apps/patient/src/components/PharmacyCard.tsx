@@ -4,7 +4,7 @@ import { FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { text as t } from '../utils/text';
+import { useText } from '../hooks/useText';
 import { PharmacyInfo } from './PharmacyInfo';
 
 dayjs.extend(customParseFormat);
@@ -34,6 +34,8 @@ export const PharmacyCard = memo(function PharmacyCard({
   showPrice = false,
   isCurrentPharmacy = false
 }: PharmacyCardProps) {
+  const t = useText();
+
   if (!pharmacy) return null;
 
   return (

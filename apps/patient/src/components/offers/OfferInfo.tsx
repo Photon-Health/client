@@ -1,11 +1,12 @@
 import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@chakra-ui/react';
 import { FiInfo, FiStar } from 'react-icons/fi';
 import { Tooltip } from './Tooltip';
-import { text as t } from '../../utils/text';
+import { useText } from '../../hooks/useText';
 import { OfferDetails } from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';
 
 const PreferredTag = () => {
+  const t = useText();
   return (
     <Tag size="sm" colorScheme="blue">
       <TagLeftIcon boxSize="12px" as={FiStar} />
@@ -15,6 +16,7 @@ const PreferredTag = () => {
 };
 
 const CurrentPharmacyTag = () => {
+  const t = useText();
   return (
     <Tag
       size="md"
@@ -25,7 +27,7 @@ const CurrentPharmacyTag = () => {
       borderWidth="1px"
     >
       <TagLabel data-testid="pharmacy-info-current-pharmacy" fontWeight="bold">
-        Current Pharmacy
+        {t.currentPharmacy}
       </TagLabel>
     </Tag>
   );
@@ -39,28 +41,21 @@ interface OfferInfoProps {
 }
 
 export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: OfferInfoProps) => {
+  const t = useText();
+
   if (!pharmacy) {
     return null;
   }
 
   const offerTags = [
-    ...offer.tags,
-    ...(isPreferred ? [t.preferred] : []),
-    ...(isCurrentPharmacy ? ['current'] : [])
-  ].map((tag) => {
-    switch (tag) {
-      case t.preferred:
-        return <PreferredTag />;
-      case 'current':
-        return <CurrentPharmacyTag />;
-      default:
-        return (
-          <Tag key={tag} size="sm" colorScheme="blue">
-            <TagLabel>{tag}</TagLabel>
-          </Tag>
-        );
-    }
-  });
+    ...offer.tags.map((tag) => (
+      <Tag key={tag} size="sm" colorScheme="blue">
+        <TagLabel>{tag}</TagLabel>
+      </Tag>
+    )),
+    ...(isPreferred ? [<PreferredTag key="preferred" />] : []),
+    ...(isCurrentPharmacy ? [<CurrentPharmacyTag key="current" />] : [])
+  ];
 
   // if we aren't explicitly given the cost amount
   // we'll expect patients to pay the retail amount
@@ -124,7 +119,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
         </Text>
         {isAmazonPharmacy && (
           <Tooltip
-            label="This pharmacy has paid for preferred placement. Photon Health does not endorse this pharmacy over others. Other pharmacies may offer this medication at the same or similar price."
+            label={t.sponsoredTooltip}
             placement="bottom-start"
             wrapperProps={{
               onClick: (e) => {
@@ -134,7 +129,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
           >
             <HStack alignItems={'center'} spacing={1}>
               <Text fontSize="sm" color="gray.500">
-                Sponsored
+                {t.sponsored}
               </Text>
               <FiInfo color="var(--chakra-colors-gray-500)" size={16} />
             </HStack>

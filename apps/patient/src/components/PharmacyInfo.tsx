@@ -16,7 +16,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { FiMapPin, FiStar } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
 import { Address, EnrichedPharmacy, OrderFulfillment } from '../utils/models';
-import { text as t } from '../utils/text';
+import { useText } from '../hooks/useText';
 
 import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
@@ -60,6 +60,7 @@ const HoursRow = ({
   isClosed: boolean;
   dayOfWeek: string;
 }) => {
+  const t = useText();
   if (isClosed || is24Hr) {
     return (
       <HStack w="full" justifyContent={'space-between'}>
@@ -67,7 +68,7 @@ const HoursRow = ({
           {titleCase(dayOfWeek)}
         </Text>
         <Text fontSize="sm" color="gray.500">
-          {is24Hr ? 'Open 24hr' : 'Closed'}
+          {is24Hr ? t.open24hrs : t.closed}
         </Text>
       </HStack>
     );
@@ -97,6 +98,7 @@ const HoursRow = ({
 };
 
 const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes, hours, showHours }: HoursProps) => {
+  const t = useText();
   const color = isClosingSoon ? 'orange.500' : isOpen ? 'green.500' : 'red.500';
   const text = is24Hr ? t.open24hrs : isClosingSoon ? t.closingSoon : isOpen ? t.open : t.closed;
   const hasHours = isOpen != null;
@@ -228,6 +230,7 @@ type CostWidgetProps = {
 };
 
 const CostWidget = ({ costAmount, costType }: CostWidgetProps) => {
+  const t = useText();
   if (costAmount == 0 || !costAmount) {
     return null;
   }
@@ -235,7 +238,7 @@ const CostWidget = ({ costAmount, costType }: CostWidgetProps) => {
   return (
     <VStack spacing={0} align="flex-end" minW="fit-content">
       <Text fontSize="sm">
-        {costType === 'INSURANCE_ESTIMATE' ? 'Avg. Copay Price' : 'As Low As'}
+        {costType === 'INSURANCE_ESTIMATE' ? t.avgCopayPrice : t.asLowAs}
       </Text>
       <Text fontWeight="bold">${formatPrice(costAmount)}</Text>
     </VStack>
@@ -276,6 +279,7 @@ export const PharmacyInfo = ({
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
+  const t = useText();
   const location = useLocation();
 
   const showPreferredTag = preferred;
@@ -320,18 +324,18 @@ export const PharmacyInfo = ({
               fontSize="md"
               fontWeight={boldPharmacyName ? 'bold' : 'medium'}
             >
-              {whiteLabelDeliveryPharmacy ? 'Free Express Delivery' : pharmacy.name}
+              {whiteLabelDeliveryPharmacy ? t.freeExpressDelivery : pharmacy.name}
             </Text>
           </HStack>
         </VStack>
 
         {showPrice && pharmacy.price != null ? (
           <VStack spacing={0} align="flex-end" minW="fit-content">
-            <Text fontSize="sm">Coupon Price</Text>
+            <Text fontSize="sm">{t.couponPrice}</Text>
             <Text fontWeight="bold">${formatPrice(pharmacy.price)}</Text>
             {pharmacy.retailPrice ? (
               <Text fontSize="sm" color="gray.500">
-                Retail{' '}
+                {t.retail}{' '}
                 <Text as="span" textDecoration="line-through">
                   ${formatPrice(pharmacy.retailPrice)}
                 </Text>
@@ -391,27 +395,27 @@ export const PharmacyInfo = ({
           ) : null}
           {showReadyIn30MinTag ? (
             <Tag size="sm" bgColor="yellow.200">
-              <TagLabel>Ready in 30 minutes</TagLabel>
+              <TagLabel>{t.readyIn30}</TagLabel>
             </Tag>
           ) : null}
           {showAvailableInYourAreaTag ? (
             <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
-              <TagLabel fontWeight="bold">Available in your area</TagLabel>
+              <TagLabel fontWeight="bold">{t.availableInArea}</TagLabel>
             </Tag>
           ) : null}
           {showFreeDeliveryTag && !showAmazonTagline && !showNovocareTagline ? (
             <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
-              <TagLabel fontWeight="bold">Free Delivery</TagLabel>
+              <TagLabel fontWeight="bold">{t.freeDelivery}</TagLabel>
             </Tag>
           ) : null}
           {isAmazonPharmacy && showAmazonTagline ? (
             <Tag size="sm" colorScheme="blue" flexShrink={0}>
-              <TagLabel fontWeight="bold">In Stock</TagLabel>
+              <TagLabel fontWeight="bold">{t.inStock}</TagLabel>
             </Tag>
           ) : null}
           {isNovocarePharmacy && showNovocareTagline ? (
             <Tag size="sm" colorScheme="blue" flexShrink={0}>
-              <TagLabel fontWeight="bold">In Stock</TagLabel>
+              <TagLabel fontWeight="bold">{t.inStock}</TagLabel>
             </Tag>
           ) : null}
         </HStack>
@@ -427,13 +431,13 @@ export const PharmacyInfo = ({
           mb={1}
         >
           <TagLabel data-testid="pharmacy-info-current-pharmacy" fontWeight="bold">
-            Current Pharmacy
+            {t.currentPharmacy}
           </TagLabel>
         </Tag>
       ) : null}
       {trackingLink && (
         <HStack spacing={0}>
-          <Text>Tracking #:</Text>
+          <Text>{t.tracking}</Text>
           <Link
             href={trackingLink}
             display="inline"

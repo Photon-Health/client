@@ -12,7 +12,7 @@ import {
   StepNumber,
   StepSeparator
 } from '@chakra-ui/react';
-import { orderStateMapping as t } from '../utils/text';
+import { useOrderStateMapping } from '../hooks/useText';
 import { ExtendedFulfillmentType } from '../utils/models';
 import { countFillsAndRemoveDuplicates } from '../utils/general';
 import { useOrderContext } from '../views/Main';
@@ -37,9 +37,10 @@ const getStates = (
 
 export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props) => {
   const currentStepIdx = getStates(fulfillmentType).findIndex((state) => state === status);
-  const activeStep = currentStepIdx + 1; // step to do next
+  const activeStep = currentStepIdx + 1;
 
   const { order } = useOrderContext();
+  const stateMapping = useOrderStateMapping();
 
   const flattenedFills = countFillsAndRemoveDuplicates(order.fills);
   const isMultiRx = flattenedFills.length > 1;
@@ -58,10 +59,9 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
             colorScheme="green"
           >
             {getStates(fulfillmentType).map((state, id) => {
-              // Types are a bit screwy here
-              const text = t[fulfillmentType][state]!;
-              const title = text.status;
-              const description = `${text.description(isMultiRx)}${
+              const stateText = stateMapping[fulfillmentType][state]!;
+              const title = stateText.status;
+              const description = `${stateText.description(isMultiRx)}${
                 isDelivery && (state === 'SHIPPED' || state === 'READY') ? patientAddress : ''
               }`;
 

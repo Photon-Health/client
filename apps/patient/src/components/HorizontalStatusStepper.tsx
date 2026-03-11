@@ -1,5 +1,5 @@
 import { Box, HStack, VStack, Text } from '@chakra-ui/react';
-import { orderStateMapping as t } from '../utils/text';
+import { useOrderStateMapping } from '../hooks/useText';
 import { ExtendedFulfillmentType } from '../utils/models';
 
 export const STATES = {
@@ -21,11 +21,12 @@ const getStates = (
 
 export const HorizontalStatusStepper = ({ status, fulfillmentType }: Props) => {
   const currentStepIdx = getStates(fulfillmentType).findIndex((state) => state === status);
+  const stateMapping = useOrderStateMapping();
 
   return (
     <HStack w="full" justify="space-evenly">
       {getStates(fulfillmentType).map((state, i) => {
-        const text = t[fulfillmentType][state]!;
+        const stateText = stateMapping[fulfillmentType][state]!;
         return (
           <VStack key={state} w="full">
             <Box
@@ -39,7 +40,7 @@ export const HorizontalStatusStepper = ({ status, fulfillmentType }: Props) => {
               fontSize="sm"
               color={currentStepIdx >= i ? 'blue.500' : 'gray.500'}
             >
-              {text.status}
+              {stateText.status}
             </Text>
           </VStack>
         );

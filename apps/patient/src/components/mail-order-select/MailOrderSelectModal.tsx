@@ -19,7 +19,7 @@ import { MailOrderPharmacyOption } from './MailOrderSelectCard';
 import { datadogRum } from '@datadog/browser-rum';
 import { patientAnalytics } from '../../configs/analytics';
 import { useOrderContext } from '../../views/Main';
-import { text } from '../../utils/text';
+import { useText } from '../../hooks/useText';
 
 type MailOrderSelectModalProps = Omit<ModalProps, 'children'> & {
   options?: MailOrderPharmacyOption[];
@@ -29,13 +29,13 @@ type MailOrderSelectModalProps = Omit<ModalProps, 'children'> & {
   ) => unknown;
 };
 
-const submitButtonText = text.placeOrder;
-
 export function MailOrderSelectModal({
   options,
   onConfirm,
   ...modalProps
 }: MailOrderSelectModalProps) {
+  const t = useText();
+  const submitButtonText = t.placeOrder;
   const [confirming, setConfirming] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<MailOrderPharmacyOption | undefined>();
   const { order } = useOrderContext();
@@ -107,7 +107,7 @@ export function MailOrderSelectModal({
           zIndex="10"
         >
           <Text maxWidth="xl" marginX="auto">
-            Mail Order Pharmacies
+            {t.mailOrderPharmacies}
           </Text>
         </ModalHeader>
         <ModalCloseButton marginTop="54px" zIndex="10" position="fixed" />
@@ -122,7 +122,7 @@ export function MailOrderSelectModal({
               fontWeight="500"
               lineHeight="shorter"
             >
-              If you can't find your pharmacy, please reach out to your provider.
+              {t.cantFindPharmacy}
             </Text>
             {options && (
               <MailOrderSelectList

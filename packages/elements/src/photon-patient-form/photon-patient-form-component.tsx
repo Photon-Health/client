@@ -10,6 +10,7 @@ import {
   Icon,
   Input,
   InputGroup,
+  LanguageSelect,
   PharmacySearch,
   PhoneInput,
   SEX_OPTIONS,
@@ -48,6 +49,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   let ref: any;
   const client = usePhoton();
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
+  const [language, setLanguage] = createSignal('en');
   const { store: pStore, actions: pActions } = PatientStore;
   const { store, actions } = createFormStore({
     firstName: undefined,
@@ -445,6 +447,13 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                       onBlur={() =>
                         trackFieldInteraction('gender', Boolean(store['gender']?.value))
                       }
+                    />
+                  </InputGroup>
+
+                  <InputGroup label="Language preference">
+                    <LanguageSelect
+                      value={language()}
+                      onChange={(e) => setLanguage(e.currentTarget.value)}
                     />
                   </InputGroup>
 

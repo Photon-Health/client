@@ -14,7 +14,7 @@ import { OrderStatusHeader } from '../components/status/Header';
 import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
 import { getFulfillmentType, isDelivery, preparePharmacy, wait } from '../utils/general';
 import { InsuranceAlert } from '../components/InsuranceAlert';
-import { text as t } from '../utils/text';
+import { useText } from '../hooks/useText';
 import { useOrderContext } from './Main';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
@@ -24,6 +24,7 @@ import { CouponCardList } from '../components/coupons';
 import { Pharmacy } from '../utils/models';
 
 export const Status = () => {
+  const t = useText();
   const navigate = useNavigate();
   const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
@@ -248,7 +249,7 @@ export const Status = () => {
         <Box bgColor="white">
           <Container py={6}>
             <VStack spacing={4} width="full" alignItems="stretch">
-              <HolidayAlert>Holiday may affect pharmacy hours.</HolidayAlert>
+              <HolidayAlert>{t.holidayAlert}</HolidayAlert>
               <InsuranceAlert exception={unresolvedExceptions[0]?.exceptionType} />
               <OrderStatusHeader
                 status={orderState}
@@ -283,7 +284,7 @@ export const Status = () => {
             {displayPharmacy && (
               <VStack w="full" alignItems="stretch" spacing={4}>
                 <Heading as="h4" size="md">
-                  Pharmacy
+                  {t.pharmacy}
                 </Heading>
                 <Card>
                   <VStack w="full" spacing={0}>
@@ -314,7 +315,7 @@ export const Status = () => {
 
             <VStack w="full" alignItems="stretch" spacing={4}>
               <Heading as="h4" size="md">
-                Need help?
+                {t.needHelp}
               </Heading>
               <Card>
                 <Button
@@ -326,7 +327,7 @@ export const Status = () => {
                     patientAnalytics.track('Clicked Pharmacy Issue Button', order);
                   }}
                 >
-                  I have a pharmacy issue
+                  {t.pharmacyIssue}
                 </Button>
               </Card>
             </VStack>

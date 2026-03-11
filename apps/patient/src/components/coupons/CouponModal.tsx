@@ -13,7 +13,7 @@ import { FC } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { useOrderContext } from '../../views/Main';
-import { text as t } from '../../utils/text';
+import { useText } from '../../hooks/useText';
 
 interface CouponModalProps {
   isOpen: boolean;
@@ -21,6 +21,7 @@ interface CouponModalProps {
 }
 
 export const CouponModal: FC<CouponModalProps> = ({ isOpen, onClose }) => {
+  const t = useText();
   const location = useLocation();
   const { flattenedFills } = useOrderContext();
 

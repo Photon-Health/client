@@ -1,7 +1,7 @@
 import { Button, Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
 
 import { Pharmacy as EnrichedPharmacy } from '../../utils/models';
-import { text as t } from '../../utils/text';
+import { useText } from '../../hooks/useText';
 import { HolidayAlert } from '../HolidayAlert';
 import { PharmacyCard } from '../PharmacyCard';
 import { PharmacyFilters } from '../PharmacyFilters';
@@ -49,6 +49,7 @@ export const PickupPharmacyCardList = ({
   numberOfBrandedOptions = 0,
   shouldTrackOfferImpressionsAndSelections
 }: PickupPharmacyCardListProps) => {
+  const t = useText();
   return (
     <VStack spacing={3} align="span" w="full">
       {showHeading ? (
@@ -69,9 +70,7 @@ export const PickupPharmacyCardList = ({
           setEnable24Hr={setEnable24Hr}
         />
       </SlideFade>
-      <HolidayAlert>
-        Holiday may affect pharmacy hours. Consider sending to a 24 hour pharmacy.
-      </HolidayAlert>
+      <HolidayAlert>{t.holidayAlert}</HolidayAlert>
       <VStack align="span" spacing={2}>
         {pharmacies.map((pharmacy: EnrichedPharmacy, i: number) => (
           <SlideFade offsetY="60px" in={true} key={`pickup-pharmacy-${pharmacy.id}-${i}`}>

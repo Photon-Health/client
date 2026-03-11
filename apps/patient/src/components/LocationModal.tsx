@@ -19,7 +19,7 @@ import { FiTarget } from 'react-icons/fi';
 import { AsyncSelect } from 'chakra-react-select';
 import { debounce } from 'lodash';
 
-import { text as t } from '../utils/text';
+import { useText } from '../hooks/useText';
 import { patientAnalytics } from '../configs/analytics';
 import { useOrderContext } from '../views/Main';
 
@@ -44,6 +44,7 @@ interface LocationModalProps {
 }
 
 export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
+  const t = useText();
   const [gettingCurrentLocation, setGettingCurrentLocation] = useState<boolean>(false);
 
   const autocompleteService = useMemo(() => new google.maps.places.AutocompleteService(), []);

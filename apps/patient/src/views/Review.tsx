@@ -6,12 +6,13 @@ import queryString from 'query-string';
 
 import { FixedFooter, PoweredBy, PrescriptionsList } from '../components';
 import { AddressForm, AddressFormHandle } from '../components/AddressForm';
-import { text as t } from '../utils/text';
+import { useText } from '../hooks/useText';
 import { useOrderContext } from './Main';
 import { patientAnalytics } from '..//configs/analytics';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 
 export const Review = () => {
+  const t = useText();
   const { order, flattenedFills, fetchOrder } = useOrderContext();
 
   const navigate = useNavigate();
@@ -119,7 +120,7 @@ export const Review = () => {
             variant="brand"
             onClick={handleCtaClick}
             isLoading={isSubmitting}
-            loadingText="Saving..."
+            loadingText={t.saving}
           >
             {t.searchPharmacy}
           </Button>

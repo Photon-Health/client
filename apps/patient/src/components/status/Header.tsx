@@ -7,6 +7,7 @@ import { IoDocumentTextOutline } from 'react-icons/io5';
 import { roundUpTo15MinInterval } from '../../utils/dates';
 import { Step } from './Step';
 import { FulfillmentType, PrescriptionFulfillment } from '../../__generated__/graphql';
+import { useText } from '../../hooks/useText';
 
 export interface OrderStatusHeaderProps {
   status: PrescriptionFulfillment['state'] | 'DELAYED' | 'FILLING' | 'SHIPPED';
@@ -38,48 +39,50 @@ export interface OrderStatusHeaderProps {
   subHeaderOverride?: string;
 }
 
-function headerText(props: OrderStatusHeaderProps) {
+type TText = ReturnType<typeof useText>;
+
+function headerText(props: OrderStatusHeaderProps, t: TText) {
   const exception = props.exception;
   const status = props.status;
   if (exception) {
     switch (exception) {
       case 'DEMOGRAPHIC_MISMATCH':
-        return 'Can’t process order';
+        return t.headerCantProcess;
       case 'PHARMACY_CLOSED':
       case 'PHARMACY_UNREACHABLE':
-        return 'Order placed';
+        return t.headerOrderPlaced;
       case 'ORDER_ERROR':
-        return 'Order error';
+        return t.headerOrderError;
       case 'NOT_COVERED':
-        return 'Order issue';
+        return t.headerOrderIssue;
       case 'EXTERNAL_TRANSFER':
-        return 'Order transferred';
+        return t.headerOrderTransferred;
       case 'DOCTOR_NOT_LICENSED_IN_STATE':
-        return 'Order issue';
+        return t.headerOrderIssue;
       case 'SUPERVISING_PHYSICIAN_NEEDED':
-        return 'Order issue';
+        return t.headerOrderIssue;
       default:
         break;
     }
   }
   switch (status) {
     case 'DELAYED':
-      return 'Order delayed';
+      return t.headerOrderDelayed;
     case 'PROCESSING':
     case 'RECEIVED':
     case 'FILLING':
-      return 'Preparing order...';
+      return t.headerPreparingOrder;
     case 'PICKED_UP':
-      return 'Order complete';
+      return t.headerOrderComplete;
     case 'CREATED':
     case 'SENT':
-      return 'Order placed';
+      return t.headerOrderPlaced;
     case 'READY':
-      return 'Order is likely ready';
+      return t.headerOrderLikelyReady;
     case 'DELIVERED':
-      return 'Order delivered';
+      return t.headerOrderDelivered;
     case 'SHIPPED':
-      return 'Order in transit';
+      return t.headerOrderInTransit;
     default: {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _: never = status;
@@ -88,7 +91,11 @@ function headerText(props: OrderStatusHeaderProps) {
   }
 }
 
-function subheaderText(props: OrderStatusHeaderProps) {
+function subheaderText(
+  props: OrderStatusHeaderProps,
+  t: TText,
+  pharmacyEstimatedReadyAtComponent: React.ReactNode
+) {
   // Exceptions take precedence
   if (
     props.exception === 'BACKORDERED' ||
@@ -99,28 +106,28 @@ function subheaderText(props: OrderStatusHeaderProps) {
     props.exception === 'OTC' ||
     props.exception === 'MEDICAL_DEVICE'
   ) {
-    return 'Please review your order for details.';
+    return t.subPleaseReview;
   }
   if (props.exception === 'PHARMACY_UNREACHABLE') {
-    return "We're unable to get updates for your order. You can call your current pharmacy or change pharmacies below.";
+    return t.subPharmacyUnreachable;
   }
   if (props.exception === 'PHARMACY_CLOSED') {
-    return 'Your pharmacy is closed. You can change it if you need your order sooner.';
+    return t.subPharmacyClosed;
   }
   if (props.exception === 'ORDER_ERROR') {
-    return 'Unable to send to pharmacy. Please select a new pharmacy below.';
+    return t.subOrderError;
   }
   if (props.exception === 'DEMOGRAPHIC_MISMATCH') {
-    return 'Please reach out to your provider with correct Legal Name / DoB / Address to write you a new prescription.';
+    return t.subDemographicMismatch;
   }
   if (props.exception === 'EXTERNAL_TRANSFER') {
-    return 'Please contact your original pharmacy if you have questions.';
+    return t.subExternalTransfer;
   }
   if (props.exception === 'DOCTOR_NOT_LICENSED_IN_STATE') {
-    return 'Please contact your provider to resolve this issue.';
+    return t.subDoctorNotLicensed;
   }
   if (props.exception === 'SUPERVISING_PHYSICIAN_NEEDED') {
-    return 'Please contact your provider to resolve this issue.';
+    return t.subDoctorNotLicensed;
   }
 
   // Then just check the status
@@ -128,38 +135,38 @@ function subheaderText(props: OrderStatusHeaderProps) {
     (props.fulfillmentType === 'MAIL_ORDER' || props.integrated) &&
     ['CREATED', 'SENT', 'RECEIVED'].includes(props.status)
   ) {
-    return "We've sent your order to the pharmacy. They will reach out shortly.";
+    return t.subMailOrderSent;
   }
   if (props.status === 'CREATED' || props.status === 'SENT') {
-    return "We're confirming your order with the pharmacy.";
+    return t.subConfirmingOrder;
   }
   if (props.status === 'READY') {
-    return 'Our estimate is based on the time the pharmacy provided';
+    return t.subEstimateReady;
   }
   if (props.status === 'PICKED_UP') {
     return null;
   }
   if (props.status === 'FILLING') {
-    return 'The pharmacy is preparing your order for delivery.';
+    return t.preparingDelivery;
   }
   if (props.status === 'SHIPPED') {
-    return 'Your order is out for delivery';
+    return t.subOutForDelivery;
   }
   if (props.status === 'RECEIVED') {
-    return 'Your pharmacy has received your order.';
+    return t.subPharmacyReceived;
   }
   if (props.status === 'PROCESSING') {
     if (props.pharmacyEstimatedReadyAt) {
-      return <PharmacyEstimatedReadyAt pharmacyEstimatedReadyAt={props.pharmacyEstimatedReadyAt} />;
+      return pharmacyEstimatedReadyAtComponent;
     } else {
       return null;
     }
   }
   if (props.status === 'DELAYED') {
     if (props.pharmacyEstimatedReadyAt) {
-      return <PharmacyEstimatedReadyAt pharmacyEstimatedReadyAt={props.pharmacyEstimatedReadyAt} />;
+      return pharmacyEstimatedReadyAtComponent;
     }
-    return 'Please review your order for details.';
+    return t.subPleaseReview;
   }
 }
 
@@ -197,6 +204,7 @@ interface PharmacyEstimatedReadyAtProps {
   pharmacyEstimatedReadyAt: Date;
 }
 const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimatedReadyAtProps) => {
+  const t = useText();
   const rounded = roundUpTo15MinInterval(pharmacyEstimatedReadyAt);
   const readyAtDayjs = dayjs(rounded);
   const timeFormat = readyAtDayjs.minute() ? 'h:mm a' : 'h a';
@@ -204,25 +212,24 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
   const isPast = now.isAfter(readyAtDayjs);
 
   if (isPast) {
-    return <Text>Your prescriptions should be ready</Text>;
+    return <Text>{t.subPrescriptionsReady}</Text>;
   }
   if (readyAtDayjs.isToday()) {
     return (
       <Text>
-        Ready at <b>{readyAtDayjs.format(timeFormat)}</b>
+        {t.readyAt} <b>{readyAtDayjs.format(timeFormat)}</b>
       </Text>
     );
   } else if (readyAtDayjs.isTomorrow()) {
     return (
       <Text>
-        Ready <b>tomorrow at {readyAtDayjs.format(timeFormat)}</b>
+        {t.readyPrefix} <b>{t.tomorrowAt} {readyAtDayjs.format(timeFormat)}</b>
       </Text>
     );
   } else {
-    // For datetimes in the past or far in the future, just append the date
     return (
       <Text>
-        Ready{' '}
+        {t.readyPrefix}{' '}
         <b>
           {readyAtDayjs.format('ddd, MMM D')} at {readyAtDayjs.format(timeFormat)}
         </b>
@@ -231,9 +238,9 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
   }
 };
 
-function patientDesiredReadyByText(readyByTime: Date | 'URGENT') {
+function patientDesiredReadyByText(readyByTime: Date | 'URGENT', t: TText) {
   if (readyByTime === 'URGENT') {
-    return 'As soon as possible';
+    return t.urgentReadyBy;
   }
   const readyByTimeDayJs = dayjs(readyByTime);
   const isToday = readyByTimeDayJs.isToday();
@@ -242,7 +249,7 @@ function patientDesiredReadyByText(readyByTime: Date | 'URGENT') {
   if (isToday) {
     return readyByTimeDayJs.format('h:mm a');
   } else if (isTomorrow) {
-    return `Tomorrow at ${readyByTimeDayJs.format('h:mm a')}`;
+    return `${t.tomorrowAtPrefix} ${readyByTimeDayJs.format('h:mm a')}`;
   }
   return readyByTimeDayJs.format('MMM D [at] h:mm a');
 }
@@ -250,6 +257,8 @@ function patientDesiredReadyByText(readyByTime: Date | 'URGENT') {
 export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
   props: OrderStatusHeaderProps
 ) => {
+  const t = useText();
+
   const isReady =
     props.status === 'READY' ||
     props.status === 'PICKED_UP' ||
@@ -261,9 +270,13 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
 
   const derivedProps = { ...props, status: derivedStatus };
 
-  const header = headerText(derivedProps);
+  const pharmacyEstimatedReadyAtNode = props.pharmacyEstimatedReadyAt ? (
+    <PharmacyEstimatedReadyAt pharmacyEstimatedReadyAt={props.pharmacyEstimatedReadyAt} />
+  ) : null;
+
+  const header = headerText(derivedProps, t);
   const displayProgressBar = props.exception !== 'EXTERNAL_TRANSFER';
-  const subheader = props.subHeaderOverride || subheaderText(derivedProps);
+  const subheader = props.subHeaderOverride || subheaderText(derivedProps, t, pharmacyEstimatedReadyAtNode);
   const color = progressLevel(derivedProps);
   const progressBar = progress(derivedProps);
 
@@ -305,8 +318,8 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
           w="full"
           justify="space-between"
         >
-          <Text>Requested Pickup:</Text>
-          <Text as="b">{patientDesiredReadyByText(props.patientDesiredReadyAt)}</Text>
+          <Text>{t.requestedPickup}</Text>
+          <Text as="b">{patientDesiredReadyByText(props.patientDesiredReadyAt, t)}</Text>
         </HStack>
       )}
     </VStack>

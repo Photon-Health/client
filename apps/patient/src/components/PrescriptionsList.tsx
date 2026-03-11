@@ -10,18 +10,19 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react';
-import { text as t } from '../utils/text';
+import { useText } from '../hooks/useText';
 import { useOrderContext } from '../views/Main';
 import { formatDate } from '../utils/formatters';
 
 export const PrescriptionsList = () => {
+  const t = useText();
   const { flattenedFills } = useOrderContext();
 
   return (
     <Container>
       <VStack spacing={4} align="span" pt={5}>
         <Heading as="h4" size="md">
-          Order Details
+          {t.orderDetails}
         </Heading>
         <Accordion allowToggle>
           {flattenedFills.map(({ id, treatment, prescription: rx, count }) => {
@@ -43,7 +44,7 @@ export const PrescriptionsList = () => {
                           </Text>
                           <HStack>
                             <Text fontSize="sm" color="gray.500">
-                              {isExpanded ? 'Show less' : 'Show more'}
+                              {isExpanded ? t.showLess : t.showMoreDetails}
                             </Text>
                             <AccordionIcon />
                           </HStack>

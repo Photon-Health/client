@@ -4,6 +4,7 @@ import isTomorrow from 'dayjs/plugin/isTomorrow';
 import { Maybe } from '../__generated__/graphql';
 import { OrderFulfillment } from '../utils/models';
 import { roundUpTo15MinInterval } from '../utils/dates';
+import { useText } from '../hooks/useText';
 
 dayjs.extend(isTomorrow);
 
@@ -40,6 +41,7 @@ interface PharmacyEstimatedReadyAtProps {
   pharmacyEstimatedReadyAt: Date;
 }
 const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimatedReadyAtProps) => {
+  const t = useText();
   const rounded = roundUpTo15MinInterval(pharmacyEstimatedReadyAt);
   const readyAtDayjs = dayjs(rounded);
   const timeFormat = readyAtDayjs.minute() ? 'h:mm a' : 'h a';
@@ -49,20 +51,19 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
   if (readyAtDayjs.isToday() && isFuture) {
     return (
       <Text>
-        Ready at <b>{readyAtDayjs.format(timeFormat)}</b>
+        {t.readyAt} <b>{readyAtDayjs.format(timeFormat)}</b>
       </Text>
     );
   } else if (readyAtDayjs.isTomorrow()) {
     return (
       <Text>
-        Ready <b>tomorrow at {readyAtDayjs.format(timeFormat)}</b>
+        {t.readyPrefix} <b>{t.tomorrowAt} {readyAtDayjs.format(timeFormat)}</b>
       </Text>
     );
   } else {
-    // For datetimes in the past or far in the future, just append the date
     return (
       <Text>
-        Ready{' '}
+        {t.readyPrefix}{' '}
         <b>
           {readyAtDayjs.format('ddd, MMM D')} at {readyAtDayjs.format(timeFormat)}
         </b>
@@ -76,6 +77,7 @@ interface PatientDesiredReadyByProps {
   readyByTime: Date;
 }
 const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByProps) => {
+  const t = useText();
   const readyByTimeDayJs = dayjs(readyByTime);
   const isToday = readyByTimeDayJs.isToday();
   const isTomorrow = readyByTimeDayJs.isTomorrow();
@@ -85,24 +87,23 @@ const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByPr
   if (readyBy === 'Urgent') {
     return (
       <Text>
-        Need order <b>as soon as possible</b>
+        {t.needOrderPre} <b>{t.asap}</b>
       </Text>
     );
   } else if (readyBy === 'After hours') {
     if (isToday && isFuture) {
       return (
         <Text>
-          Need order <b>this evening</b>
+          {t.needOrderPre} <b>{t.thisEvening}</b>
         </Text>
       );
     } else if (isTomorrow) {
       return (
         <Text>
-          Need order <b>tomorrow evening</b>
+          {t.needOrderPre} <b>{t.tomorrowEvening}</b>
         </Text>
       );
     } else {
-      // Let's not surface anything here until we decide on copy
       return null;
     }
   } else {
@@ -112,7 +113,7 @@ const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByPr
     if (isToday && isFuture) {
       return (
         <Text>
-          Need order by{' '}
+          {t.needOrderByPre}{' '}
           <b>
             {hour} {period}
           </b>
@@ -121,17 +122,16 @@ const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByPr
     } else if (isTomorrow) {
       return (
         <Text>
-          Need order by{' '}
+          {t.needOrderByPre}{' '}
           <b>
-            tomorrow at {hour} {period}
+            {t.tomorrowAt} {hour} {period}
           </b>
         </Text>
       );
     } else {
-      // Requested time is in the past, this would happen if we don't get around to confirming it
       return (
         <Text>
-          Need order by{' '}
+          {t.needOrderByPre}{' '}
           <b>
             {readyByTimeDayJs.format('ddd, MMM D')} at {hour} {period}
           </b>

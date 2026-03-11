@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CouponModal } from './CouponModal';
 import { Box, HStack, Icon, Link, Text, VStack } from '@chakra-ui/react';
 import { formatPrice } from '../../utils/formatters';
-import { text as t } from '../../utils/text';
+import { useText } from '../../hooks/useText';
 import { FiInfo } from 'react-icons/fi';
 import { DiscountCard } from '../../__generated__/graphql';
 import { CouponSourceLogo } from './CouponSourceLogo';
@@ -14,6 +14,7 @@ export type Coupon = Pick<
 >;
 
 export const EmbeddedCouponCard = ({ coupon }: { coupon: Coupon }) => {
+  const t = useText();
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
   const { price, retailPrice, bin, pcn, group, memberId, source } = coupon;
 
@@ -30,7 +31,7 @@ export const EmbeddedCouponCard = ({ coupon }: { coupon: Coupon }) => {
         </Text>
         {retailPrice ? (
           <Text alignSelf="center" color="gray.500">
-            Retail price:{' '}
+            {t.retailPriceLabel}{' '}
             <span style={{ textDecoration: 'line-through' }}>${formatPrice(retailPrice)}</span>
           </Text>
         ) : null}
