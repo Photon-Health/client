@@ -12,6 +12,13 @@
         "command": "vite build"
       }
     },
+    "build:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/components",
+        "command": "vite build"
+      }
+    },
     "test": {
       "executor": "nx:run-commands",
       "options": {

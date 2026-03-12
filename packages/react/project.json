@@ -20,6 +20,21 @@
         }
       ]
     },
+    "build:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/react",
+        "commands": ["rimraf dist", "tsc", "vite build"],
+        "parallel": false
+      },
+      "outputs": ["{workspaceRoot}/dist/packages/sdk"],
+      "dependsOn": [
+        {
+          "projects": ["sdk"],
+          "target": "build:tau"
+        }
+      ]
+    },
     "start": {
       "executor": "nx:run-commands",
       "options": {

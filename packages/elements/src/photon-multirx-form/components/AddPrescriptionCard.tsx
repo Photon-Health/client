@@ -188,6 +188,14 @@ export const AddPrescriptionCard = (props: {
                 key: 'treatment',
                 value: e.detail.data
               });
+              // Auto-select first dose form as dispense unit
+              const doseForms = e.detail.data.doseForms;
+              if (doseForms && doseForms.length > 0) {
+                props.actions.updateFormValue({
+                  key: 'dispenseUnit',
+                  value: doseForms[0].name
+                });
+              }
             }
             dispatchAnalytics({
               trackEventType: 'prescription_field_interaction',
@@ -284,6 +292,7 @@ export const AddPrescriptionCard = (props: {
           <InputGroup label="Dispense Unit" required error={props.store.dispenseUnit?.error}>
             <DispenseUnitSelect
               value={props.store.dispenseUnit?.value ?? undefined}
+              options={props.store.treatment?.value?.doseForms?.map((df: any) => df.name)}
               onChange={(e: Event & { currentTarget: HTMLSelectElement }) => {
                 props.actions.updateFormValue({
                   key: 'dispenseUnit',

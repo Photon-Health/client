@@ -28,6 +28,14 @@
       },
       "dependsOn": ["^build"]
     },
+    "build:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/elements",
+        "command": "rimraf dist && vite build"
+      },
+      "dependsOn": ["^build:tau"]
+    },
     "test": {
       "executor": "nx:run-commands",
       "options": {

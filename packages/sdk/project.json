@@ -34,6 +34,21 @@
       },
       "dependsOn": ["codegen:clinical-api"]
     },
+    "build:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/sdk",
+        "commands": [
+          "rimraf dist",
+          "tsc --emitDeclarationOnly --outDir dist",
+          "vite build",
+          "cp src/types.ts dist/types.ts",
+          "cp src/graphql/clinical-api/gql/graphql.ts dist/graphql/clinical-api/gql/graphql.ts"
+        ],
+        "parallel": false
+      },
+      "dependsOn": ["codegen:clinical-api:tau"]
+    },
     "start": {
       "executor": "nx:run-commands",
       "options": {

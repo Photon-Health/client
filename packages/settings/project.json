@@ -14,6 +14,16 @@
         "assets": ["packages/settings/*.md"]
       }
     },
+    "build:tau": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/settings",
+        "main": "packages/settings/src/index.ts",
+        "tsConfig": "packages/settings/tsconfig.lib.json",
+        "assets": ["packages/settings/*.md"]
+      }
+    },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
