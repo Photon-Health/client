@@ -26,7 +26,7 @@ i18n.use(initReactI18next).init({
     ru: { translation: ru },
     my: { translation: my }
   },
-  lng: (localStorage.getItem(STORAGE_KEY) as LanguageCode | null) ?? 'en',
+  lng: (localStorage.getItem(STORAGE_KEY) as LanguageCode | null) ?? 'my',
   fallbackLng: 'en',
   interpolation: {
     escapeValue: false
