@@ -21,8 +21,8 @@ import {
   Toaster,
   triggerToast,
   useDraftPrescriptions,
+  usePharmacySelectionContext,
   usePhoton,
-  usePrescribe,
   usePrescribeEventDispatch,
   useRecentOrders
 } from '@photonhealth/components';
@@ -81,16 +81,11 @@ export type PrescribeProps = {
   hideTemplates: boolean;
   hidePatientCard: boolean;
   enableOrder: boolean;
-  enableLocalPickup: boolean;
-  enableSendToPatient: boolean;
   enableMedHistory: boolean;
   enableMedHistoryLinks: boolean;
   enableMedHistoryRefillButton: boolean;
   enableCombineAndDuplicate: boolean;
-  enableDeliveryPharmacies: boolean;
   optionalPatientAddress: boolean;
-  mailOrderIds?: string;
-  pharmacyId?: string;
   address?: Address;
   weight?: number;
   weightUnit?: string;
@@ -133,7 +128,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   const { draftPrescriptions, prescriptionIds, tryUpdatePrescriptionStates, isLoadingPrefills } =
     useDraftPrescriptions();
-  const { routingConstraints, combinedRoutingConstraint, orderFormData } = usePrescribe();
+  const pharmacySelectionContext = usePharmacySelectionContext();
   const {
     dispatchFormValidate,
     dispatchPrescriptionsCreated,
@@ -144,19 +139,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchClinicalAlertCancel,
     dispatchAnalytics
   } = usePrescribeEventDispatch();
-
-  const autoRoutedPharmacyId = createMemo(() => {
-    if (props.pharmacyId) {
-      return props.pharmacyId;
-    }
-
-    if (
-      combinedRoutingConstraint()?.routing_constraint_type === 'include' &&
-      combinedRoutingConstraint()?.constraint_pharmacies?.length === 1
-    ) {
-      return combinedRoutingConstraint().constraint_pharmacies?.[0].id;
-    }
-  });
 
   const client = usePhoton();
   const [showForm, setShowForm] = createSignal<boolean>(props.initialShowForm);
@@ -183,7 +165,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     if (!props.optionalPatientAddress || !props.enableOrder) {
       return false;
     }
-    return fulfillmentNeedsAddress(props.formStore?.fulfillmentType?.value) && !hasPatientAddress();
+    return (
+      fulfillmentNeedsAddress(pharmacySelectionContext.fulfillmentType()) && !hasPatientAddress()
+    );
   });
   const [isScreeningAlertWarningOpen, setIsScreeningAlertWarningOpen] = createSignal(false);
 
@@ -208,7 +192,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     }
 
     ref.addEventListener('photon-ticket-created-duplicate', () => {
+      // need to reset all the form data
       clearForm(props.formActions, prefillNotes ? { notes: prefillNotes } : undefined);
+      pharmacySelectionContext.setFulfillmentType(undefined);
+      pharmacySelectionContext.setPharmacyId(undefined);
+      pharmacySelectionContext.setUpdatePreferredPharmacy(false);
     });
   });
 
@@ -346,7 +334,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
     if (
       props.enableOrder &&
-      shouldBlockOrderWithoutAddress(props.formStore?.fulfillmentType?.value, hasPatientAddress())
+      shouldBlockOrderWithoutAddress(
+        pharmacySelectionContext.fulfillmentType(),
+        hasPatientAddress()
+      )
     ) {
       setIsLoading(false);
       triggerToast({
@@ -411,10 +402,12 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     const updatePatientMutation = client.getSDK().clinical.patient.updatePatient({});
 
     try {
+      const selectedPharmacyId = pharmacySelectionContext.pharmacyId();
+
       if (
-        props.formStore.updatePreferredPharmacy?.value &&
-        orderFormData.pharmacyId &&
-        props.formStore.fulfillmentType?.value === 'PICK_UP'
+        pharmacySelectionContext.updatePreferredPharmacy() &&
+        selectedPharmacyId &&
+        pharmacySelectionContext.fulfillmentType() === 'PICK_UP'
       ) {
         const patient = props.formStore.patient?.value;
         if (patient?.preferredPharmacies && patient?.preferredPharmacies?.length > 0) {
@@ -431,7 +424,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         updatePatientMutation({
           variables: {
             id: patient.id,
-            preferredPharmacies: [orderFormData.pharmacyId]
+            preferredPharmacies: [selectedPharmacyId]
           },
           awaitRefetchQueries: false
         });
@@ -439,10 +432,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
       // default to auto-routed pharmacy passed in by customer using
       // elements embed or determined based on routing constraints
-      let pharmacyId = autoRoutedPharmacyId();
-      if (orderFormData.pharmacyId) {
+      let pharmacyId = pharmacySelectionContext.autoRoutedPharmacyId();
+      if (selectedPharmacyId) {
         // use selected pharmacy if available
-        pharmacyId = orderFormData.pharmacyId;
+        pharmacyId = selectedPharmacyId;
       }
       if (!pharmacyId) {
         // api does not allow null/undefined
@@ -455,7 +448,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           ...(props.groupId ? { groupId: props.groupId } : {}),
           patientId: props.formStore.patient?.value.id,
           pharmacyId,
-          fulfillmentType: props.formStore.fulfillmentType?.value || '',
+          fulfillmentType: pharmacySelectionContext.fulfillmentType() || '',
           ...(addressId()
             ? { addressId: addressId() }
             : hasValidAddress()
@@ -480,9 +473,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         properties: {
           orderId: orderData!.createOrder.id,
           prescriptionCount: draftPrescriptions().length,
-          fulfillmentType: props.formStore.fulfillmentType?.value || 'SEND_TO_PATIENT',
+          fulfillmentType: pharmacySelectionContext.fulfillmentType() || 'SEND_TO_PATIENT',
           hasPreferredPharmacy: hasPreferredPharmacy(),
-          setAsPreferred: props.formStore.updatePreferredPharmacy?.value ?? false,
+          setAsPreferred: pharmacySelectionContext.updatePreferredPharmacy(),
           pharmacyId: pharmacyId || null,
           isCombinedOrder: false
         }
@@ -669,18 +662,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     screenDraftedPrescriptions();
                   }}
                   screeningAlerts={screeningAlerts()}
-                  routingConstraints={routingConstraints()}
+                  routingConstraints={pharmacySelectionContext.routingConstraints()}
                   enableOrder={props.enableOrder}
                 />
-                <Show when={props.enableOrder && !autoRoutedPharmacyId()}>
-                  <OrderCard
-                    store={props.formStore}
-                    actions={props.formActions}
-                    enableLocalPickup={props.enableLocalPickup}
-                    enableSendToPatient={props.enableSendToPatient}
-                    enableDeliveryPharmacies={props.enableDeliveryPharmacies}
-                    mailOrderIds={props.mailOrderIds}
-                  />
+                <Show when={props.enableOrder && !pharmacySelectionContext.isAutoRouted()}>
+                  <OrderCard store={props.formStore} />
                 </Show>
                 <Show when={forceAddressForm() && props.formStore.patient?.value?.id}>
                   <AddressForm
@@ -702,8 +688,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     }}
                   />
                 </Show>
-                <Show when={props.enableOrder && autoRoutedPharmacyId()}>
-                  <PharmacyCard pharmacyId={autoRoutedPharmacyId()} />
+                <Show when={props.enableOrder && pharmacySelectionContext.isAutoRouted()}>
+                  <PharmacyCard pharmacyId={pharmacySelectionContext.autoRoutedPharmacyId()} />
                 </Show>
                 <Show when={!props.hideSubmit}>
                   {/* We're hiding this alert message if enable-order is set, a rough way to let us know this is not in the App.

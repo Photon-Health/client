@@ -2,52 +2,25 @@ import {
   Accessor,
   createContext,
   createEffect,
-  createMemo,
   createSignal,
   JSXElement,
   useContext
 } from 'solid-js';
 import { usePhotonClient } from '../SDKProvider';
 import { Prescription } from '@photonhealth/sdk/dist/types';
-import {
-  GenerateCoverageOptions,
-  GetPatientPreferredPharmaciesAndAddress,
-  GetPharmaciesQuery
-} from '../../fetch';
+import { GenerateCoverageOptions, GetPatientPreferredPharmaciesAndAddress } from '../../fetch';
 import { triggerToast } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
-import {
-  combineAllRoutingConstraints,
-  getRoutingConstraint,
-  RoutingConstraint
-} from '../RoutingConstraints';
-import { createStore } from 'solid-js/store';
-import getLocation from '../../utils/getLocations';
-import { useGoogleService } from '../GoogleServiceProvider';
+import { usePharmacySelectionContext, Address } from '../PharmacySelect/PharmacySelectionProvider';
 import { Env } from '@photonhealth/sdk';
-
-// The order form data will consist of, at least, the list of selected prescription IDs and pharmacy ID.
-// The prescription form data (todo) will consist of a single prescription's data during user input
-// Note: Multiple prescription "sub" forms can be opened/completed within a single order form
-interface PrescribeOrderFormData {
-  pharmacyId?: string;
-}
 
 export type PrescribeContextType = {
   // values
   coverageOptions: Accessor<CoverageOption[]>;
-  routingConstraints: Accessor<RoutingConstraint[]>;
-  combinedRoutingConstraint: Accessor<RoutingConstraint>;
-  unroutablePharmacyIds: Accessor<Set<string>>;
-  orderFormData: PrescribeOrderFormData;
   selectedCoverageOption: Accessor<CoverageOption | undefined>;
 
   // actions
   selectOtherCoverageOption: (value: CoverageOption) => void;
-  setOrderFormData: <K extends keyof PrescribeOrderFormData>(
-    key: K,
-    value: PrescribeOrderFormData[K]
-  ) => void;
 };
 
 const PrescribeContext = createContext<PrescribeContextType>();
@@ -79,17 +52,9 @@ export type CoverageOption = {
   pharmacy: { id: string; name: string };
 };
 
-export type Address = {
-  street1: string;
-  street2: string;
-  city: string;
-  state: string;
-  postalCode: string;
-};
-
 export const PrescribeProvider = (props: PrescribeProviderProps) => {
-  const { googleMapsServices } = useGoogleService();
   const { draftPrescriptions, setDraftPrescriptions } = useDraftPrescriptions();
+  const pharmacySelectionContext = usePharmacySelectionContext();
   const client = usePhotonClient();
   const [coverageOptions, setCoverageOptions] = createSignal<CoverageOption[]>([]);
   const [patientPreferredPharmacyId, setPatientPreferredPharmacyId] = createSignal<string | null>(
@@ -102,53 +67,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const [selectedCoverageOption, setSelectedCoverageOption] = createSignal<
     CoverageOption | undefined
   >();
-
-  const [orderFormData, setOrderFormData] = createStore<PrescribeOrderFormData>();
-
-  const routingConstraints = createMemo((): RoutingConstraint[] => {
-    return draftPrescriptions().map((prescription: Prescription) =>
-      getRoutingConstraint(prescription)
-    );
-  });
-
-  const combinedRoutingConstraint = createMemo(() => {
-    return combineAllRoutingConstraints(routingConstraints());
-  });
-
-  const unroutablePharmacyIds = createMemo(() => {
-    const combinedExcludeRoutingConstraint = combineAllRoutingConstraints(routingConstraints(), [
-      'exclude'
-    ]);
-    return new Set(
-      combinedExcludeRoutingConstraint.constraint_pharmacies?.map((pharmacy) => pharmacy.id) || []
-    );
-  });
-
-  async function fetchPharmacies(location: { latitude: number; longitude: number }) {
-    const { data } = await client!.apollo.query({
-      query: GetPharmaciesQuery,
-      variables: {
-        location: { latitude: location?.latitude, longitude: location?.longitude }
-      }
-    });
-    if (!data?.pharmacies) {
-      return [];
-    }
-
-    return data.pharmacies;
-  }
-
-  async function fetchLocalPharmacies(address: Address) {
-    const { geocoder } = googleMapsServices();
-    if (!geocoder) throw new Error('Geocoder not loaded');
-
-    const stringAddress = `${address?.street1}, ${address?.city}, ${address?.state} ${address?.postalCode}`;
-
-    const locations = await getLocation(stringAddress, geocoder);
-
-    const pharmacies = await fetchPharmacies(locations[0]);
-    return pharmacies;
-  }
 
   createEffect(() => {
     if (props.patientId) {
@@ -205,7 +123,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
         // check coverage on a walgreens or cvs pharmacy near the patient
         const address = patientAddress();
         if (address) {
-          fetchLocalPharmacies(address).then((pharmacies) => {
+          pharmacySelectionContext.fetchLocalPharmacies(address).then((pharmacies) => {
             let localPharmacyId: string | null = null;
             const majorChainPharmacy = pharmacies.find(
               (pharmacy: { id: string; name: string }) =>
@@ -269,24 +187,20 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     return response.data.generateCoverageOptions as CoverageOption[];
   };
 
+  // Coordinator: when a coverage option is selected, sync pharmacyId to the pharmacy provider
   const selectOtherCoverageOption = (value: CoverageOption) => {
-    setOrderFormData('pharmacyId', value.pharmacy.id);
     setSelectedCoverageOption(value);
     setDidSelectOtherCoverageOption(true);
+    pharmacySelectionContext.setPharmacyId(value.pharmacy.id);
   };
 
   const value = {
     // values
     coverageOptions,
-    routingConstraints,
-    combinedRoutingConstraint,
-    unroutablePharmacyIds,
-    orderFormData,
     selectedCoverageOption,
 
     // actions
-    selectOtherCoverageOption,
-    setOrderFormData
+    selectOtherCoverageOption
   };
 
   return <PrescribeContext.Provider value={value}>{props.children}</PrescribeContext.Provider>;

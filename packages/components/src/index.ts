@@ -29,7 +29,11 @@ import PatientInfo from './systems/PatientInfo';
 import PatientMedHistory from './systems/PatientMedHistory';
 import PickupPharmacySearch from './systems/PharmacySearch';
 import type { PharmacyOption } from './systems/PharmacySearch/PharmacySearch';
-import { PharmacySelect } from './systems/PharmacySelect';
+import {
+  PharmacySelect,
+  PharmacySelectionProvider,
+  usePharmacySelectionContext
+} from './systems/PharmacySelect';
 import Spinner from './particles/Spinner';
 import RadioGroupCards from './particles/RadioGroupCards';
 import { RecentOrders, useRecentOrders } from './systems/RecentOrders';
@@ -125,8 +129,10 @@ export {
   useRecentOrders,
   formatPrescriptionDetails,
   PrescribeProvider,
+  PharmacySelectionProvider,
   GoogleServiceProvider,
   usePrescribe,
+  usePharmacySelectionContext,
   useGoogleService,
   CALENDAR_DATE_FORMAT,
   PrescribeEventDispatchProvider,
