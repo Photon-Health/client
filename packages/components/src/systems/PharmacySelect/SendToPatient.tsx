@@ -14,6 +14,7 @@ import {
 import { GetPatientPreferredPharmaciesAndAddress } from '../../fetch';
 import { usePhotonClient } from '../SDKProvider';
 import { usePrescribe } from '../PrescribeProvider';
+import { usePharmacySelectionContext } from '../PharmacySelect';
 
 type STPState = {
   badgeColor: BadgeColor;
@@ -48,7 +49,8 @@ const stpStates: {
 
 export function SendToPatient(props: { patientId: string }) {
   const client = usePhotonClient();
-  const { orderFormData, selectedCoverageOption } = usePrescribe();
+  const { selectedCoverageOption } = usePrescribe();
+  const { pharmacyId } = usePharmacySelectionContext();
 
   const [stpState, setStpState] = createSignal<STPState>(stpStates.patientWillSelect);
   const [pharmacy, setPharmacy] = createSignal<Pharmacy | undefined>(undefined);
@@ -112,9 +114,10 @@ export function SendToPatient(props: { patientId: string }) {
 
   createEffect(() => {
     const coverageOption = selectedCoverageOption();
-    if (coverageOption && coverageOption.pharmacy.id === orderFormData.pharmacyId) {
+    const currentPharmacyId = pharmacyId();
+    if (coverageOption && currentPharmacyId && coverageOption.pharmacy.id === currentPharmacyId) {
       setStpState(stpStates.coverageOptionPharmacy);
-      client.clinical.pharmacy.getPharmacy({ id: orderFormData.pharmacyId }).then((result) => {
+      client.clinical.pharmacy.getPharmacy({ id: currentPharmacyId }).then((result) => {
         setPharmacy(result.data.pharmacy);
       });
     }
