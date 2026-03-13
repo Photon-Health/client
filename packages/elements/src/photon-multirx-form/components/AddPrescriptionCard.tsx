@@ -26,6 +26,7 @@ import { afterDate, between, message } from '../../validators';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import clearForm from '../util/clearForm';
+import { getDispenseDefaults } from '../util/getDispenseDefaults';
 import repopulateForm from '../util/repopulateForm';
 import { DisableList } from './PrescribeWorkflow';
 
@@ -68,6 +69,7 @@ export const AddPrescriptionCard = (props: {
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
   const [searchText, setSearchText] = createSignal<string>('');
   const [isLoading, setIsLoading] = createSignal(false);
+  const [dispenseUnitOptions, setDispenseUnitOptions] = createSignal<string[]>([]);
 
   onMount(() => {
     for (const [k, v] of Object.entries(validators)) {
@@ -188,12 +190,29 @@ export const AddPrescriptionCard = (props: {
                 key: 'treatment',
                 value: e.detail.data
               });
-              // Auto-select first dose form as dispense unit
-              const doseForms = e.detail.data.doseForms;
-              if (doseForms && doseForms.length > 0) {
+
+              // Smart defaults from package data
+              const defaults = getDispenseDefaults(
+                e.detail.data.packageDetails,
+                e.detail.data.doseForms?.[0]?.name
+              );
+              setDispenseUnitOptions(defaults.dispenseUnitOptions);
+
+              // Set dispense unit from package analysis, fallback to first dose form
+              const dispenseUnit =
+                defaults.suggestedDispenseUnit ?? e.detail.data.doseForms?.[0]?.name;
+              if (dispenseUnit) {
                 props.actions.updateFormValue({
                   key: 'dispenseUnit',
-                  value: doseForms[0].name
+                  value: dispenseUnit
+                });
+              }
+
+              // Set suggested quantity
+              if (defaults.suggestedQuantity != null) {
+                props.actions.updateFormValue({
+                  key: 'dispenseQuantity',
+                  value: defaults.suggestedQuantity
                 });
               }
             }
@@ -212,6 +231,7 @@ export const AddPrescriptionCard = (props: {
             props.draftedPrescriptionChanged();
           }}
           on:photon-treatment-unselected={() => {
+            setDispenseUnitOptions([]);
             clearForm(
               props.actions,
               props?.prefillNotes ? { notes: props.prefillNotes } : undefined
@@ -292,7 +312,7 @@ export const AddPrescriptionCard = (props: {
           <InputGroup label="Dispense Unit" required error={props.store.dispenseUnit?.error}>
             <DispenseUnitSelect
               value={props.store.dispenseUnit?.value ?? undefined}
-              options={props.store.treatment?.value?.doseForms?.map((df: any) => df.name)}
+              options={dispenseUnitOptions().length > 0 ? dispenseUnitOptions() : undefined}
               onChange={(e: Event & { currentTarget: HTMLSelectElement }) => {
                 props.actions.updateFormValue({
                   key: 'dispenseUnit',

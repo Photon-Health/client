@@ -24,6 +24,13 @@ export const SearchTreatmentOptionsQuery = graphql(`
         doseForms {
           name
         }
+        packageDetails {
+          packaging
+          quantity
+          size
+          doseForm
+          unitDose
+        }
       }
     }
   }
