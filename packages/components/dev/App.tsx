@@ -4,6 +4,7 @@ import {
   DraftPrescriptionList,
   DraftPrescriptionsProvider,
   PharmacySelect,
+  PharmacySelectionProvider,
   PrescribeEventDispatchProvider,
   PrescribeProvider,
   RecentOrders,
@@ -91,27 +92,29 @@ const App = () => {
               prescriptionIdsPrefill={prescriptionIds()}
               enableCombineAndDuplicate={true}
             >
-              <PrescribeProvider patientId={patientId} enableCoverageCheck={true}>
-                <div class="mb-10">
-                  <h2>Patient Info</h2>
-                  <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
-                </div>
+              <PharmacySelectionProvider>
+                <PrescribeProvider patientId={patientId} enableCoverageCheck={true}>
+                  <div class="mb-10">
+                    <h2>Patient Info</h2>
+                    <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
+                  </div>
 
-                <div class="mb-10">
-                  <h2>Draft Prescriptions</h2>
-                </div>
-                <DraftPrescriptionList
-                  handleDelete={(id) =>
-                    setPrescriptionIds(prescriptionIds().filter((p) => p !== id))
-                  }
-                  handleEdit={(rx) =>
-                    setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))
-                  }
-                  handleSwapToOtherPrescription={(_) => _}
-                  screeningAlerts={[]}
-                  routingConstraints={[]}
-                />
-              </PrescribeProvider>
+                  <div class="mb-10">
+                    <h2>Draft Prescriptions</h2>
+                  </div>
+                  <DraftPrescriptionList
+                    handleDelete={(id) =>
+                      setPrescriptionIds(prescriptionIds().filter((p) => p !== id))
+                    }
+                    handleEdit={(rx) =>
+                      setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))
+                    }
+                    handleSwapToOtherPrescription={(_) => _}
+                    screeningAlerts={[]}
+                    routingConstraints={[]}
+                  />
+                </PrescribeProvider>
+              </PharmacySelectionProvider>
             </DraftPrescriptionsProvider>
           </RecentOrders>
         </PrescribeEventDispatchProvider>
@@ -167,30 +170,21 @@ const App = () => {
         </div>
 
         <h2>Pharmacy Select</h2>
-        <Card>
-          <PharmacySelect
-            patientIds={patientIds()}
-            enableLocalPickup
-            enableSendToPatient
-            setFufillmentType={(t) => console.log('fulfillmentType: ', t)}
-            setPharmacyId={(p) => console.log('pharmacyId: ', p)}
-          />
-        </Card>
+        <PharmacySelectionProvider enableLocalPickup enableSendToPatient>
+          <Card>
+            <PharmacySelect patientIds={patientIds()} />
+          </Card>
+        </PharmacySelectionProvider>
         <h4 class="mt-8">With Mail Order</h4>
-        <Card>
-          <PharmacySelect
-            patientIds={['pat_01JEVF5DWQAQFHTVYK9ABG65JZ']}
-            enableLocalPickup
-            enableSendToPatient
-            mailOrderPharmacyIds={[
-              'phr_01GA9HPVBVJ0E65P819FD881N0',
-              'phr_01GCA54GVKA06C905DETQ9SY98'
-            ]}
-            address="11221"
-            setPharmacyId={(p) => console.log('pharmacyId! ', p)}
-            setFufillmentType={(t) => console.log('fulfillmentType! ', t)}
-          />
-        </Card>
+        <PharmacySelectionProvider
+          enableLocalPickup
+          enableSendToPatient
+          mailOrderIds="phr_01GA9HPVBVJ0E65P819FD881N0,phr_01GCA54GVKA06C905DETQ9SY98"
+        >
+          <Card>
+            <PharmacySelect patientIds={['pat_01JEVF5DWQAQFHTVYK9ABG65JZ']} address="11221" />
+          </Card>
+        </PharmacySelectionProvider>
 
         <h2>Toast</h2>
         <Button
