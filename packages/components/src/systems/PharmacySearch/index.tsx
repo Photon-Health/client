@@ -1,60 +1,23 @@
-import { Show, createEffect, createMemo, createSignal, onCleanup } from 'solid-js';
-import { gql } from '@apollo/client';
-import { Address, Pharmacy as _Pharmacy } from '@photonhealth/sdk/dist/types';
+import { createEffect, createMemo, createSignal, onCleanup, Show } from 'solid-js';
+import { PreferredPharmacy } from '../SelectedPatientProvider/queries';
 import LocationSelect from '../LocationSelect';
 import Icon from '../../particles/Icon';
 import { types } from '@photonhealth/sdk';
 import { usePhotonClient } from '../SDKProvider';
 import getLocations, { Location } from '../../utils/getLocations';
 import Checkbox from '../../particles/Checkbox';
-import formatAddress from '../../utils/formatAddress';
 import Spinner from '../../particles/Spinner';
 import { useGoogleService } from '../GoogleServiceProvider';
-import { GetPatientPreferredPharmaciesAndAddress, GetPharmaciesQuery } from '../../fetch';
+import { GetPharmaciesQuery } from '../../fetch';
 import { PharmacyOption, PharmacySearchInput } from './PharmacySearch';
+import { useSelectedPatientContext } from '../SelectedPatientProvider';
 
-type Pharmacy = Pick<_Pharmacy, 'id' | 'name'> & {
-  address: Pick<Address, 'street1' | 'city' | 'state'>;
-};
-
-export interface GetPreferredPharmaciesResponse {
-  patient: {
-    address: Address;
-    preferredPharmacies: Pharmacy[];
-  };
-}
-
-export const GetLastOrderQuery = gql`
-  query GetLastOrder($id: ID!) {
-    orders(filter: { patientId: $id }, first: 1) {
-      createdAt
-      pharmacy {
-        id
-        name
-        address {
-          street1
-          street2
-          city
-          state
-          postalCode
-        }
-      }
-    }
-  }
-`;
-
-type PharmacyOrder = {
-  id: string;
-  name: string;
-  address: Address;
-};
-
-export interface GetLastOrderResponse {
-  orders: {
-    createdAt: string;
-    pharmacy: PharmacyOrder;
-  }[];
-}
+// Re-export types for backward compatibility
+export type {
+  GetPreferredPharmaciesResponse,
+  GetLastOrderResponse
+} from '../SelectedPatientProvider';
+export { GetLastOrderQuery } from '../SelectedPatientProvider';
 
 export interface PharmacySearchProps {
   address?: string;
@@ -69,13 +32,13 @@ export interface PharmacySearchProps {
 export default function PickupPharmacySearch(props: PharmacySearchProps) {
   const client = usePhotonClient();
   const { googleMapsServices } = useGoogleService();
+  const selectedPatientContext = useSelectedPatientContext();
   const [selected, setSelected] = createSignal<any>(props.initialValue);
   const [query, setQuery] = createSignal('');
   const [location, setLocation] = createSignal<Location | null>(null);
   const [pharmacies, setPharmacies] = createSignal<PharmacyOption[] | null>(null);
   const [preferredPharmacies, setPreferredPharmacies] = createSignal<PharmacyOption[]>([]);
   const [fetchingPharmacies, setFetchingPharmacies] = createSignal(false);
-  const [fetchingPreferred, setFetchingPreferred] = createSignal(false);
   const [openLocationSearch, setOpenLocationSearch] = createSignal(false);
   const [previousId, setPreviousId] = createSignal<string | null>(null);
   const [lastGeocodedAddress, setLastGeocodedAddress] = createSignal('');
@@ -89,53 +52,17 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
     });
 
     if (data?.pharmacies?.length > 0) {
-      setPharmacies(data.pharmacies.map((ph: Pharmacy) => ({ ...ph, isPreferred: false })));
+      setPharmacies(
+        data.pharmacies.map((ph: PreferredPharmacy) => ({
+          ...ph,
+          isPreferred: false
+        }))
+      );
     }
     setFetchingPharmacies(false);
   }
 
-  async function fetchPreferredAndPrevious(patientId: string) {
-    setFetchingPreferred(true);
-    try {
-      const { data: preferredData } = await client!.apollo.query({
-        query: GetPatientPreferredPharmaciesAndAddress,
-        variables: { id: patientId }
-      });
-      const { data: previousData } = await client!.apollo.query({
-        query: GetLastOrderQuery,
-        variables: { id: patientId }
-      });
-
-      const address = preferredData?.patient?.address;
-
-      if (address) {
-        const addressStr = formatAddress(address);
-        await getAndSetLocation(addressStr);
-      }
-
-      if (preferredData?.patient?.preferredPharmacies?.length > 0) {
-        setPreferredPharmacies(
-          preferredData?.patient?.preferredPharmacies.map((ph: Pharmacy) => ({
-            ...ph,
-            isPreferred: true
-          }))
-        );
-      }
-
-      if (previousData?.orders?.length > 0) {
-        setPreviousId(previousData?.orders?.[0]?.pharmacy?.id);
-      }
-    } catch (error) {
-      console.error('Error fetching preferred and previous pharmacies:', error);
-    } finally {
-      setFetchingPreferred(false);
-    }
-  }
-
   const localPreferredPharmacies = createMemo(() => {
-    // -- verify preferred pharmacy is included in local pharmacy search
-    // e.g. I live in Brooklyn where my preferred pharm is, but if I'm traveling in Texas,
-    // I don't want my Brooklyn preferred to show up in the Texas list
     const localPharmacies = pharmacies() || [];
     return preferredPharmacies().filter((preferredPharmacy) =>
       localPharmacies.some((regularPharmacy) => regularPharmacy.id === preferredPharmacy.id)
@@ -147,13 +74,10 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
     const localPreferred = localPreferredPharmacies();
     const previousPharmacyId = previousId();
 
-    // -- merge preferred and local lists and remove duplicates
     const allPharmacies = [...localPreferred, ...localPharmacies];
 
-    // dedupe pharmacies in favor of preferred pharmacy if there's a duplicate in local pharmacies
     const pharmacyLookup = allPharmacies.reduce((acc, cur) => {
       if (!acc[cur.id]) {
-        // while we're scanning, if we have a matching previous id here, mark it as so
         const isPrevious = previousPharmacyId === cur.id;
         acc[cur.id] = { ...cur, isPrevious };
       }
@@ -165,7 +89,6 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
   });
 
   createEffect(() => {
-    // If user selects a location, fetch pharmacies
     if (location()?.latitude && location()?.longitude) {
       setPharmacies(null);
       setFetchingPharmacies(true);
@@ -186,7 +109,6 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
   });
 
   createEffect(() => {
-    // if user selects a pharmacy from the drop down, set the pharmacy
     if (selected()?.id) {
       setQuery('');
       props?.setPharmacy?.(selected());
@@ -204,9 +126,19 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
   }
 
   createEffect(() => {
-    // if patient id, fetch preferred Pharmacies
-    if (props?.patientId) {
-      fetchPreferredAndPrevious(props?.patientId);
+    const preferredPharmacies = selectedPatientContext.preferredPharmacies();
+    if (preferredPharmacies.length > 0) {
+      const preferredPharmacyOptions = preferredPharmacies
+        .filter((ph) => ph.address)
+        .map(toPharmacyOption);
+      setPreferredPharmacies(preferredPharmacyOptions);
+    }
+  });
+
+  createEffect(() => {
+    const recent = selectedPatientContext.recentOrder();
+    if (recent?.pharmacy?.id) {
+      setPreviousId(recent.pharmacy.id);
     }
   });
 
@@ -249,7 +181,10 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
         label={
           <div class="w-full flex flex-col sm:flex-row sm:items-center mb-2">
             <label class="whitespace-nowrap mr-1">Showing near:</label>
-            <Show when={!fetchingPreferred()} fallback={<Spinner size="sm" />}>
+            <Show
+              when={!selectedPatientContext.patientPharmacyDataLoading()}
+              fallback={<Spinner size="sm" />}
+            >
               <a
                 href="#!"
                 role="button"
@@ -270,7 +205,7 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
         when={
           !props?.hidePreferred &&
           !fetchingPharmacies() &&
-          !fetchingPreferred() &&
+          !selectedPatientContext.patientPharmacyDataLoading() &&
           !!selected() &&
           !selected()?.isPreferred
         }
@@ -286,4 +221,18 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
       </Show>
     </div>
   );
+}
+
+function toPharmacyOption(ph: PreferredPharmacy): PharmacyOption {
+  return {
+    id: ph.id,
+    name: ph.name,
+    address: {
+      street1: ph.address?.street1 ?? '',
+      state: ph.address?.state ?? '',
+      city: ph.address?.city ?? ''
+    },
+    isPreferred: true,
+    isPrevious: false
+  };
 }

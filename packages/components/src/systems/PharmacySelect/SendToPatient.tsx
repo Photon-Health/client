@@ -4,17 +4,11 @@ import Badge, { BadgeColor } from '../../particles/Badge';
 import Card from '../../particles/Card';
 import Spinner from '../../particles/Spinner';
 import Text from '../../particles/Text';
-import { createQuery } from '../../utils/createQuery';
 import formatAddress from '../../utils/formatAddress';
-import {
-  GetLastOrderQuery,
-  GetLastOrderResponse,
-  GetPreferredPharmaciesResponse
-} from '../PharmacySearch';
-import { GetPatientPreferredPharmaciesAndAddress } from '../../fetch';
 import { usePhotonClient } from '../SDKProvider';
 import { usePrescribe } from '../PrescribeProvider';
 import { usePharmacySelectionContext } from '../PharmacySelect';
+import { useSelectedPatientContext } from '../SelectedPatientProvider';
 
 type STPState = {
   badgeColor: BadgeColor;
@@ -47,56 +41,34 @@ const stpStates: {
   }
 };
 
-export function SendToPatient(props: { patientId: string }) {
+export function SendToPatient() {
   const client = usePhotonClient();
   const { selectedCoverageOption } = usePrescribe();
   const { pharmacyId } = usePharmacySelectionContext();
+  const { preferredPharmacies, recentOrder, patientPharmacyDataLoading } =
+    useSelectedPatientContext();
 
   const [stpState, setStpState] = createSignal<STPState>(stpStates.patientWillSelect);
   const [pharmacy, setPharmacy] = createSignal<Pharmacy | undefined>(undefined);
 
-  const queryOptions = createMemo(() => ({
-    variables: { id: props.patientId },
-    client: client.apollo
-  }));
-
-  const preferredPharmaciesData = createQuery<GetPreferredPharmaciesResponse, { id: string }>(
-    GetPatientPreferredPharmaciesAndAddress,
-    queryOptions
-  );
-
-  const lastOrderData = createQuery<GetLastOrderResponse, { id: string }>(
-    GetLastOrderQuery,
-    queryOptions
-  );
-
-  const notLoading = createMemo(() => !lastOrderData.loading && !preferredPharmaciesData.loading);
-  const recentOrder = createMemo(() => {
-    const lastOrder = lastOrderData()?.orders?.[0];
-    if (lastOrder) {
-      const now = new Date();
-      const eightHoursAgo = new Date(now.getTime() - 8 * 60 * 60 * 1000);
-
-      if (new Date(lastOrder.createdAt) > eightHoursAgo) {
-        return lastOrder;
-      }
-    }
-  });
+  const notLoading = createMemo(() => !patientPharmacyDataLoading());
 
   createEffect(() => {
     if (notLoading()) {
-      const preferredPharmacies = preferredPharmaciesData()?.patient?.preferredPharmacies;
+      const preferred = preferredPharmacies();
       const lastPharmacy = recentOrder()?.pharmacy;
-      if ((preferredPharmacies?.length ?? 0) > 0) {
+      if ((preferred?.length ?? 0) > 0) {
         setStpState(stpStates.preferredPharmacy);
-        if (preferredPharmacies && preferredPharmacies.length > 0) {
-          const firstPreferredPharmacy = preferredPharmacies[0];
+        if (preferred && preferred.length > 0) {
+          const firstPreferredPharmacy = preferred[0];
           const updatedPharmacy: Pharmacy = {
             ...firstPreferredPharmacy,
             address: {
+              street1: firstPreferredPharmacy.address?.street1 ?? '',
+              city: firstPreferredPharmacy.address?.city ?? '',
+              state: firstPreferredPharmacy.address?.state ?? '',
               country: '',
-              postalCode: '',
-              ...firstPreferredPharmacy.address
+              postalCode: ''
             }
           };
           setPharmacy(updatedPharmacy);

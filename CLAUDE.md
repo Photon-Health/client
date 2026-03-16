@@ -110,6 +110,7 @@ Pure **Solid.js + TypeScript** component library (private, not published to npm)
 - `systems/` — composite domain components (PrescribeProvider, DraftPrescriptions, PharmacySearch, PatientMedHistory, DoseCalculator, RecentOrders, etc.)
 - `fetch/` — GraphQL queries and mutations shared across elements
 - `context.ts` / `store.ts` — Solid.js context (`PhotonContext`) and shared store used by elements via `usePhoton()`
+- `dev/App.tsx` — local dev harness for visually testing components in isolation (`npx nx run components:dev`). It is not part of the published package and is partially broken (see `// todo` comment at top). Do not let its standalone usage of components influence the design of the component library's public interfaces — if `App.tsx` can't provide required context providers, fix `App.tsx`, don't weaken the component API.
 - Has Storybook for component development: `npx nx run components:storybook`
 
 When building new UI for Photon Elements, add Solid.js components here and compose them in `packages/elements`.

@@ -4,6 +4,7 @@ import {
   PrescribeEventDispatchProvider,
   PrescribeProvider,
   RecentOrders,
+  SelectedPatientProvider,
   TemplateOverrides
 } from '@photonhealth/components';
 import { customElement } from 'solid-element';
@@ -62,57 +63,59 @@ const Component = (props: PrescribeWorkflowComponentProps) => {
           prescriptionIdsPrefill={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
           enableCombineAndDuplicate={props.enableCombineAndDuplicate}
         >
-          <PharmacySelectionProvider
-            pharmacyIdProp={props.pharmacyId}
-            enableLocalPickup={props.enableLocalPickup}
-            enableSendToPatient={props.enableSendToPatient}
-            enableDeliveryPharmacies={props.enableDeliveryPharmacies}
-            mailOrderIds={props.mailOrderIds}
-            onFulfillmentTypeChange={(ft) => {
-              actions.updateFormValue({ key: 'fulfillmentType', value: ft || '' });
-            }}
-            onPreferredPharmacyChange={(shouldSet) => {
-              actions.updateFormValue({ key: 'updatePreferredPharmacy', value: shouldSet });
-            }}
-          >
-            <PrescribeProvider
-              patientId={store.patient?.value?.id}
-              enableCoverageCheck={props.enableCoverageCheck}
+          <SelectedPatientProvider patientId={store.patient?.value?.id}>
+            <PharmacySelectionProvider
+              pharmacyIdProp={props.pharmacyId}
+              enableLocalPickup={props.enableLocalPickup}
+              enableSendToPatient={props.enableSendToPatient}
+              enableDeliveryPharmacies={props.enableDeliveryPharmacies}
+              mailOrderIds={props.mailOrderIds}
+              onFulfillmentTypeChange={(ft) => {
+                actions.updateFormValue({ key: 'fulfillmentType', value: ft || '' });
+              }}
+              onPreferredPharmacyChange={(shouldSet) => {
+                actions.updateFormValue({ key: 'updatePreferredPharmacy', value: shouldSet });
+              }}
             >
-              <style>{tailwind}</style>
-              <style>{shoelaceDarkStyles}</style>
-              <style>{shoelaceLightStyles}</style>
-              <style>{styles}</style>
-              <style>{photonStyles}</style>
-              <PrescribeWorkflow
-                patientId={props.patientId}
-                hideSubmit={props.hideSubmit}
-                hideTemplates={props.hideTemplates}
-                hidePatientCard={props.hidePatientCard}
-                enableOrder={props.enableOrder}
-                enableMedHistory={props.enableMedHistory}
-                enableMedHistoryLinks={props.enableMedHistoryLinks}
-                enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
-                enableCombineAndDuplicate={props.enableCombineAndDuplicate}
-                optionalPatientAddress={props.optionalPatientAddress}
-                address={props.address}
-                weight={props.weight}
-                weightUnit={props.weightUnit}
-                additionalNotes={props.additionalNotes}
-                triggerSubmit={props.triggerSubmit}
-                toastBuffer={props.toastBuffer}
-                formStore={store}
-                formActions={actions}
-                externalOrderId={props.externalOrderId}
-                catalogId={props.catalogId}
-                allowOffCatalogSearch={props.allowOffCatalogSearch}
-                disableList={props.disableList}
-                groupId={props.groupId}
-                // this logic keeps the rx form closed when refilling a particular template/prescription
-                initialShowForm={!props.templateIds && !props.prescriptionIds}
-              />
-            </PrescribeProvider>
-          </PharmacySelectionProvider>
+              <PrescribeProvider
+                patientId={store.patient?.value?.id}
+                enableCoverageCheck={props.enableCoverageCheck}
+              >
+                <style>{tailwind}</style>
+                <style>{shoelaceDarkStyles}</style>
+                <style>{shoelaceLightStyles}</style>
+                <style>{styles}</style>
+                <style>{photonStyles}</style>
+                <PrescribeWorkflow
+                  patientId={props.patientId}
+                  hideSubmit={props.hideSubmit}
+                  hideTemplates={props.hideTemplates}
+                  hidePatientCard={props.hidePatientCard}
+                  enableOrder={props.enableOrder}
+                  enableMedHistory={props.enableMedHistory}
+                  enableMedHistoryLinks={props.enableMedHistoryLinks}
+                  enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
+                  enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+                  optionalPatientAddress={props.optionalPatientAddress}
+                  address={props.address}
+                  weight={props.weight}
+                  weightUnit={props.weightUnit}
+                  additionalNotes={props.additionalNotes}
+                  triggerSubmit={props.triggerSubmit}
+                  toastBuffer={props.toastBuffer}
+                  formStore={store}
+                  formActions={actions}
+                  externalOrderId={props.externalOrderId}
+                  catalogId={props.catalogId}
+                  allowOffCatalogSearch={props.allowOffCatalogSearch}
+                  disableList={props.disableList}
+                  groupId={props.groupId}
+                  // this logic keeps the rx form closed when refilling a particular template/prescription
+                  initialShowForm={!props.templateIds && !props.prescriptionIds}
+                />
+              </PrescribeProvider>
+            </PharmacySelectionProvider>
+          </SelectedPatientProvider>
         </DraftPrescriptionsProvider>
       </RecentOrders>
     </PrescribeEventDispatchProvider>

@@ -39,7 +39,7 @@ export const OrderCard = (props: { store: Record<string, any> }) => {
       <style>{photonStyles}</style>
       <Card addChildrenDivider={true}>
         <div class="flex items-center justify-between">
-          <Text color="gray">Select Pharmacy</Text>
+          <Text color="gray">Pharmacy</Text>
         </div>
         <PharmacySelect
           patientIds={patientIds()}

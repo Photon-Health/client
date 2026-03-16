@@ -34,6 +34,10 @@ import {
   PharmacySelectionProvider,
   usePharmacySelectionContext
 } from './systems/PharmacySelect';
+import {
+  SelectedPatientProvider,
+  useSelectedPatientContext
+} from './systems/SelectedPatientProvider';
 import Spinner from './particles/Spinner';
 import RadioGroupCards from './particles/RadioGroupCards';
 import { RecentOrders, useRecentOrders } from './systems/RecentOrders';
@@ -130,9 +134,11 @@ export {
   formatPrescriptionDetails,
   PrescribeProvider,
   PharmacySelectionProvider,
+  SelectedPatientProvider,
   GoogleServiceProvider,
   usePrescribe,
   usePharmacySelectionContext,
+  useSelectedPatientContext,
   useGoogleService,
   CALENDAR_DATE_FORMAT,
   PrescribeEventDispatchProvider,

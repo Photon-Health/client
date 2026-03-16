@@ -12,6 +12,7 @@ import {
   InputGroup,
   PharmacySearch,
   PhoneInput,
+  SelectedPatientProvider,
   SEX_OPTIONS,
   SexSelect,
   Spinner,
@@ -329,156 +330,162 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   };
 
   return (
-    <div class="w-full h-full relative" ref={ref}>
-      <style>{tailwind}</style>
-      <style>{photonStyles}</style>
-      <Show when={pStore.selectedPatient.isLoading}>
-        <div class="w-full flex justify-center">
-          <Spinner color="green" />
-        </div>
-      </Show>
+    <SelectedPatientProvider patientId={props.patientId}>
+      <div class="w-full h-full relative" ref={ref}>
+        <style>{tailwind}</style>
+        <style>{photonStyles}</style>
+        <Show when={pStore.selectedPatient.isLoading}>
+          <div class="w-full flex justify-center">
+            <Spinner color="green" />
+          </div>
+        </Show>
 
-      <Show when={!pStore.selectedPatient.isLoading}>
-        <PhotonAuthorized permissions={['write:patient']}>
-          <div class="flex flex-col gap-8">
-            <Card>
-              <div>
-                <p class="font-sans text-lg flex-grow" role="heading" aria-level="2">
-                  Patient info
-                </p>
-                <div class="flex flex-col">
-                  <InputGroup label="First name" error={store['firstName']?.error} required>
-                    <Input
-                      value={store['firstName']?.value ?? pStore.selectedPatient.data?.name.first}
-                      onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-                        actions.updateFormValue({
-                          key: 'firstName',
-                          value: e.currentTarget.value
-                        });
-                      }}
-                      onBlur={(e) =>
-                        trackFieldInteraction('firstName', Boolean(e.currentTarget.value))
-                      }
-                    />
-                  </InputGroup>
+        <Show when={!pStore.selectedPatient.isLoading}>
+          <PhotonAuthorized permissions={['write:patient']}>
+            <div class="flex flex-col gap-8">
+              <Card>
+                <div>
+                  <p class="font-sans text-lg flex-grow" role="heading" aria-level="2">
+                    Patient info
+                  </p>
+                  <div class="flex flex-col">
+                    <InputGroup label="First name" error={store['firstName']?.error} required>
+                      <Input
+                        value={store['firstName']?.value ?? pStore.selectedPatient.data?.name.first}
+                        onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+                          actions.updateFormValue({
+                            key: 'firstName',
+                            value: e.currentTarget.value
+                          });
+                        }}
+                        onBlur={(e) =>
+                          trackFieldInteraction('firstName', Boolean(e.currentTarget.value))
+                        }
+                      />
+                    </InputGroup>
 
-                  <InputGroup label="Last name" error={store['lastName']?.error} required>
-                    <Input
-                      value={store['lastName']?.value ?? pStore.selectedPatient.data?.name.last}
-                      onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-                        actions.updateFormValue({
-                          key: 'lastName',
-                          value: e.currentTarget.value
-                        });
-                      }}
-                      onBlur={(e) =>
-                        trackFieldInteraction('lastName', Boolean(e.currentTarget.value))
-                      }
-                    />
-                  </InputGroup>
+                    <InputGroup label="Last name" error={store['lastName']?.error} required>
+                      <Input
+                        value={store['lastName']?.value ?? pStore.selectedPatient.data?.name.last}
+                        onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+                          actions.updateFormValue({
+                            key: 'lastName',
+                            value: e.currentTarget.value
+                          });
+                        }}
+                        onBlur={(e) =>
+                          trackFieldInteraction('lastName', Boolean(e.currentTarget.value))
+                        }
+                      />
+                    </InputGroup>
 
-                  <InputGroup label="Date of birth" error={store['dateOfBirth']?.error} required>
-                    <DateInput
-                      value={
-                        store['dateOfBirth']?.value ?? pStore.selectedPatient.data?.dateOfBirth
-                      }
-                      onDateChange={(value) => {
-                        actions.updateFormValue({ key: 'dateOfBirth', value });
-                      }}
-                      onBlur={(e) =>
-                        trackFieldInteraction('dateOfBirth', Boolean(e.currentTarget.value))
-                      }
-                    />
-                  </InputGroup>
+                    <InputGroup label="Date of birth" error={store['dateOfBirth']?.error} required>
+                      <DateInput
+                        value={
+                          store['dateOfBirth']?.value ?? pStore.selectedPatient.data?.dateOfBirth
+                        }
+                        onDateChange={(value) => {
+                          actions.updateFormValue({ key: 'dateOfBirth', value });
+                        }}
+                        onBlur={(e) =>
+                          trackFieldInteraction('dateOfBirth', Boolean(e.currentTarget.value))
+                        }
+                      />
+                    </InputGroup>
 
-                  <InputGroup label="Mobile number" error={store['phone']?.error} required>
-                    <PhoneInput
-                      value={store['phone']?.value ?? pStore.selectedPatient.data?.phone}
-                      onPhoneChange={(value) => {
-                        actions.updateFormValue({ key: 'phone', value });
-                      }}
-                      onBlur={(e) => trackFieldInteraction('phone', Boolean(e.currentTarget.value))}
-                    />
-                  </InputGroup>
+                    <InputGroup label="Mobile number" error={store['phone']?.error} required>
+                      <PhoneInput
+                        value={store['phone']?.value ?? pStore.selectedPatient.data?.phone}
+                        onPhoneChange={(value) => {
+                          actions.updateFormValue({ key: 'phone', value });
+                        }}
+                        onBlur={(e) =>
+                          trackFieldInteraction('phone', Boolean(e.currentTarget.value))
+                        }
+                      />
+                    </InputGroup>
 
-                  <InputGroup label="Sex at birth" error={store['sex']?.error} required>
-                    <SexSelect
-                      value={store['sex']?.value ?? pStore.selectedPatient.data?.sex}
-                      onChange={(e) =>
-                        actions.updateFormValue({ key: 'sex', value: e.currentTarget.value })
-                      }
-                      onBlur={() => trackFieldInteraction('sex', Boolean(store['sex']?.value))}
-                    />
-                  </InputGroup>
-                </div>
-                <Show when={!props.optionalPatientAddress}>
-                  <AddressFields />
-                </Show>
-                <button
-                  class="mb-4 mt-8 flex items-center md:!hidden"
-                  aria-expanded={showOptionalFields()}
-                  aria-controls="optional-fields-section"
-                  onClick={() => setShowOptionalFields((value) => !value)}
-                >
-                  <span class="font-sans text-lg">
-                    {showOptionalFields() ? 'Hide optional fields' : 'Show optional fields'}
-                  </span>
-                  <Icon
-                    name={showOptionalFields() ? 'chevronUp' : 'chevronDown'}
-                    size="md"
-                    class="inline-block ml-1 mt-1"
-                  />
-                </button>
-                <div
-                  id="optional-fields-section"
-                  class={`mb-4 ${showOptionalFields() ? 'block' : 'hidden md:!block'}`}
-                >
-                  <Show when={props.optionalPatientAddress}>
+                    <InputGroup label="Sex at birth" error={store['sex']?.error} required>
+                      <SexSelect
+                        value={store['sex']?.value ?? pStore.selectedPatient.data?.sex}
+                        onChange={(e) =>
+                          actions.updateFormValue({ key: 'sex', value: e.currentTarget.value })
+                        }
+                        onBlur={() => trackFieldInteraction('sex', Boolean(store['sex']?.value))}
+                      />
+                    </InputGroup>
+                  </div>
+                  <Show when={!props.optionalPatientAddress}>
                     <AddressFields />
                   </Show>
-                  <InputGroup label="Gender" error={store['gender']?.error}>
-                    <GenderSelect
-                      value={store['gender']?.value ?? pStore.selectedPatient.data?.gender}
-                      onChange={(e) =>
-                        actions.updateFormValue({ key: 'gender', value: e.currentTarget.value })
-                      }
-                      onBlur={() =>
-                        trackFieldInteraction('gender', Boolean(store['gender']?.value))
-                      }
+                  <button
+                    class="mb-4 mt-8 flex items-center md:!hidden"
+                    aria-expanded={showOptionalFields()}
+                    aria-controls="optional-fields-section"
+                    onClick={() => setShowOptionalFields((value) => !value)}
+                  >
+                    <span class="font-sans text-lg">
+                      {showOptionalFields() ? 'Hide optional fields' : 'Show optional fields'}
+                    </span>
+                    <Icon
+                      name={showOptionalFields() ? 'chevronUp' : 'chevronDown'}
+                      size="md"
+                      class="inline-block ml-1 mt-1"
                     />
-                  </InputGroup>
+                  </button>
+                  <div
+                    id="optional-fields-section"
+                    class={`mb-4 ${showOptionalFields() ? 'block' : 'hidden md:!block'}`}
+                  >
+                    <Show when={props.optionalPatientAddress}>
+                      <AddressFields />
+                    </Show>
+                    <InputGroup label="Gender" error={store['gender']?.error}>
+                      <GenderSelect
+                        value={store['gender']?.value ?? pStore.selectedPatient.data?.gender}
+                        onChange={(e) =>
+                          actions.updateFormValue({ key: 'gender', value: e.currentTarget.value })
+                        }
+                        onBlur={() =>
+                          trackFieldInteraction('gender', Boolean(store['gender']?.value))
+                        }
+                      />
+                    </InputGroup>
 
-                  <InputGroup label="Email" error={store['email']?.error}>
-                    <Input
-                      type="email"
-                      value={store['email']?.value ?? pStore.selectedPatient.data?.email}
-                      onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-                        actions.updateFormValue({ key: 'email', value: e.currentTarget.value });
+                    <InputGroup label="Email" error={store['email']?.error}>
+                      <Input
+                        type="email"
+                        value={store['email']?.value ?? pStore.selectedPatient.data?.email}
+                        onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+                          actions.updateFormValue({ key: 'email', value: e.currentTarget.value });
+                        }}
+                        onBlur={(e) =>
+                          trackFieldInteraction('email', Boolean(e.currentTarget.value))
+                        }
+                      />
+                    </InputGroup>
+
+                    <p class="font-sans text-sm m-0 mt-6">Preferred pharmacy</p>
+                    <PharmacySearch
+                      address={getPatientAddress(pStore, store)}
+                      setPharmacy={(pharmacy: any) => {
+                        actions.updateFormValue({
+                          key: 'preferredPharmacy',
+                          value: pharmacy.id
+                        });
                       }}
-                      onBlur={(e) => trackFieldInteraction('email', Boolean(e.currentTarget.value))}
+                      patientId={props.patientId}
+                      initialValue={preferredPharmacy()}
+                      hidePreferred
                     />
-                  </InputGroup>
-
-                  <p class="font-sans text-sm m-0 mt-6">Preferred pharmacy</p>
-                  <PharmacySearch
-                    address={getPatientAddress(pStore, store)}
-                    setPharmacy={(pharmacy: any) => {
-                      actions.updateFormValue({
-                        key: 'preferredPharmacy',
-                        value: pharmacy.id
-                      });
-                    }}
-                    patientId={props.patientId}
-                    initialValue={preferredPharmacy()}
-                    hidePreferred
-                  />
+                  </div>
                 </div>
-              </div>
-            </Card>
-          </div>
-        </PhotonAuthorized>
-      </Show>
-    </div>
+              </Card>
+            </div>
+          </PhotonAuthorized>
+        </Show>
+      </div>
+    </SelectedPatientProvider>
   );
 };
 
