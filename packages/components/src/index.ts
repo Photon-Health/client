@@ -4,6 +4,8 @@ import { Alert } from './particles/Alert';
 import Checkbox from './particles/Checkbox';
 import DispenseUnitSelect from './particles/DispenseUnitSelect';
 import Input from './particles/Input';
+import AddressAutocompleteInput from './particles/AddressAutocompleteInput';
+import type { ParsedAddress } from './particles/AddressAutocompleteInput';
 import { InputGroup } from './particles/InputGroup';
 import DateInput from './particles/DateInput';
 import Select from './particles/Select';
@@ -81,6 +83,7 @@ export { usePhoton, PhotonClientStore, PhotonContext };
 
 export {
   AddressForm,
+  AddressAutocompleteInput,
   Alert,
   Banner,
   Checkbox,
@@ -145,6 +148,7 @@ export {
 
 // Export types
 export type {
+  ParsedAddress,
   PharmacyOption,
   ScreeningAlertType,
   RoutingConstraint,
