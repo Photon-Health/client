@@ -1,11 +1,26 @@
-import { expect, test } from '@playwright/test';
+import { expect, Page, test } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
 const testDataPath = path.join(__dirname, '.test-data.json');
 
 test('create test patient and order via clinical app', async ({ page }) => {
-  // 1. Log in via Auth0
+  await loginViaAuth0(page);
+  await createPatientAndStartPrescription(page);
+  await createDraftPrescription(page, 'Amoxicillin');
+  await clickSendOrder(page);
+
+  // Extract orderId from order details page URL
+  const url = page.url();
+  const orderId = url.match(/\/orders\/(ord_[^/?]+)/)?.[1];
+  expect(orderId).toBeTruthy();
+
+  // Write to testDataPath, so patient app specs can load this fresh order
+  fs.writeFileSync(testDataPath, JSON.stringify({ orderId }, null, 2));
+  console.log(`Test data written: orderId=${orderId}`);
+});
+
+async function loginViaAuth0(page: Page) {
   await page.goto('/login?connection=e2e-test-users');
   await expect(page).toHaveTitle(/Photon/);
   await page.getByRole('button', { name: 'Log in' }).click();
@@ -17,8 +32,9 @@ test('create test patient and order via clinical app', async ({ page }) => {
   await page.getByRole('button', { name: 'Continue', exact: true }).click();
   await page.waitForURL('**/prescriptions', { timeout: 60_000 });
   await expect(page.getByRole('heading', { name: 'Prescriptions' })).toBeVisible();
+}
 
-  // 2. Create a patient
+async function createPatientAndStartPrescription(page: Page) {
   await page.getByRole('link', { name: /Patients/ }).click();
   await page.getByRole('link', { name: /Create patient/ }).click();
 
@@ -35,15 +51,16 @@ test('create test patient and order via clinical app', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Create and start prescription' }).click();
   await page.waitForURL(/\/prescriptions\/new\?patientId=/);
+}
 
-  // 3. Add a prescription
+async function createDraftPrescription(page: Page, medicationName: string) {
   const medSearchInput = page.getByPlaceholder('Type medication');
   await expect(medSearchInput).toBeVisible({ timeout: 30_000 });
 
-  await medSearchInput.fill('Amoxicillin');
+  await medSearchInput.fill(medicationName);
   const amoxicillinOption = page
     .locator('sl-menu-item')
-    .filter({ hasText: /Amoxicillin/i })
+    .filter({ hasText: medicationName })
     .first();
   await expect(amoxicillinOption).toBeVisible({ timeout: 10_000 });
   await amoxicillinOption.click();
@@ -56,17 +73,9 @@ test('create test patient and order via clinical app', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Add to drafts' }).click();
   await expect(page.getByText('Draft Prescriptions')).toBeVisible({ timeout: 10_000 });
+}
 
-  // 4. Send the order
+async function clickSendOrder(page: Page) {
   await page.getByRole('button', { name: 'Send' }).click();
   await page.waitForURL(/\/orders\/ord_/, { timeout: 30_000 });
-
-  // 5. Extract orderId from URL
-  const url = page.url();
-  const orderId = url.match(/\/orders\/(ord_[^/?]+)/)?.[1];
-  expect(orderId).toBeTruthy();
-
-  // 6. Write test data for patient app specs
-  fs.writeFileSync(testDataPath, JSON.stringify({ orderId }, null, 2));
-  console.log(`Test data written: orderId=${orderId}`);
-});
+}

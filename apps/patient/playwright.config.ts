@@ -19,15 +19,15 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'setup',
-      testMatch: /setup\.spec\.ts/,
+      name: 'setup-new-order',
+      testMatch: /setup-new-order\.spec\.ts/,
       use: { baseURL: clinicalBaseUrl }
     },
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      dependencies: ['setup'],
-      testIgnore: /setup\.spec\.ts/
+      dependencies: ['setup-new-order'],
+      testIgnore: /setup-new-order\.spec\.ts/
     }
   ],
   ...localDevServer()
