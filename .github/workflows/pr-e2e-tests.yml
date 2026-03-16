@@ -10,7 +10,6 @@ jobs:
   test:
     timeout-minutes: 10
     runs-on: ubuntu-latest
-    environment: 'boson'
     steps:
       - uses: actions/checkout@v4
 
