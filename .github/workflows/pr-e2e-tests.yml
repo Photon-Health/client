@@ -7,21 +7,6 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    # Placeholder — "test" is a required status check on the repo.
-    # It depends on the real e2e jobs so it passes only when they do.
-    # delete this after e2e-tests added to github config
-    runs-on: ubuntu-latest
-    needs: e2e-tests
-    if: always()
-    steps:
-      - name: Check e2e results
-        run: |
-          if [ "${{ needs.e2e-tests.result }}" != "success" ]; then
-            echo "e2e-tests failed or were cancelled"
-            exit 1
-          fi
-
   e2e-tests:
     timeout-minutes: 15
     runs-on: ubuntu-latest
