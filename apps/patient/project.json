@@ -170,6 +170,20 @@
         "command": "npx tsc --noEmit"
       },
       "dependsOn": ["codegen:photon"]
+    },
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "env-cmd -f .env.boson npx playwright test"
+      }
+    },
+    "e2e:ui": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "env-cmd -f .env.boson npx playwright test --ui"
+      }
     }
   }
 }
