@@ -39,8 +39,8 @@ async function createPatientAndStartPrescription(page: Page) {
   await page.getByRole('link', { name: /Create patient/ }).click();
 
   const patientNumber = Math.floor(Math.random() * 100_000_000);
-  await page.getByLabel('First name').fill('E2E');
-  await page.getByLabel('Last name').fill(`TestPatient_${patientNumber}`);
+  await page.getByLabel('First name').fill('patient-e2e-firstname');
+  await page.getByLabel('Last name').fill(`patient-e2e-lastname-${patientNumber}`);
   await page.getByLabel('Date of birth').fill('1990-01-15');
   await page.getByLabel('Mobile number').fill(process.env.PLAYWRIGHT_E2E_PATIENT_PHONE!);
   await page.getByLabel('Sex at birth').selectOption('UNKNOWN');
