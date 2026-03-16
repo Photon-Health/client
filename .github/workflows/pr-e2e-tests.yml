@@ -29,12 +29,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - app: clinical-app
+          - app: app
             codegen: 'npx nx run app:codegen'
             base_url: 'http://localhost:3000'
             report_name: playwright-report-clinical
             report_path: apps/app/playwright-report/
-          - app: patient-app
+          - app: patient
             codegen: 'npx nx run patient:codegen'
             base_url: 'http://localhost:3001'
             report_name: playwright-report-patient
