@@ -44,6 +44,12 @@ export const PharmacyCard = memo(function PharmacyCard({
       shadow={'none'}
       borderRadius="lg"
       onClick={() => onSelect && onSelect()}
+      onKeyDown={(e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && onSelect) {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
       mx={{ base: -2, md: undefined }}
       cursor={selectable ? 'pointer' : undefined}
       pointerEvents={isCurrentPharmacy ? 'none' : undefined}

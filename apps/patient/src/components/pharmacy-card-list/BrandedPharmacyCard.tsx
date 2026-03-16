@@ -93,6 +93,12 @@ export const BrandedPharmacyCard = ({
       borderRadius="lg"
       shadow={'none'}
       onClick={() => handleSelect(pharmacyId)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleSelect(pharmacyId);
+        }
+      }}
       mx={{ base: -2, md: undefined }}
       cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
       pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
