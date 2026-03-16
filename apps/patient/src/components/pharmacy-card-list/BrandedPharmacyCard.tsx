@@ -97,6 +97,11 @@ export const BrandedPharmacyCard = ({
       cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
       pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
       opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}
+      role="radio"
+      aria-checked={selected}
+      aria-label={brand.name}
+      aria-disabled={isPharmacyFulfillingCurrentOrder}
+      tabIndex={isPharmacyFulfillingCurrentOrder ? -1 : 0}
     >
       <CardBody p={3}>
         <PharmacyInfo

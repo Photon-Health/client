@@ -19,15 +19,20 @@ test('displays order status for a freshly created order', async ({ page }) => {
 
   await page.getByRole('button', { name: /search for a pharmacy/i }).click();
 
-  await expect(page.getByText(/select a pharmacy/i)).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole('heading', { name: /select a pharmacy/i })).toBeVisible({
+    timeout: 15_000
+  });
 
-  await page.getByText('Organic Planet Pharmacy').click();
+  const pharmacyListGroup = page.getByRole('radiogroup', { name: /select a pharmacy/i });
+  const pharmacyCardToSelect = pharmacyListGroup.getByRole('radio').nth(1);
+  const selectedPharmacyName = await pharmacyCardToSelect.getAttribute('aria-label');
+  await pharmacyCardToSelect.click();
   await page.getByRole('button', { name: /select pharmacy/i }).click();
   await page.getByText('Urgent').click();
   await page.getByRole('button', { name: /next/i }).click();
 
   await expect(page.getByText(/Order placed/i)).toBeVisible();
-  await expect(page.getByText(/Organic Planet Pharmacy/i)).toBeVisible();
+  await expect(page.getByText(selectedPharmacyName)).toBeVisible();
   await expect(page.getByText(/Amoxicillin/i)).toBeVisible();
 });
 
