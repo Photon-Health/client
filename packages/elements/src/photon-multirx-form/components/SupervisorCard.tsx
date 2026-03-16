@@ -52,7 +52,12 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
   onMount(async () => {
     const {
       data: { supervisors, mostRecentSupervisor }
-    } = await client.sdk.apolloClinical.query({ query: SupervisorCardQuery });
+    } = await client.sdk.apolloClinical.query({
+      query: SupervisorCardQuery,
+      // This query takes no variables so nothing indicates to the
+      // client-side cache when to refetch the data
+      fetchPolicy: 'network-only'
+    });
 
     const supervisorsResult = sortSupervisors(supervisors.filter((s) => !!s));
     setSupervisors(supervisorsResult);
