@@ -475,10 +475,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         pharmacyId = '';
       }
 
-      // const supervisorId =
-      //   needsSupervisor() && props.formStore.supervisorId?.value
-      //     ? props.formStore.supervisorId.value
-      //     : undefined;
+      const supervisorId =
+        needsSupervisor() && props.formStore.supervisorId?.value
+          ? props.formStore.supervisorId.value
+          : undefined;
 
       const { data: orderData, errors } = await orderMutation({
         variables: {
@@ -494,8 +494,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             : {}),
           fills: prescriptionIds().map((id) => ({
             prescriptionId: id
-          }))
-          // supervisorId: supervisorId
+          })),
+          supervisorId: supervisorId
         },
         refetchQueries: [],
         awaitRefetchQueries: false

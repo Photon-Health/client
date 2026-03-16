@@ -32,10 +32,13 @@ export const MeUserQuery = graphql(`
   }
 `);
 
-export const SupervisorsQuery = graphql(`
-  query SupervisorsQuery {
+export const SupervisorCardQuery = graphql(`
+  query SupervisorCardQuery {
     supervisors {
       ...SupervisorCard
+    }
+    mostRecentSupervisor {
+      id
     }
   }
 `);

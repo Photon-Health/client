@@ -29,7 +29,7 @@ export default function Collapsible(preProps: CollapsibleProps) {
         <button
           type="button"
           class={clsx(
-            'flex w-full items-center gap-1 text-left text-xs text-gray-500 hover:text-gray-600',
+            'flex items-center gap-1 text-left text-xs text-gray-500 hover:text-gray-600',
             props.buttonClass
           )}
           onClick={() => {
