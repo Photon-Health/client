@@ -177,13 +177,14 @@ function ComboOption(props: ComboOptionProps) {
 
 interface ComboBoxInputProps {
   displayValue: (item: any) => string;
+  showClear?: boolean;
 }
 
 function ComboInput(props: ComboBoxInputProps & InputProps) {
-  const [state, { setOpen }] = useComboBox();
+  const [state, { setOpen, setSelected }] = useComboBox();
   const [inputGroupState] = useInputGroup();
   const [local, restInput] = splitProps(props, ['onInput', 'value']);
-  const [selectedLocalValue, setLocalSelectedValue] = createSignal('');
+  const [localValue, setLocalValue] = createSignal('');
   let inputContainer: HTMLElement;
 
   onMount(() => {
@@ -195,17 +196,17 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
   createEffect(() => {
     // update localSelectedValue when internal selected state is changed
     if (state.selected) {
-      setLocalSelectedValue(props.displayValue(state.selected));
+      setLocalValue(props.displayValue(state.selected));
     }
     if (state.selected === undefined) {
-      setLocalSelectedValue('');
+      setLocalValue(props.displayValue(state.selected) || '');
     }
   });
 
   createEffect(() => {
     // separately, listen for open state to change and reset the display value
     if (!state.open) {
-      setLocalSelectedValue(props.displayValue(state.selected) || '');
+      setLocalValue(props.displayValue(state.selected) || '');
     }
   });
 
@@ -215,23 +216,35 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
         <Input
           {...restInput}
           aria-label={props.label}
-          value={selectedLocalValue() || ''}
+          value={localValue() || ''}
           onClick={() => setOpen(!state.open)}
           onInput={(e) => {
             if (local?.onInput) {
               // @ts-ignore
               local?.onInput(e);
             }
-            setLocalSelectedValue(e.currentTarget.value);
+            setLocalValue(e.currentTarget.value);
             setOpen(true);
           }}
           type="text"
         />
       </div>
+      <Show when={props.showClear && state.selected}>
+        <button
+          class="absolute inset-y-0 right-8 flex items-center px-1"
+          onClick={() => {
+            setSelected(undefined);
+          }}
+          aria-label="Clear selection"
+          type="button"
+        >
+          <span class="text-sm text-gray-400">Clear</span>
+        </button>
+      </Show>
       <button
-        class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
+        class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2"
         onClick={() => setOpen(!state.open)}
-        title="Input dropdown"
+        aria-label="Show options"
       >
         <Show when={!inputGroupState.loading && !props.loading}>
           <Icon name="chevronUpDown" class="text-gray-400" />
