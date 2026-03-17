@@ -131,12 +131,9 @@ const supervisorSchema = zod.object({
     .string({ required_error: 'First name is required' })
     .min(1, 'First name is required'),
   lastName: zod.string({ required_error: 'Last name is required' }).min(1, 'Last name is required'),
-  npi: zod.preprocess(
-    (value) => value ?? undefined,
-    zod
-      .string({ required_error: 'NPI is required' })
-      .regex(/^[0-9]{10}$/, 'Enter a valid 10-digit NPI')
-  )
+  npi: zod.coerce
+    .string({ required_error: 'NPI is required' })
+    .regex(/^[0-9]{10}$/, 'Enter a valid 10-digit NPI')
 });
 
 interface NewSupervisorFormProps {
