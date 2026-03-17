@@ -44,10 +44,21 @@ export const PharmacyCard = memo(function PharmacyCard({
       shadow={'none'}
       borderRadius="lg"
       onClick={() => onSelect && onSelect()}
+      onKeyDown={(e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && onSelect) {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
       mx={{ base: -2, md: undefined }}
       cursor={selectable ? 'pointer' : undefined}
       pointerEvents={isCurrentPharmacy ? 'none' : undefined}
       opacity={isCurrentPharmacy ? 0.7 : undefined}
+      role="radio"
+      aria-checked={selected}
+      aria-label={pharmacy.name}
+      aria-disabled={isCurrentPharmacy}
+      tabIndex={isCurrentPharmacy ? -1 : 0}
     >
       <CardBody p={3}>
         <PharmacyInfo

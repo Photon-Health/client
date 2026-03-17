@@ -46,3 +46,9 @@ apps/app/src/gql
 __generated__
 
 vite.config.ts.timestamp-*
+
+# Playwright
+apps/patient/e2e/.auth/
+apps/patient/e2e/.test-data.json
+apps/patient/playwright-report/
+apps/patient/test-results/
