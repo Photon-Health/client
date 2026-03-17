@@ -4,6 +4,8 @@ import { Alert } from './particles/Alert';
 import Checkbox from './particles/Checkbox';
 import DispenseUnitSelect from './particles/DispenseUnitSelect';
 import Input from './particles/Input';
+import AddressAutocompleteInput from './particles/AddressAutocompleteInput';
+import type { ParsedAddress } from './particles/AddressAutocompleteInput';
 import { InputGroup } from './particles/InputGroup';
 import DateInput from './particles/DateInput';
 import Select from './particles/Select';
@@ -29,7 +31,11 @@ import PatientInfo from './systems/PatientInfo';
 import PatientMedHistory from './systems/PatientMedHistory';
 import PickupPharmacySearch from './systems/PharmacySearch';
 import type { PharmacyOption } from './systems/PharmacySearch/PharmacySearch';
-import { PharmacySelect } from './systems/PharmacySelect';
+import {
+  PharmacySelect,
+  PharmacySelectionProvider,
+  usePharmacySelectionContext
+} from './systems/PharmacySelect';
 import Spinner from './particles/Spinner';
 import RadioGroupCards from './particles/RadioGroupCards';
 import { RecentOrders, useRecentOrders } from './systems/RecentOrders';
@@ -77,6 +83,7 @@ export { usePhoton, PhotonClientStore, PhotonContext };
 
 export {
   AddressForm,
+  AddressAutocompleteInput,
   Alert,
   Banner,
   Checkbox,
@@ -125,8 +132,10 @@ export {
   useRecentOrders,
   formatPrescriptionDetails,
   PrescribeProvider,
+  PharmacySelectionProvider,
   GoogleServiceProvider,
   usePrescribe,
+  usePharmacySelectionContext,
   useGoogleService,
   CALENDAR_DATE_FORMAT,
   PrescribeEventDispatchProvider,
@@ -139,6 +148,7 @@ export {
 
 // Export types
 export type {
+  ParsedAddress,
   PharmacyOption,
   ScreeningAlertType,
   RoutingConstraint,

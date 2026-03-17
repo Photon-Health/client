@@ -46,3 +46,25 @@ npx nx run patient:start
 
 npx nx run patient:start:tau
 ```
+
+### Playwright e2e Tests
+
+End-to-end tests run against the browser, testing the patient app "end" to the server "end".
+These are expensive to run, and are best suited to validating critical user flows within the application.
+
+#### First time setup:
+
+1. Copy `apps/patient/.env.local.sample` into a new file named `apps/patient/.env.local`
+2. Go to 1password and search for "e2e test user" (in Shared credentials). There should be two options.
+3. Copy password into the `PLAYWRIGHT_E2E_ACCOUNT_PASSWORD` field inside `.env.local`
+4. Put **your** phone number into the `PLAYWRIGHT_E2E_PATIENT_PHONE` field inside `.env.local`
+
+#### Run e2e tests:
+
+```shell
+# run with headless browser
+$ npx nx run patient:e2e
+
+# or run within UI popup window
+$ npx nx run patient:e2e:ui
+```

@@ -1,14 +1,14 @@
 import { Card, CardBody } from '@chakra-ui/react';
 
-import { Offer } from '../pharmacy-card-list';
 import { OfferInfo } from './OfferInfo';
+import { OfferDetails } from '../../utils/models';
 
 interface Props {
-  offer: Offer;
+  offer: OfferDetails;
   isPharmacyFulfillingCurrentOrder: boolean;
   selected: boolean;
   isPreferred: boolean;
-  handleSelect: (id: string, offer?: Offer) => void;
+  handleSelect: (id: string, offer?: OfferDetails) => void;
 }
 export const OfferCard = ({
   offer,

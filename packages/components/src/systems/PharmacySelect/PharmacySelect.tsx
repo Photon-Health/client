@@ -6,6 +6,7 @@ import PickupPharmacySearch from '../PharmacySearch';
 import { MailOrderPharmacy } from './MailOrderPharmacy';
 import { SendToPatient } from './SendToPatient';
 import { usePrescribe } from '../PrescribeProvider';
+import { usePharmacySelectionContext } from '../PharmacySelect';
 import { usePrescribeEventDispatch } from '../PrescribeEventDispatchProvider';
 import { PharmacyRoutingAlert } from '../RoutingConstraints';
 import { Alert } from '../../particles/Alert';
@@ -32,17 +33,9 @@ export type FulfillmentOption = {
 export type FulfillmentOptions = FulfillmentOption[];
 
 interface PharmacySelectProps {
-  enableSendToPatient?: boolean; // declaritively displays Send to Patient tab
-  enableLocalPickup?: boolean; // declaritively displays Local Pickup tab
-  enableDeliveryPharmacies?: boolean; // declaritively displays Mail Order tab
-  mailOrderPharmacyIds?: string[]; // implicitly displays Mail Order tab
   patientIds?: string[];
   address?: string;
   hasPreferredPharmacy?: boolean;
-  setFufillmentType: (type: types.FulfillmentType | undefined) => void;
-  setPharmacyId: (id: string | undefined) => void;
-  setPatientId?: (id: string | undefined) => void;
-  setPreferredPharmacy?: (shouldSet: boolean) => void;
 }
 
 const fulfillmentOptions: FulfillmentOptions = [
@@ -65,7 +58,9 @@ const parseFulfillmentType = (type: FulfillmentType | undefined) => {
 };
 
 export function PharmacySelect(props: PharmacySelectProps) {
-  const { orderFormData, selectedCoverageOption, unroutablePharmacyIds } = usePrescribe();
+  const { selectedCoverageOption } = usePrescribe();
+  const pharmacySelectionContext = usePharmacySelectionContext();
+  const unroutablePharmacyIds = () => pharmacySelectionContext.unroutablePharmacyIds();
   const { dispatchAnalytics } = usePrescribeEventDispatch();
   const hasAddress = createMemo(() => Boolean(props.address?.trim()));
 
@@ -77,7 +72,9 @@ export function PharmacySelect(props: PharmacySelectProps) {
   const [activeTab, setActiveTab] = createSignal<TabNamesEnum>(TabNamesEnum.sendToPatient);
 
   const routableMailOrderPharmacyIds = createMemo(() => {
-    return props.mailOrderPharmacyIds?.filter((id) => !unroutablePharmacyIds().has(id));
+    return pharmacySelectionContext
+      .mailOrderPharmacyIds()
+      ?.filter((id) => !unroutablePharmacyIds().has(id));
   });
 
   const initMailOrderPharmacyId = createMemo(() => {
@@ -95,9 +92,9 @@ export function PharmacySelect(props: PharmacySelectProps) {
   onMount(() => {
     // add the tabs to tabs
     setTabs([
-      ...(props.enableSendToPatient ? [TabNamesEnum.sendToPatient] : []),
-      ...(props.enableLocalPickup ? [TabNamesEnum.localPickup] : []),
-      ...(props.enableDeliveryPharmacies ? [TabNamesEnum.mailOrder] : [])
+      ...(pharmacySelectionContext.enableSendToPatient() ? [TabNamesEnum.sendToPatient] : []),
+      ...(pharmacySelectionContext.enableLocalPickup() ? [TabNamesEnum.localPickup] : []),
+      ...(pharmacySelectionContext.enableDeliveryPharmacies() ? [TabNamesEnum.mailOrder] : [])
     ]);
 
     // Fulfillment option from the first tab name
@@ -106,15 +103,15 @@ export function PharmacySelect(props: PharmacySelectProps) {
     )?.fulfillmentType;
 
     // Sets the initial fulfillment type to the first available tab
-    props.setFufillmentType(parseFulfillmentType(firstOption));
+    pharmacySelectionContext.setFulfillmentType(parseFulfillmentType(firstOption));
     setActiveTab(tabs()[0]);
   });
 
   createEffect(() => {
     // when coverage option is selected, navigate to Send to Patient
     const coverageOption = selectedCoverageOption();
-    // untrack b/c we only want to change the tab on coverage selection, not on orderFormData changes
-    const untrackedId = untrack(() => orderFormData.pharmacyId);
+    // untrack b/c we only want to change the tab on coverage selection, not on pharmacyId changes
+    const untrackedId = untrack(() => pharmacySelectionContext.pharmacyId());
     if (coverageOption && untrackedId === coverageOption.pharmacy.id) {
       setActiveTab(tabs()[0]);
     }
@@ -128,7 +125,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
     }
 
     const type = fulfillmentOptions.find((option) => option.name === newTab)?.fulfillmentType;
-    props.setFufillmentType(parseFulfillmentType(type));
+    pharmacySelectionContext.setFulfillmentType(parseFulfillmentType(type));
 
     dispatchAnalytics({
       trackEventType: 'pharmacy_interaction',
@@ -140,14 +137,14 @@ export function PharmacySelect(props: PharmacySelectProps) {
 
     // Preserve the selected pharmacy ID for Local Pickup and Mail Order tabs
     if (newTab === TabNamesEnum.localPickup && localPharmId()) {
-      props.setPharmacyId(localPharmId());
+      pharmacySelectionContext.setPharmacyId(localPharmId());
     } else if (newTab === TabNamesEnum.mailOrder && mailOrderId()) {
-      props.setPharmacyId(mailOrderId());
+      pharmacySelectionContext.setPharmacyId(mailOrderId());
     } else {
       // Use the selectedCoverageOption's pharmacy, if available, for Send To Patient flow.
       // This is a bit strange - doing this for our first version of RTBC feature.
       // But we dont yet have a better way to show the Provider what pharmacy they selected by selecting a Coverage Option
-      props.setPharmacyId(selectedCoverageOption()?.pharmacy.id);
+      pharmacySelectionContext.setPharmacyId(selectedCoverageOption()?.pharmacy.id);
     }
   };
 
@@ -184,11 +181,11 @@ export function PharmacySelect(props: PharmacySelectProps) {
                 setPharmacy={(pharmacy) => {
                   setLocalPharmId(pharmacy.id);
                   if (activeTab() === TabNamesEnum.localPickup) {
-                    props.setPharmacyId(pharmacy.id);
+                    pharmacySelectionContext.setPharmacyId(pharmacy.id);
                   }
                 }}
                 setPreferred={(shouldSetPreferred) => {
-                  props?.setPreferredPharmacy?.(shouldSetPreferred);
+                  pharmacySelectionContext.setUpdatePreferredPharmacy(shouldSetPreferred);
                   dispatchAnalytics({
                     trackEventType: 'pharmacy_interaction',
                     properties: {
@@ -222,11 +219,11 @@ export function PharmacySelect(props: PharmacySelectProps) {
                     setMailOrderOption(pharmacy);
                     setMailOrderId(pharmacy.id);
                     if (activeTab() === TabNamesEnum.mailOrder) {
-                      props.setPharmacyId(pharmacy.id);
+                      pharmacySelectionContext.setPharmacyId(pharmacy.id);
                     }
                   }}
                 />
-                {(props.mailOrderPharmacyIds?.length ?? 0) > 0 && (
+                {(pharmacySelectionContext.mailOrderPharmacyIds()?.length ?? 0) > 0 && (
                   <div class="space-y-2">
                     <label>Choose a partner pharmacy</label>
                     <RadioGroupCards
@@ -236,12 +233,12 @@ export function PharmacySelect(props: PharmacySelectProps) {
                         setMailOrderOption(undefined);
                         setMailOrderId(pharmacyId);
                         if (activeTab() === TabNamesEnum.mailOrder) {
-                          props.setPharmacyId(pharmacyId);
+                          pharmacySelectionContext.setPharmacyId(pharmacyId);
                         }
                       }}
                       contextRef={(context) => (radioGroupContext = context)}
                     >
-                      <For each={props?.mailOrderPharmacyIds || []}>
+                      <For each={pharmacySelectionContext.mailOrderPharmacyIds() || []}>
                         {(id) => (
                           <RadioGroupCards.Option
                             value={id}
