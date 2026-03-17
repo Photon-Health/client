@@ -3,6 +3,7 @@ import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from
 import { enums, size, string, union } from 'superstruct';
 import type { PharmacyOption } from '@photonhealth/components';
 import {
+  AddressAutocompleteInput,
   Card,
   DateInput,
   dispatchAnalyticsTrackEvent,
@@ -255,12 +256,19 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
           error={store['address_street1']?.error}
           required={isAddressRequired()}
         >
-          <Input
+          <AddressAutocompleteInput
             value={store['address_street1']?.value ?? pStore.selectedPatient.data?.address?.street1}
             onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
               actions.updateFormValue({ key: 'address_street1', value: e.currentTarget.value });
             }}
             onBlur={(e) => trackFieldInteraction('address_street1', Boolean(e.currentTarget.value))}
+            onAddressSelect={(address) => {
+              actions.updateFormValue({ key: 'address_street1', value: address.street1 });
+              actions.updateFormValue({ key: 'address_street2', value: address.street2 });
+              actions.updateFormValue({ key: 'address_city', value: address.city });
+              actions.updateFormValue({ key: 'address_state', value: address.state });
+              actions.updateFormValue({ key: 'address_zip', value: address.postalCode });
+            }}
           />
         </InputGroup>
 
