@@ -152,7 +152,7 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
       setSubmitting(true);
       try {
         validate();
-        if (!isValid) {
+        if (!isValid()) {
           throw new Error();
         }
         const { data } = await client.sdk.apolloClinical.mutate({
@@ -160,7 +160,7 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
           variables: {
             firstName: values.firstName,
             lastName: values.lastName,
-            npi: values.npi
+            npi: String(values.npi)
           }
         });
         if (data?.createSupervisor) {
