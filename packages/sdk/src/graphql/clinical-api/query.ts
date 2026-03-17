@@ -18,3 +18,27 @@ export const SearchTreatmentOptionsQuery = graphql(`
     }
   }
 `);
+
+export const MeUserQuery = graphql(`
+  query MeUserQuery {
+    me {
+      name {
+        title
+      }
+      address {
+        state
+      }
+    }
+  }
+`);
+
+export const SupervisorCardQuery = graphql(`
+  query SupervisorCardQuery {
+    supervisors {
+      ...SupervisorCard
+    }
+    mostRecentSupervisor {
+      id
+    }
+  }
+`);
