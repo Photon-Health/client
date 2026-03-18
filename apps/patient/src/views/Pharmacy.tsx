@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
   Box,
   Button,
@@ -23,7 +22,7 @@ import { FixedFooter, LocationModal, PoweredBy } from '../components';
 import { CouponModal } from '../components/coupons';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy, wait } from '../utils/general';
-import { Pharmacy as EnrichedPharmacy, OfferBundleDetails, OfferDetails } from '../utils/models';
+import { OfferDetails, Pharmacy as EnrichedPharmacy, OfferBundleDetails } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -1236,7 +1235,14 @@ export const Pharmacy = () => {
       <Container pb={showFooter ? 32 : 8}>
         {patientLocation && (
           <VStack spacing={6} align="stretch" pt={4}>
-            <VStack spacing={2} align="span" w="full" rowGap="6">
+            <VStack
+              spacing={2}
+              align="span"
+              w="full"
+              rowGap="6"
+              role="radiogroup"
+              aria-label="Select a pharmacy"
+            >
               {(showBrandedOptionsHeader || showOffers || showBrandedOptions) && (
                 <VStack align="span" w="full" rowGap="2">
                   {showBrandedOptionsHeader && (
