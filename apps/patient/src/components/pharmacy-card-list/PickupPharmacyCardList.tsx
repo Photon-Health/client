@@ -18,6 +18,7 @@ interface PickupPharmacyCardListProps {
   loadingMore: boolean;
   showingAllPharmacies: boolean;
   showHeading: boolean;
+  showPrice?: boolean;
   enableOpenNow: boolean;
   enable24Hr: boolean;
   enablePrice: boolean;
@@ -41,6 +42,7 @@ export const PickupPharmacyCardList = ({
   loadingMore,
   showingAllPharmacies,
   showHeading,
+  showPrice = true,
   enableOpenNow,
   enable24Hr,
   setEnableOpenNow,
@@ -90,7 +92,7 @@ export const PickupPharmacyCardList = ({
                 onSelect={() => handleSelect(pharmacy.id)}
                 onSetPreferred={() => handleSetPreferred(pharmacy.id)}
                 selectable={true}
-                showPrice
+                showPrice={showPrice}
                 isCurrentPharmacy={pharmacy.id === currentPharmacyId}
               />
             </OfferImpressionTracker>

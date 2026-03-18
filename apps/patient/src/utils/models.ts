@@ -3,7 +3,8 @@ import {
   GetOrderQuery,
   Address as GQLAddress,
   FulfillmentType,
-  Maybe
+  Maybe,
+  OfferPromotion
 } from '../__generated__/graphql';
 
 type NotMaybe<T> = Exclude<T, null | undefined>;
@@ -36,6 +37,17 @@ export interface OfferDetails {
   tags: string[];
 }
 
+export interface OfferBundleDetails extends OfferDetails {
+  medications: Array<{
+    name?: string;
+    amount: number;
+    amountTitle?: string;
+    retailAmount?: number;
+    retailAmountTitle?: string;
+    promotions?: Array<OfferPromotion>;
+  }>;
+}
+
 export const OfferTypes = {
   RxSense: 'RxSense',
   GoodRx: 'GoodRx',
@@ -58,3 +70,4 @@ export type EnrichedPharmacy = Pharmacy & {
 export type ExtendedFulfillmentType = FulfillmentType | 'COURIER';
 
 export type Address = GQLAddress;
+export type Promotion = OfferPromotion;

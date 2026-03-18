@@ -1,6 +1,12 @@
-import { getOffers } from '../api';
+import { getOfferBundles, getOffers } from '../api';
 import { PHARMACY_BRANDING } from '../components/pharmacy-card-list';
-import { EnrichedPharmacy, ExtendedFulfillmentType, OfferDetails, Order } from '../utils/models';
+import {
+  EnrichedPharmacy,
+  ExtendedFulfillmentType,
+  OfferBundleDetails,
+  OfferDetails,
+  Order
+} from '../utils/models';
 import { FulfillmentType, Pharmacy as PharmacyType } from '../__generated__/graphql';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
@@ -26,7 +32,7 @@ function getNovocareOffers(order: Order): OfferDetails[] {
   }
 }
 
-// this function will return the offers available for the given order
+// this function will return the offers available for the given order (single rx)
 export async function fetchOffers(order: Order): Promise<OfferDetails[] | undefined> {
   const offers = await getOffers(order.id);
 
@@ -48,6 +54,63 @@ export async function fetchOffers(order: Order): Promise<OfferDetails[] | undefi
       },
       tags: ['In Stock']
     }));
+
+  const novocareOffers = getNovocareOffers(order);
+
+  // measured will only want to show amazon offers if we do not have a novocare offer
+  if (order.organization.id === 'org_pcPnPx5PVamzjS2p') {
+    if (novocareOffers.length === 0) {
+      return amazonOffers;
+    } else {
+      return novocareOffers;
+    }
+  }
+
+  return [...amazonOffers, ...novocareOffers];
+}
+
+// this function will return the offers available for the given order
+// (currently just for multi rx but will expand to single rx in PHO-322)
+export async function fetchOfferBundles(
+  order: Order
+): Promise<OfferBundleDetails[] | OfferDetails[] | undefined> {
+  const bundles = await getOfferBundles(order.id);
+
+  const amazonOffers = bundles
+    .filter((bundle) => bundle.supplier === 'AMAZON_PHARMACY')
+    .map((bundle) => {
+      const deliveryPromises = bundle.medications
+        .map((m) => m.deliveryEstimate?.deliveryPromise)
+        .filter((promise) => promise !== undefined);
+      // pick the latest delivery promise across all medications by looking at the first character
+      // Priority: '2...' (2-3 day) > '1...' (1-2 day) > 'S...' (same day)
+      const latestDelivery =
+        deliveryPromises.find((promise) => promise[0] === '2') ??
+        deliveryPromises.find((promise) => promise[0] === '1') ??
+        deliveryPromises[0];
+
+      return {
+        deliveryEstimate: latestDelivery,
+        costType: bundle.pricingType,
+        costAmount: bundle.aggregateCost?.totalAmount,
+        costAmountTitle: bundle.medications[0]?.medicationPrice?.amountTitle, // should move amount titles to the top level instead of per medication in the API but for now we'll just use the first one since we expect them to be the same across medications
+        retailAmount: bundle.aggregateCost?.totalRetailAmount,
+        retailAmountTitle: bundle.medications[0]?.medicationPrice?.retailAmountTitle, // same as costAmountTitle, should be moved to top level eventually
+        medications: bundle.medications.map((m) => ({
+          name: m.prescription?.treatment?.name,
+          amount: m.medicationPrice?.amount,
+          retailAmount: m.medicationPrice?.retailAmount,
+          promotions: m.medicationPrice?.promotions
+        })),
+        pharmacy: {
+          id: import.meta.env.VITE_AMAZON_PHARMACY_ID as string,
+          name: 'Amazon Pharmacy',
+          fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[],
+          logo: PHARMACY_BRANDING['phr_demoAmazon'].logo
+        },
+        tags: ['In Stock']
+      };
+    });
 
   const novocareOffers = getNovocareOffers(order);
 
