@@ -25,6 +25,7 @@ import { OrderStatusHeader } from '../components/status/Header';
 import { getInfoPageData } from '../api';
 import { OrderDetailsModal, PrescriptionData } from '../components/order-details/OrderDetailsModal';
 import { Helmet } from 'react-helmet';
+import { usePageAnalytics } from '../hooks/usePageAnalytics';
 
 export function InfoPage() {
   const navigate = useNavigate();
