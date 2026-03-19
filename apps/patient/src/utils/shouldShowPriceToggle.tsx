@@ -2,7 +2,6 @@ import { FillWithCount } from './general';
 import { Order } from './models';
 import { isGLP } from './isGLP';
 
-// note: prices are only for single-rx right now
 export function shouldShowPriceToggle(flattenedFills: FillWithCount[], order: Order): boolean {
   const hideGlp1Prices = shouldHideGlp1Prices(flattenedFills, order.organization.id);
   const orderIsMultiRx = flattenedFills.length > 1;
