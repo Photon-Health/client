@@ -13,7 +13,7 @@ import {
 import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
 import { getOffers, getOrder, getPharmaciesByLocation, setOrderPharmacy } from '../api';
-import { fetchOffers, getPharmacy } from './pharmacy.utils';
+import { fetchOfferBundles, fetchOffers, getPharmacy } from './pharmacy.utils';
 import { FulfillmentType } from '../__generated__/graphql';
 
 // Mock the settings and pharmacy utils before any imports
@@ -60,6 +60,7 @@ vi.mock('../configs/graphqlClient', () => ({
 
 vi.mock('./pharmacy.utils', () => ({
   fetchOffers: vi.fn(),
+  fetchOfferBundles: vi.fn(),
   getPharmacy: vi.fn()
 }));
 
