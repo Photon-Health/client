@@ -28,11 +28,7 @@ export const getOffers = async (orderId: string) => {
 
 export const getOfferBundles = async (orderId: string) => {
   const response = await graphQLClient.GetOfferBundlesForOrder({ orderId: orderId });
-  if (response.offerBundles) {
-    return response.offerBundles;
-  } else {
-    throw new Error('No offer bundles found');
-  }
+  return response.offerBundles;
 };
 
 export const getPharmaciesByLocation = async ({

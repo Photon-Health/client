@@ -4,7 +4,8 @@ import { isGLP } from './isGLP';
 
 export function shouldShowPriceToggle(flattenedFills: FillWithCount[], order: Order): boolean {
   const hideGlp1Prices = shouldHideGlp1Prices(flattenedFills, order.organization.id);
-  return !hideGlp1Prices;
+  const orderIsMultiRx = flattenedFills.length > 1;
+  return (!hideGlp1Prices && !orderIsMultiRx) ?? false;
 }
 
 function shouldHideGlp1Prices(flattenedFills: FillWithCount[], organizationId: string) {

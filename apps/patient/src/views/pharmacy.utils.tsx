@@ -1,4 +1,5 @@
 import { getOfferBundles, getOffers } from '../api';
+import { getLatestDelivery } from '../utils/deliveryPromise';
 import { PHARMACY_BRANDING } from '../components/pharmacy-card-list';
 import {
   EnrichedPharmacy,
@@ -82,15 +83,9 @@ export async function fetchOfferBundles(
       const deliveryPromises = bundle.medications
         .map((m) => m.deliveryEstimate?.deliveryPromise)
         .filter((promise) => promise !== undefined);
-      // pick the latest delivery promise across all medications by looking at the first character
-      // Priority: '2...' (2-3 day) > '1...' (1-2 day) > 'S...' (same day)
-      const latestDelivery =
-        deliveryPromises.find((promise) => promise[0] === '2') ??
-        deliveryPromises.find((promise) => promise[0] === '1') ??
-        deliveryPromises[0];
 
       return {
-        deliveryEstimate: latestDelivery,
+        deliveryEstimate: getLatestDelivery(deliveryPromises),
         costType: bundle.pricingType,
         costAmount: bundle.aggregateCost?.totalAmount,
         costAmountTitle: bundle.medications[0]?.medicationPrice?.amountTitle, // should move amount titles to the top level instead of per medication in the API but for now we'll just use the first one since we expect them to be the same across medications

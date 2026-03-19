@@ -12,7 +12,17 @@ test('shows the price toggle switch when order has single medication', async () 
   expect(shouldShowPriceToggle([singleNonGLPFill], order)).toEqual(true);
 });
 
-test('shows the price toggle when order has multiple prescriptions', () => {
+test('shows the price toggle switch when order contains GLP-1 medication', () => {
+  const glp1MedicationName = 'Semaglutide';
+  const glpFill = generateFlattenedFill({
+    treatment: generateTreatment({ name: glp1MedicationName })
+  });
+  const order = generateOrder();
+
+  expect(shouldShowPriceToggle([glpFill], order)).toEqual(true);
+});
+
+test('hides the price toggle when order has multiple prescriptions', () => {
   const multipleFills = [
     generateFlattenedFill({
       treatment: generateTreatment({ name: 'Metformin' })
@@ -23,17 +33,7 @@ test('shows the price toggle when order has multiple prescriptions', () => {
   ];
   const order = generateOrder();
 
-  expect(shouldShowPriceToggle(multipleFills, order)).toEqual(true);
-});
-
-test('shows the price toggle switch when order contains GLP-1 medication', () => {
-  const glp1MedicationName = 'Semaglutide';
-  const glpFill = generateFlattenedFill({
-    treatment: generateTreatment({ name: glp1MedicationName })
-  });
-  const order = generateOrder();
-
-  expect(shouldShowPriceToggle([glpFill], order)).toEqual(true);
+  expect(shouldShowPriceToggle(multipleFills, order)).toEqual(false);
 });
 
 test('hides the price toggle switch when order contains GLP-1 medication for org that hides glp prices', () => {
