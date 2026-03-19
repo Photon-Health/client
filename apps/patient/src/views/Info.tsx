@@ -31,6 +31,7 @@ export function InfoPage() {
   const [searchParams] = useSearchParams();
   const [tokenPayload, setTokenPayload] = useState<TokenPayload>();
   const [detailsModalOpen, setDetailsModalOpen] = useState<boolean>(false);
+  usePageAnalytics({ pageName: 'Info Page' });
 
   const [me, setMe] = useState<Patient>();
   const [pharmacy, setPharmacy] = useState<Pharmacy>();

@@ -23,6 +23,10 @@ export const usePageAnalytics = ({ pageName, properties }: UsePageAnalyticsProps
         organizationId: order.organization.id,
         organizationName: order.organization.name
       });
+
+      patientAnalytics.track('Page Opened', order, {
+        page_name: pageName
+      });
     }
   }, [location.pathname, pageName, order?.id, order?.organization.id, order?.organization.name]);
 };
