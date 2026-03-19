@@ -112,7 +112,7 @@ describe('App', () => {
     await userEvent.click(screen.getByText('Select pharmacy'));
     expect(setOrderPharmacyMock).not.toHaveBeenCalled();
     expect(await screen.findByText('When do you need your order ready by?')).toBeInTheDocument();
-    await expectTotalPageViewAnalyticsCountToBe(5);
+    await expectTotalPageViewAnalyticsCountToBe(6);
     await userEvent.click(screen.getByText('Urgent'));
     await userEvent.click(screen.getByText('Next'));
     expect(setOrderPharmacyMock).toHaveBeenCalledWith(
@@ -125,7 +125,7 @@ describe('App', () => {
     );
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
-    await expectTotalPageViewAnalyticsCountToBe(6);
+    await expectTotalPageViewAnalyticsCountToBe(8);
   }, 10_000);
 
   test('For Mail Order Pharmacies: skips the readyBy page', async () => {
