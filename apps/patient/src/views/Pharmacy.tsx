@@ -22,7 +22,7 @@ import { FixedFooter, LocationModal, PoweredBy } from '../components';
 import { CouponModal } from '../components/coupons';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy, wait } from '../utils/general';
-import { OfferDetails, Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { OfferDetails, Pharmacy as EnrichedPharmacy, OfferBundleDetails } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -48,7 +48,7 @@ import {
   Prescription
 } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
-import { fetchOffers, getPharmacy } from './pharmacy.utils';
+import { fetchOfferBundles, fetchOffers, getPharmacy } from './pharmacy.utils';
 import _ from 'lodash';
 import {
   BrandedOptionOverrides,
@@ -142,6 +142,7 @@ export const Pharmacy = () => {
   const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(true);
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
   const isLoading = loadingLocation || loadingPharmacies;
+  const orderIsMultiRx = flattenedFills.length > 1;
 
   // pricing
   const shouldTrackOfferImpressionsAndSelections = showPriceToggle && !isDemo;
@@ -156,7 +157,9 @@ export const Pharmacy = () => {
     BrandedOptionOverrides | undefined
   >(undefined);
 
-  const [offers, setOffers] = useState<OfferDetails[] | undefined>(undefined);
+  const [offers, setOffers] = useState<OfferDetails[] | OfferBundleDetails[] | undefined>(
+    undefined
+  );
   const [filteredOffers, setFilteredOffers] = useState<OfferDetails[] | undefined>(undefined);
 
   // pagination
@@ -239,11 +242,19 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     const getOffers = async () => {
-      let fetchedOffers: OfferDetails[] | undefined;
+      let fetchedOffers: OfferDetails[] | OfferBundleDetails | undefined = [];
 
       // only fetch offers if we don't have any
       if (!offers) {
-        fetchedOffers = await fetchOffers(order);
+        if (orderIsMultiRx) {
+          // for multi-rx orders, we are only tracking the response right now
+          const offerBundles = await fetchOfferBundles(order);
+          patientAnalytics.track('Fetched Offer Bundles', order, {
+            offerBundles: offerBundles?.map((bundle) => ({ ...bundle }))
+          });
+        } else {
+          fetchedOffers = await fetchOffers(order);
+        }
 
         if (JSON.stringify(fetchedOffers) !== JSON.stringify(offers)) {
           setOffers(fetchedOffers);
@@ -1135,6 +1146,7 @@ export const Pharmacy = () => {
       loadingMore={isLoading}
       showingAllPharmacies={showingAllPharmacies}
       showHeading={showPickupHeading}
+      showPrice={!orderIsMultiRx}
       enableOpenNow={enableOpenNow}
       enable24Hr={enable24Hr}
       enablePrice={enablePrice}
@@ -1206,7 +1218,7 @@ export const Pharmacy = () => {
                     }}
                   />
                 </HStack>
-                {enablePrice ? (
+                {enablePrice && !orderIsMultiRx ? (
                   <Box p={3} bgColor="blue.100" borderRadius="lg">
                     <Text fontSize="sm">
                       Coupon will be generated after you select a pharmacy.{' '}
