@@ -1,5 +1,5 @@
 import { expect } from 'vitest';
-import { getLatestDelivery } from '../utils/deliveryPromise';
+import { getLatestDelivery } from './deliveryPromise';
 
 const SAME_DAY = 'Same day';
 const ONE_TO_TWO_DAY = 'Delivery in 1–2 days, after you place your order';
