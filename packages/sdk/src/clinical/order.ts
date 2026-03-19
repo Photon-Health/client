@@ -143,6 +143,7 @@ export class OrderQueryManager {
         $address: AddressInput
         $pharmacyId: ID
         $groupId: ID
+        $supervisorId: ID
       ) {
         createOrder(
           externalId: $externalId
@@ -152,6 +153,7 @@ export class OrderQueryManager {
           address: $address
           pharmacyId: $pharmacyId
           groupId: $groupId
+          supervisorId: $supervisorId
         ) {
           ...${fName}
         }
