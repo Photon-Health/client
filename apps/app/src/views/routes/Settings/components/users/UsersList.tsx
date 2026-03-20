@@ -48,8 +48,6 @@ const usersQuery = graphql(/* GraphQL */ `
 
 export const UsersList = (props: { rolesMap: Record<string, string> }) => {
   const { clinicalClient } = usePhoton();
-  // const [sortBy, setSortBy] = useState<'NAME' | 'ROLES' | 'EMAIL' | undefined>();
-  // const [sortByDir, setSortByDir] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const hasUsers = usePermissions(['edit:profile', 'read:profile']);
