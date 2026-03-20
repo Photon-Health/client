@@ -25,6 +25,12 @@ export const getOffers = async (orderId: string) => {
     throw new Error('No offers found');
   }
 };
+
+export const getOfferBundles = async (orderId: string) => {
+  const response = await graphQLClient.GetOfferBundlesForOrder({ orderId: orderId });
+  return response.offerBundles;
+};
+
 export const getPharmaciesByLocation = async ({
   searchParams,
   limit,
