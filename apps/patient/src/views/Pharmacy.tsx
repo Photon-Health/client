@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Card,
   Center,
   CircularProgress,
   Container,
@@ -1275,18 +1276,22 @@ export const Pharmacy = () => {
                 </VStack>
               )}
               {patientMailOrderOptions?.length && (
-                <HStack
-                  w="full"
-                  justifyContent="space-between"
-                  background="Background"
-                  padding="2"
-                  borderRadius="md"
-                >
-                  <Text fontSize="sm">Don't see your pharmacy?</Text>
-                  <Link as="button" onClick={() => setMailOrderModalOpen(true)} fontSize="sm">
-                    See all mail orders
-                  </Link>
-                </HStack>
+                <Card shadow={'none'} mx={{ base: -2, md: undefined }}>
+                  <VStack>
+                    <HStack
+                      w="full"
+                      justifyContent="space-between"
+                      background="Background"
+                      padding="2"
+                      borderRadius="md"
+                    >
+                      <Text fontSize="sm">Don't see your pharmacy?</Text>
+                      <Link as="button" onClick={() => setMailOrderModalOpen(true)} fontSize="sm">
+                        See all mail orders
+                      </Link>
+                    </HStack>
+                  </VStack>
+                </Card>
               )}
               {pickupPharmacyOptions(patientLocation)}
             </VStack>
