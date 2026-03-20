@@ -59,7 +59,7 @@ const inviteSchema = yup
     roles: rolesSchema.required().min(1, 'Must have at least one role'),
     npi: yup
       .string()
-      .matches(/^[0-9]+$/, { message: 'Enter a valid NPI' })
+      .matches(/^\d{10}$/, 'NPI must be a 10-digit number')
       .when('roles', requiredForPrescribers('NPI is required')),
     phone: yup
       .string()
