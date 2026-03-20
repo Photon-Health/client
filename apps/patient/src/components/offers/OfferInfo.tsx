@@ -1,8 +1,8 @@
 import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@chakra-ui/react';
-import { FiInfo, FiStar } from 'react-icons/fi';
+import { FiInfo, FiStar, FiTag } from 'react-icons/fi';
 import { Tooltip } from './Tooltip';
 import { text as t } from '../../utils/text';
-import { OfferDetails } from '../../utils/models';
+import { OfferBundleDetails, OfferDetails, Promotion } from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';
 
 const PreferredTag = () => {
@@ -31,9 +31,32 @@ const CurrentPharmacyTag = () => {
   );
 };
 
+const getLargestPromotionAmount = (promotions: Array<Promotion> | undefined): number =>
+  Math.max(...(promotions ?? []).map((p) => p.amountSaved ?? 0));
+
+const CouponTag = ({ promotions }: { promotions?: Array<Promotion> }) => {
+  const largestPromotion = getLargestPromotionAmount(promotions);
+  return (
+    promotions?.length && (
+      <HStack bg="orange.50" color="orange.500" borderRadius="md" px={1.5} py={0.5}>
+        <FiTag size={10} />
+        {largestPromotion > 0 ? (
+          <Text fontSize="xs">
+            <strong>Up to ${formatPrice(largestPromotion)}</strong> off with coupon if eligible
+          </Text>
+        ) : (
+          <Text fontSize="xs" fontWeight="bold">
+            with coupon if eligible
+          </Text>
+        )}
+      </HStack>
+    )
+  );
+};
+
 interface OfferInfoProps {
   pharmacy?: Pick<OfferDetails['pharmacy'], 'id' | 'name' | 'logo'>;
-  offer: OfferDetails;
+  offer: OfferDetails | OfferBundleDetails;
   isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
 }
@@ -76,6 +99,8 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
 
   const isAmazonPharmacy = pharmacy.id === import.meta.env.VITE_AMAZON_PHARMACY_ID;
 
+  const isOfferBundle = 'medications' in offer; // we can remove this variable once we contract to only using OfferBundleDetails in this component
+
   return (
     <VStack data-testid="pharmacy-info" align="start" w="full">
       {offerTags.length > 0 ? (
@@ -106,7 +131,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
           <VStack spacing={0} align="flex-end" minW="fit-content">
             <Text fontSize="sm">{costAmountTitle}</Text>
             <Text fontWeight="bold">${formatPrice(costAmount)}</Text>
-            {retailAmount ? (
+            {retailAmount && retailAmount > costAmount ? (
               <Text fontSize="sm" color="gray.500">
                 {retailAmountTitle}{' '}
                 <Text as="span" textDecoration="line-through">
@@ -117,6 +142,44 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
           </VStack>
         ) : null}
       </HStack>
+
+      {/* currently only OfferBundles have medications */}
+      {isOfferBundle && (
+        <VStack w="full" bg="gray.50" borderRadius="md" p={3}>
+          {offer.medications.map((med) => (
+            <HStack key={med.name} w="full" justify="space-between" align="start">
+              <VStack align="flex-start">
+                <Tooltip
+                  label={med.name}
+                  placement="top-start"
+                  wrapperProps={{
+                    onClick: (e) => {
+                      e.stopPropagation();
+                    }
+                  }}
+                >
+                  <Text fontSize="sm" color="gray.700" noOfLines={1}>
+                    {med.name}
+                  </Text>
+                </Tooltip>
+                <CouponTag promotions={med.promotions} />
+              </VStack>
+
+              <VStack align="flex-end" spacing={1}>
+                <Text fontSize="sm" fontWeight="bold">
+                  ${formatPrice(med.amount)}
+                </Text>
+                {/* only show retail amount if it's higher than the current amount */}
+                {med.retailAmount && med.retailAmount > med.amount && (
+                  <Text fontSize="xs" color="gray.400" textDecoration="line-through">
+                    ${formatPrice(med.retailAmount)}
+                  </Text>
+                )}
+              </VStack>
+            </HStack>
+          ))}
+        </VStack>
+      )}
 
       <VStack w="full" alignItems="start">
         <Text fontSize="sm" fontWeight="semibold">

@@ -456,3 +456,38 @@ export const GET_OFFERS = gql`
     }
   }
 `;
+
+export const GET_OFFER_BUNDLES = gql`
+  query GetOfferBundlesForOrder($orderId: ID!) {
+    offerBundles(orderId: $orderId) {
+      aggregateCost {
+        totalAmount
+        totalRetailAmount
+      }
+      medications {
+        medicationPrice {
+          amount
+          amountTitle
+          promotions {
+            type
+            amount
+            amountSaved
+          }
+          retailAmount
+          retailAmountTitle
+        }
+        deliveryEstimate {
+          deliveryPromise
+        }
+        prescription {
+          treatment {
+            id
+            name
+          }
+        }
+      }
+      pricingType
+      supplier
+    }
+  }
+`;
