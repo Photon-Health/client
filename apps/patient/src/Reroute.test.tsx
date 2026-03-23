@@ -48,6 +48,7 @@ vi.mock('@datadog/browser-rum');
 vi.mock('./configs/analytics');
 vi.mock('./hooks/usePageAnalytics');
 vi.mock('react-ga4');
+vi.mock('mixpanel-browser');
 
 vi.mock('./components', async () => {
   const mod = await vi.importActual('./components');

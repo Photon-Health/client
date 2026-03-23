@@ -107,18 +107,20 @@ export const Main = () => {
   const settings = order?.organization.settings;
 
   useEffect(() => {
-    if (order?.patient.id && order?.organization.id && order?.organization.name && order?.address) {
+    if (order) {
       patientAnalytics.identify({
         userId: order.patient.id,
-        address: {
-          city: order.address.city,
-          country: order.address.country,
-          postalCode: order.address.postalCode,
-          state: order.address.state,
-          street: order.address.street2
-            ? `${order.address.street1}, ${order.address.street2}`
-            : order.address.street1
-        },
+        address: order.address
+          ? {
+              city: order.address.city,
+              country: order.address.country,
+              postalCode: order.address.postalCode,
+              state: order.address.state,
+              street: order.address.street2
+                ? `${order.address.street1}, ${order.address.street2}`
+                : order.address.street1
+            }
+          : undefined,
         orgId: order.organization.id,
         orgName: order.organization.name
       });

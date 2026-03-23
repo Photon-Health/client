@@ -53,6 +53,7 @@ vi.mock('./configs/analytics', () => ({
   }
 }));
 vi.mock('react-ga4');
+vi.mock('mixpanel-browser');
 
 vi.mock('./components', async () => {
   const mod = await vi.importActual('./components');
