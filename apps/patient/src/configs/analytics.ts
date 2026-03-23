@@ -211,7 +211,7 @@ function mapOrderToContextData(order: Order): ContextData {
   };
 }
 
-export class PatientAnalytics {
+class PatientAnalytics {
   private rudderanalytics?: RudderAnalytics;
   private environment = 'development';
 
