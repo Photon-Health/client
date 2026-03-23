@@ -32,7 +32,6 @@ import { patientAnalytics } from '../configs/analytics';
 import { computeNumRefillsForPrescription } from '../utils/presenters';
 import { CouponCardList } from '../components/coupons';
 import { Pharmacy } from '../utils/models';
-import mixpanel from 'mixpanel-browser';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -84,7 +83,10 @@ export const Status = () => {
 
   useEffect(() => {
     if (!isDemo) {
-      const isEnabled = mixpanel.flags.is_enabled_sync('change_pharmacy_reasons', false);
+      const isEnabled = patientAnalytics.getFlagValueSync<boolean>(
+        'change_pharmacy_reasons',
+        false
+      );
       console.log('isEnabled', isEnabled);
       setShowChangePharmacyReasons(isEnabled);
     }

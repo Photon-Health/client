@@ -304,6 +304,22 @@ class PatientAnalytics {
       mixpanel.identify(userId);
     }
   }
+
+  async getFlagValue<T>(flagName: string, fallback: T): Promise<T> {
+    if (this.mixpanelEnabled) {
+      return mixpanel.flags.get_variant_value(flagName, fallback);
+    }
+
+    return fallback;
+  }
+
+  getFlagValueSync<T>(flagName: string, fallback: T): T {
+    if (this.mixpanelEnabled) {
+      return mixpanel.flags.get_variant_value_sync(flagName, fallback);
+    }
+
+    return fallback;
+  }
 }
 
 export const patientAnalytics = new PatientAnalytics();
