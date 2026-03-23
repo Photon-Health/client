@@ -1,6 +1,7 @@
 import { ApiObject, IdentifyTraits, RudderAnalytics } from '@rudderstack/analytics-js';
 import { Order } from '../utils/models';
 import mixpanel from 'mixpanel-browser';
+import { defaults } from 'lodash';
 
 const RUDDERSTACK_WRITE_KEY = import.meta.env.VITE_RUDDERSTACK_WRITE_KEY;
 const RUDDERSTACK_DATA_PLANE_URL = import.meta.env.VITE_RUDDERSTACK_DATA_PLANE_URL;
@@ -237,7 +238,7 @@ class PatientAnalytics {
 
     if (MIXPANEL_TOKEN) {
       mixpanel.init(MIXPANEL_TOKEN, {
-        debug: false,
+        debug: false, // floods the console, only turn on when needed
         track_pageview: true,
         persistence: 'localStorage',
         record_sessions_percent: 100, // session replay
@@ -265,10 +266,15 @@ class PatientAnalytics {
     }
   }
 
-  track(eventName: string, order: Order, properties: ApiObject = {}) {
-    if (!this.rudderanalytics) {
-      return;
-    }
+  track(
+    eventName: string,
+    order: Order,
+    properties: ApiObject = {},
+    options: { toRudderStack?: boolean; toMixpanel?: boolean } = {}
+  ) {
+    // Rudderstack is our existing metrics tool so default to true
+    // Mixpanel is new and we don't want to send everything there yet, default to false
+    defaults(options, { toRudderStack: true, toMixpanel: false });
 
     const trackProperties = {
       environment: this.environment,
@@ -276,18 +282,24 @@ class PatientAnalytics {
       ...properties
     };
 
-    const isNonProductionEnvironment =
-      this.environment === 'boson' ||
-      this.environment === 'neutron' ||
-      this.environment === 'tau' ||
-      this.environment === 'local' ||
-      this.environment === 'development';
+    if (this.rudderanalytics && options.toRudderStack) {
+      const isNonProductionEnvironment =
+        this.environment === 'boson' ||
+        this.environment === 'neutron' ||
+        this.environment === 'tau' ||
+        this.environment === 'local' ||
+        this.environment === 'development';
 
-    if (isNonProductionEnvironment) {
-      console.log(`📊 [Analytics] ${eventName}`, trackProperties);
+      if (isNonProductionEnvironment) {
+        console.log(`📊 [Analytics] ${eventName}`, trackProperties);
+      }
+
+      this.rudderanalytics.track(eventName, trackProperties);
     }
 
-    this.rudderanalytics.track(eventName, trackProperties);
+    if (this.mixpanelEnabled && options.toMixpanel) {
+      mixpanel.track(eventName, trackProperties);
+    }
   }
 
   identify({

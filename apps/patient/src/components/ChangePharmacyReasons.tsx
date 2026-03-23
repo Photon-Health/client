@@ -14,6 +14,8 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
+import { patientAnalytics } from '../configs/analytics';
+import { useOrderContext } from '../views/Main';
 
 enum Screen {
   Reasons = 'reasons',
@@ -33,10 +35,19 @@ export const ChangePharmacyReasons = ({
   onClose,
   onSelect
 }: ChangePharmacyReasonsProps) => {
+  const { order } = useOrderContext();
   const placement = useBreakpointValue({ base: 'bottom', md: 'right' }, { fallback: 'bottom' });
   const [screen, setScreen] = useState(Screen.Reasons);
 
   useEffect(() => {
+    if (isOpen) {
+      patientAnalytics.track(
+        'Pharmacy Change Reasons Viewed',
+        order,
+        {},
+        { toRudderStack: false, toMixpanel: true }
+      );
+    }
     // Reset state when drawer is toggled
     setScreen(Screen.Reasons);
   }, [isOpen]);

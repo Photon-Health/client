@@ -175,8 +175,13 @@ export const Status = () => {
   };
 
   const handleSelectReason = (reason: string, otherReason?: string) => {
-    console.log({ reason, otherReason });
-    // navigateToReroute();
+    patientAnalytics.track(
+      'Pharmacy Change Reason Selected',
+      order,
+      { reason, otherReason: otherReason || undefined },
+      { toRudderStack: false, toMixpanel: true }
+    );
+    navigateToReroute();
   };
 
   const fulfillments = order.fulfillments.map((f) => ({
