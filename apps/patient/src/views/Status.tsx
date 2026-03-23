@@ -67,8 +67,6 @@ export const Status = () => {
     });
   };
 
-  usePageAnalytics({ pageName: 'Order Status' });
-
   const handleDemoStatusPage = async (demoUserPhone: string, selectedDemoPharmacy: Pharmacy) => {
     const isMailOrder = !!order.pharmacy?.fulfillmentTypes?.includes('MAIL_ORDER');
 

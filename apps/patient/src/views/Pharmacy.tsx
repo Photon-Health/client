@@ -85,6 +85,7 @@ export const Pharmacy = () => {
     setEnablePrice
   } = useOrderContext();
   usePageAnalytics({ pageName: 'Pharmacy Select' });
+
   const mailOrderPharmacies = getOrgMailOrderPharms(order?.organization.id).patient;
   const { enablePatientDeliveryPharmacies, patientFeaturedPharmacyName } =
     order?.organization?.settings?.patientUx ?? {};
@@ -237,10 +238,6 @@ export const Pharmacy = () => {
 
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
-
-  usePageAnalytics({
-    pageName: 'Pharmacy Select'
-  });
 
   useEffect(() => {
     const getOffers = async () => {
