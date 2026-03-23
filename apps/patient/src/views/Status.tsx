@@ -286,7 +286,7 @@ export const Status = () => {
                   Pharmacy
                 </Heading>
                 <Card>
-                  <VStack w="full" spacing={0}>
+                  <VStack w="full" spacing={2}>
                     <PharmacyInfo
                       pharmacy={displayPharmacy}
                       showDetails={!isDeliveryPharmacy}
