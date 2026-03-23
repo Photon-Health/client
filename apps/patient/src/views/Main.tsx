@@ -22,6 +22,7 @@ import { FAQModal } from '../components/FAQModal';
 import { patientAnalytics } from '../configs/analytics';
 import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
 import { preloadImage } from '../utils/preloadImage';
+import mixpanel from 'mixpanel-browser';
 
 type FetchOrderOptions = {
   triggerNavigationAfterFetch: boolean;
@@ -105,7 +106,13 @@ export const Main = () => {
   const settings = order?.organization.settings;
 
   useEffect(() => {
-    if (order?.patient.id && order?.organization.id && order?.organization.name && order?.address) {
+    const patientId = order?.patient.id;
+
+    if (patientId) {
+      mixpanel.identify(patientId);
+    }
+
+    if (patientId && order?.organization.id && order?.organization.name && order?.address) {
       patientAnalytics.identify({
         userId: order.patient.id,
         address: {
