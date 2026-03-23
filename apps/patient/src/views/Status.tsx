@@ -22,11 +22,13 @@ import { patientAnalytics } from '../configs/analytics';
 import { computeNumRefillsForPrescription } from '../utils/presenters';
 import { CouponCardList } from '../components/coupons';
 import { Pharmacy } from '../utils/models';
+import mixpanel from 'mixpanel-browser';
 
 export const Status = () => {
   const navigate = useNavigate();
   const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
+  const [showChangePharmacyReasons, setShowChangePharmacyReasons] = useState(false);
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') ?? undefined;
@@ -67,6 +69,14 @@ export const Status = () => {
   };
 
   usePageAnalytics({ pageName: 'Order Status' });
+
+  useEffect(() => {
+    if (!isDemo) {
+      const isEnabled = mixpanel.flags.is_enabled_sync('change_pharmacy_reasons', false);
+      console.log('isEnabled', isEnabled);
+      setShowChangePharmacyReasons(isEnabled);
+    }
+  }, [isDemo]);
 
   const handleDemoStatusPage = async (demoUserPhone: string, selectedDemoPharmacy: Pharmacy) => {
     const isMailOrder = !!order.pharmacy?.fulfillmentTypes?.includes('MAIL_ORDER');
@@ -136,7 +146,11 @@ export const Status = () => {
 
   const canOrderReroute = !isDemo && enablePatientRerouting && order.isReroutable;
 
-  const handleRerouteLink = () => {
+  const handleReroute = () => {
+    if (showChangePharmacyReasons) {
+      return;
+    }
+
     const query = queryString.stringify({
       orderId: order.id,
       token,
@@ -207,7 +221,7 @@ export const Status = () => {
       size="md"
       py={6}
       variant="outline"
-      onClick={handleRerouteLink}
+      onClick={handleReroute}
       leftIcon={<FiRefreshCcw />}
       color="blue.500"
       w="full"

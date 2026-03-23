@@ -33,10 +33,12 @@ const MIXPANEL_TOKEN = import.meta.env.VITE_MIXPANEL_TOKEN;
 
 if (MIXPANEL_TOKEN) {
   mixpanel.init(MIXPANEL_TOKEN, {
+    debug: false,
     track_pageview: true,
     persistence: 'localStorage',
     record_sessions_percent: 100, // session replay
-    record_heatmap_data: true
+    record_heatmap_data: true,
+    flags: true
   });
 }
 
