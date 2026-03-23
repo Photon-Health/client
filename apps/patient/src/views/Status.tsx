@@ -1,4 +1,14 @@
-import { Box, Button, Container, Heading, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Container,
+  Drawer,
+  DrawerContent,
+  DrawerOverlay,
+  Heading,
+  useDisclosure,
+  VStack
+} from '@chakra-ui/react';
 import queryString from 'query-string';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
@@ -29,6 +39,7 @@ export const Status = () => {
   const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
   const [showChangePharmacyReasons, setShowChangePharmacyReasons] = useState(false);
+  const { isOpen, onClose, onOpen } = useDisclosure();
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') ?? undefined;
@@ -148,6 +159,7 @@ export const Status = () => {
 
   const handleReroute = () => {
     if (showChangePharmacyReasons) {
+      onOpen();
       return;
     }
 
@@ -350,6 +362,10 @@ export const Status = () => {
       <VStack w="full" pb={6}>
         <PoweredBy />
       </VStack>
+      <Drawer isOpen={isOpen} onClose={onClose} placement="bottom">
+        <DrawerOverlay />
+        <DrawerContent>hello</DrawerContent>
+      </Drawer>
     </VStack>
   );
 };
