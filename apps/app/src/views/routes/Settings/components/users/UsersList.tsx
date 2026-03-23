@@ -48,8 +48,6 @@ const usersQuery = graphql(/* GraphQL */ `
 
 export const UsersList = (props: { rolesMap: Record<string, string> }) => {
   const { clinicalClient } = usePhoton();
-  // const [sortBy, setSortBy] = useState<'NAME' | 'ROLES' | 'EMAIL' | undefined>();
-  // const [sortByDir, setSortByDir] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const hasUsers = usePermissions(['edit:profile', 'read:profile']);
@@ -72,26 +70,9 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
   const pages = Math.ceil((data?.userCount ?? 0) / PAGE_SIZE);
 
   const total = data?.userCount;
-  // const users = useMemo(
-  //   () =>
-  //     data?.users
-  //       .map((x) => x)
-  //       .sort(sortByFn(sortBy, sortByDir))
-  //       .slice(start, start + PAGE_SIZE),
-  //   [data?.users, page, sortBy, sortByDir]
-  // );
+
   const users = data?.users;
   const currPageSize = users?.length ?? 0;
-
-  // TODO: Add sorting functionality back
-  // const handleSort = (key: 'NAME' | 'ROLES' | 'EMAIL') => () => {
-  //   if (key === sortBy) {
-  //     setSortByDir(!sortByDir);
-  //   } else {
-  //     setSortByDir(true);
-  //     setSortBy(key);
-  //   }
-  // };
 
   if (!hasUsers) return null;
 
@@ -176,36 +157,19 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
                 <Table variant="simple" size="sm">
                   <Thead>
                     <Tr>
-                      <Th
-                        py={4}
-                        // cursor={'pointer'}
-                        width={{ lg: '30%' }}
-                        // onClick={handleSort('NAME')}
-                      >
+                      <Th py={4} width={{ lg: '30%' }}>
                         <HStack alignItems={'center'} spacing={2}>
                           <Text userSelect={'none'}>Name</Text>
-                          {/* {sortBy === 'NAME' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)} */}
                         </HStack>
                       </Th>
-                      <Th
-                        py={4}
-                        // cursor={'pointer'}
-                        width={{ lg: '30%' }}
-                        // onClick={handleSort('EMAIL')}
-                      >
+                      <Th py={4} width={{ lg: '30%' }}>
                         <HStack alignItems={'center'} spacing={2}>
                           <Text userSelect={'none'}>Email</Text>
-                          {/* {sortBy === 'EMAIL' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)} */}
                         </HStack>
                       </Th>
-                      <Th
-                        py={4}
-                        // cursor={'pointer'}
-                        // onClick={handleSort('ROLES')}
-                      >
+                      <Th py={4}>
                         <HStack alignItems={'center'} spacing={2}>
                           <Text userSelect={'none'}>Roles</Text>
-                          {/* {sortBy === 'ROLES' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)} */}
                         </HStack>
                       </Th>
                       <Th py={4} cursor={'pointer'}>
