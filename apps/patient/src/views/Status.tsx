@@ -72,8 +72,6 @@ export const Status = () => {
     });
   };
 
-  usePageAnalytics({ pageName: 'Order Status' });
-
   useEffect(() => {
     if (canOrderReroute) {
       const isEnabled = patientAnalytics.getFlagValueSync('change_pharmacy_reasons', false);

@@ -60,8 +60,6 @@ export const ReadyBy = () => {
 
   const isMultiRx = flattenedFills.length > 1;
 
-  usePageAnalytics({ pageName: "Patient's Ready By Time" });
-
   const handleSubmit = async () => {
     if (isDemo) {
       const query = queryString.stringify({ demo: true, phone });
