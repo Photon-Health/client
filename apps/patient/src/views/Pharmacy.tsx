@@ -246,15 +246,7 @@ export const Pharmacy = () => {
 
       // only fetch offers if we don't have any
       if (!offers) {
-        if (orderIsMultiRx) {
-          // for multi-rx orders, we are only tracking the response right now
-          const offerBundles = await fetchOfferBundles(order);
-          patientAnalytics.track('Fetched Offer Bundles', order, {
-            offerBundles: offerBundles?.map((bundle) => ({ ...bundle }))
-          });
-        } else {
-          fetchedOffers = await fetchOffers(order);
-        }
+        fetchedOffers = orderIsMultiRx ? await fetchOfferBundles(order) : await fetchOffers(order);
 
         if (JSON.stringify(fetchedOffers) !== JSON.stringify(offers)) {
           setOffers(fetchedOffers);
@@ -271,7 +263,12 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     const insuranceOffer = offers?.find((offer) => offer.costType == 'INSURANCE_ESTIMATE');
-    const primeRxOffer = offers?.find((offer) => offer.costType == 'PRIME_RX');
+    const cashOrPrimeRxOffers =
+      offers?.filter((o) => o.costType === 'CASH' || o.costType === 'PRIME_RX') ?? [];
+    const bestCashOrPrimeRxOffer = cashOrPrimeRxOffers
+      .filter((o) => o.costAmount != null)
+      // sort by price, then prioritize PRIME_RX over CASH if prices are the same
+      .sort((a, b) => a.costAmount! - b.costAmount! || (b.costType === 'PRIME_RX' ? 1 : -1))[0];
 
     const novocareOffer = offers?.find((offer) => offer.costType == 'NOVOCARE_OFFER');
 
@@ -279,12 +276,11 @@ export const Pharmacy = () => {
 
     const filteringOffers = [];
 
-    // we'll only want to set the override
-    // if we have at least one offer
-    if (insuranceOffer || primeRxOffer) {
-      if (enablePrice && primeRxOffer) {
-        amazonPharmacyOverride = primeRxOffer;
-        filteringOffers.push(primeRxOffer);
+    // we'll only want to set the override if we have at least one offer to show
+    if (bestCashOrPrimeRxOffer || insuranceOffer) {
+      if (enablePrice && bestCashOrPrimeRxOffer) {
+        amazonPharmacyOverride = bestCashOrPrimeRxOffer;
+        filteringOffers.push(bestCashOrPrimeRxOffer);
       } else if (!enablePrice && insuranceOffer) {
         amazonPharmacyOverride = insuranceOffer;
         filteringOffers.push(insuranceOffer);

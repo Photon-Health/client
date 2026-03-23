@@ -1,8 +1,8 @@
 import { expect } from 'vitest';
 import { getLatestDelivery } from './deliveryPromise';
 
-const SAME_DAY = 'Same day';
-const ONE_TO_TWO_DAY = 'Delivery in 1–2 days, after you place your order';
+const SAME_DAY = 'Same-Day';
+const ONE_TO_TWO_DAY = '1–2 day delivery available, after you place your order';
 const TWO_TO_THREE_DAY = 'Delivery in 2–3 days, after you place your order';
 const ONE_TO_FOUR_DAY = 'Delivery in 1–4 days, after you place your order';
 

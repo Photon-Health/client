@@ -230,6 +230,70 @@ describe('Pharmacy page', () => {
       expect(await screen.findByText('Prime Rx Price')).toBeInTheDocument();
     }, 10_000);
 
+    test('shows the cheaper offer when both CASH and PRIME_RX offers are available', async () => {
+      const { fetchOffers } = await import('./pharmacy.utils');
+      vi.mocked(fetchOffers).mockResolvedValueOnce([
+        {
+          costType: 'CASH',
+          deliveryEstimate: 'Delivers in 2-3 days',
+          costAmount: 9.99,
+          costAmountTitle: 'Cash Price',
+          retailAmount: 100.0,
+          retailAmountTitle: 'Retail',
+          pharmacy: {
+            id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
+            name: 'Amazon Pharmacy',
+            fulfillmentTypes: ['MAIL_ORDER']
+          },
+          tags: []
+        },
+        {
+          costType: 'PRIME_RX',
+          deliveryEstimate: 'Delivers in 1-2 days',
+          costAmount: 19.99,
+          costAmountTitle: 'Prime Rx Price',
+          retailAmount: 100.0,
+          retailAmountTitle: 'Retail',
+          pharmacy: {
+            id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
+            name: 'Amazon Pharmacy',
+            fulfillmentTypes: ['MAIL_ORDER']
+          },
+          tags: []
+        }
+      ]);
+
+      const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
+      vi.mocked(getOrder).mockResolvedValue(
+        generateOrder({
+          id: 'ord_testId777',
+          state: 'ROUTING',
+          patient: generatePatient(),
+          fills: [generateFill('test-treatment')],
+          address: {
+            street1: '123 Main St',
+            city: 'New York',
+            state: 'NY',
+            postalCode: '10001',
+            country: 'US'
+          }
+        })
+      );
+      vi.mocked(getPharmaciesByLocation).mockResolvedValue({
+        pharmaciesByLocation: [
+          generatePharmacy({ id: 'phr_testId123', name: 'Test Local Pickup Pharmacy' })
+        ]
+      });
+      vi.mocked(setOrderPharmacy).mockResolvedValue(true);
+
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      expect(await screen.findByText('$9.99')).toBeInTheDocument();
+      expect(await screen.findByText('Cash Price')).toBeInTheDocument();
+      expect(screen.queryByText('Prime Rx Price')).not.toBeInTheDocument();
+    }, 10_000);
+
     test('does not show offers when no offers are available', async () => {
       // Override the mock to return empty array for this test
       const { fetchOffers } = await import('./pharmacy.utils');

@@ -71,3 +71,6 @@ export type ExtendedFulfillmentType = FulfillmentType | 'COURIER';
 
 export type Address = GQLAddress;
 export type Promotion = OfferPromotion;
+export const OfferPromotionTypes = {
+  AmazonPharmacyRXCoupon: 'PHARMACY_RX_COUPON'
+} as const;
