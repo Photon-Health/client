@@ -8,8 +8,6 @@ import ReactGA from 'react-ga4';
 
 import pkg from '../package.json';
 
-import mixpanel from 'mixpanel-browser';
-
 ReactGA.initialize('G-WQ9PD39S25');
 
 datadogRum.init({
@@ -28,17 +26,6 @@ datadogRum.init({
 });
 
 datadogRum.startSessionReplayRecording();
-
-const MIXPANEL_TOKEN = import.meta.env.VITE_MIXPANEL_TOKEN;
-
-if (MIXPANEL_TOKEN) {
-  mixpanel.init(MIXPANEL_TOKEN, {
-    track_pageview: true,
-    persistence: 'localStorage',
-    record_sessions_percent: 100, // session replay
-    record_heatmap_data: true
-  });
-}
 
 const root = createRoot(document.getElementById('root')!);
 root.render(<App />);
