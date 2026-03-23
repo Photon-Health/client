@@ -1,14 +1,4 @@
-import {
-  Box,
-  Button,
-  Container,
-  Drawer,
-  DrawerContent,
-  DrawerOverlay,
-  Heading,
-  useDisclosure,
-  VStack
-} from '@chakra-ui/react';
+import { Box, Button, Container, Heading, useDisclosure, VStack } from '@chakra-ui/react';
 import queryString from 'query-string';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
@@ -29,6 +19,7 @@ import { useOrderContext } from './Main';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
+import { ChangePharmacyReasons } from '../components/ChangePharmacyReasons';
 import { computeNumRefillsForPrescription } from '../utils/presenters';
 import { CouponCardList } from '../components/coupons';
 import { Pharmacy } from '../utils/models';
@@ -51,6 +42,8 @@ export const Status = () => {
   const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
 
   const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
+
+  const canOrderReroute = !isDemo && enablePatientRerouting && order.isReroutable;
 
   const handleGetDirections = () => {
     if (!pharmacy?.name) return;
@@ -82,15 +75,12 @@ export const Status = () => {
   usePageAnalytics({ pageName: 'Order Status' });
 
   useEffect(() => {
-    if (!isDemo) {
-      const isEnabled = patientAnalytics.getFlagValueSync<boolean>(
-        'change_pharmacy_reasons',
-        false
-      );
+    if (canOrderReroute) {
+      const isEnabled = patientAnalytics.getFlagValueSync('change_pharmacy_reasons', false);
       console.log('isEnabled', isEnabled);
       setShowChangePharmacyReasons(isEnabled);
     }
-  }, [isDemo]);
+  }, [canOrderReroute]);
 
   const handleDemoStatusPage = async (demoUserPhone: string, selectedDemoPharmacy: Pharmacy) => {
     const isMailOrder = !!order.pharmacy?.fulfillmentTypes?.includes('MAIL_ORDER');
@@ -158,14 +148,7 @@ export const Status = () => {
     return null;
   }
 
-  const canOrderReroute = !isDemo && enablePatientRerouting && order.isReroutable;
-
-  const handleReroute = () => {
-    if (showChangePharmacyReasons) {
-      onOpen();
-      return;
-    }
-
+  const navigateToReroute = () => {
     const query = queryString.stringify({
       orderId: order.id,
       token,
@@ -180,6 +163,20 @@ export const Status = () => {
       isPharmacyOpen: displayPharmacy?.isOpen,
       fulfillmentType: fulfillmentType
     });
+  };
+
+  const handleReroute = () => {
+    if (showChangePharmacyReasons) {
+      onOpen();
+      return;
+    }
+
+    navigateToReroute();
+  };
+
+  const handleSelectReason = (reason: string, otherReason?: string) => {
+    console.log({ reason, otherReason });
+    // navigateToReroute();
   };
 
   const fulfillments = order.fulfillments.map((f) => ({
@@ -365,10 +362,9 @@ export const Status = () => {
       <VStack w="full" pb={6}>
         <PoweredBy />
       </VStack>
-      <Drawer isOpen={isOpen} onClose={onClose} placement="bottom">
-        <DrawerOverlay />
-        <DrawerContent>hello</DrawerContent>
-      </Drawer>
+      {showChangePharmacyReasons && (
+        <ChangePharmacyReasons isOpen={isOpen} onClose={onClose} onSelect={handleSelectReason} />
+      )}
     </VStack>
   );
 };
