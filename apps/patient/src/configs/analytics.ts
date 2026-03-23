@@ -213,6 +213,12 @@ function mapOrderToContextData(order: Order): ContextData {
   };
 }
 
+type FlagValues = {
+  change_pharmacy_reasons: boolean;
+};
+
+type FlagNames = keyof FlagValues;
+
 class PatientAnalytics {
   private rudderanalytics?: RudderAnalytics;
   private environment = 'development';
@@ -305,7 +311,10 @@ class PatientAnalytics {
     }
   }
 
-  async getFlagValue<T>(flagName: string, fallback: T): Promise<T> {
+  async getFlagValue<K extends FlagNames>(
+    flagName: K,
+    fallback: FlagValues[K]
+  ): Promise<FlagValues[K]> {
     if (this.mixpanelEnabled) {
       return mixpanel.flags.get_variant_value(flagName, fallback);
     }
@@ -313,7 +322,7 @@ class PatientAnalytics {
     return fallback;
   }
 
-  getFlagValueSync<T>(flagName: string, fallback: T): T {
+  getFlagValueSync<K extends FlagNames>(flagName: K, fallback: FlagValues[K]): FlagValues[K] {
     if (this.mixpanelEnabled) {
       return mixpanel.flags.get_variant_value_sync(flagName, fallback);
     }
