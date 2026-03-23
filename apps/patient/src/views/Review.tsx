@@ -13,6 +13,7 @@ import { usePageAnalytics } from '../hooks/usePageAnalytics';
 
 export const Review = () => {
   const { order, flattenedFills, fetchOrder } = useOrderContext();
+  usePageAnalytics({ pageName: 'Review' });
 
   const navigate = useNavigate();
 
