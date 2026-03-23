@@ -22,6 +22,7 @@ import { FAQModal } from '../components/FAQModal';
 import { patientAnalytics } from '../configs/analytics';
 import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
 import { preloadImage } from '../utils/preloadImage';
+import { usePageAnalytics } from '../hooks/usePageAnalytics';
 
 type FetchOrderOptions = {
   triggerNavigationAfterFetch: boolean;
@@ -99,6 +100,7 @@ export const Main = () => {
   );
 
   const navigate = useNavigate();
+  usePageAnalytics({ pageName: 'Main' });
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
 
   const orgId = order?.organization.id;

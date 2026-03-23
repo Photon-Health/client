@@ -1,18 +1,16 @@
 import * as yup from 'yup';
 import { yupStateSchema } from '../../Settings/components/utils/States';
+import { npiRegex, phoneRegex } from '../../Settings/components/utils/Validation';
 
 export const signupFormSchema = yup.object({
   firstName: yup.string().required('First name is required'),
   lastName: yup.string().required('Last name is required'),
   email: yup.string().required('Email is required').email('Please enter a valid email'),
-  npi: yup
-    .string()
-    .required('NPI is required')
-    .matches(/^\d{10}$/, 'NPI must be a 10-digit number'),
+  npi: yup.string().required('NPI is required').matches(npiRegex, 'NPI must be a 10-digit number'),
   phone: yup
     .string()
     .required('Phone number is required')
-    .matches(/^\d{10}$/, 'Phone must be a 10-digit number'),
+    .matches(phoneRegex, 'Phone must be a 10-digit number'),
   street1: yup.string().required('Street address is required'),
   street2: yup.string(),
   city: yup.string().required('City is required'),
