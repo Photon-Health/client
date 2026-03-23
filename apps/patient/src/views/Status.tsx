@@ -37,6 +37,7 @@ import mixpanel from 'mixpanel-browser';
 export const Status = () => {
   const navigate = useNavigate();
   const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
+  usePageAnalytics({ pageName: 'Order Status' });
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
   const [showChangePharmacyReasons, setShowChangePharmacyReasons] = useState(false);
   const { isOpen, onClose, onOpen } = useDisclosure();
