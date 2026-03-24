@@ -2,7 +2,12 @@ import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@c
 import { FiInfo, FiStar, FiTag } from 'react-icons/fi';
 import { Tooltip } from './Tooltip';
 import { text as t } from '../../utils/text';
-import { OfferBundleDetails, OfferDetails, Promotion } from '../../utils/models';
+import {
+  OfferBundleDetails,
+  OfferDetails,
+  OfferPromotionTypes,
+  Promotion
+} from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';
 
 const PreferredTag = () => {
@@ -162,7 +167,11 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
                     {med.name}
                   </Text>
                 </Tooltip>
-                <CouponTag promotions={med.promotions} />
+                <CouponTag
+                  promotions={med.promotions?.filter(
+                    (promo) => promo.type === OfferPromotionTypes.AmazonPharmacyRXCoupon
+                  )}
+                />
               </VStack>
 
               <VStack align="flex-end" spacing={1}>
