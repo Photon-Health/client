@@ -148,7 +148,7 @@ export const Pharmacy = () => {
   const orderIsMultiRx = flattenedFills.length > 1;
 
   // pricing
-  const shouldTrackOfferImpressionsAndSelections = showPriceToggle && !isDemo;
+  const shouldTrackOfferImpressionsAndSelections = enablePrice && !isDemo;
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
