@@ -2,7 +2,7 @@ import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
   schema: process.env.VITE_GRAPHQL_API_ENDPOINT,
-  documents: ['**/*.ts'],
+  documents: ['**/*.graphql'],
   config: {
     maybeValue: 'T | undefined',
     enumsAsTypes: true,

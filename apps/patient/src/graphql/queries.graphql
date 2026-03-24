@@ -1,0 +1,451 @@
+query GetOrder($id: ID!, $openAt: DateTime) {
+  order(id: $id) {
+    id
+    state
+    isReroutable
+    readyBy
+    readyByTime
+    readyByDay
+    address {
+      id
+      street1
+      street2
+      city
+      state
+      country
+      postalCode
+    }
+    group {
+      id
+      name
+    }
+    metadata {
+      type
+      marketIsRequired
+      fulfillmentMethod
+      transmissionType
+      routingHistory {
+        pharmacy {
+          id
+          name
+        }
+        selector
+        createdAt
+      }
+    }
+    organization {
+      id
+      name
+      settings {
+        brandColor
+        brandLogo
+        priorAuthorizationExceptionMessage
+        patientUx {
+          enableAutomatedOps
+          enablePatientRerouting
+          enablePatientDeliveryPharmacies
+          patientFeaturedPharmacyName
+        }
+      }
+    }
+    fulfillment {
+      type
+      state
+      carrier
+      trackingNumber
+      pharmacyEstimatedReadyAt
+    }
+    exceptions {
+      exceptionType
+      message
+      resolvedAt
+    }
+    pharmacy {
+      id
+      name
+      logo
+      integrated
+      fulfillmentTypes
+      address {
+        street1
+        street2
+        city
+        state
+        country
+        postalCode
+      }
+      phone
+      isOpen(at: $openAt)
+      nextEvents(at: $openAt) {
+        open {
+          ... on PharmacyOpenEvent {
+            type
+            datetime
+          }
+          ... on PharmacyCloseEvent {
+            type
+            datetime
+          }
+          ... on PharmacyOpen24HrEvent {
+            type
+          }
+        }
+        close {
+          ... on PharmacyOpenEvent {
+            type
+            datetime
+          }
+          ... on PharmacyCloseEvent {
+            type
+            datetime
+          }
+          ... on PharmacyOpen24HrEvent {
+            type
+          }
+        }
+      }
+      hours {
+        dayOfWeek
+        is24Hr
+        openFrom
+        openUntil
+        timezone
+      }
+    }
+    fills {
+      id
+      treatment {
+        ... on Medication {
+          id
+          name
+          strength
+          names {
+            brandName
+            genericName
+          }
+          therapeuticClassifications {
+            tc0 {
+              code
+              name
+            }
+            tc10 {
+              name
+              code
+            }
+            tc6 {
+              name
+              code
+            }
+            tc4 {
+              name
+              code
+            }
+            tc2 {
+              name
+              code
+            }
+          }
+        }
+        ... on MedicalEquipment {
+          id
+          name
+          names {
+            brandName
+            genericName
+          }
+          therapeuticClassifications {
+            tc0 {
+              code
+              name
+            }
+            tc10 {
+              name
+              code
+            }
+            tc6 {
+              name
+              code
+            }
+            tc4 {
+              name
+              code
+            }
+            tc2 {
+              name
+              code
+            }
+          }
+        }
+        ... on Compound {
+          id
+          name
+        }
+      }
+      prescription {
+        id
+        daysSupply
+        dispenseQuantity
+        dispenseUnit
+        dispenseAsWritten
+        expirationDate
+        fillsAllowed
+        provider {
+          id
+          name {
+            full
+          }
+        }
+      }
+    }
+    patient {
+      id
+      name {
+        full
+      }
+      dateOfBirth
+      gender
+      sex
+      address {
+        id
+        street1
+        street2
+        city
+        state
+        postalCode
+        country
+      }
+      preferredPharmacies {
+        ...PharmacyFields
+      }
+    }
+    fulfillments {
+      id
+      state
+      exceptions {
+        exceptionType
+        message
+        resolvedAt
+      }
+      patientDesiredAt
+      patientDesiredByText
+      pharmacyEstimatedReadyAt
+      prescription {
+        id
+        daysSupply
+        dispenseQuantity
+        dispenseUnit
+        expirationDate
+        fillsAllowed
+        treatment {
+          ... on Medication {
+            id
+            name
+            strength
+          }
+          ... on MedicalEquipment {
+            id
+            name
+          }
+          ... on Compound {
+            id
+            name
+          }
+        }
+      }
+    }
+    discountCards {
+      id
+      prescriptionId
+      price
+      retailPrice
+      bin
+      pcn
+      group
+      memberId
+      pharmacyId
+      source
+      externalUrl
+    }
+  }
+}
+
+fragment PharmacyFields on Pharmacy {
+  id
+  name
+  logo
+  address {
+    street1
+    street2
+    city
+    state
+    country
+    postalCode
+  }
+  phone
+  fulfillmentTypes
+  integrated
+  distance
+  isOpen(at: $openAt)
+  nextEvents(at: $openAt) {
+    open {
+      ... on PharmacyOpenEvent {
+        type
+        datetime
+      }
+      ... on PharmacyCloseEvent {
+        type
+        datetime
+      }
+      ... on PharmacyOpen24HrEvent {
+        type
+      }
+    }
+    close {
+      ... on PharmacyOpenEvent {
+        type
+        datetime
+      }
+      ... on PharmacyCloseEvent {
+        type
+        datetime
+      }
+      ... on PharmacyOpen24HrEvent {
+        type
+      }
+    }
+  }
+  hours {
+    dayOfWeek
+    is24Hr
+    openFrom
+    openUntil
+    timezone
+  }
+  price
+  retailPrice
+  source
+}
+
+query GetPharmaciesByLocation(
+  $location: LatLongSearch!
+  $limit: Int
+  $offset: Int
+  $openAt: DateTime
+  $is24hr: Boolean
+  $name: String
+  $includePrice: Boolean
+) {
+  pharmaciesByLocation(
+    location: $location
+    limit: $limit
+    offset: $offset
+    openAt: $openAt
+    is24hr: $is24hr
+    name: $name
+    includePrice: $includePrice
+  ) {
+    ...PharmacyFields
+  }
+}
+
+query GetPharmacies(
+  $fulfillmentType: FulfillmentType
+  $integrated: Boolean
+  $limit: Int
+  $offset: Int
+) {
+  pharmacies(
+    fulfillmentType: $fulfillmentType
+    integrated: $integrated
+    limit: $limit
+    offset: $offset
+  ) {
+    id
+    name
+    logo
+    fulfillmentTypes
+  }
+}
+
+query GetInfoPageData($organizationId: ID!, $pharmacyId: ID!, $openAt: DateTime) {
+  me {
+    name {
+      full
+      title
+      first
+      middle
+      last
+    }
+  }
+  organization(id: $organizationId) {
+    id
+    name
+    settings {
+      id
+      organizationId
+      brandColor
+      brandLogo
+      priorAuthorizationExceptionMessage
+      patientUx {
+        enableAutomatedOps
+        enablePatientRerouting
+        enablePatientDeliveryPharmacies
+        patientFeaturedPharmacyName
+      }
+    }
+  }
+  pharmacy(id: $pharmacyId) {
+    ...PharmacyFields
+  }
+}
+
+query GetOffersForOrder($orderId: ID!) {
+  offers(orderId: $orderId) {
+    deliveryEstimate {
+      deliveryPromise
+      deliveryPromiseRangeEnd
+      deliveryPromiseRangeStart
+    }
+    cost {
+      type
+      amount
+      amountTitle
+      retailAmount
+      retailAmountTitle
+    }
+    supplier
+  }
+}
+
+query GetOfferBundlesForOrder($orderId: ID!) {
+  offerBundles(orderId: $orderId) {
+    aggregateCost {
+      totalAmount
+      totalRetailAmount
+    }
+    medications {
+      medicationPrice {
+        amount
+        amountTitle
+        promotions {
+          type
+          amount
+          amountSaved
+        }
+        retailAmount
+        retailAmountTitle
+      }
+      deliveryEstimate {
+        deliveryPromise
+      }
+      prescription {
+        treatment {
+          id
+          name
+        }
+      }
+    }
+    pricingType
+    supplier
+  }
+}
