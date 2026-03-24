@@ -90,7 +90,7 @@ export const Main = () => {
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
   // This is used to track whether the patient has enabled price on the pharmacy page
   const [showPriceToggle, setShowPriceToggle] = useState<boolean>(false);
-  const [enablePrice, setEnablePrice] = useState<boolean>(!!isDemo);
+  const [enablePrice, setEnablePrice] = useState<boolean>(true); // default is to show cash price
 
   const [logo, setLogo] = useState<any>(undefined);
   const [loadingLogo, setLoadingLogo] = useState(true);
@@ -193,7 +193,6 @@ export const Main = () => {
 
       const showPriceToggle = shouldShowPriceToggle(newFlattenedFills, newOrder);
       setShowPriceToggle(showPriceToggle);
-      setEnablePrice(showPriceToggle);
 
       datadogRum.setGlobalContextProperty('organizationId', newOrder.organization.id);
       datadogRum.setGlobalContextProperty('orderId', orderId);

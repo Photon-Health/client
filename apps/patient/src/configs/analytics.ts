@@ -2,6 +2,7 @@ import { ApiObject, IdentifyTraits, RudderAnalytics } from '@rudderstack/analyti
 import { Order } from '../utils/models';
 import mixpanel from 'mixpanel-browser';
 import { defaults } from 'lodash';
+import { countFillsAndRemoveDuplicates } from '../utils/general';
 
 const RUDDERSTACK_WRITE_KEY = import.meta.env.VITE_RUDDERSTACK_WRITE_KEY;
 const RUDDERSTACK_DATA_PLANE_URL = import.meta.env.VITE_RUDDERSTACK_DATA_PLANE_URL;
@@ -91,28 +92,30 @@ interface ContextData {
 }
 
 function mapOrderToContextData(order: Order): ContextData {
-  const medications: ContextDataMedication[] = order.fills.map((fill) => {
-    const names =
-      'names' in fill.treatment && Array.isArray(fill.treatment.names)
-        ? fill.treatment.names
-        : undefined;
-    const therapeuticClassifications =
-      'therapeuticClassifications' in fill.treatment &&
-      Array.isArray(fill.treatment.therapeuticClassifications)
-        ? fill.treatment.therapeuticClassifications
-        : undefined;
+  const medications: ContextDataMedication[] = countFillsAndRemoveDuplicates(order.fills).map(
+    (fill) => {
+      const names =
+        'names' in fill.treatment && Array.isArray(fill.treatment.names)
+          ? fill.treatment.names
+          : undefined;
+      const therapeuticClassifications =
+        'therapeuticClassifications' in fill.treatment &&
+        Array.isArray(fill.treatment.therapeuticClassifications)
+          ? fill.treatment.therapeuticClassifications
+          : undefined;
 
-    return {
-      id: fill.treatment.id,
-      name: fill.treatment.name,
-      strength:
-        'strength' in fill.treatment && fill.treatment.strength ? fill.treatment.strength : '',
-      quantity: fill.prescription?.dispenseQuantity || 0,
-      unit: fill.prescription?.dispenseUnit || '',
-      names,
-      therapeuticClassifications
-    };
-  });
+      return {
+        id: fill.treatment.id,
+        name: fill.treatment.name,
+        strength:
+          'strength' in fill.treatment && fill.treatment.strength ? fill.treatment.strength : '',
+        quantity: fill.prescription?.dispenseQuantity || 0,
+        unit: fill.prescription?.dispenseUnit || '',
+        names,
+        therapeuticClassifications
+      };
+    }
+  );
 
   const orderMetadata: ContextDataOrderMetadata = {
     type: order.metadata?.type || '',
