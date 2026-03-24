@@ -84,6 +84,7 @@ export const Pharmacy = () => {
     enablePrice,
     setEnablePrice
   } = useOrderContext();
+  usePageAnalytics({ pageName: 'Pharmacy Select' });
   const mailOrderPharmacies = getOrgMailOrderPharms(order?.organization.id).patient;
   const { enablePatientDeliveryPharmacies, patientFeaturedPharmacyName } =
     order?.organization?.settings?.patientUx ?? {};

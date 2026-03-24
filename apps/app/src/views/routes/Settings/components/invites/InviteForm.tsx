@@ -23,7 +23,7 @@ import * as yup from 'yup';
 import { usePhoton } from '@photonhealth/react';
 import { RolesSelect, hasPrescriberRole, rolesSchema } from '../utils/Roles';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
-import { phoneRegex, zipCodeRegex } from '../utils/Validation';
+import { npiRegex, phoneRegex, zipCodeRegex } from '../utils/Validation';
 import { AddressInput } from 'packages/sdk/dist/types';
 
 const organizationSettingsQuery = graphql(/* GraphQL */ `
@@ -59,7 +59,7 @@ const inviteSchema = yup
     roles: rolesSchema.required().min(1, 'Must have at least one role'),
     npi: yup
       .string()
-      .matches(/^[0-9]+$/, { message: 'Enter a valid NPI' })
+      .matches(npiRegex, 'NPI must be a 10-digit number')
       .when('roles', requiredForPrescribers('NPI is required')),
     phone: yup
       .string()
