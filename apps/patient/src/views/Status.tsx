@@ -26,7 +26,7 @@ import { Pharmacy } from '../utils/models';
 
 export const Status = () => {
   const navigate = useNavigate();
-  const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
+  const { order, setOrder, isDemo, setFaqModalIsOpen, setReason } = useOrderContext();
   usePageAnalytics({ pageName: 'Order Status' });
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
   const [showChangePharmacyReasons, setShowChangePharmacyReasons] = useState(false);
@@ -179,6 +179,7 @@ export const Status = () => {
       { reason, otherReason: otherReason || undefined },
       { toRudderStack: false, toMixpanel: true }
     );
+    setReason(otherReason ? `${reason}: ${otherReason}` : reason);
     navigateToReroute();
   };
 

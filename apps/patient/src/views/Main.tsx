@@ -44,6 +44,8 @@ export interface OrderContextType {
     options?: FetchOrderOptions
   ) => Promise<Order | undefined>;
   setFaqModalIsOpen: (isOpen: boolean) => void;
+  reason: string;
+  setReason: (reason: string) => void;
 }
 export const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
@@ -102,6 +104,7 @@ export const Main = () => {
   const navigate = useNavigate();
   usePageAnalytics({ pageName: 'Main' });
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
+  const [reason, setReason] = useState<string>('');
 
   const orgId = order?.organization.id;
   const settings = order?.organization.settings;
@@ -324,7 +327,9 @@ export const Main = () => {
     setEnablePrice,
     logo,
     fetchOrder,
-    setFaqModalIsOpen
+    setFaqModalIsOpen,
+    reason,
+    setReason
   };
 
   const isAutomatedOrder = order.organization.settings?.patientUx.enableAutomatedOps;

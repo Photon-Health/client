@@ -82,7 +82,8 @@ export const Pharmacy = () => {
     fetchOrder,
     showPriceToggle,
     enablePrice,
-    setEnablePrice
+    setEnablePrice,
+    reason
   } = useOrderContext();
   usePageAnalytics({ pageName: 'Pharmacy Select' });
 
@@ -777,7 +778,7 @@ export const Pharmacy = () => {
       try {
         const patientSelectedPrice = enablePrice;
         const result = isReroute
-          ? await rerouteOrder(order.id, selectedPharmacy.id, patientSelectedPrice)
+          ? await rerouteOrder(order.id, selectedPharmacy.id, patientSelectedPrice, reason)
           : await setOrderPharmacy(
               order.id,
               selectedPharmacy.id,
