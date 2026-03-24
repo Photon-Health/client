@@ -53,6 +53,7 @@ vi.mock('./configs/analytics', () => ({
   }
 }));
 vi.mock('react-ga4');
+vi.mock('mixpanel-browser');
 
 vi.mock('./components', async () => {
   const mod = await vi.importActual('./components');
@@ -104,15 +105,15 @@ describe('App', () => {
     renderApp({ order: testOrder });
 
     expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
-    await expectTotalPageViewAnalyticsCountToBe(2);
+    await expectTotalPageViewAnalyticsCountToBe(1);
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
     expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
-    await expectTotalPageViewAnalyticsCountToBe(4);
+    await expectTotalPageViewAnalyticsCountToBe(2);
     await userEvent.click(screen.getByText('Test Local Pickup Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
     expect(setOrderPharmacyMock).not.toHaveBeenCalled();
     expect(await screen.findByText('When do you need your order ready by?')).toBeInTheDocument();
-    await expectTotalPageViewAnalyticsCountToBe(6);
+    await expectTotalPageViewAnalyticsCountToBe(3);
     await userEvent.click(screen.getByText('Urgent'));
     await userEvent.click(screen.getByText('Next'));
     expect(setOrderPharmacyMock).toHaveBeenCalledWith(
@@ -125,7 +126,7 @@ describe('App', () => {
     );
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
-    await expectTotalPageViewAnalyticsCountToBe(8);
+    await expectTotalPageViewAnalyticsCountToBe(4);
   }, 10_000);
 
   test('For Mail Order Pharmacies: skips the readyBy page', async () => {

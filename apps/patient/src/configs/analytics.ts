@@ -1,9 +1,12 @@
 import { ApiObject, IdentifyTraits, RudderAnalytics } from '@rudderstack/analytics-js';
 import { Order } from '../utils/models';
+import mixpanel from 'mixpanel-browser';
+import { countFillsAndRemoveDuplicates } from '../utils/general';
 
 const RUDDERSTACK_WRITE_KEY = import.meta.env.VITE_RUDDERSTACK_WRITE_KEY;
 const RUDDERSTACK_DATA_PLANE_URL = import.meta.env.VITE_RUDDERSTACK_DATA_PLANE_URL;
 const ENVIRONMENT = import.meta.env.VITE_ENV_NAME || 'development';
+const MIXPANEL_TOKEN = import.meta.env.VITE_MIXPANEL_TOKEN;
 
 interface ContextDataAddress {
   city: string;
@@ -88,28 +91,30 @@ interface ContextData {
 }
 
 function mapOrderToContextData(order: Order): ContextData {
-  const medications: ContextDataMedication[] = order.fills.map((fill) => {
-    const names =
-      'names' in fill.treatment && Array.isArray(fill.treatment.names)
-        ? fill.treatment.names
-        : undefined;
-    const therapeuticClassifications =
-      'therapeuticClassifications' in fill.treatment &&
-      Array.isArray(fill.treatment.therapeuticClassifications)
-        ? fill.treatment.therapeuticClassifications
-        : undefined;
+  const medications: ContextDataMedication[] = countFillsAndRemoveDuplicates(order.fills).map(
+    (fill) => {
+      const names =
+        'names' in fill.treatment && Array.isArray(fill.treatment.names)
+          ? fill.treatment.names
+          : undefined;
+      const therapeuticClassifications =
+        'therapeuticClassifications' in fill.treatment &&
+        Array.isArray(fill.treatment.therapeuticClassifications)
+          ? fill.treatment.therapeuticClassifications
+          : undefined;
 
-    return {
-      id: fill.treatment.id,
-      name: fill.treatment.name,
-      strength:
-        'strength' in fill.treatment && fill.treatment.strength ? fill.treatment.strength : '',
-      quantity: fill.prescription?.dispenseQuantity || 0,
-      unit: fill.prescription?.dispenseUnit || '',
-      names,
-      therapeuticClassifications
-    };
-  });
+      return {
+        id: fill.treatment.id,
+        name: fill.treatment.name,
+        strength:
+          'strength' in fill.treatment && fill.treatment.strength ? fill.treatment.strength : '',
+        quantity: fill.prescription?.dispenseQuantity || 0,
+        unit: fill.prescription?.dispenseUnit || '',
+        names,
+        therapeuticClassifications
+      };
+    }
+  );
 
   const orderMetadata: ContextDataOrderMetadata = {
     type: order.metadata?.type || '',
@@ -211,19 +216,32 @@ function mapOrderToContextData(order: Order): ContextData {
   };
 }
 
-export class PatientAnalytics {
+class PatientAnalytics {
   private rudderanalytics?: RudderAnalytics;
   private environment = 'development';
+  private mixpanelEnabled: boolean = false;
 
   constructor() {
-    if (!RUDDERSTACK_WRITE_KEY || !RUDDERSTACK_DATA_PLANE_URL) {
+    this.environment = ENVIRONMENT;
+
+    if (RUDDERSTACK_WRITE_KEY && RUDDERSTACK_DATA_PLANE_URL) {
+      this.rudderanalytics = new RudderAnalytics();
+      this.rudderanalytics.load(RUDDERSTACK_WRITE_KEY || '', RUDDERSTACK_DATA_PLANE_URL || '');
+    } else {
       console.error('RudderStack write key and data plane URL are required');
       return;
     }
 
-    this.rudderanalytics = new RudderAnalytics();
-    this.rudderanalytics.load(RUDDERSTACK_WRITE_KEY || '', RUDDERSTACK_DATA_PLANE_URL || '');
-    this.environment = ENVIRONMENT;
+    if (MIXPANEL_TOKEN) {
+      mixpanel.init(MIXPANEL_TOKEN, {
+        debug: false,
+        track_pageview: true,
+        persistence: 'localStorage',
+        record_sessions_percent: 100, // session replay
+        record_heatmap_data: true
+      });
+      this.mixpanelEnabled = true;
+    }
   }
 
   page(category: string, name?: string, properties: ApiObject = {}) {
@@ -274,17 +292,19 @@ export class PatientAnalytics {
     orgId,
     orgName
   }: {
-    userId: string;
-    address: IdentifyTraits['address'];
-    orgId: string;
-    orgName: string;
+    userId?: string;
+    address?: IdentifyTraits['address'];
+    orgId?: string;
+    orgName?: string;
   }) {
-    if (!this.rudderanalytics) {
-      return;
+    if (this.rudderanalytics && userId && address && orgId && orgName) {
+      this.rudderanalytics.identify(userId, { address });
+      this.rudderanalytics.group(orgId, { name: orgName });
     }
 
-    this.rudderanalytics.identify(userId, { address });
-    this.rudderanalytics.group(orgId, { name: orgName });
+    if (this.mixpanelEnabled && userId) {
+      mixpanel.identify(userId);
+    }
   }
 }
 
