@@ -22,6 +22,7 @@ import { FAQModal } from '../components/FAQModal';
 import { patientAnalytics } from '../configs/analytics';
 import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
 import { preloadImage } from '../utils/preloadImage';
+import { usePageAnalytics } from '../hooks/usePageAnalytics';
 
 type FetchOrderOptions = {
   triggerNavigationAfterFetch: boolean;
@@ -99,24 +100,27 @@ export const Main = () => {
   );
 
   const navigate = useNavigate();
+  usePageAnalytics({ pageName: 'Main' });
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
 
   const orgId = order?.organization.id;
   const settings = order?.organization.settings;
 
   useEffect(() => {
-    if (order?.patient.id && order?.organization.id && order?.organization.name && order?.address) {
+    if (order) {
       patientAnalytics.identify({
         userId: order.patient.id,
-        address: {
-          city: order.address.city,
-          country: order.address.country,
-          postalCode: order.address.postalCode,
-          state: order.address.state,
-          street: order.address.street2
-            ? `${order.address.street1}, ${order.address.street2}`
-            : order.address.street1
-        },
+        address: order.address
+          ? {
+              city: order.address.city,
+              country: order.address.country,
+              postalCode: order.address.postalCode,
+              state: order.address.state,
+              street: order.address.street2
+                ? `${order.address.street1}, ${order.address.street2}`
+                : order.address.street1
+            }
+          : undefined,
         orgId: order.organization.id,
         orgName: order.organization.name
       });

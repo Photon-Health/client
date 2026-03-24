@@ -1,12 +1,14 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { createContext } from 'react';
 import { usePageAnalytics } from './usePageAnalytics';
 
 const mockPage = vi.fn();
 
 vi.mock('../configs/analytics', () => ({
   patientAnalytics: {
-    page: (...args: unknown[]) => mockPage(...args)
+    page: (...args: unknown[]) => mockPage(...args),
+    track: vi.fn()
   }
 }));
 
@@ -15,7 +17,7 @@ vi.mock('react-router-dom', () => ({
 }));
 
 vi.mock('../views/Main', () => ({
-  useOrderContext: () => ({
+  OrderContext: createContext({
     order: {
       id: 'ord_123',
       organization: {

@@ -26,6 +26,7 @@ import { Pharmacy } from '../utils/models';
 export const Status = () => {
   const navigate = useNavigate();
   const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
+  usePageAnalytics({ pageName: 'Order Status' });
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
 
   const [searchParams] = useSearchParams();
@@ -65,8 +66,6 @@ export const Status = () => {
       fulfillmentType: fulfillmentType
     });
   };
-
-  usePageAnalytics({ pageName: 'Order Status' });
 
   const handleDemoStatusPage = async (demoUserPhone: string, selectedDemoPharmacy: Pharmacy) => {
     const isMailOrder = !!order.pharmacy?.fulfillmentTypes?.includes('MAIL_ORDER');

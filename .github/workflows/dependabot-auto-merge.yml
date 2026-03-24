@@ -17,12 +17,13 @@ jobs:
         id: metadata
         uses: dependabot/fetch-metadata@v2
 
-      - uses: tibdex/github-app-token@v1
+      - uses: actions/create-github-app-token@v1
         if: steps.metadata.outputs.dependency-group == 'security'
         id: generate-token
         with:
-          app_id: ${{ secrets.CPR_APP_ID }}
-          private_key: ${{ secrets.CPR_APP_SECRET }}
+          # configured at https://github.com/organizations/Photon-Health/settings/secrets/dependabot
+          app-id: ${{ secrets.CPR_APP_ID_DEPENDABOT }}
+          private-key: ${{ secrets.CPR_APP_SECRET_DEPENDABOT }}
 
       - name: Approve PR
         if: steps.metadata.outputs.dependency-group == 'security'
@@ -33,7 +34,7 @@ jobs:
 
       - name: Enable auto-merge
         if: steps.metadata.outputs.dependency-group == 'security'
-        run: gh pr merge --auto --merge "$PR_URL"
+        run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}

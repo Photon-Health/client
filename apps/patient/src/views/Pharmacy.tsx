@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Card,
   Center,
   CircularProgress,
   Container,
@@ -83,6 +84,8 @@ export const Pharmacy = () => {
     enablePrice,
     setEnablePrice
   } = useOrderContext();
+  usePageAnalytics({ pageName: 'Pharmacy Select' });
+
   const mailOrderPharmacies = getOrgMailOrderPharms(order?.organization.id).patient;
   const { enablePatientDeliveryPharmacies, patientFeaturedPharmacyName } =
     order?.organization?.settings?.patientUx ?? {};
@@ -235,10 +238,6 @@ export const Pharmacy = () => {
 
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
-
-  usePageAnalytics({
-    pageName: 'Pharmacy Select'
-  });
 
   useEffect(() => {
     const getOffers = async () => {
@@ -1271,18 +1270,22 @@ export const Pharmacy = () => {
                 </VStack>
               )}
               {patientMailOrderOptions?.length && (
-                <HStack
-                  w="full"
-                  justifyContent="space-between"
-                  background="Background"
-                  padding="2"
-                  borderRadius="md"
-                >
-                  <Text fontSize="sm">Don't see your pharmacy?</Text>
-                  <Link as="button" onClick={() => setMailOrderModalOpen(true)} fontSize="sm">
-                    See all mail orders
-                  </Link>
-                </HStack>
+                <Card shadow={'none'} mx={{ base: -2, md: undefined }}>
+                  <VStack>
+                    <HStack
+                      w="full"
+                      justifyContent="space-between"
+                      background="Background"
+                      padding="2"
+                      borderRadius="md"
+                    >
+                      <Text fontSize="sm">Don't see your pharmacy?</Text>
+                      <Link as="button" onClick={() => setMailOrderModalOpen(true)} fontSize="sm">
+                        See all mail orders
+                      </Link>
+                    </HStack>
+                  </VStack>
+                </Card>
               )}
               {pickupPharmacyOptions(patientLocation)}
             </VStack>

@@ -42,6 +42,7 @@ const checkDisabled = (option: string): boolean => {
 
 export const ReadyBy = () => {
   const { order, flattenedFills, enablePrice, fetchOrder } = useOrderContext();
+  usePageAnalytics({ pageName: 'Ready By Time' });
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
@@ -58,8 +59,6 @@ export const ReadyBy = () => {
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
   const isMultiRx = flattenedFills.length > 1;
-
-  usePageAnalytics({ pageName: "Patient's Ready By Time" });
 
   const handleSubmit = async () => {
     if (isDemo) {
