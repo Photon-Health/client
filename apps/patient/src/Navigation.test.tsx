@@ -20,6 +20,9 @@ const mockPatientAnalytics = {
   identify: vi.fn(),
   track: vi.fn()
 };
+vi.mock('./configs/analytics', () => ({
+  getPatientAnalytics: () => mockPatientAnalytics
+}));
 
 vi.mock('./api', () => ({
   geocode: vi.fn().mockResolvedValue({
@@ -50,9 +53,6 @@ vi.mock('./configs/graphqlClient', () => ({
 }));
 
 vi.mock('@datadog/browser-rum');
-vi.mock('./configs/analytics', () => ({
-  getPatientAnalytics: () => mockPatientAnalytics
-}));
 vi.mock('react-ga4');
 vi.mock('mixpanel-browser');
 

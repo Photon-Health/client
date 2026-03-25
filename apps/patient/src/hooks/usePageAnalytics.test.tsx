@@ -2,7 +2,6 @@ import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { createContext } from 'react';
 import { usePageAnalytics } from './usePageAnalytics';
-import { getPatientAnalytics } from '../configs/analytics';
 
 const mockPage = vi.fn();
 const patientAnalytics = {
