@@ -1,5 +1,10 @@
 version: 0.2
 
+env:
+  secrets-manager:
+    VITE_DATADOG_RUM_APPLICATION_ID: patient_build_vars:VITE_DATADOG_RUM_APPLICATION_ID
+    VITE_DATADOG_RUM_CLIENT_TOKEN: patient_build_vars:VITE_DATADOG_RUM_CLIENT_TOKEN
+
 phases:
   install:
     on-failure: ABORT
