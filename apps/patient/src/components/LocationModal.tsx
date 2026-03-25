@@ -20,8 +20,8 @@ import { AsyncSelect } from 'chakra-react-select';
 import { debounce } from 'lodash';
 
 import { text as t } from '../utils/text';
-import { patientAnalytics } from '../configs/analytics';
 import { useOrderContext } from '../views/Main';
+import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 interface Option {
   value: string;
@@ -50,6 +50,8 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
   const geocoder = useMemo(() => new google.maps.Geocoder(), []);
 
   const { order } = useOrderContext();
+
+  const patientAnalytics = usePatientAnalytics();
 
   const [searchParams] = useSearchParams();
   const isDemo = searchParams.get('demo');

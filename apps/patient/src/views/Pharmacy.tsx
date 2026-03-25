@@ -59,11 +59,11 @@ import {
 } from '../components/pharmacy-card-list';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
-import { patientAnalytics } from '../configs/analytics';
 import { OffersList } from '../components/offers/OffersList';
 import { MailOrderSelectModal } from '../components/mail-order-select';
 import { MailOrderPharmacyOption } from '../components/mail-order-select/MailOrderSelectCard';
 import { getOfferType } from '../utils/offers';
+import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -84,6 +84,8 @@ export const Pharmacy = () => {
     enablePrice,
     setEnablePrice
   } = useOrderContext();
+  // We don't want to collect data on demo activity
+  const patientAnalytics = usePatientAnalytics();
   usePageAnalytics({ pageName: 'Pharmacy Select' });
 
   const mailOrderPharmacies = getOrgMailOrderPharms(order?.organization.id).patient;

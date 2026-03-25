@@ -11,10 +11,15 @@ import {
 } from './test-utils/generators';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
-import { patientAnalytics } from './configs/analytics';
 
 const mockToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
+
+const mockPatientAnalytics = {
+  page: vi.fn(),
+  identify: vi.fn(),
+  track: vi.fn()
+};
 
 vi.mock('./api', () => ({
   geocode: vi.fn().mockResolvedValue({
@@ -46,11 +51,7 @@ vi.mock('./configs/graphqlClient', () => ({
 
 vi.mock('@datadog/browser-rum');
 vi.mock('./configs/analytics', () => ({
-  patientAnalytics: {
-    page: vi.fn(),
-    identify: vi.fn(),
-    track: vi.fn()
-  }
+  getPatientAnalytics: () => mockPatientAnalytics
 }));
 vi.mock('react-ga4');
 vi.mock('mixpanel-browser');
@@ -179,5 +180,5 @@ const renderApp = (order: Partial<OrderContextType> = {}) => {
 };
 
 async function expectTotalPageViewAnalyticsCountToBe(times: number) {
-  await waitFor(() => expect(patientAnalytics.page).toHaveBeenCalledTimes(times));
+  await waitFor(() => expect(mockPatientAnalytics).toHaveBeenCalledTimes(times));
 }
