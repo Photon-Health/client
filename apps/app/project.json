@@ -5,6 +5,20 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
+    "pullenv": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "aws secretsmanager get-secret-value --secret-id app_build_vars --query SecretString --output text | jq -r 'to_entries[] | \"\\(.key)=\\(.value)\"' > .env"
+      }
+    },
+    "pullenv:boson": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "AWS_PROFILE=boson aws secretsmanager get-secret-value --secret-id app_build_vars --query SecretString --output text | jq -r 'to_entries[] | \"\\(.key)=\\(.value)\"' > .env"
+      }
+    },
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
@@ -51,7 +65,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.boson vite"
+        "command": "vite"
       },
       "dependsOn": ["^build", "codegen"]
     },
@@ -76,7 +90,7 @@
       "options": {
         "cwd": "apps/app",
         "commands": [
-          "env-cmd -f .env.boson vite",
+          "vite",
           "nx watch --projects=app --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=app"
         ]
       },
@@ -98,7 +112,7 @@
       "outputs": ["{workspaceRoot}/dist/apps/app"],
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.boson vite build"
+        "command": "vite build"
       },
       "dependsOn": ["^build", "codegen"]
     },
@@ -131,14 +145,14 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.boson npx playwright test"
+        "command": "npx playwright test"
       }
     },
     "e2e:ui": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.boson npx playwright test --ui"
+        "command": "npx playwright test --ui"
       }
     },
     "e2e:ci": {

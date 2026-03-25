@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   e2e-tests:
@@ -15,11 +16,13 @@ jobs:
       matrix:
         include:
           - app: app
+            pullenv: 'npx nx run app:pullenv'
             codegen: 'npx nx run app:codegen'
             base_url: 'http://localhost:3000'
             report_name: playwright-report-clinical
             report_path: apps/app/playwright-report/
           - app: patient
+            pullenv: 'npx nx run patient:pullenv'
             codegen: 'npx nx run patient:codegen'
             base_url: 'http://localhost:3001'
             report_name: playwright-report-patient
@@ -35,6 +38,15 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Pull env vars
+        run: ${{ matrix.pullenv }}
 
       - name: Codegen
         run: ${{ matrix.codegen }}
