@@ -33,7 +33,7 @@ export const usePatientAnalytics = (): PatientAnalytics => {
   const patientAnalytics = useContext(PatientAnalyticsContext);
 
   if (!patientAnalytics) {
-    throw new Error('useProviderAnalytics must be used within a ProviderAnalyticsProvider');
+    throw new Error('usePatientAnalytics must be used within a PatientAnalyticsProvider');
   }
 
   return patientAnalytics;

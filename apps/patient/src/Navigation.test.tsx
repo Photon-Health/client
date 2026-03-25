@@ -180,5 +180,5 @@ const renderApp = (order: Partial<OrderContextType> = {}) => {
 };
 
 async function expectTotalPageViewAnalyticsCountToBe(times: number) {
-  await waitFor(() => expect(mockPatientAnalytics).toHaveBeenCalledTimes(times));
+  await waitFor(() => expect(mockPatientAnalytics.page).toHaveBeenCalledTimes(times));
 }

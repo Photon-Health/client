@@ -101,7 +101,7 @@ export const Main = () => {
   );
 
   const navigate = useNavigate();
-  usePageAnalytics({ pageName: 'Main', patientAnalytics });
+  usePageAnalytics({ pageName: 'Main' });
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
 
   const orgId = order?.organization.id;
