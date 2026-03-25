@@ -11,6 +11,7 @@ env:
     VITE_AUTH0_CLIENT_ID: app_build_vars:VITE_AUTH0_CLIENT_ID
     VITE_AUTH0_AUDIENCE: app_build_vars:VITE_AUTH0_AUDIENCE
     VITE_GRAPHQL_URI: app_build_vars:VITE_GRAPHQL_URI
+    VITE_CLINICAL_GRAPHQL_URI: app_build_vars:VITE_CLINICAL_GRAPHQL_URI
 
 phases:
   install:

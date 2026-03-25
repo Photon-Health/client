@@ -9,42 +9,42 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.boson npx graphql-codegen"
+        "command": "VITE_ENV_NAME=boson npx graphql-codegen"
       }
     },
     "codegen:tau": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.tau npx graphql-codegen"
+        "command": "VITE_ENV_NAME=tau npx graphql-codegen"
       }
     },
     "codegen:neutron": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.neutron npx graphql-codegen"
+        "command": "VITE_ENV_NAME=neutron npx graphql-codegen"
       }
     },
     "codegen:photon": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.photon npx graphql-codegen"
+        "command": "VITE_ENV_NAME=photon npx graphql-codegen"
       }
     },
     "codegen:watch": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.boson npx graphql-codegen --watch"
+        "command": "VITE_ENV_NAME=boson npx graphql-codegen --watch"
       }
     },
     "codegen:watch:tau": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.tau npx graphql-codegen --watch"
+        "command": "VITE_ENV_NAME=tau npx graphql-codegen --watch"
       }
     },
     "start": {
