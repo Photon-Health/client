@@ -66,8 +66,7 @@ export const Review = () => {
 
   usePageAnalytics({
     pageName: 'Review Prescriptions',
-    properties: { needsAddress },
-    patientAnalytics
+    properties: { needsAddress }
   });
 
   return (
