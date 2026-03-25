@@ -9,12 +9,12 @@ const patientAnalytics = {
   track: vi.fn()
 };
 
-vi.mock('../configs/analytics', () => ({
-  getPatientAnalytics: () => patientAnalytics
-}));
-
 vi.mock('react-router-dom', () => ({
   useLocation: () => ({ pathname: '/test-path' })
+}));
+
+vi.mock('./usePatientAnalytics', () => ({
+  usePatientAnalytics: () => patientAnalytics
 }));
 
 vi.mock('../views/Main', () => ({
