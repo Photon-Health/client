@@ -1,19 +1,19 @@
 import {
+  Box,
   Button,
+  CloseButton,
   Drawer,
-  DrawerBody,
-  DrawerCloseButton,
   DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
   DrawerOverlay,
-  DrawerProps,
   Heading,
+  Modal,
+  ModalContent,
+  ModalOverlay,
   Textarea,
   useBreakpointValue,
   VStack
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { patientAnalytics } from '../configs/analytics';
 import { useOrderContext } from '../views/Main';
 
@@ -36,7 +36,6 @@ export const ChangePharmacyReasons = ({
   onSelect
 }: ChangePharmacyReasonsProps) => {
   const { order } = useOrderContext();
-  const placement = useBreakpointValue({ base: 'bottom', md: 'right' }, { fallback: 'bottom' });
   const [screen, setScreen] = useState(Screen.Reasons);
 
   useEffect(() => {
@@ -53,27 +52,48 @@ export const ChangePharmacyReasons = ({
   }, [isOpen]);
 
   return (
-    <Drawer
-      isOpen={isOpen}
-      onClose={onClose}
-      placement={placement as DrawerProps['placement']}
-      size={placement === 'bottom' ? '' : 'sm'}
-    >
+    <Container isOpen={isOpen} onClose={onClose}>
+      <CloseButton position={'absolute'} top={2} right={3} onClick={onClose} />
+      {screen === Screen.Reasons && (
+        <ReasonsScreen
+          onSelect={onSelect}
+          onSomethingElse={() => setScreen(Screen.SomethingElse)}
+        />
+      )}
+      {screen === Screen.SomethingElse && (
+        <SomethingElseScreen
+          onSubmit={(otherReason) => onSelect(SOMETHING_ELSE_REASON, otherReason)}
+        />
+      )}
+    </Container>
+  );
+};
+
+const Container = ({
+  isOpen,
+  onClose,
+  children
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  children: ReactNode;
+}) => {
+  const container = useBreakpointValue({ base: 'drawer', md: 'modal' }) || 'drawer';
+  const borderRadius = 'xl';
+
+  if (container === 'modal') {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent borderRadius={borderRadius}>{children}</ModalContent>
+      </Modal>
+    );
+  }
+
+  return (
+    <Drawer isOpen={isOpen} onClose={onClose} placement={'bottom'}>
       <DrawerOverlay />
-      <DrawerContent borderTopRadius={placement === 'bottom' ? 'xl' : 'none'}>
-        <DrawerCloseButton onClick={onClose} />
-        {screen === Screen.Reasons && (
-          <ReasonsScreen
-            onSelect={onSelect}
-            onSomethingElse={() => setScreen(Screen.SomethingElse)}
-          />
-        )}
-        {screen === Screen.SomethingElse && (
-          <SomethingElseScreen
-            onSubmit={(otherReason) => onSelect(SOMETHING_ELSE_REASON, otherReason)}
-          />
-        )}
-      </DrawerContent>
+      <DrawerContent borderTopRadius={borderRadius}>{children}</DrawerContent>
     </Drawer>
   );
 };
@@ -110,21 +130,18 @@ const ReasonsScreen = ({
   ];
 
   return (
-    <>
-      <DrawerHeader pt={6}>
-        <Heading as="h4" size="md">
-          Let us know why you want to change pharmacies
-        </Heading>
-      </DrawerHeader>
-      <DrawerBody pb={6}>
-        <VStack spacing={2}>
-          {reasons.map((reason) => {
-            return <ReasonButton key={reason} reason={reason} onClick={() => onSelect(reason)} />;
-          })}
-          <ReasonButton reason={SOMETHING_ELSE_REASON} onClick={onSomethingElse} />
-        </VStack>
-      </DrawerBody>
-    </>
+    <Box p={6}>
+      {/* pr prevents heading from overlapping w CloseButton */}
+      <Heading as="h4" size="md" pb={6} pr={7}>
+        Let us know why you want to change pharmacies
+      </Heading>
+      <VStack spacing={2}>
+        {reasons.map((reason) => {
+          return <ReasonButton key={reason} reason={reason} onClick={() => onSelect(reason)} />;
+        })}
+        <ReasonButton reason={SOMETHING_ELSE_REASON} onClick={onSomethingElse} />
+      </VStack>
+    </Box>
   );
 };
 
@@ -132,30 +149,25 @@ const SomethingElseScreen = ({ onSubmit }: { onSubmit: (otherReason: string) => 
   const [text, setText] = useState('');
 
   return (
-    <>
-      <DrawerHeader pt={6}>
-        <Heading as="h4" size="md">
-          Tell us about your pharmacy issue
-        </Heading>
-      </DrawerHeader>
-      <DrawerBody>
-        <Textarea
-          placeholder="Please describe your issue..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={2}
-        />
-      </DrawerBody>
-      <DrawerFooter pb={6}>
-        <Button
-          w="full"
-          colorScheme="blue"
-          isDisabled={text.trim() === ''}
-          onClick={() => onSubmit(text)}
-        >
-          Continue
-        </Button>
-      </DrawerFooter>
-    </>
+    <VStack p={6} spacing={6} alignItems={'start'}>
+      {/* pr prevents heading from overlapping w CloseButton */}
+      <Heading as="h4" size="md" pr={7}>
+        Tell us about your pharmacy issue
+      </Heading>
+      <Textarea
+        placeholder="Please describe your issue..."
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={3}
+      />
+      <Button
+        w="full"
+        colorScheme="blue"
+        isDisabled={text.trim() === ''}
+        onClick={() => onSubmit(text)}
+      >
+        Continue
+      </Button>
+    </VStack>
   );
 };
