@@ -1148,7 +1148,7 @@ export const Pharmacy = () => {
       loadingMore={isLoading}
       showingAllPharmacies={showingAllPharmacies}
       showHeading={showPickupHeading}
-      showPrice={!orderIsMultiRx}
+      showPrice={isDemo || !orderIsMultiRx}
       enableOpenNow={enableOpenNow}
       enable24Hr={enable24Hr}
       enablePrice={enablePrice}

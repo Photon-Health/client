@@ -86,6 +86,15 @@ describe('Send To Patient Demo', () => {
     await waitFor(() => screen.findByText('Order placed'), { timeout: 2500 });
     expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
   }, 10_000);
+
+  test('displays coupon prices for non-offer pharmacies', async () => {
+    renderDemoApp();
+
+    expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
+
+    expect(await screen.findByText('Coupon Price')).toBeInTheDocument();
+  }, 10_000);
 });
 
 const renderDemoApp = () => {
