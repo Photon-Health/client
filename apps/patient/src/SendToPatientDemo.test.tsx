@@ -4,6 +4,7 @@ import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 're
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
 import { triggerDemoNotification } from './api';
+import { demoPharmacies } from './data/demoPharmacies';
 
 vi.mock('./api', () => ({
   geocode: vi.fn().mockResolvedValue({
@@ -89,12 +90,13 @@ describe('Send To Patient Demo', () => {
   }, 10_000);
 
   test('displays coupon prices for non-offer pharmacies', async () => {
+    const expectedNumberOfCouponPrices = demoPharmacies.filter((p) => p.price).length;
     renderDemoApp();
 
     expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
 
-    expect(await screen.findByText('Coupon Price')).toBeInTheDocument();
+    expect(await screen.getAllByText('Coupon Price')).toHaveLength(expectedNumberOfCouponPrices);
   }, 10_000);
 });
 
