@@ -2,7 +2,7 @@ name: Playwright e2e Tests
 on:
   workflow_dispatch:
     inputs:
-      sha:
+      branch:
         required: true
 
 permissions:
@@ -18,7 +18,7 @@ jobs:
         include:
           - app: app
             codegen: 'npx nx run app:codegen'
-            base_url: 'http://localhost:3000'
+            base_url: 'https://app-${{ inputs.branch }}.boson.health'
             report_name: playwright-report-clinical
             report_path: apps/app/playwright-report/
           - app: patient
@@ -29,7 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.sha }}
+          ref: ${{ inputs.branch }}
+      
+      - name: Echo base_url
+        run: echo "Running against ${{ matrix.base_url }}"
 
       - name: Use Node.js 20.x
         uses: actions/setup-node@v4
@@ -41,7 +44,7 @@ jobs:
         name: Add e2e tests check to PR
         id: add_check
         env:
-          SHA: ${{ inputs.sha }}
+          BRANCH_NAME: ${{ inputs.branch }}
         with:
           script: |
             const script = require('./.github/scripts/add-e2e-test-checks.js')
