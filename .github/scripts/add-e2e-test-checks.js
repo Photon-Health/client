@@ -5,7 +5,7 @@ module.exports = async ({ github, context }) => {
     name: `e2e-tests (${process.env.APP_NAME})`,
     head_sha: process.env.SHA,
     status: 'completed',
-    conclusion: 'success',
+    conclusion: process.env.CONCLUSION,
     details_url: process.env.DETAILS_URL
   };
 
