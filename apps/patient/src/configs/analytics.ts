@@ -216,7 +216,37 @@ function mapOrderToContextData(order: Order): ContextData {
   };
 }
 
-class PatientAnalytics {
+export interface PatientAnalytics {
+  page(category: string, name?: string, properties?: ApiObject): void;
+
+  track(eventName: string, order: Order, properties?: ApiObject): void;
+
+  identify(input: {
+    userId?: string;
+    address?: IdentifyTraits['address'];
+    orgId?: string;
+    orgName?: string;
+  }): void;
+}
+
+class NoopPatientAnalytics implements PatientAnalytics {
+  page(_category: string, _name?: string, _properties?: ApiObject): void {
+    return;
+  }
+  track(_eventName: string, _order: Order, _properties?: ApiObject): void {
+    return;
+  }
+  identify(_input: {
+    userId?: string;
+    address?: IdentifyTraits['address'];
+    orgId?: string;
+    orgName?: string;
+  }): void {
+    return;
+  }
+}
+
+class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
   private rudderanalytics?: RudderAnalytics;
   private environment = 'development';
   private mixpanelEnabled: boolean = false;
@@ -308,4 +338,13 @@ class PatientAnalytics {
   }
 }
 
-export const patientAnalytics = new PatientAnalytics();
+const rudderAndMixPanelPatientAnalytics = new RudderAndMixPanelPatientAnalytics();
+const noOpPatientAnalytics = new NoopPatientAnalytics();
+
+export function getPatientAnalytics(opts?: { noop: boolean }): PatientAnalytics {
+  if (opts?.noop) {
+    return noOpPatientAnalytics;
+  }
+
+  return rudderAndMixPanelPatientAnalytics;
+}

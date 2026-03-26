@@ -11,6 +11,8 @@ export const demoPharmacies: EnrichedPharmacy[] = [
       state: 'NY',
       street1: '121 Kent Ave'
     },
+    price: 52,
+    retailPrice: 100,
     name: 'Central Pharmacy',
     distance: 0.2,
     isOpen: true,
@@ -28,6 +30,8 @@ export const demoPharmacies: EnrichedPharmacy[] = [
       state: 'NY',
       street1: '559 Driggs Ave'
     },
+    price: 80,
+    retailPrice: 100,
     name: 'Northside Pharmacy',
     distance: 0.4,
     isOpen: false,

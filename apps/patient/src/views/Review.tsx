@@ -8,8 +8,8 @@ import { FixedFooter, PoweredBy, PrescriptionsList } from '../components';
 import { AddressForm, AddressFormHandle } from '../components/AddressForm';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
-import { patientAnalytics } from '..//configs/analytics';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
+import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 export const Review = () => {
   const { order, flattenedFills, fetchOrder } = useOrderContext();
@@ -19,6 +19,7 @@ export const Review = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isDemo = searchParams.get('demo');
+  const patientAnalytics = usePatientAnalytics();
   const phone = searchParams.get('phone');
 
   const { patient } = order;

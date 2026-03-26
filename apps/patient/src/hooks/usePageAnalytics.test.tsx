@@ -4,16 +4,17 @@ import { createContext } from 'react';
 import { usePageAnalytics } from './usePageAnalytics';
 
 const mockPage = vi.fn();
-
-vi.mock('../configs/analytics', () => ({
-  patientAnalytics: {
-    page: (...args: unknown[]) => mockPage(...args),
-    track: vi.fn()
-  }
-}));
+const patientAnalytics = {
+  page: (...args: unknown[]) => mockPage(...args),
+  track: vi.fn()
+};
 
 vi.mock('react-router-dom', () => ({
   useLocation: () => ({ pathname: '/test-path' })
+}));
+
+vi.mock('./usePatientAnalytics', () => ({
+  usePatientAnalytics: () => patientAnalytics
 }));
 
 vi.mock('../views/Main', () => ({

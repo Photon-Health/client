@@ -17,9 +17,9 @@ import { PoweredBy } from '../PoweredBy';
 import { MailOrderSelectList } from './MailOrderSelectList';
 import { MailOrderPharmacyOption } from './MailOrderSelectCard';
 import { datadogRum } from '@datadog/browser-rum';
-import { patientAnalytics } from '../../configs/analytics';
 import { useOrderContext } from '../../views/Main';
 import { text } from '../../utils/text';
+import { usePatientAnalytics } from '../../hooks/usePatientAnalytics';
 
 type MailOrderSelectModalProps = Omit<ModalProps, 'children'> & {
   options?: MailOrderPharmacyOption[];
@@ -36,6 +36,7 @@ export function MailOrderSelectModal({
   onConfirm,
   ...modalProps
 }: MailOrderSelectModalProps) {
+  const patientAnalytics = usePatientAnalytics();
   const [confirming, setConfirming] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<MailOrderPharmacyOption | undefined>();
   const { order } = useOrderContext();
