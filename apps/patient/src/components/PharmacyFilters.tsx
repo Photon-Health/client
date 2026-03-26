@@ -1,6 +1,6 @@
 import { Button, HStack, Text } from '@chakra-ui/react';
-import { patientAnalytics } from '../configs/analytics';
 import { useOrderContext } from '../views/Main';
+import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 interface PharmacyFiltersProps {
   enableOpenNow: boolean;
@@ -15,7 +15,7 @@ export const PharmacyFilters = ({
   setEnable24Hr
 }: PharmacyFiltersProps) => {
   const { order } = useOrderContext();
-
+  const patientAnalytics = usePatientAnalytics();
   return (
     <HStack>
       <Text>Filter by</Text>

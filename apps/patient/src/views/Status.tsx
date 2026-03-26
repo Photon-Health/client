@@ -18,14 +18,15 @@ import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
-import { patientAnalytics } from '../configs/analytics';
 import { computeNumRefillsForPrescription } from '../utils/presenters';
 import { CouponCardList } from '../components/coupons';
 import { Pharmacy } from '../utils/models';
+import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 export const Status = () => {
   const navigate = useNavigate();
   const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
+  const patientAnalytics = usePatientAnalytics();
   usePageAnalytics({ pageName: 'Order Status' });
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
 
