@@ -1,7 +1,9 @@
 name: Playwright e2e Tests
 on:
-  repository_dispatch:
-    types: [codebuild-complete]
+  workflow_dispatch:
+    inputs:
+      sha:
+        required: true
 
 permissions:
   contents: read
@@ -26,6 +28,8 @@ jobs:
             report_path: apps/patient/playwright-report/
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.sha }}
 
       - name: Use Node.js 20.x
         uses: actions/setup-node@v4
