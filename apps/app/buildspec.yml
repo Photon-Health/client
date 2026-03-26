@@ -83,7 +83,6 @@ phases:
           --release-version=$PACKAGE_VERSION \
           --minified-path-prefix=https://app.${ENVIRONMENT}.health
 
-
 artifacts:
   files:
     - '**/*'

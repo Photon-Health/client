@@ -36,7 +36,7 @@ jobs:
           elif [ "${{ inputs.app }}" = "patient" ]; then
             echo "e2e=npx nx run patient:e2e" >> $GITHUB_OUTPUT
             echo "codegen=npx nx run patient:codegen" >> $GITHUB_OUTPUT
-            echo "base_url=http://localhost:3001" >> $GITHUB_OUTPUT
+            echo "base_url=https://orders-${{ inputs.branch }}.boson.health" >> $GITHUB_OUTPUT
             echo "report_name=playwright-report-patient" >> $GITHUB_OUTPUT
             echo "report_path=apps/patient/playwright-report/" >> $GITHUB_OUTPUT
           else
