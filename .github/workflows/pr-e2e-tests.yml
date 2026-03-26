@@ -4,47 +4,77 @@ on:
     inputs:
       branch:
         required: true
+      app:
+        required: true
+        options:
+        - app
+        - patient
 
 permissions:
   contents: read
 
 jobs:
+  define-config:
+    runs-on: ubuntu-latest
+    outputs:
+      e2e: ${{ steps.set-config.outputs.e2e }}
+      codegen: ${{ steps.set-config.outputs.codegen }}
+      base_url: ${{ steps.set-config.outputs.base_url }}
+      report_name: ${{ steps.set-config.outputs.report_name }}
+      report_path: ${{ steps.set-config.outputs.report_path }}
+    steps:
+      - name: Determine config for app
+        id: set-config
+        run: |
+          if [ "${{ inputs.app }}" = "app" ]; then
+            echo "e2e=npx nx run app:e2e" >> $GITHUB_OUTPUT
+            echo "codegen=npx nx run app:codegen" >> $GITHUB_OUTPUT
+            echo "base_url=https://app-${{ inputs.branch }}.boson.health" >> $GITHUB_OUTPUT
+            echo "report_name=playwright-report-clinical" >> $GITHUB_OUTPUT
+            echo "report_path=apps/app/playwright-report/" >> $GITHUB_OUTPUT
+          elif [ "${{ inputs.app }}" = "patient" ]; then
+            echo "e2e=npx nx run patient:e2e" >> $GITHUB_OUTPUT
+            echo "codegen=npx nx run patient:codegen" >> $GITHUB_OUTPUT
+            echo "base_url=http://localhost:3001" >> $GITHUB_OUTPUT
+            echo "report_name=playwright-report-patient" >> $GITHUB_OUTPUT
+            echo "report_path=apps/patient/playwright-report/" >> $GITHUB_OUTPUT
+          else
+            echo "Error: inputs.app must be 'app' or 'patient', got '${{ inputs.app }}'"
+            exit 1
+          fi
+
   e2e-tests:
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - app: app
-            codegen: 'npx nx run app:codegen'
-            base_url: 'https://app-${{ inputs.branch }}.boson.health'
-            report_name: playwright-report-clinical
-            report_path: apps/app/playwright-report/
-          - app: patient
-            codegen: 'npx nx run patient:codegen'
-            base_url: 'http://localhost:3001'
-            report_name: playwright-report-patient
-            report_path: apps/patient/playwright-report/
+    needs: define-config
+
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.branch }}
-      
-      - name: Echo base_url
-        run: echo "Running against ${{ matrix.base_url }}"
+
+      - name: Echo config
+        run: |
+          echo "app: ${{ inputs.app }}"
+          echo "branch: ${{ inputs.branch }}"
+          echo "e2e: ${{ needs.define-config.outputs.e2e }}"
+          echo "codegen: ${{ needs.define-config.outputs.codegen }}"
+          echo "base_url: ${{ needs.define-config.outputs.base_url }}"
+          echo "report_name: ${{ needs.define-config.outputs.report_name }}"
+          echo "report_path: ${{ needs.define-config.outputs.report_path }}"
 
       - name: Use Node.js 20.x
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
           cache: 'npm'
-      
+
       - uses: actions/github-script@v8
         name: Add e2e tests check to PR
         id: add_check
         env:
           BRANCH_NAME: ${{ inputs.branch }}
+          APP_NAME: ${{ inputs.app }}
         with:
           script: |
             const script = require('./.github/scripts/add-e2e-test-checks.js')
@@ -54,25 +84,25 @@ jobs:
         run: npm ci
 
       - name: Codegen
-        run: ${{ matrix.codegen }}
+        run: ${{ needs.define-config.outputs.codegen }}
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
         env:
-          PLAYWRIGHT_BASE_URL: ${{ matrix.base_url }}
+          PLAYWRIGHT_BASE_URL: ${{ needs.define-config.outputs.base_url }}
           PLAYWRIGHT_CLINICAL_BASE_URL: https://app.boson.health
           PLAYWRIGHT_E2E_ACCOUNT_USERNAME: ${{ vars.PLAYWRIGHT_E2E_ACCOUNT_USERNAME }}
           PLAYWRIGHT_E2E_ACCOUNT_PASSWORD: ${{ secrets.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD }}
           PLAYWRIGHT_E2E_SSO_ACCOUNT_USERNAME: ${{ vars.PLAYWRIGHT_E2E_SSO_ACCOUNT_USERNAME }}
           PLAYWRIGHT_E2E_SSO_ACCOUNT_PASSWORD: ${{ secrets.PLAYWRIGHT_E2E_SSO_ACCOUNT_PASSWORD }}
           PLAYWRIGHT_E2E_PATIENT_PHONE: ${{ vars.PLAYWRIGHT_E2E_PATIENT_PHONE }}
-        run: npx nx run ${{ matrix.app }}:e2e
+        run: ${{ needs.define-config.outputs.e2e }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: ${{ matrix.report_name }}
-          path: ${{ matrix.report_path }}
+          name: ${{ needs.define-config.outputs.report_name }}
+          path: ${{ needs.define-config.outputs.report_path }}
           retention-days: 30
