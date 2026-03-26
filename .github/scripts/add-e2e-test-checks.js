@@ -1,26 +1,15 @@
 module.exports = async ({ github, context }) => {
-  const jobName = 'e2e-tests';
-  const appJobName = `${jobName} (${process.env.APP_NAME}`;
-
-  const result = await github.rest.checks.listForRef({
+  const payload = {
     owner: context.repo.owner,
     repo: context.repo.repo,
-    ref: process.env.BRANCH_NAME
-  });
+    name: `e2e-tests (${process.env.APP_NAME})`,
+    head_sha: process.env.SHA,
+    status: 'completed',
+    conclusion: 'success',
+    details_url: process.env.DETAILS_URL
+  };
 
-  const testChecks = (result.data.check_runs || []).filter((check) => check.name.includes(jobName));
-  if (!testChecks.length) {
-    throw new Error('No e2e test checks found, aborting');
-  }
+  console.log('New check payload', JSON.stringify(payload, null, 2));
 
-  console.log(testChecks);
-
-  console.log(appJobName);
-
-  const appCheck = testChecks.find((check) => check.name.includes(appJobName));
-  if (!appCheck) {
-    throw new Error(`No e2e test check for ${process.env.APP_NAME} found, aborting`);
-  }
-
-  console.log(appCheck);
+  await github.rest.checks.create(payload);
 };

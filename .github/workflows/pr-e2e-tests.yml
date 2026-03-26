@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
 
 jobs:
   define-config:
@@ -53,10 +54,15 @@ jobs:
         with:
           ref: ${{ inputs.branch }}
 
+      - name: Get branch SHA
+        id: get-sha
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
       - name: Echo config
         run: |
           echo "app: ${{ inputs.app }}"
           echo "branch: ${{ inputs.branch }}"
+          echo "sha: ${{ steps.get-sha.outputs.sha }}"
           echo "e2e: ${{ needs.define-config.outputs.e2e }}"
           echo "codegen: ${{ needs.define-config.outputs.codegen }}"
           echo "base_url: ${{ needs.define-config.outputs.base_url }}"
@@ -75,6 +81,8 @@ jobs:
         env:
           BRANCH_NAME: ${{ inputs.branch }}
           APP_NAME: ${{ inputs.app }}
+          SHA: ${{ steps.get-sha.outputs.sha }}
+          DETAILS_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         with:
           script: |
             const script = require('./.github/scripts/add-e2e-test-checks.js')
