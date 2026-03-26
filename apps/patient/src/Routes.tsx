@@ -23,8 +23,6 @@ export const routeElements = (
       <Route path="/readyBy" element={<ReadyBy />} />
       <Route path="/pharmacy" element={<Pharmacy />} />
       <Route path="/status" element={<Status />} />
-      {/* Leaving this here in case we need to roll back */}
-      {/* <Route path="/status" element={<Status />} /> */}
       <Route path="/canceled" element={<Canceled />} />
     </Route>
     <Route
