@@ -77,14 +77,6 @@
       },
       "dependsOn": ["^build", "codegen:tau"]
     },
-    "start:neutron": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/app",
-        "command": "env-cmd -f .env.neutron vite"
-      },
-      "dependsOn": ["^build", "codegen:neutron"]
-    },
     "dev": {
       "executor": "nx:run-commands",
       "options": {
@@ -121,7 +113,7 @@
       "outputs": ["{workspaceRoot}/dist/apps/app"],
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.neutron vite build"
+        "command": "vite build"
       },
       "dependsOn": ["^build", "codegen:neutron"]
     },
@@ -130,7 +122,7 @@
       "outputs": ["{workspaceRoot}/dist/apps/app"],
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.photon vite build"
+        "command": "vite build"
       },
       "dependsOn": ["^build", "codegen:photon"]
     },

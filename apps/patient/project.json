@@ -113,7 +113,7 @@
       "outputs": ["{workspaceRoot}/dist/apps/patient"],
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.neutron vite build"
+        "command": "vite build"
       },
       "dependsOn": ["^build", "codegen:neutron"]
     },
@@ -122,7 +122,7 @@
       "outputs": ["{workspaceRoot}/dist/apps/patient"],
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.photon vite build"
+        "command": "vite build"
       },
       "dependsOn": ["^build", "codegen:photon"]
     },
