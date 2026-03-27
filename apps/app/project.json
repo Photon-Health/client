@@ -9,14 +9,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "aws secretsmanager get-secret-value --secret-id app_build_vars --query SecretString --output text | jq -r 'to_entries[] | \"\\(.key)=\\(.value)\"' > .env"
-      }
-    },
-    "pullenv:boson": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/app",
-        "command": "AWS_PROFILE=boson aws secretsmanager get-secret-value --secret-id app_build_vars --query SecretString --output text | jq -r 'to_entries[] | \"\\(.key)=\\(.value)\"' > .env"
+        "command": "AWS_PROFILE=boson npm run pullenv"
       }
     },
     "codegen": {

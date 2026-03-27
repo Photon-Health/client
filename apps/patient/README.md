@@ -4,8 +4,13 @@
 
 In local development, it is possible to run the client against your local "tau" environment, or the remote "boson" dev environment. npm commands and Nx targets without an environment name attached run against boson by default, since we currently cannot spin up the entire backend architecture in tau.
 
-
 ### Default setup
+
+First, download environment variables used at runtime from AWS:
+
+```
+npx nx run patient:pullenv
+```
 
 To open the patient app, you'll need a URL with an order ID and token in the parameters. You can:
 
