@@ -66,7 +66,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.tau vite"
+        "command": "env-cmd -f .env -f .env.tau vite"
       },
       "dependsOn": ["^build", "codegen:tau"]
     },
@@ -86,7 +86,7 @@
       "options": {
         "cwd": "apps/app",
         "commands": [
-          "env-cmd -f .env.tau vite",
+          "env-cmd -f .env -f .env.tau vite",
           "nx watch --projects=app --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=app"
         ]
       },

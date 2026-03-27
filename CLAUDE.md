@@ -179,7 +179,7 @@ const mailOrderProviders = getOrgMailOrderPharms(user?.org_id)?.provider;
 | neutron  | Staging          |
 | photon   | Production       |
 
-Environment variables for boson, neutron and photon are stored in AWS Secrets Manager. You will typically only need to pull env vars for boson or tau for local development.
+Environment variables for boson, neutron and photon are stored in AWS Secrets Manager. You will typically only need to pull env vars for boson for local development. `.env.tau` contains tau-specific (non-sensitive) overrides.
 
 **Nx automatic `.env` loading:** Nx automatically loads `.env.local` (and other `.env` files) from the project root before running any target. Variables loaded first take precedence — Nx won't overwrite a variable already set in the process. This means `.env.local` values are available to all Nx targets without explicit `env-cmd` references. For example, Playwright credentials (`PLAYWRIGHT_E2E_ACCOUNT_USERNAME`, `PLAYWRIGHT_E2E_ACCOUNT_PASSWORD`) and `PLAYWRIGHT_BASE_URL` stored in `apps/app/.env.local` are automatically available when running `nx run app:e2e`.
 
