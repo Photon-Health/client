@@ -6,6 +6,7 @@ import { Canceled } from './Canceled';
 import { OrderContext, OrderContextType } from './Main';
 import { Order } from '../utils/models';
 import { generateOrder, generatePatient } from '../test-utils/generators';
+import { PatientAnalyticsProvider } from '../hooks/usePatientAnalytics';
 
 vi.mock('../components', () => ({
   PrescriptionsList: () => <div>Mock Prescriptions List</div>
@@ -64,9 +65,11 @@ const renderCanceled = (orderContextValueOverride: Partial<OrderContextType> = {
   return render(
     <MemoryRouter>
       <ChakraProvider>
-        <OrderContext.Provider value={orderContextValue}>
-          <Canceled />
-        </OrderContext.Provider>
+        <PatientAnalyticsProvider>
+          <OrderContext.Provider value={orderContextValue}>
+            <Canceled />
+          </OrderContext.Provider>
+        </PatientAnalyticsProvider>
       </ChakraProvider>
     </MemoryRouter>
   );

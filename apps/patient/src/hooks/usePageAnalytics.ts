@@ -1,8 +1,9 @@
 import { useContext, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { patientAnalytics } from '../configs/analytics';
+
 import { ApiObject } from '@rudderstack/analytics-js';
 import { OrderContext } from '../views/Main';
+import { usePatientAnalytics } from './usePatientAnalytics';
 
 interface UsePageAnalyticsProps {
   pageName: string;
@@ -13,6 +14,7 @@ export const usePageAnalytics = ({ pageName, properties }: UsePageAnalyticsProps
   const location = useLocation();
   const orderContext = useContext(OrderContext);
   const order = orderContext?.order;
+  const patientAnalytics = usePatientAnalytics();
 
   const onLoadProperties = useRef(properties);
 
