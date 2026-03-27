@@ -68,6 +68,18 @@ jobs:
           echo "base_url: ${{ needs.define-config.outputs.base_url }}"
           echo "report_name: ${{ needs.define-config.outputs.report_name }}"
           echo "report_path: ${{ needs.define-config.outputs.report_path }}"
+      
+      - uses: actions/github-script@v8
+        name: Add in-progress check to PR
+        id: create-check
+        env:
+          APP_NAME: ${{ inputs.app }}
+          SHA: ${{ steps.get-sha.outputs.sha }}
+          DETAILS_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          script: |
+            const scripts = require('./.github/scripts/add-e2e-test-checks.js')
+            return await scripts.createCheck({github, context, core})
 
       - name: Use Node.js 20.x
         uses: actions/setup-node@v4
@@ -104,15 +116,12 @@ jobs:
           retention-days: 30
 
       - uses: actions/github-script@v8
-        name: Add check to PR
+        name: Update check with result
         if: ${{ !cancelled() }}
         env:
-          BRANCH_NAME: ${{ inputs.branch }}
-          APP_NAME: ${{ inputs.app }}
-          SHA: ${{ steps.get-sha.outputs.sha }}
-          DETAILS_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          CHECK_RUN_ID: ${{ steps.create-check.outputs.result }}
           CONCLUSION: ${{ steps.run-tests.outcome }}
         with:
           script: |
-            const script = require('./.github/scripts/add-e2e-test-checks.js')
-            await script({github, context, core})
+            const scripts = require('./.github/scripts/add-e2e-test-checks.js')
+            await scripts.updateCheck({github, context, core})
