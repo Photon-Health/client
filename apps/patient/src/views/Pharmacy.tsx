@@ -23,7 +23,7 @@ import { FixedFooter, LocationModal, PoweredBy } from '../components';
 import { CouponModal } from '../components/coupons';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy, wait } from '../utils/general';
-import { OfferDetails, Pharmacy as EnrichedPharmacy, OfferBundleDetails } from '../utils/models';
+import { Pharmacy as EnrichedPharmacy, OfferBundleDetails } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -49,7 +49,7 @@ import {
   Prescription
 } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
-import { fetchOfferBundles, fetchOffers, getPharmacy } from './pharmacy.utils';
+import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
 import _ from 'lodash';
 import {
   BrandedOptionOverrides,
@@ -160,10 +160,8 @@ export const Pharmacy = () => {
     BrandedOptionOverrides | undefined
   >(undefined);
 
-  const [offers, setOffers] = useState<OfferDetails[] | OfferBundleDetails[] | undefined>(
-    undefined
-  );
-  const [filteredOffers, setFilteredOffers] = useState<OfferDetails[] | undefined>(undefined);
+  const [offers, setOffers] = useState<OfferBundleDetails[] | undefined>(undefined);
+  const [filteredOffers, setFilteredOffers] = useState<OfferBundleDetails[] | undefined>(undefined);
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
@@ -241,11 +239,9 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     const getOffers = async () => {
-      let fetchedOffers: OfferDetails[] | OfferBundleDetails | undefined = [];
-
       // only fetch offers if we don't have any
       if (!offers) {
-        fetchedOffers = orderIsMultiRx ? await fetchOfferBundles(order) : await fetchOffers(order);
+        const fetchedOffers = await fetchOfferBundles(order);
 
         if (JSON.stringify(fetchedOffers) !== JSON.stringify(offers)) {
           setOffers(fetchedOffers);

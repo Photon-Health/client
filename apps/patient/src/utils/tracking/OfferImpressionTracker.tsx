@@ -3,7 +3,6 @@ import { useInView } from 'react-intersection-observer';
 import { patientAnalytics } from '../../configs/analytics';
 import { EnrichedPharmacy, OfferBundleDetails } from '../models';
 import { useOrderContext } from '../../views/Main';
-import { OfferDetails } from '../models';
 import { getOfferType } from '../offers';
 import { Prescription } from '../../__generated__/graphql';
 
@@ -16,7 +15,7 @@ const OfferImpressionTracker = ({
   enabled
 }: {
   children: React.ReactNode;
-  offer: OfferDetails | OfferBundleDetails | undefined;
+  offer: OfferBundleDetails | undefined;
   pharmacy: EnrichedPharmacy;
   ordinalPosition: number;
   isAlreadySelected: boolean;

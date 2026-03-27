@@ -2,12 +2,7 @@ import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@c
 import { FiInfo, FiStar, FiTag } from 'react-icons/fi';
 import { Tooltip } from './Tooltip';
 import { text as t } from '../../utils/text';
-import {
-  OfferBundleDetails,
-  OfferDetails,
-  OfferPromotionTypes,
-  Promotion
-} from '../../utils/models';
+import { OfferBundleDetails, OfferPromotionTypes, Promotion } from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';
 
 const PreferredTag = () => {
@@ -39,18 +34,32 @@ const CurrentPharmacyTag = () => {
 const getLargestPromotionAmount = (promotions: Array<Promotion> | undefined): number =>
   Math.max(...(promotions ?? []).map((p) => p.amountSaved ?? 0));
 
-const CouponTag = ({ promotions }: { promotions?: Array<Promotion> }) => {
+const CouponTag = ({
+  promotions,
+  size = 'sm'
+}: {
+  promotions?: Array<Promotion>;
+  size?: 'sm' | 'md';
+}) => {
   const largestPromotion = getLargestPromotionAmount(promotions);
+  const isMd = size === 'md';
   return (
     promotions?.length && (
-      <HStack bg="orange.50" color="orange.500" borderRadius="md" px={1.5} py={0.5}>
-        <FiTag size={10} />
+      <HStack
+        bg="orange.50"
+        color="orange.500"
+        borderRadius="md"
+        px={isMd ? 3 : 1.5}
+        py={isMd ? 2 : 0.5}
+        w={isMd ? 'full' : undefined}
+      >
+        <FiTag size={isMd ? 14 : 10} />
         {largestPromotion > 0 ? (
-          <Text fontSize="xs">
+          <Text fontSize={isMd ? 'sm' : 'xs'}>
             <strong>Up to ${formatPrice(largestPromotion)}</strong> off with coupon if eligible
           </Text>
         ) : (
-          <Text fontSize="xs" fontWeight="bold">
+          <Text fontSize={isMd ? 'sm' : 'xs'} fontWeight="bold">
             with coupon if eligible
           </Text>
         )}
@@ -60,8 +69,8 @@ const CouponTag = ({ promotions }: { promotions?: Array<Promotion> }) => {
 };
 
 interface OfferInfoProps {
-  pharmacy?: Pick<OfferDetails['pharmacy'], 'id' | 'name' | 'logo'>;
-  offer: OfferDetails | OfferBundleDetails;
+  pharmacy?: Pick<OfferBundleDetails['pharmacy'], 'id' | 'name' | 'logo'>;
+  offer: OfferBundleDetails;
   isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
 }
@@ -104,7 +113,13 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
 
   const isAmazonPharmacy = pharmacy.id === import.meta.env.VITE_AMAZON_PHARMACY_ID;
 
-  const isOfferBundle = 'medications' in offer; // we can remove this variable once we contract to only using OfferBundleDetails in this component
+  const isMultiRx = 'medications' in offer && offer.medications.length > 1;
+
+  const singleMedPromotions = !isMultiRx
+    ? offer.medications?.[0]?.promotions?.filter(
+        (promo) => promo.type === OfferPromotionTypes.AmazonPharmacyRXCoupon
+      )
+    : undefined;
 
   return (
     <VStack data-testid="pharmacy-info" align="start" w="full">
@@ -148,8 +163,9 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
         ) : null}
       </HStack>
 
-      {/* currently only OfferBundles have medications */}
-      {isOfferBundle && (
+      {!isMultiRx && <CouponTag size="md" promotions={singleMedPromotions} />}
+
+      {isMultiRx && (
         <VStack w="full" bg="gray.50" borderRadius="md" p={3}>
           {offer.medications.map((med) => (
             <HStack key={med.name} w="full" justify="space-between" align="start">

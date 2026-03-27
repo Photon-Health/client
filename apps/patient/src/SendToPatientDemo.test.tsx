@@ -3,7 +3,7 @@ import { afterEach, describe, expect, vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
-import { triggerDemoNotification } from './api';
+import { getOfferBundles, triggerDemoNotification } from './api';
 
 vi.mock('./api', () => ({
   geocode: vi.fn().mockResolvedValue({
@@ -12,7 +12,7 @@ vi.mock('./api', () => ({
     address: '123 Main St, New York, NY 10001'
   }),
   getPharmacies: vi.fn().mockResolvedValue({ pharmacies: [] }),
-  getOffers: vi.fn().mockResolvedValue([]),
+  getOfferBundles: vi.fn().mockResolvedValue([]),
   triggerDemoNotification: vi.fn()
 }));
 
