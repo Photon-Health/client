@@ -113,7 +113,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
 
   const isAmazonPharmacy = pharmacy.id === import.meta.env.VITE_AMAZON_PHARMACY_ID;
 
-  const isMultiRx = 'medications' in offer && offer.medications.length > 1;
+  const isMultiRx = (offer.medications?.length ?? 0) > 1;
 
   const singleMedPromotions = !isMultiRx
     ? offer.medications?.[0]?.promotions?.filter(
@@ -167,7 +167,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
 
       {isMultiRx && (
         <VStack w="full" bg="gray.50" borderRadius="md" p={3}>
-          {offer.medications.map((med) => (
+          {offer.medications?.map((med) => (
             <HStack key={med.name} w="full" justify="space-between" align="start">
               <VStack align="flex-start">
                 <Tooltip
@@ -190,17 +190,19 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
                 />
               </VStack>
 
-              <VStack align="flex-end" spacing={1}>
-                <Text fontSize="sm" fontWeight="bold">
-                  ${formatPrice(med.amount)}
-                </Text>
-                {/* only show retail amount if it's higher than the current amount */}
-                {med.retailAmount && med.retailAmount > med.amount && (
-                  <Text fontSize="xs" color="gray.400" textDecoration="line-through">
-                    ${formatPrice(med.retailAmount)}
+              {med.amount ? ( // only show the price if we have one
+                <VStack align="flex-end" spacing={1}>
+                  <Text fontSize="sm" fontWeight="bold">
+                    ${formatPrice(med.amount)}
                   </Text>
-                )}
-              </VStack>
+                  {/* only show retail amount if it's higher than the current amount */}
+                  {med.retailAmount && med.retailAmount > med.amount && (
+                    <Text fontSize="xs" color="gray.400" textDecoration="line-through">
+                      ${formatPrice(med.retailAmount)}
+                    </Text>
+                  )}
+                </VStack>
+              ) : null}
             </HStack>
           ))}
         </VStack>

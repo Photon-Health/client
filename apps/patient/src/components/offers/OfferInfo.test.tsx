@@ -425,7 +425,7 @@ describe('OfferInfo', () => {
         ...baseSingleMedBundle,
         medications: [
           {
-            ...baseSingleMedBundle.medications[0],
+            ...baseSingleMedBundle.medications![0],
             promotions: [{ type: 'PHARMACY_RX_COUPON', amountSaved: 15 }]
           }
         ]
@@ -449,7 +449,7 @@ describe('OfferInfo', () => {
         ...baseSingleMedBundle,
         medications: [
           {
-            ...baseSingleMedBundle.medications[0],
+            ...baseSingleMedBundle.medications![0],
             promotions: [{ type: 'PHARMACY_RX_COUPON', amountSaved: 0 }]
           }
         ]

@@ -35,9 +35,9 @@ export interface OfferBundleDetails {
     logo?: string;
   };
   tags: string[];
-  medications: Array<{
+  medications?: Array<{
     name?: string;
-    amount: number;
+    amount?: number;
     amountTitle?: string;
     retailAmount?: number;
     retailAmountTitle?: string;
