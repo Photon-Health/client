@@ -15,6 +15,7 @@ import { graphql } from 'apps/app/src/gql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 import { Page } from '../../components/Page';
 import { usePhoton } from '@photonhealth/react';
+import { DashboardTab } from './views/DashboardTab';
 import { DevelopersTab } from './views/DevelopersTab';
 import { OrganizationTab } from './views/OrganizationTab';
 import { TeamTab } from './views/TeamTab';
@@ -47,7 +48,8 @@ const tabs = [
   '/settings/organization',
   '/settings/developers',
   '/settings/catalog',
-  '/settings/templates'
+  '/settings/templates',
+  '/settings/dashboard'
 ] as const;
 
 const canNavigate = (
@@ -65,6 +67,7 @@ const canNavigate = (
   if (route === '/settings/developers') return hasDeveloper;
   if (route === '/settings/team') return hasTeam;
   if (route === '/settings/organization') return canManageOrganization;
+  if (route === '/settings/dashboard') return canManageOrganization;
   return true;
 };
 
@@ -138,6 +141,7 @@ export const Settings = () => {
             <Tab hidden={!hasDeveloper}>Developers</Tab>
             <Tab>Catalog</Tab>
             <Tab>Templates</Tab>
+            <Tab hidden={!canManageOrganization}>Dashboard</Tab>
           </TabList>
           <TabPanels>
             <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
@@ -157,6 +161,9 @@ export const Settings = () => {
             </TabPanel>
             <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
               <TemplateTab />
+            </TabPanel>
+            <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
+              <DashboardTab />
             </TabPanel>
           </TabPanels>
         </Tabs>
