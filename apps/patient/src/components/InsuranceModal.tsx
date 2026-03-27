@@ -14,8 +14,8 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import { patientAnalytics } from '../configs/analytics';
 import { useOrderContext } from '../views/Main';
+import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 interface InsuranceModalProps {
   isOpen: boolean;
@@ -55,6 +55,7 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
   const [groupNumber, setGroupNumber] = useState('');
   const [rxBin, setRxBin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const patientAnalytics = usePatientAnalytics();
 
   const getFormData = () => ({
     provider,

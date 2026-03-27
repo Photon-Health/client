@@ -7,6 +7,7 @@ import { OrderContext, OrderContextType } from './Main';
 import { Order } from '../utils/models';
 import { generateOrder, generatePatient } from '../test-utils/generators';
 import userEvent from '@testing-library/user-event';
+import { PatientAnalyticsProvider } from '../hooks/usePatientAnalytics';
 
 vi.mock('../components', () => ({
   PrescriptionsList: () => <div>Mock Prescriptions List</div>,
@@ -63,9 +64,11 @@ const renderReadyBy = (orderContextValueOverride: Partial<OrderContextType> = {}
   return render(
     <MemoryRouter>
       <ChakraProvider>
-        <OrderContext.Provider value={orderContextValue}>
-          <ReadyBy />
-        </OrderContext.Provider>
+        <PatientAnalyticsProvider>
+          <OrderContext.Provider value={orderContextValue}>
+            <ReadyBy />
+          </OrderContext.Provider>
+        </PatientAnalyticsProvider>
       </ChakraProvider>
     </MemoryRouter>
   );

@@ -10,6 +10,14 @@ vi.mock('@datadog/browser-rum', () => ({
     addAction: vi.fn()
   }
 }));
+const mockPatientAnalytics = {
+  page: vi.fn(),
+  identify: vi.fn(),
+  track: vi.fn()
+};
+vi.mock('./configs/analytics', () => ({
+  getPatientAnalytics: () => mockPatientAnalytics
+}));
 
 vi.mock('@client/settings', () => ({
   getOrgMailOrderPharms: vi.fn(() => ({ patient: [] }))

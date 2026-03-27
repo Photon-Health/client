@@ -3,8 +3,8 @@ import { DiscountCard } from '../../__generated__/graphql';
 import { CouponSourceLogo } from './CouponSourceLogo';
 import { formatPrice } from '../../utils/formatters';
 import { Card } from '../Card';
-import { patientAnalytics } from '../../configs/analytics';
 import { Order } from '../../utils/models';
+import { usePatientAnalytics } from '../../hooks/usePatientAnalytics';
 
 interface ExternalLinkCouponCardProps {
   coupon: ExternalLinkCoupon;
@@ -19,6 +19,7 @@ export type ExternalLinkCoupon = Pick<
 export const ExternalLinkCouponCard = (props: ExternalLinkCouponCardProps) => {
   const { price, externalUrl, source, retailPrice } = props.coupon;
   const { order } = props;
+  const patientAnalytics = usePatientAnalytics();
 
   const handleGetCouponClick = () => {
     patientAnalytics.track('Click External Offer Link', order, {
