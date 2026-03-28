@@ -73,8 +73,7 @@ export const DashboardTab = () => {
         title="Partner Value Dashboard"
         width="100%"
         height="800"
-        style={{ border: 'none' }}
-        allowTransparency
+        style={{ border: 'none', background: 'transparent' }}
       />
     </Box>
   );
