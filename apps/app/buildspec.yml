@@ -63,7 +63,7 @@ phases:
       - |
         BRANCH_NAME=$(echo $CODEBUILD_WEBHOOK_HEAD_REF | sed -e "s/refs\/heads\///g")
         echo "BRANCH_NAME: $BRANCH_NAME"
-        if [ "$CODEBUILD_BUILD_SUCCEEDING" = "1" ] && [ "$VITE_ENV_NAME" = "boson" ] && [ "$BRANCH_NAME" != "neutrons/merge" ] && [ "$BRANCH_NAME" != "photons/merge" ]; then
+        if [ "$CODEBUILD_BUILD_SUCCEEDING" = "1" ] && [ "$VITE_ENV_NAME" = "boson" ] && [ "$BRANCH_NAME" != "neturons/merge" ] && [ "$BRANCH_NAME" != "photons/merge" ]; then
           curl -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github+json" \
