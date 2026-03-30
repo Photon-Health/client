@@ -16,8 +16,8 @@ import { FiMapPin } from 'react-icons/fi';
 import { Formik, Form, Field, FieldProps, FormikProps } from 'formik';
 import * as Yup from 'yup';
 import { updatePatientAddress, updateOrderAddress } from '../api';
-import { patientAnalytics } from '../configs/analytics';
 import { Order } from '../utils/models';
+import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 const US_STATES = [
   { value: 'AL', label: 'Alabama' },
@@ -117,6 +117,7 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
     const [submitError, setSubmitError] = useState<string | null>(null);
     const formikRef = useRef<FormikProps<AddressFormValues>>(null);
     const submitResultRef = useRef<boolean>(false);
+    const patientAnalytics = usePatientAnalytics();
 
     const submitAddress = useCallback(
       async (values: AddressFormValues): Promise<boolean> => {

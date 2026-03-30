@@ -58,6 +58,7 @@ export const GET_ORDER = gql`
           }
           selector
           createdAt
+          reason
         }
       }
       organization {
@@ -73,6 +74,10 @@ export const GET_ORDER = gql`
             enablePatientDeliveryPharmacies
             patientFeaturedPharmacyName
           }
+        }
+        customer {
+          id
+          name
         }
       }
       fulfillment {

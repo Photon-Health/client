@@ -2,10 +2,10 @@ import { Center, Heading, Text, VStack, ChakraProvider } from '@chakra-ui/react'
 import { MdSearch } from 'react-icons/md';
 import { text as t } from '../utils/text';
 import theme from '../configs/theme';
-import { patientAnalytics } from '../configs/analytics';
+import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 export const NoMatch = () => {
-  patientAnalytics.page('/', 'No Page or Order Found');
+  usePatientAnalytics().page('/', 'No Page or Order Found');
 
   return (
     <ChakraProvider theme={theme()}>
