@@ -6,7 +6,7 @@ In local development, it is possible to run the client against your local "tau" 
 
 ### Default setup
 
-First, download environment variables used at runtime from AWS:
+First, download environment variables used at runtime to `.env` from AWS:
 
 ```
 npx nx run patient:pullenv
