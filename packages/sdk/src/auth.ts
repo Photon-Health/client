@@ -1,8 +1,8 @@
 import {
   Auth0Client,
-  LogoutOptions as Auth0LogoutOptions,
   GetTokenSilentlyOptions,
   GetTokenWithPopupOptions,
+  LogoutOptions as Auth0LogoutOptions,
   RedirectLoginOptions,
   User
 } from '@auth0/auth0-spa-js';
