@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "vitest",
-    "pullenv": "secret=$(aws secretsmanager get-secret-value --secret-id patient_build_vars --query SecretString --output text) && echo \"$secret\" | jq -r 'to_entries[] | \"\\(.key)=\\(.value)\"' > .env"
+    "pullenv": "aws sso login && secret=$(aws secretsmanager get-secret-value --secret-id patient_build_vars --query SecretString --output text) && echo \"$secret\" | jq -r 'to_entries[] | \"\\(.key)=\\(.value)\"' > .env && echo \"\nSuccessfully downloaded .env file\""
   },
   "dependencies": {
     "@rudderstack/analytics-js": "^3.22.0",
