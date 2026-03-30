@@ -18,14 +18,14 @@ function getNovocareOffers(order: Order): OfferBundleDetails[] {
     return [
       {
         costType: 'NOVOCARE_OFFER',
-        deliveryEstimate: novocareExperimentSegment,
-        tags: ['Delivers in 3-5 days'],
+        deliveryEstimate: novocareExperimentSegment.deliveryType,
+        tags: [],
         pharmacy: {
           id: import.meta.env.VITE_NOVOCARE_PHARMACY_ID as string,
           name: 'Novocare',
           fulfillmentTypes: ['MAIL_ORDER']
         },
-        medications: []
+        medications: novocareExperimentSegment.medications.map((name) => ({ name }))
       }
     ];
   } else {
@@ -82,7 +82,9 @@ export async function fetchOfferBundles(order: Order): Promise<OfferBundleDetail
 }
 
 // this function will update the state for novocareExperimentOverride if there are specific medications inside the order
-export function determineNovocareExperimentSegment(order: Order): string | undefined {
+export function determineNovocareExperimentSegment(
+  order: Order
+): { deliveryType: string | undefined; medications: string[] } | undefined {
   const organizationId = order?.organization.id;
 
   const medicinesAndDeliveryTypes = [
@@ -143,7 +145,7 @@ export function determineNovocareExperimentSegment(order: Order): string | undef
 
   const deliveryType = getDeliveryType();
 
-  return deliveryType;
+  return { deliveryType, medications };
 }
 
 export function getPharmacy(
