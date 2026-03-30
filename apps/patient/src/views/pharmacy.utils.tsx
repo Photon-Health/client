@@ -14,7 +14,7 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 function getNovocareOffers(order: Order): OfferBundleDetails[] {
   const novocareExperimentSegment = determineNovocareExperimentSegment(order);
 
-  if (novocareExperimentSegment) {
+  if (novocareExperimentSegment?.deliveryType != undefined) {
     return [
       {
         costType: 'NOVOCARE_OFFER',
