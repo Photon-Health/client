@@ -1,9 +1,10 @@
 import { Link, Text, HStack } from '@chakra-ui/react';
 import { Logo } from './Logo';
-import { patientAnalytics } from '../configs/analytics';
 import { useOrderContext } from '../views/Main';
+import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 export const PoweredBy = () => {
+  const patientAnalytics = usePatientAnalytics();
   const { order } = useOrderContext();
 
   const handlePhotonClick = () => {

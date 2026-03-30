@@ -3,7 +3,7 @@ import { SlideFade } from '@chakra-ui/react';
 import { BrandedPharmacyCard } from './BrandedPharmacyCard';
 import { OfferImpressionTracker } from '../../utils/tracking/OfferImpressionTracker';
 import { getPharmacy } from '../../views/pharmacy.utils';
-import { OfferDetails } from '../../utils/models';
+import { OfferBundleDetails } from '../../utils/models';
 
 interface Props {
   options: string[];
@@ -17,7 +17,7 @@ interface Props {
 }
 
 export interface BrandedOptionOverrides {
-  amazonPharmacyOverride?: OfferDetails;
+  amazonPharmacyOverride?: OfferBundleDetails;
   novocareExperimentOverride?: string;
 }
 
