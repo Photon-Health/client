@@ -1,7 +1,17 @@
+/// <reference types="node" />
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
+const schemaByEnv: Record<string, string> = {
+  boson: 'https://patient-api.boson.health/graphql',
+  neutron: 'https://patient-api.neutron.health/graphql',
+  photon: 'https://patient-api.photon.health/graphql',
+  tau: 'http://patient-api.tau.health:8080/graphql'
+};
+
+const env = process.env.VITE_ENV_NAME ?? 'photon';
+
 const config: CodegenConfig = {
-  schema: process.env.VITE_GRAPHQL_API_ENDPOINT,
+  schema: schemaByEnv[env],
   documents: ['**/*.ts'],
   config: {
     maybeValue: 'T | undefined',

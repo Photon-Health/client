@@ -6,6 +6,12 @@ In local development, it is possible to run the client against your local "tau" 
 
 ### Default setup
 
+First, download environment variables used at runtime to `.env` from AWS:
+
+```
+npx nx run app:pullenv
+```
+
 Start the clinical app dev server with hot refresh and codegen to generate TS types for any new queries/mutations. Files in `app` dependencies will automatically rebuild, but you'll need to manually refresh the webpage to see your changes.
 
 ```
@@ -84,10 +90,6 @@ Automatically fix ESLint issues:
 ### Build
 
 `npx nx run app:build:boson`
-
-`npx nx run app:build:neutron`
-
-`npx nx run app:build:photon`
 
 Builds the app for each environment into the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.

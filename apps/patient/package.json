@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "test": "vitest"
+    "test": "vitest",
+    "pullenv": "aws sso login && secret=$(aws secretsmanager get-secret-value --secret-id patient_build_vars --query SecretString --output text) && echo \"$secret\" | jq -r 'to_entries[] | \"\\(.key)=\\(.value)\"' > .env && echo \"\nSuccessfully downloaded .env file\""
   },
   "dependencies": {
     "@rudderstack/analytics-js": "^3.22.0",

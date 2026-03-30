@@ -1,5 +1,23 @@
 version: 0.2
 
+env:
+  secrets-manager:
+    VITE_ENV_NAME: patient_build_vars:VITE_ENV_NAME
+    VITE_DATADOG_RUM_APPLICATION_ID: patient_build_vars:VITE_DATADOG_RUM_APPLICATION_ID
+    VITE_DATADOG_RUM_CLIENT_TOKEN: patient_build_vars:VITE_DATADOG_RUM_CLIENT_TOKEN
+    VITE_RUDDERSTACK_WRITE_KEY: patient_build_vars:VITE_RUDDERSTACK_WRITE_KEY
+    VITE_RUDDERSTACK_DATA_PLANE_URL: patient_build_vars:VITE_RUDDERSTACK_DATA_PLANE_URL
+    VITE_MIXPANEL_TOKEN: patient_build_vars:VITE_MIXPANEL_TOKEN
+    VITE_GRAPHQL_API_ENDPOINT: patient_build_vars:VITE_GRAPHQL_API_ENDPOINT
+    VITE_THIRD_PARTY_REST_API_ENDPOINT: patient_build_vars:VITE_THIRD_PARTY_REST_API_ENDPOINT
+    VITE_ALTO_PHARMACY_ID: patient_build_vars:VITE_ALTO_PHARMACY_ID
+    VITE_AMAZON_PHARMACY_ID: patient_build_vars:VITE_AMAZON_PHARMACY_ID
+    VITE_COST_PLUS_PHARMACY_ID: patient_build_vars:VITE_COST_PLUS_PHARMACY_ID
+    VITE_COSTCO_PHARMACY_ID: patient_build_vars:VITE_COSTCO_PHARMACY_ID
+    VITE_NOVOCARE_PHARMACY_ID: patient_build_vars:VITE_NOVOCARE_PHARMACY_ID
+    VITE_WALMART_MAIL_ORDER_PHARMACY_ID: patient_build_vars:VITE_WALMART_MAIL_ORDER_PHARMACY_ID
+    VITE_TWILIO_SMS_NUMBER: patient_build_vars:VITE_TWILIO_SMS_NUMBER
+
 phases:
   install:
     on-failure: ABORT
@@ -19,10 +37,9 @@ phases:
       - printenv
       - node -v
       - npm -v
-      # - npm install
       # For boson save in folders named after the branch name
       - |
-        if [ "$ENV" = "boson" ] ; then
+        if [ "$VITE_ENV_NAME" = "boson" ] ; then
           export OUTPUT_DIR=$(echo $CODEBUILD_WEBHOOK_HEAD_REF | sed -e "s/refs\/heads\///g")
 
           # Lowercase branch name
@@ -35,18 +52,29 @@ phases:
         fi
       # For photon and neutron save in folders named after the git hash
       - |
-        if [ "$ENV" = "photon" ] ; then
+        if [ "$VITE_ENV_NAME" = "photon" ] ; then
           export OUTPUT_DIR="photon"
           npx nx run patient:build:photon
         fi
       - |
-        if [ "$ENV" = "neutron" ] ; then
+        if [ "$VITE_ENV_NAME" = "neutron" ] ; then
           export OUTPUT_DIR="neutron"
           npx nx run patient:build:neutron
         fi
       - echo "OUTPUT_DIR set to '$OUTPUT_DIR'"
   post_build:
     commands:
+      - echo "Sending e2e test workflow dispatch to GitHub"
+      - |
+        BRANCH_NAME=$(echo $CODEBUILD_WEBHOOK_HEAD_REF | sed -e "s/refs\/heads\///g")
+        echo "BRANCH_NAME: $BRANCH_NAME"
+        if [ "$CODEBUILD_BUILD_SUCCEEDING" = "1" ]; then
+          curl -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/Photon-Health/client/actions/workflows/pr-e2e-tests.yml/dispatches \
+            -d "{\"ref\":\"$CODEBUILD_WEBHOOK_HEAD_REF\",\"inputs\":{\"branch\":\"$BRANCH_NAME\",\"app\":\"patient\"}}"
+        fi
       - echo Installing Datadog CI
       - npm install -g @datadog/datadog-ci
       - echo Uploading source maps to Datadog

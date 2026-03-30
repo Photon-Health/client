@@ -1,5 +1,18 @@
 version: 0.2
 
+env:
+  secrets-manager:
+    VITE_ENV_NAME: app_build_vars:VITE_ENV_NAME
+    VITE_DATADOG_RUM_APPLICATION_ID: app_build_vars:VITE_DATADOG_RUM_APPLICATION_ID
+    VITE_DATADOG_RUM_CLIENT_TOKEN: app_build_vars:VITE_DATADOG_RUM_CLIENT_TOKEN
+    VITE_RUDDERSTACK_WRITE_KEY: app_build_vars:VITE_RUDDERSTACK_WRITE_KEY
+    VITE_RUDDERSTACK_DATA_PLANE_URL: app_build_vars:VITE_RUDDERSTACK_DATA_PLANE_URL
+    VITE_AUTH0_DOMAIN: app_build_vars:VITE_AUTH0_DOMAIN
+    VITE_AUTH0_CLIENT_ID: app_build_vars:VITE_AUTH0_CLIENT_ID
+    VITE_AUTH0_AUDIENCE: app_build_vars:VITE_AUTH0_AUDIENCE
+    VITE_GRAPHQL_URI: app_build_vars:VITE_GRAPHQL_URI
+    VITE_CLINICAL_GRAPHQL_URI: app_build_vars:VITE_CLINICAL_GRAPHQL_URI
+
 phases:
   install:
     on-failure: ABORT
@@ -19,10 +32,9 @@ phases:
       - printenv
       - node -v
       - npm -v
-      # - npm install
       # For boson save in folders named after the branch name
       - |
-        if [ "$ENV" = "boson" ] ; then
+        if [ "$VITE_ENV_NAME" = "boson" ] ; then
           export OUTPUT_DIR=$(echo $CODEBUILD_WEBHOOK_HEAD_REF | sed -e "s/refs\/heads\///g")
 
           # Lowercase branch name
@@ -35,27 +47,29 @@ phases:
         fi
       # For photon and neutron save in folders named after the git hash
       - |
-        if [ "$ENV" = "photon" ] ; then
+        if [ "$VITE_ENV_NAME" = "photon" ] ; then
           export OUTPUT_DIR="photon"
           npx nx run app:build:photon
         fi
       - |
-        if [ "$ENV" = "neutron" ] ; then
+        if [ "$VITE_ENV_NAME" = "neutron" ] ; then
           export OUTPUT_DIR="neutron"
           npx nx run app:build:neutron
         fi
       - echo "OUTPUT_DIR set to '$OUTPUT_DIR'"
   post_build:
     commands:
-      - echo "Sending codebuild-complete to GitHub"
+      - echo "Sending e2e test workflow dispatch to GitHub"
       - |
         BRANCH_NAME=$(echo $CODEBUILD_WEBHOOK_HEAD_REF | sed -e "s/refs\/heads\///g")
         echo "BRANCH_NAME: $BRANCH_NAME"
-        curl -X POST \
-          -H "Accept: application/vnd.github.v3+json" \
-          -H "Authorization: token $GITHUB_TOKEN" \
-          https://api.github.com/repos/Photon-Health/client/dispatches \
-          -d '{"event_type":"codebuild-complete","client_payload":{"branchName":"'$BRANCH_NAME'"}}'
+        if [ "$CODEBUILD_BUILD_SUCCEEDING" = "1" ]; then
+          curl -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/Photon-Health/client/actions/workflows/pr-e2e-tests.yml/dispatches \
+            -d "{\"ref\":\"$CODEBUILD_WEBHOOK_HEAD_REF\",\"inputs\":{\"branch\":\"$BRANCH_NAME\",\"app\":\"app\"}}"
+        fi
       - echo Installing Datadog CI
       - npm install -g @datadog/datadog-ci
       - echo Uploading source maps to Datadog
