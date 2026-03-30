@@ -17,15 +17,6 @@ export const getOrder = async (orderId: string) => {
   }
 };
 
-export const getOffers = async (orderId: string) => {
-  const response = await graphQLClient.GetOffersForOrder({ orderId: orderId });
-  if (response.offers) {
-    return response.offers;
-  } else {
-    throw new Error('No offers found');
-  }
-};
-
 export const getOfferBundles = async (orderId: string) => {
   const response = await graphQLClient.GetOfferBundlesForOrder({ orderId: orderId });
   return response.offerBundles;

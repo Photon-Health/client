@@ -37,6 +37,7 @@ interface ContextDataOrderMetadata {
 interface ContextDataRoutingHistory {
   selector: string;
   createdAt: string;
+  reason: string;
   [key: string]: any;
 }
 
@@ -46,10 +47,16 @@ interface ContextDataOrder {
   [key: string]: any;
 }
 
+interface ContextDataCustomer {
+  id: string;
+  name: string;
+}
+
 interface ContextDataOrganization {
   id: string;
   name: string;
   address: ContextDataAddress;
+  customer?: ContextDataCustomer;
   [key: string]: any;
 }
 
@@ -129,7 +136,8 @@ function mapOrderToContextData(order: Order): ContextData {
       .map(
         (history): ContextDataRoutingHistory => ({
           selector: history.selector || '',
-          createdAt: history.createdAt || ''
+          createdAt: history.createdAt || '',
+          reason: history.reason || ''
         })
       )
   };
@@ -153,6 +161,8 @@ function mapOrderToContextData(order: Order): ContextData {
     }
   };
 
+  const organizationCustomer = order.organization?.customer;
+
   const contextDataOrganization: ContextDataOrganization = {
     id: order.organization?.id || '',
     name: order.organization?.name || '',
@@ -162,6 +172,10 @@ function mapOrderToContextData(order: Order): ContextData {
       state: order.address?.state || '',
       country: order.address?.country || '',
       postalCode: order.address?.postalCode || ''
+    },
+    customer: {
+      id: organizationCustomer?.id || '',
+      name: organizationCustomer?.name || ''
     }
   };
 
