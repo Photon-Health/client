@@ -8,7 +8,7 @@ const schemaByEnv: Record<string, string> = {
   tau: 'http://clinical-api.tau.health:8080/graphql'
 };
 
-const env = process.env.VITE_ENV_NAME ?? 'boson';
+const env = process.env.VITE_ENV_NAME ?? 'photon';
 
 const config: CodegenConfig = {
   schema: schemaByEnv[env],
