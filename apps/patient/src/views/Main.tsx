@@ -19,10 +19,10 @@ import { countFillsAndRemoveDuplicates, FillWithCount } from '../utils/general';
 import { Order } from '../utils/models';
 import { Pharmacy } from '../__generated__/graphql';
 import { FAQModal } from '../components/FAQModal';
-import { patientAnalytics } from '../configs/analytics';
 import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
 import { preloadImage } from '../utils/preloadImage';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
+import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 type FetchOrderOptions = {
   triggerNavigationAfterFetch: boolean;
@@ -88,6 +88,7 @@ export const Main = () => {
   const orderId = searchParams.get('orderId');
   const phone = searchParams.get('phone');
   const location = useLocation();
+  const patientAnalytics = usePatientAnalytics();
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
   // This is used to track whether the patient has enabled price on the pharmacy page

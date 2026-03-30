@@ -38,6 +38,7 @@ interface ContextDataOrderMetadata {
 interface ContextDataRoutingHistory {
   selector: string;
   createdAt: string;
+  reason: string;
   [key: string]: any;
 }
 
@@ -47,10 +48,16 @@ interface ContextDataOrder {
   [key: string]: any;
 }
 
+interface ContextDataCustomer {
+  id: string;
+  name: string;
+}
+
 interface ContextDataOrganization {
   id: string;
   name: string;
   address: ContextDataAddress;
+  customer?: ContextDataCustomer;
   [key: string]: any;
 }
 
@@ -130,7 +137,8 @@ function mapOrderToContextData(order: Order): ContextData {
       .map(
         (history): ContextDataRoutingHistory => ({
           selector: history.selector || '',
-          createdAt: history.createdAt || ''
+          createdAt: history.createdAt || '',
+          reason: history.reason || ''
         })
       )
   };
@@ -154,6 +162,8 @@ function mapOrderToContextData(order: Order): ContextData {
     }
   };
 
+  const organizationCustomer = order.organization?.customer;
+
   const contextDataOrganization: ContextDataOrganization = {
     id: order.organization?.id || '',
     name: order.organization?.name || '',
@@ -163,6 +173,10 @@ function mapOrderToContextData(order: Order): ContextData {
       state: order.address?.state || '',
       country: order.address?.country || '',
       postalCode: order.address?.postalCode || ''
+    },
+    customer: {
+      id: organizationCustomer?.id || '',
+      name: organizationCustomer?.name || ''
     }
   };
 
@@ -223,7 +237,37 @@ type FlagValues = {
 
 type FlagNames = keyof FlagValues;
 
-class PatientAnalytics {
+export interface PatientAnalytics {
+  page(category: string, name?: string, properties?: ApiObject): void;
+
+  track(eventName: string, order: Order, properties?: ApiObject): void;
+
+  identify(input: {
+    userId?: string;
+    address?: IdentifyTraits['address'];
+    orgId?: string;
+    orgName?: string;
+  }): void;
+}
+
+class NoopPatientAnalytics implements PatientAnalytics {
+  page(_category: string, _name?: string, _properties?: ApiObject): void {
+    return;
+  }
+  track(_eventName: string, _order: Order, _properties?: ApiObject): void {
+    return;
+  }
+  identify(_input: {
+    userId?: string;
+    address?: IdentifyTraits['address'];
+    orgId?: string;
+    orgName?: string;
+  }): void {
+    return;
+  }
+}
+
+class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
   private rudderanalytics?: RudderAnalytics;
   private environment = 'development';
   private mixpanelEnabled: boolean = false;
@@ -346,4 +390,13 @@ class PatientAnalytics {
   }
 }
 
-export const patientAnalytics = new PatientAnalytics();
+const rudderAndMixPanelPatientAnalytics = new RudderAndMixPanelPatientAnalytics();
+const noOpPatientAnalytics = new NoopPatientAnalytics();
+
+export function getPatientAnalytics(opts?: { noop: boolean }): PatientAnalytics {
+  if (opts?.noop) {
+    return noOpPatientAnalytics;
+  }
+
+  return rudderAndMixPanelPatientAnalytics;
+}

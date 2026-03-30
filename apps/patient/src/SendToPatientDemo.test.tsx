@@ -3,7 +3,8 @@ import { afterEach, describe, expect, vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
-import { triggerDemoNotification } from './api';
+import { getOfferBundles, triggerDemoNotification } from './api';
+import { demoPharmacies } from './data/demoPharmacies';
 
 vi.mock('./api', () => ({
   geocode: vi.fn().mockResolvedValue({
@@ -12,7 +13,7 @@ vi.mock('./api', () => ({
     address: '123 Main St, New York, NY 10001'
   }),
   getPharmacies: vi.fn().mockResolvedValue({ pharmacies: [] }),
-  getOffers: vi.fn().mockResolvedValue([]),
+  getOfferBundles: vi.fn().mockResolvedValue([]),
   triggerDemoNotification: vi.fn()
 }));
 
@@ -21,7 +22,6 @@ vi.mock('./utils/preloadImage', () => ({
 }));
 
 vi.mock('@datadog/browser-rum');
-vi.mock('./configs/analytics');
 vi.mock('./hooks/usePageAnalytics');
 vi.mock('react-ga4');
 vi.mock('mixpanel-browser');
@@ -86,6 +86,16 @@ describe('Send To Patient Demo', () => {
 
     await waitFor(() => screen.findByText('Order placed'), { timeout: 2500 });
     expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
+  }, 10_000);
+
+  test('displays coupon prices for non-offer pharmacies', async () => {
+    const expectedNumberOfCouponPrices = demoPharmacies.filter((p) => p.price).length;
+    renderDemoApp();
+
+    expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
+
+    expect(await screen.getAllByText('Coupon Price')).toHaveLength(expectedNumberOfCouponPrices);
   }, 10_000);
 });
 

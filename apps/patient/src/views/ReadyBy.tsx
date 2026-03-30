@@ -29,7 +29,7 @@ import { RxLightningBolt } from 'react-icons/rx';
 import { FiCheck } from 'react-icons/fi';
 import { capitalize } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
-import { patientAnalytics } from '../configs/analytics';
+import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 dayjs.extend(timezone);
 
@@ -42,12 +42,13 @@ const checkDisabled = (option: string): boolean => {
 
 export const ReadyBy = () => {
   const { order, flattenedFills, enablePrice, fetchOrder } = useOrderContext();
-  usePageAnalytics({ pageName: 'Ready By Time' });
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isDemo = searchParams.get('demo');
+  const patientAnalytics = usePatientAnalytics();
+  usePageAnalytics({ pageName: 'Ready By Time' });
   const phone = searchParams.get('phone');
 
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);

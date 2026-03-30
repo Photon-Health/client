@@ -24,7 +24,7 @@ vi.mock('../api', () => ({
   updateOrderAddress: (...args: unknown[]) => mockUpdateOrderAddress(...args),
   getPharmacies: vi.fn().mockResolvedValue({ pharmacies: [] }),
   getPharmaciesByLocation: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
-  getOffers: vi.fn().mockResolvedValue([]),
+  getOfferBundles: vi.fn().mockResolvedValue([]),
   AUTH_HEADER_ERRORS: []
 }));
 
@@ -40,7 +40,6 @@ vi.mock('../configs/graphqlClient', () => ({
 }));
 
 vi.mock('@datadog/browser-rum');
-vi.mock('../configs/analytics');
 vi.mock('../hooks/usePageAnalytics');
 vi.mock('react-ga4');
 vi.mock('mixpanel-browser');

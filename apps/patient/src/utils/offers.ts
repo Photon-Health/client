@@ -1,12 +1,11 @@
-import { OfferDetails } from './models';
-import { EnrichedPharmacy, OfferType, OfferTypes } from './models';
+import { EnrichedPharmacy, OfferBundleDetails, OfferType, OfferTypes } from './models';
 
 export function getOfferType({
   pharmacy,
   offer
 }: {
   pharmacy?: EnrichedPharmacy;
-  offer?: OfferDetails;
+  offer?: OfferBundleDetails;
 }) {
   let offerType: OfferType | null = null;
   if (offer?.costType) {
