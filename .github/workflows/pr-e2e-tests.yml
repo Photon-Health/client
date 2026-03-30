@@ -9,6 +9,8 @@ on:
         options:
         - app
         - patient
+      output_dir:
+        required: true
 
 permissions:
   contents: read
@@ -30,13 +32,13 @@ jobs:
           if [ "${{ inputs.app }}" = "app" ]; then
             echo "e2e=npx nx run app:e2e" >> $GITHUB_OUTPUT
             echo "codegen=npx nx run app:codegen" >> $GITHUB_OUTPUT
-            echo "base_url=https://app-${{ inputs.branch }}.boson.health" >> $GITHUB_OUTPUT
+            echo "base_url=https://app-${{ inputs.output_dir }}.boson.health" >> $GITHUB_OUTPUT
             echo "report_name=playwright-report-clinical" >> $GITHUB_OUTPUT
             echo "report_path=apps/app/playwright-report/" >> $GITHUB_OUTPUT
           elif [ "${{ inputs.app }}" = "patient" ]; then
             echo "e2e=npx nx run patient:e2e" >> $GITHUB_OUTPUT
             echo "codegen=npx nx run patient:codegen" >> $GITHUB_OUTPUT
-            echo "base_url=https://orders-${{ inputs.branch }}.boson.health" >> $GITHUB_OUTPUT
+            echo "base_url=https://orders-${{ inputs.output_dir }}.boson.health" >> $GITHUB_OUTPUT
             echo "report_name=playwright-report-patient" >> $GITHUB_OUTPUT
             echo "report_path=apps/patient/playwright-report/" >> $GITHUB_OUTPUT
           else

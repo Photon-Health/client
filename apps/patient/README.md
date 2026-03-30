@@ -73,3 +73,7 @@ $ npx nx run patient:e2e
 # or run within UI popup window
 $ npx nx run patient:e2e:ui
 ```
+
+## Deployment
+
+Refer to [our Notion docs](https://www.notion.so/photons/Deployments-a5e7334066744b13a9cd6dc49edb3a6d) on how to deploy to different environments.
