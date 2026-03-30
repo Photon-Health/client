@@ -11,12 +11,14 @@ Photon Health client monorepo — a healthcare platform with a clinical provider
 ### Development
 
 ```bash
-npm i                   # Install all dependencies
-npm run app             # Run clinical app (boson env, with codegen watch)
-npm run app:tau          # Run clinical app (local tau env)
-npm run patient          # Run patient app (boson env, with codegen watch)
-npm run patient:tau      # Run patient app (local tau env)
-npx nx run elements:start  # Elements dev server at localhost:3000 (no hot reload)
+npm i                         # Install all dependencies
+npm nx run app:pullenv        # Get env vars for clinical app (boson env)
+npm run app                   # Run clinical app (boson env, with codegen watch)
+npm run app:tau               # Run clinical app (local tau env)
+npm nx run patient:pullenv    # Get env vars for patient app (boson env)
+npm run patient               # Run patient app (boson env, with codegen watch)
+npm run patient:tau           # Run patient app (local tau env)
+npx nx run elements:start     # Elements dev server at localhost:3000 (no hot reload)
 ```
 
 ### Linting
@@ -170,16 +172,16 @@ const mailOrderProviders = getOrgMailOrderPharms(user?.org_id)?.provider;
 
 ### Environments
 
-| Name     | Purpose          | Config files      |
-|----------|------------------|-------------------|
-| boson    | Development      | `.env.boson`      |
-| tau      | Local services   | `.env.tau`        |
-| neutron  | Staging          | `.env.neutron`    |
-| photon   | Production       | `.env.photon`     |
+| Name     | Purpose          |
+|----------|------------------|
+| boson    | Development      |
+| tau      | Local services   |
+| neutron  | Staging          |
+| photon   | Production       |
 
-Environment is selected via `env-cmd -f .env.<name>` in Nx targets.
+Environment variables for boson, neutron and photon are stored in AWS Secrets Manager. You will typically only need to pull env vars for boson for local development. `.env.tau` contains tau-specific (non-sensitive) overrides.
 
-**Nx automatic `.env` loading:** Nx automatically loads `.env.local` (and other `.env` files) from the project root before running any target. Variables loaded first take precedence — Nx won't overwrite a variable already set in the process. This means `.env.local` values are available to all Nx targets without explicit `env-cmd` references. For example, Playwright credentials (`PLAYWRIGHT_E2E_ACCOUNT_USERNAME`, `PLAYWRIGHT_E2E_ACCOUNT_PASSWORD`) and `PLAYWRIGHT_BASE_URL` stored in `apps/app/.env.local` are automatically available when running `nx run app:e2e`, even though that target only explicitly loads `.env.boson` via `env-cmd`.
+**Nx automatic `.env` loading:** Nx automatically loads `.env.local` (and other `.env` files) from the project root before running any target. Variables loaded first take precedence — Nx won't overwrite a variable already set in the process. This means `.env.local` values are available to all Nx targets without explicit `env-cmd` references. For example, Playwright credentials (`PLAYWRIGHT_E2E_ACCOUNT_USERNAME`, `PLAYWRIGHT_E2E_ACCOUNT_PASSWORD`) and `PLAYWRIGHT_BASE_URL` stored in `apps/app/.env.local` are automatically available when running `nx run app:e2e`.
 
 ### Backend APIs
 

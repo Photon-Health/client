@@ -1,31 +1,31 @@
-import { getOfferBundles, getOffers } from '../api';
+import { getOfferBundles } from '../api';
 import { getLatestDelivery } from '../utils/deliveryPromise';
 import { PHARMACY_BRANDING } from '../components/pharmacy-card-list';
 import {
   EnrichedPharmacy,
   ExtendedFulfillmentType,
   OfferBundleDetails,
-  OfferDetails,
   Order
 } from '../utils/models';
 import { FulfillmentType, Pharmacy as PharmacyType } from '../__generated__/graphql';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
-function getNovocareOffers(order: Order): OfferDetails[] {
+function getNovocareOffers(order: Order): OfferBundleDetails[] {
   const novocareExperimentSegment = determineNovocareExperimentSegment(order);
 
-  if (novocareExperimentSegment) {
+  if (novocareExperimentSegment?.deliveryType != undefined) {
     return [
       {
         costType: 'NOVOCARE_OFFER',
-        deliveryEstimate: novocareExperimentSegment,
-        tags: ['Delivers in 3-5 days'],
+        deliveryEstimate: novocareExperimentSegment.deliveryType,
+        tags: [],
         pharmacy: {
           id: import.meta.env.VITE_NOVOCARE_PHARMACY_ID as string,
           name: 'Novocare',
           fulfillmentTypes: ['MAIL_ORDER']
-        }
+        },
+        medications: novocareExperimentSegment.medications.map((name) => ({ name }))
       }
     ];
   } else {
@@ -33,48 +33,8 @@ function getNovocareOffers(order: Order): OfferDetails[] {
   }
 }
 
-// this function will return the offers available for the given order (single rx)
-export async function fetchOffers(order: Order): Promise<OfferDetails[] | undefined> {
-  const offers = await getOffers(order.id);
-
-  const amazonOffers = offers
-    .filter((offer) => offer.supplier === 'AMAZON_PHARMACY')
-    .filter((offer) => offer.deliveryEstimate !== undefined)
-    .map((offer) => ({
-      deliveryEstimate: offer.deliveryEstimate?.deliveryPromise,
-      costType: offer.cost?.type,
-      costAmount: offer.cost?.amount,
-      costAmountTitle: offer.cost?.amountTitle,
-      retailAmount: offer.cost?.retailAmount,
-      retailAmountTitle: offer.cost?.retailAmountTitle,
-      pharmacy: {
-        id: import.meta.env.VITE_AMAZON_PHARMACY_ID as string,
-        name: 'Amazon Pharmacy',
-        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[],
-        logo: PHARMACY_BRANDING['phr_demoAmazon'].logo
-      },
-      tags: ['In Stock']
-    }));
-
-  const novocareOffers = getNovocareOffers(order);
-
-  // measured will only want to show amazon offers if we do not have a novocare offer
-  if (order.organization.id === 'org_pcPnPx5PVamzjS2p') {
-    if (novocareOffers.length === 0) {
-      return amazonOffers;
-    } else {
-      return novocareOffers;
-    }
-  }
-
-  return [...amazonOffers, ...novocareOffers];
-}
-
 // this function will return the offers available for the given order
-// (currently just for multi rx but will expand to single rx in PHO-322)
-export async function fetchOfferBundles(
-  order: Order
-): Promise<OfferBundleDetails[] | OfferDetails[] | undefined> {
+export async function fetchOfferBundles(order: Order): Promise<OfferBundleDetails[] | undefined> {
   const bundles = await getOfferBundles(order.id);
 
   const amazonOffers = bundles
@@ -122,7 +82,9 @@ export async function fetchOfferBundles(
 }
 
 // this function will update the state for novocareExperimentOverride if there are specific medications inside the order
-export function determineNovocareExperimentSegment(order: Order): string | undefined {
+export function determineNovocareExperimentSegment(
+  order: Order
+): { deliveryType: string | undefined; medications: string[] } | undefined {
   const organizationId = order?.organization.id;
 
   const medicinesAndDeliveryTypes = [
@@ -183,7 +145,7 @@ export function determineNovocareExperimentSegment(order: Order): string | undef
 
   const deliveryType = getDeliveryType();
 
-  return deliveryType;
+  return { deliveryType, medications };
 }
 
 export function getPharmacy(

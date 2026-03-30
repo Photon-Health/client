@@ -6,6 +6,12 @@ In local development, it is possible to run the client against your local "tau" 
 
 ### Default setup
 
+First, download environment variables used at runtime to `.env` from AWS:
+
+```
+npx nx run app:pullenv
+```
+
 Start the clinical app dev server with hot refresh and codegen to generate TS types for any new queries/mutations. Files in `app` dependencies will automatically rebuild, but you'll need to manually refresh the webpage to see your changes.
 
 ```
@@ -85,16 +91,16 @@ Automatically fix ESLint issues:
 
 `npx nx run app:build:boson`
 
-`npx nx run app:build:neutron`
-
-`npx nx run app:build:photon`
-
 Builds the app for each environment into the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
 The build is minified and the filenames include the hashes.
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+## Deployment
+
+Refer to [our Notion docs](https://www.notion.so/photons/Deployments-a5e7334066744b13a9cd6dc49edb3a6d) on how to deploy to different environments.
 
 ## Learn More
 
