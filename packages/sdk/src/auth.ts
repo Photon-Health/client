@@ -156,7 +156,6 @@ export class AuthManager {
       }
     }
     if (!token) {
-      console.error('_getAccessToken fallback loginWithRedirect', window.location.href);
       const redirectOpts: RedirectLoginOptions = {
         ...opts,
         appState: {

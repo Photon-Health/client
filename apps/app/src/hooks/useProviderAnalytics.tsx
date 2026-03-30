@@ -82,6 +82,9 @@ interface ProviderAnalyticsProviderProps {
 export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProviderProps) => {
   const { isAuthenticated, isLoading, clinicalClient } = usePhoton();
   const { pathname } = useLocation();
+
+  // We need to skip the Analytics GQL call for Auth pages, because it will trigger
+  // a race condition: packages/sdk/src/auth.ts `loginWithRedirect` vs the login/logout flow on the SSOLogin page
   const isAuthRoute = ['/sso', '/login', '/logout', '/signup'].includes(pathname);
 
   // Fetch me + organization data via GraphQL
