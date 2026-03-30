@@ -1,8 +1,8 @@
 import {
   Auth0Client,
-  LogoutOptions as Auth0LogoutOptions,
   GetTokenSilentlyOptions,
   GetTokenWithPopupOptions,
+  LogoutOptions as Auth0LogoutOptions,
   RedirectLoginOptions,
   User
 } from '@auth0/auth0-spa-js';
@@ -156,6 +156,7 @@ export class AuthManager {
       }
     }
     if (!token) {
+      console.error('_getAccessToken fallback loginWithRedirect', window.location.href);
       const redirectOpts: RedirectLoginOptions = {
         ...opts,
         appState: {

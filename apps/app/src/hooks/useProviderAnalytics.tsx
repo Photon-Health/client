@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from 'react';
 import { gql, useQuery } from '@apollo/client';
+import { useLocation } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
 import { ApiObject } from '@rudderstack/analytics-js';
 import { getProviderAnalytics } from '../configs/providerAnalytics';
@@ -80,11 +81,13 @@ interface ProviderAnalyticsProviderProps {
 
 export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProviderProps) => {
   const { isAuthenticated, isLoading, clinicalClient } = usePhoton();
+  const { pathname } = useLocation();
+  const isAuthRoute = ['/sso', '/login', '/logout', '/signup'].includes(pathname);
 
   // Fetch me + organization data via GraphQL
   const { data, loading: queryLoading } = useQuery(ANALYTICS_CONTEXT_QUERY, {
     client: clinicalClient,
-    skip: !isAuthenticated || isLoading || !clinicalClient
+    skip: !isAuthenticated || isLoading || !clinicalClient || isAuthRoute
   });
 
   // Build context data from query response
