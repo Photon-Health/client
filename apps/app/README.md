@@ -98,6 +98,10 @@ The build is minified and the filenames include the hashes.
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
+## Deployment
+
+Refer to [our Notion docs](https://www.notion.so/photons/Deployments-a5e7334066744b13a9cd6dc49edb3a6d) on how to deploy to different environments.
+
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
