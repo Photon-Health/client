@@ -248,6 +248,10 @@ export interface PatientAnalytics {
     orgId?: string;
     orgName?: string;
   }): void;
+
+  getFlagValue<K extends FlagNames>(flagName: K, fallback: FlagValues[K]): Promise<FlagValues[K]>;
+
+  getFlagValueSync<K extends FlagNames>(flagName: K, fallback: FlagValues[K]): FlagValues[K];
 }
 
 class NoopPatientAnalytics implements PatientAnalytics {
@@ -264,6 +268,15 @@ class NoopPatientAnalytics implements PatientAnalytics {
     orgName?: string;
   }): void {
     return;
+  }
+  async getFlagValue<K extends FlagNames>(
+    flagName: K,
+    fallback: FlagValues[K]
+  ): Promise<FlagValues[K]> {
+    return fallback;
+  }
+  getFlagValueSync<K extends FlagNames>(flagName: K, fallback: FlagValues[K]): FlagValues[K] {
+    return fallback;
   }
 }
 
