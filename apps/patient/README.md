@@ -4,8 +4,13 @@
 
 In local development, it is possible to run the client against your local "tau" environment, or the remote "boson" dev environment. npm commands and Nx targets without an environment name attached run against boson by default, since we currently cannot spin up the entire backend architecture in tau.
 
-
 ### Default setup
+
+First, download environment variables used at runtime to `.env` from AWS:
+
+```
+npx nx run patient:pullenv
+```
 
 To open the patient app, you'll need a URL with an order ID and token in the parameters. You can:
 
@@ -68,3 +73,7 @@ $ npx nx run patient:e2e
 # or run within UI popup window
 $ npx nx run patient:e2e:ui
 ```
+
+## Deployment
+
+Refer to [our Notion docs](https://www.notion.so/photons/Deployments-a5e7334066744b13a9cd6dc49edb3a6d) on how to deploy to different environments.

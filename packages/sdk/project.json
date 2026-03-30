@@ -9,14 +9,14 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/sdk",
-        "command": "env-cmd -f .env.boson npx graphql-codegen --config codegen.clinical-api.ts"
+        "command": "VITE_ENV_NAME=boson npx graphql-codegen --config codegen.clinical-api.ts"
       }
     },
     "codegen:clinical-api:tau": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/sdk",
-        "command": "env-cmd -f .env.tau npx graphql-codegen --config codegen.clinical-api.ts"
+        "command": "VITE_ENV_NAME=tau npx graphql-codegen --config codegen.clinical-api.ts"
       }
     },
     "build": {
