@@ -243,8 +243,8 @@ export interface PatientAnalytics {
   track(
     eventName: string,
     order: Order,
-    properties: ApiObject,
-    options: { toRudderStack?: boolean; toMixpanel?: boolean }
+    properties?: ApiObject,
+    options?: { toRudderStack?: boolean; toMixpanel?: boolean }
   ): void;
 
   identify(input: {
