@@ -114,15 +114,20 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
     [data]
   );
 
-  // Set Datadog instrumentation context when data is loaded
+  // Init analytics when data is loaded
   useEffect(() => {
     if (data?.me && data?.organization) {
+      // Set Datadog instrumentation
       setInstrumentationUserContext({
         org_id: data.organization.id,
         email: data.me.email,
         name: data.me.name?.full ?? '',
         customer_id: data.organization.customer?.id
       });
+    }
+
+    if (data?.me?.id) {
+      getProviderAnalytics().identify(data.me.id);
     }
   }, [data]);
 
