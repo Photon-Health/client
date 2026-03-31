@@ -240,7 +240,12 @@ type FlagNames = keyof FlagValues;
 export interface PatientAnalytics {
   page(category: string, name?: string, properties?: ApiObject): void;
 
-  track(eventName: string, order: Order, properties?: ApiObject): void;
+  track(
+    eventName: string,
+    order: Order,
+    properties: ApiObject,
+    options: { toRudderStack?: boolean; toMixpanel?: boolean }
+  ): void;
 
   identify(input: {
     userId?: string;
@@ -258,7 +263,12 @@ class NoopPatientAnalytics implements PatientAnalytics {
   page(_category: string, _name?: string, _properties?: ApiObject): void {
     return;
   }
-  track(_eventName: string, _order: Order, _properties?: ApiObject): void {
+  track(
+    _eventName: string,
+    _order: Order,
+    _properties: ApiObject,
+    _options: { toRudderStack?: boolean; toMixpanel?: boolean }
+  ): void {
     return;
   }
   identify(_input: {
@@ -270,12 +280,12 @@ class NoopPatientAnalytics implements PatientAnalytics {
     return;
   }
   async getFlagValue<K extends FlagNames>(
-    flagName: K,
+    _flagName: K,
     fallback: FlagValues[K]
   ): Promise<FlagValues[K]> {
     return fallback;
   }
-  getFlagValueSync<K extends FlagNames>(flagName: K, fallback: FlagValues[K]): FlagValues[K] {
+  getFlagValueSync<K extends FlagNames>(_flagName: K, fallback: FlagValues[K]): FlagValues[K] {
     return fallback;
   }
 }

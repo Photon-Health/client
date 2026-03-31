@@ -14,8 +14,8 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { ReactNode, useEffect, useState } from 'react';
-import { patientAnalytics } from '../configs/analytics';
 import { useOrderContext } from '../views/Main';
+import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 enum Screen {
   Reasons = 'reasons',
@@ -37,6 +37,7 @@ export const ChangePharmacyReasons = ({
 }: ChangePharmacyReasonsProps) => {
   const { order } = useOrderContext();
   const [screen, setScreen] = useState(Screen.Reasons);
+  const patientAnalytics = usePatientAnalytics();
 
   useEffect(() => {
     if (isOpen) {
