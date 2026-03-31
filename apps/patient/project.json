@@ -9,7 +9,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "AWS_PROFILE=boson npm run pullenv"
+        "command": "../../tools/pullenv.sh boson patient_build_vars"
       }
     },
     "codegen": {
