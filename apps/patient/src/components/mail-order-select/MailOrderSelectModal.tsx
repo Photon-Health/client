@@ -16,7 +16,6 @@ import { useEffect, useState } from 'react';
 import { PoweredBy } from '../PoweredBy';
 import { MailOrderSelectList } from './MailOrderSelectList';
 import { MailOrderPharmacyOption } from './MailOrderSelectCard';
-import { datadogRum } from '@datadog/browser-rum';
 import { useOrderContext } from '../../views/Main';
 import { text } from '../../utils/text';
 import { usePatientAnalytics } from '../../hooks/usePatientAnalytics';
@@ -44,10 +43,6 @@ export function MailOrderSelectModal({
   const handleOptionSelect = (val: MailOrderPharmacyOption) => {
     const newSelection = val.id !== selectedOption?.id;
     if (newSelection) {
-      datadogRum.addAction('patient_mail_order_pharmacy_selected', {
-        pharmacyId: val.id
-      });
-
       patientAnalytics.track('Patient Clicked Mail Order Pharmacy', order, {
         pharmacyId: val.id,
         pharmacyName: val.name
@@ -65,10 +60,6 @@ export function MailOrderSelectModal({
         selectedFrom: 'Mail Order List',
         buttonText: submitButtonText
       });
-      datadogRum.addAction('patient_mail_order_pharmacy_confirmed', {
-        pharmacyId: selectedOption.id
-      });
-
       patientAnalytics.track('Patient Confirmed Mail Order Pharmacy', order, {
         pharmacyId: selectedOption.id,
         pharmacyName: selectedOption.name
@@ -86,10 +77,8 @@ export function MailOrderSelectModal({
 
     // track the modal opening event
     if (modalProps.isOpen) {
-      datadogRum.addAction('patient_mail_order_modal_opened');
       patientAnalytics.track('Patient Mail Order Model Opened', order);
     } else {
-      datadogRum.addAction('patient_mail_order_modal_closed');
       patientAnalytics.track('Patient Mail Order Model Closed', order);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
