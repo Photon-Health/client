@@ -270,10 +270,9 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
 
     if (RUDDERSTACK_WRITE_KEY && RUDDERSTACK_DATA_PLANE_URL) {
       this.rudderanalytics = new RudderAnalytics();
-      this.rudderanalytics.load(RUDDERSTACK_WRITE_KEY || '', RUDDERSTACK_DATA_PLANE_URL || '');
+      this.rudderanalytics.load(RUDDERSTACK_WRITE_KEY, RUDDERSTACK_DATA_PLANE_URL);
     } else {
       console.error('RudderStack write key and data plane URL are required');
-      return;
     }
 
     if (MIXPANEL_TOKEN) {
