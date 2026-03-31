@@ -87,8 +87,10 @@ export function MailOrderSelectModal({
     // track the modal opening event
     if (modalProps.isOpen) {
       datadogRum.addAction('patient_mail_order_modal_opened');
+      patientAnalytics.track('Patient Mail Order Model Opened', order);
     } else {
       datadogRum.addAction('patient_mail_order_modal_closed');
+      patientAnalytics.track('Patient Mail Order Model Closed', order);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modalProps.isOpen]);
