@@ -1,13 +1,23 @@
-import type { PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
+import type { CtaClickEvent, FieldInteractionEvent, PageViewEvent } from '@photonhealth/sdk';
 
-export const dispatchAnalyticsTrackEvent = (
-  detail: PhotonEmbedAnalyticsEventInput,
-  ref: { dispatchEvent(event: CustomEvent): void }
-) => {
-  const event = new CustomEvent('photon-analytics-track-event', {
+type AnalyticsRef = { dispatchEvent(event: CustomEvent): void };
+
+function dispatch(category: string, event: Record<string, unknown>, ref: AnalyticsRef) {
+  const customEvent = new CustomEvent('photon-analytics-track-event', {
     composed: true,
     bubbles: true,
-    detail: { ...detail, timestamp: new Date().toISOString() }
+    detail: { ...event, category, timestamp: new Date().toISOString() }
   });
-  ref?.dispatchEvent(event);
-};
+  ref?.dispatchEvent(customEvent);
+}
+
+export const dispatchPageViewAnalyticsEvent = (event: PageViewEvent, ref: AnalyticsRef) =>
+  dispatch('pageViewed', event as unknown as Record<string, unknown>, ref);
+
+export const dispatchCtaAnalyticsEvent = (event: CtaClickEvent, ref: AnalyticsRef) =>
+  dispatch('ctaClicked', event as unknown as Record<string, unknown>, ref);
+
+export const dispatchFieldInteractionAnalyticsEvent = (
+  event: FieldInteractionEvent,
+  ref: AnalyticsRef
+) => dispatch('fieldInteraction', event as unknown as Record<string, unknown>, ref);

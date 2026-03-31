@@ -72,7 +72,11 @@ import {
   PrescribeEventDispatchProvider,
   usePrescribeEventDispatch
 } from './systems/PrescribeEventDispatchProvider';
-import { dispatchAnalyticsTrackEvent } from './analytics/dispatchAnalyticsTrackEvent';
+import {
+  dispatchCtaAnalyticsEvent,
+  dispatchFieldInteractionAnalyticsEvent,
+  dispatchPageViewAnalyticsEvent
+} from './analytics/dispatchAnalyticsTrackEvent';
 import {
   buildFieldSnapshot,
   DRAFT_PRESCRIPTION_FORM_FIELDS,
@@ -140,7 +144,9 @@ export {
   CALENDAR_DATE_FORMAT,
   PrescribeEventDispatchProvider,
   usePrescribeEventDispatch,
-  dispatchAnalyticsTrackEvent,
+  dispatchCtaAnalyticsEvent,
+  dispatchFieldInteractionAnalyticsEvent,
+  dispatchPageViewAnalyticsEvent,
   buildFieldSnapshot,
   PATIENT_FORM_FIELDS,
   DRAFT_PRESCRIPTION_FORM_FIELDS

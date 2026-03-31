@@ -4,8 +4,8 @@ import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
 import { useProviderAnalytics } from '../../../hooks/useProviderAnalytics';
-import { type PatientFormAnalyticsEvent } from '@photonhealth/sdk';
-import { buildPatientFormInteractionPayload } from '../../../instrumentation/analyticsTrackEventListenerUtils';
+import type { PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
+import { trackAnalyticsEvent } from '../../../instrumentation/analyticsTrackEventListenerUtils';
 
 declare global {
   namespace JSX {
@@ -46,11 +46,8 @@ export const PatientForm = () => {
 
     ref.current.addEventListener(
       'photon-analytics-track-event',
-      (e: CustomEvent<PatientFormAnalyticsEvent>) => {
-        providerAnalytics.track(
-          'clinicalapp_patient_form_track_events',
-          buildPatientFormInteractionPayload(e.detail)
-        );
+      (e: CustomEvent<PhotonEmbedAnalyticsEventInput>) => {
+        trackAnalyticsEvent(e.detail, providerAnalytics.track);
       },
       listenerOptions
     );

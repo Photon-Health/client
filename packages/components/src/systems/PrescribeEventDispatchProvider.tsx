@@ -2,8 +2,12 @@ import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createContext, JSXElement, useContext } from 'solid-js';
 import { ScreeningAlertType } from './ScreeningAlerts';
-import { dispatchAnalyticsTrackEvent } from '../analytics/dispatchAnalyticsTrackEvent';
-import { PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
+import {
+  dispatchCtaAnalyticsEvent as dispatchCtaFn,
+  dispatchFieldInteractionAnalyticsEvent as dispatchFieldInteractionFn,
+  dispatchPageViewAnalyticsEvent as dispatchPageViewFn
+} from '../analytics/dispatchAnalyticsTrackEvent';
+import type { CtaClickEvent, FieldInteractionEvent, PageViewEvent } from '@photonhealth/sdk';
 
 const PrescribeEventDispatchContext = createContext<{
   dispatchFormValidate: (canSubmit: boolean, form: any) => void;
@@ -19,7 +23,9 @@ const PrescribeEventDispatchContext = createContext<{
   dispatchClinicalAlertCancel: (alerts: ScreeningAlertType[]) => void;
   dispatchSignatureAttestationAgreed: () => void;
   dispatchSignatureAttestationCanceled: () => void;
-  dispatchAnalytics: (detail: PhotonEmbedAnalyticsEventInput) => void;
+  dispatchPageViewAnalyticsEvent: (event: PageViewEvent) => void;
+  dispatchCtaAnalyticsEvent: (event: CtaClickEvent) => void;
+  dispatchFieldInteractionAnalyticsEvent: (event: FieldInteractionEvent) => void;
 }>();
 
 interface DraftPrescriptionProviderProps {
@@ -168,9 +174,10 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref?.dispatchEvent(event);
   };
 
-  const dispatchAnalytics = (detail: PhotonEmbedAnalyticsEventInput) => {
-    dispatchAnalyticsTrackEvent(detail, ref);
-  };
+  const dispatchPageViewAnalyticsEvent = (event: PageViewEvent) => dispatchPageViewFn(event, ref);
+  const dispatchCtaAnalyticsEvent = (event: CtaClickEvent) => dispatchCtaFn(event, ref);
+  const dispatchFieldInteractionAnalyticsEvent = (event: FieldInteractionEvent) =>
+    dispatchFieldInteractionFn(event, ref);
 
   const value = {
     dispatchFormValidate,
@@ -186,7 +193,9 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     dispatchClinicalAlertCancel,
     dispatchSignatureAttestationAgreed,
     dispatchSignatureAttestationCanceled,
-    dispatchAnalytics
+    dispatchPageViewAnalyticsEvent,
+    dispatchCtaAnalyticsEvent,
+    dispatchFieldInteractionAnalyticsEvent
   };
 
   return (

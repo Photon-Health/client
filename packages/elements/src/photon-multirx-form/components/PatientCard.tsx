@@ -63,7 +63,8 @@ export const PatientCard = (props: {
   hidePatientCard?: boolean;
   optionalPatientAddress?: boolean;
 }) => {
-  const { dispatchAnalytics } = usePrescribeEventDispatch();
+  const { dispatchFieldInteractionAnalyticsEvent, dispatchCtaAnalyticsEvent } =
+    usePrescribeEventDispatch();
   const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
   const [showEditPatientView, setShowEditPatientView] = createSignal(false);
   const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
@@ -95,9 +96,10 @@ export const PatientCard = (props: {
       value: e.detail.patient
     });
     if (trackInteraction) {
-      dispatchAnalytics({
-        trackEventType: 'prescription_patient_changed',
-        properties: { patientId: e.detail.patient.id }
+      dispatchFieldInteractionAnalyticsEvent({
+        name: 'Field Interaction',
+        formName: 'add_prescription_form',
+        patientId: e.detail.patient.id
       });
     }
     if (props.enableOrder && !props.address) {
@@ -178,7 +180,13 @@ export const PatientCard = (props: {
             weightUnit={props?.weightUnit}
             editPatient={
               props?.enableOrder && !showAddressForm()
-                ? () => setShowEditPatientView(true)
+                ? () => {
+                    dispatchCtaAnalyticsEvent({
+                      name: 'Minor CTA Clicked',
+                      ctaName: 'edit patient'
+                    });
+                    setShowEditPatientView(true);
+                  }
                 : undefined
             }
             address={props?.address || props.store.patient?.value?.address}
@@ -217,8 +225,9 @@ export const PatientCard = (props: {
             open={showAddMedDialog()}
             on:photon-medication-selected={(e: { detail: { medication: Treatment } }) => {
               setNewMedication(e.detail.medication);
-              dispatchAnalytics({
-                trackEventType: 'add_to_medication_history'
+              dispatchCtaAnalyticsEvent({
+                name: 'Minor CTA Clicked',
+                ctaName: 'add to medication history'
               });
             }}
             on:photon-medication-closed={() => {

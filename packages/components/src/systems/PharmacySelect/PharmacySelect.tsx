@@ -61,7 +61,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
   const { selectedCoverageOption } = usePrescribe();
   const pharmacySelectionContext = usePharmacySelectionContext();
   const unroutablePharmacyIds = () => pharmacySelectionContext.unroutablePharmacyIds();
-  const { dispatchAnalytics } = usePrescribeEventDispatch();
+  const { dispatchFieldInteractionAnalyticsEvent } = usePrescribeEventDispatch();
   const hasAddress = createMemo(() => Boolean(props.address?.trim()));
 
   const [localPharmId, setLocalPharmId] = createSignal<string | undefined>();
@@ -127,12 +127,11 @@ export function PharmacySelect(props: PharmacySelectProps) {
     const type = fulfillmentOptions.find((option) => option.name === newTab)?.fulfillmentType;
     pharmacySelectionContext.setFulfillmentType(parseFulfillmentType(type));
 
-    dispatchAnalytics({
-      trackEventType: 'pharmacy_interaction',
-      properties: {
-        tabSelected: newTab,
-        hasPreferredPharmacy: props.hasPreferredPharmacy ?? false
-      }
+    dispatchFieldInteractionAnalyticsEvent({
+      name: 'Field Interaction',
+      formName: 'select_pharmacy',
+      tabSelected: newTab,
+      hasPreferredPharmacy: props.hasPreferredPharmacy ?? false
     });
 
     // Preserve the selected pharmacy ID for Local Pickup and Mail Order tabs
@@ -186,13 +185,12 @@ export function PharmacySelect(props: PharmacySelectProps) {
                 }}
                 setPreferred={(shouldSetPreferred) => {
                   pharmacySelectionContext.setUpdatePreferredPharmacy(shouldSetPreferred);
-                  dispatchAnalytics({
-                    trackEventType: 'pharmacy_interaction',
-                    properties: {
-                      tabSelected: TabNamesEnum.localPickup,
-                      hasPreferredPharmacy: props.hasPreferredPharmacy ?? false,
-                      setAsPreferred: shouldSetPreferred
-                    }
+                  dispatchFieldInteractionAnalyticsEvent({
+                    name: 'Field Interaction',
+                    formName: 'select_pharmacy',
+                    tabSelected: TabNamesEnum.localPickup,
+                    hasPreferredPharmacy: props.hasPreferredPharmacy ?? false,
+                    setAsPreferred: shouldSetPreferred
                   });
                 }}
               />

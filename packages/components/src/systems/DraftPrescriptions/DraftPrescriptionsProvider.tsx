@@ -163,7 +163,8 @@ const createPrefillPrescriptionsOnApi = async ({
 };
 
 export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps) => {
-  const { dispatchDraftPrescriptionCreated, dispatchAnalytics } = usePrescribeEventDispatch();
+  const { dispatchDraftPrescriptionCreated, dispatchCtaAnalyticsEvent } =
+    usePrescribeEventDispatch();
   const [, recentOrdersActions] = useRecentOrders();
   const client = usePhotonClient();
   const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
@@ -193,12 +194,11 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
           setDraftPrescriptions((prev) => [...prev, ...newRxs]);
           newRxs.forEach((rx) => {
             dispatchDraftPrescriptionCreated(rx);
-            dispatchAnalytics({
-              trackEventType: 'draft_prescription_added',
-              properties: {
-                draftPrescriptionSource: 'prefill',
-                fields: buildPrescriptionSnapshot(rx)
-              }
+            dispatchCtaAnalyticsEvent({
+              name: 'Minor CTA Clicked',
+              ctaName: 'draft prescription added',
+              draftPrescriptionSource: 'prefill',
+              fields: buildPrescriptionSnapshot(rx)
             });
           });
         }
@@ -266,15 +266,14 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       createdPrescription = created;
       setDraftPrescriptions((prev) => [...prev, created]);
       dispatchDraftPrescriptionCreated(created);
-      dispatchAnalytics({
-        trackEventType: 'draft_prescription_added',
-        properties: {
-          draftPrescriptionSource: draftPrescriptionSource,
-          fields: buildPrescriptionSnapshot(prescriptionFormData, {
-            addToTemplates: options?.addToTemplates,
-            templateName: options?.templateName
-          })
-        }
+      dispatchCtaAnalyticsEvent({
+        name: 'Minor CTA Clicked',
+        ctaName: 'draft prescription added',
+        draftPrescriptionSource: draftPrescriptionSource,
+        fields: buildPrescriptionSnapshot(prescriptionFormData, {
+          addToTemplates: options?.addToTemplates,
+          templateName: options?.templateName
+        })
       });
     } catch (e) {
       console.error('Mutation error:', e);

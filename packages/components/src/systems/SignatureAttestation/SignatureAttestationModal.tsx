@@ -119,7 +119,8 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   const {
     dispatchSignatureAttestationAgreed,
     dispatchSignatureAttestationCanceled,
-    dispatchAnalytics
+    dispatchPageViewAnalyticsEvent,
+    dispatchCtaAnalyticsEvent
   } = usePrescribeEventDispatch();
   const [status, setStatus] = createSignal<Status>({ status: 'LOADING' });
   const [submitting, setSubmitting] = createSignal(false);
@@ -160,9 +161,9 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   createEffect(() => {
     const curr = status();
     if (curr.status === 'NEEDS ATTESTATION') {
-      dispatchAnalytics({
-        trackEventType: 'signature_attestation_shown',
-        properties: { attestationVersion: curr.version }
+      dispatchPageViewAnalyticsEvent({
+        name: 'Signature Attestation Viewed',
+        attestationVersion: curr.version
       });
     }
   });
@@ -182,9 +183,10 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
       if (res.data?.agreeToSignatureAttestation) {
         setSubmitting(false);
         setStatus({ status: 'COMPLETE' });
-        dispatchAnalytics({
-          trackEventType: 'signature_attestation_agreed',
-          properties: { attestationVersion: curr.version }
+        dispatchCtaAnalyticsEvent({
+          name: 'Attestation Agreed',
+          buttonText: 'I Agree',
+          attestationVersion: curr.version
         });
       } else if (res.error || res.errors) {
         setSubmitting(false);
@@ -218,7 +220,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
           <AgreementCard
             onAgree={onAgree}
             onCancel={() => {
-              dispatchAnalytics({ trackEventType: 'signature_attestation_canceled' });
+              dispatchCtaAnalyticsEvent({ name: 'Attestation Canceled', buttonText: 'Cancel' });
               dispatchSignatureAttestationCanceled();
             }}
             disabled={submitting()}

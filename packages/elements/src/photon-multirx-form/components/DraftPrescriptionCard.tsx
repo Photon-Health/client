@@ -24,7 +24,8 @@ export const DraftPrescriptionCard = (props: {
   routingConstraints: RoutingConstraint[];
   enableOrder: boolean;
 }) => {
-  const { dispatchDraftPrescriptionDeleted, dispatchAnalytics } = usePrescribeEventDispatch();
+  const { dispatchDraftPrescriptionDeleted, dispatchCtaAnalyticsEvent } =
+    usePrescribeEventDispatch();
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
   const [editDialogConfirm, setEditDialogConfirm] = createSignal<(() => void) | undefined>();
@@ -64,7 +65,7 @@ export const DraftPrescriptionCard = (props: {
       editPrescription();
       onConfirm?.();
       dispatchDraftPrescriptionDeleted();
-      dispatchAnalytics({ trackEventType: 'draft_prescription_edited' });
+      dispatchCtaAnalyticsEvent({ name: 'Minor CTA Clicked', ctaName: 'edit draft' });
     } else {
       setEditDialogOpen(true);
       setEditDialogConfirm(onConfirm);
@@ -85,7 +86,7 @@ export const DraftPrescriptionCard = (props: {
     editDialogConfirm()?.();
     setEditDialogConfirm(undefined);
     dispatchDraftPrescriptionDeleted();
-    dispatchAnalytics({ trackEventType: 'draft_prescription_edited' });
+    dispatchCtaAnalyticsEvent({ name: 'Minor CTA Clicked', ctaName: 'edit draft' });
   };
   const handleEditCancel = () => {
     setEditDialogOpen(false);
@@ -98,7 +99,7 @@ export const DraftPrescriptionCard = (props: {
       const deletedRx = draftPrescriptions().find((rx) => rx.id === deletedId);
       deletePrescription(deletedId);
       dispatchDraftPrescriptionDeleted(deletedRx);
-      dispatchAnalytics({ trackEventType: 'draft_prescription_deleted' });
+      dispatchCtaAnalyticsEvent({ name: 'Minor CTA Clicked', ctaName: 'delete draft' });
     }
 
     setDeleteDialogOpen(false);

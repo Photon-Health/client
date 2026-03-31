@@ -26,18 +26,15 @@ export * from './graphql/clinical-api';
 export * from './graphql/clinical-api/gql';
 export type {
   FieldCompletionSnapshot,
-  PatientFormTrackEventType,
-  SignatureAttestationTrackEventType,
-  PrescriptionFormTrackEventType,
-  FormTrackEventType,
-  PhotonEmbedAnalyticsEventInput,
-  PatientFormAnalyticsEvent,
-  SignatureAttestationAnalyticsEvent,
-  PrescriptionFormAnalyticsEvent,
-  DraftPrescriptionSource
+  DraftPrescriptionSource,
+  ClinicalAppEventName,
+  PageViewEvent,
+  MajorCtaClickEvent,
+  MinorCtaClickEvent,
+  CtaClickEvent,
+  FieldInteractionEvent,
+  PhotonEmbedAnalyticsEventInput
 } from './clinicalAnalyticsTypes';
-
-export { prescriptionFormEventTypes } from './clinicalAnalyticsTypes';
 
 const version: string = pkg?.version ?? 'unknown';
 

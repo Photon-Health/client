@@ -3,7 +3,8 @@ import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import {
   buildFieldSnapshot,
   Button,
-  dispatchAnalyticsTrackEvent,
+  dispatchCtaAnalyticsEvent,
+  dispatchPageViewAnalyticsEvent,
   PATIENT_FORM_FIELDS,
   usePhoton
 } from '@photonhealth/components';
@@ -83,10 +84,9 @@ const Component = (props: PatientDialogProps) => {
 
   createEffect(() => {
     if (props.open) {
-      dispatchAnalyticsTrackEvent(
+      dispatchPageViewAnalyticsEvent(
         {
-          trackEventType: 'patient_form_opened',
-          properties: { isEdit: Boolean(props.patientId) }
+          name: props.patientId ? 'Update Patient Page Viewed' : 'New Patient Page Viewed'
         },
         ref
       );
@@ -173,14 +173,15 @@ const Component = (props: PatientDialogProps) => {
         const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
         await updatePatientMutation({ variables: patientData, awaitRefetchQueries: false });
         dispatchUpdate(props.patientId, didClickCreatePatientAndPrescription);
-        dispatchAnalyticsTrackEvent(
+        dispatchCtaAnalyticsEvent(
           {
-            trackEventType: 'patient_updated',
-            properties: {
-              patientId: props.patientId,
-              didClickCreatePatientAndPrescription,
-              fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS)
-            }
+            name: 'Patient Updated',
+            buttonText: didClickCreatePatientAndPrescription
+              ? 'Update and Start Prescription'
+              : 'Update',
+            patientId: props.patientId,
+            didClickCreatePatientAndPrescription,
+            fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS)
           },
           ref
         );
@@ -193,14 +194,15 @@ const Component = (props: PatientDialogProps) => {
         });
         const patientId = patient?.data?.createPatient?.id || '';
         dispatchCreated(patientId, didClickCreatePatientAndPrescription);
-        dispatchAnalyticsTrackEvent(
+        dispatchCtaAnalyticsEvent(
           {
-            trackEventType: 'patient_created',
-            properties: {
-              patientId,
-              didClickCreatePatientAndPrescription,
-              fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS)
-            }
+            name: 'Patient Created',
+            buttonText: didClickCreatePatientAndPrescription
+              ? 'Create and Start Prescription'
+              : 'Create',
+            patientId,
+            didClickCreatePatientAndPrescription,
+            fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS)
           },
           ref
         );
@@ -220,18 +222,6 @@ const Component = (props: PatientDialogProps) => {
       <Show when={props.open}>
         <PhotonFormWrapper
           onClosed={() => {
-            dispatchAnalyticsTrackEvent(
-              {
-                trackEventType: 'patient_form_closed',
-                properties: {
-                  isEdit: Boolean(props.patientId),
-                  fields: formStore()
-                    ? buildFieldSnapshot(formStore(), PATIENT_FORM_FIELDS)
-                    : undefined
-                }
-              },
-              ref
-            );
             dispatchClosed();
             actions().resetStores();
             props.open = false;

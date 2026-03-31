@@ -1,8 +1,17 @@
-import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef
+} from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { useLocation } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
 import { ApiObject } from '@rudderstack/analytics-js';
+import { type ClinicalAppEventName } from '@photonhealth/sdk';
 import { getProviderAnalytics } from '../configs/providerAnalytics';
 import { setInstrumentationUserContext } from '../instrumentation/setInstrumentationUserContext';
 
@@ -49,18 +58,11 @@ export interface ProviderContextData {
   customerName?: string;
 }
 
-// these values map to table names, so please use clinicalapp as a prefix
-type ClinicalAppTrackEventName =
-  | 'clinicalapp_patient_form_track_events'
-  | 'clinicalapp_signature_attestation_form_track_events'
-  | 'clinicalapp_prescription_form_track_events'
-  | 'clinicalapp_order_details_track_events';
-
 interface ProviderAnalyticsContextValue {
   /**
    * Track a user event with automatic context injection
    */
-  track: (eventName: ClinicalAppTrackEventName, properties?: ApiObject) => void;
+  track: (eventName: ClinicalAppEventName, properties?: ApiObject) => void;
 
   /**
    * Current provider context data (user, org info)
@@ -86,6 +88,19 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
   // We need to skip the Analytics GQL call for Auth pages, because it will trigger
   // a race condition: packages/sdk/src/auth.ts `loginWithRedirect` vs the login/logout flow on the SSOLogin page
   const isAuthRoute = ['/sso', '/login', '/logout', '/signup'].includes(pathname);
+
+  // useRef (not useState) so the ID is available synchronously on the first render —
+  // some components fire form_opened analytics events during that initial render.
+  const prescribeFlowIdRef = useRef<string | null>(null);
+
+  const isOnPrescribeFlowRoute = isPrescribeFlowRoute(pathname);
+  if (isOnPrescribeFlowRoute && !prescribeFlowIdRef.current) {
+    prescribeFlowIdRef.current = crypto.randomUUID();
+    console.log(`📊 [Analytics] Changed Prescribe Flow ID to ${prescribeFlowIdRef.current}`);
+  } else if (!isOnPrescribeFlowRoute) {
+    prescribeFlowIdRef.current = null;
+    console.log(`📊 [Analytics] Changed Prescribe Flow ID to null`);
+  }
 
   // Fetch me + organization data via GraphQL
   const { data, loading: queryLoading } = useQuery(ANALYTICS_CONTEXT_QUERY, {
@@ -126,15 +141,18 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
     }
   }, [data]);
 
+  const pageName = getPageName(pathname);
+
   // Wrapped track function that auto-includes context
   const track = useCallback(
     (eventName: string, properties: ApiObject = {}) => {
-      getProviderAnalytics().track(eventName, {
-        ...contextData,
-        ...properties
-      });
+      const event: ApiObject = { ...contextData, pageName, ...properties };
+      if (prescribeFlowIdRef.current) {
+        event.prescribeFlowId = prescribeFlowIdRef.current;
+      }
+      getProviderAnalytics().track(eventName, event);
     },
-    [contextData]
+    [contextData, pageName]
   );
 
   const value: ProviderAnalyticsContextValue = useMemo(
@@ -150,6 +168,31 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
     <ProviderAnalyticsContext.Provider value={value}>{children}</ProviderAnalyticsContext.Provider>
   );
 };
+
+const PRESCRIBE_FLOW_ROUTES = [
+  '/patients/new',
+  '/patients/update/',
+  '/prescriptions/new',
+  '/orders/new',
+  '/orders/ord_'
+];
+
+function isPrescribeFlowRoute(pathname: string): boolean {
+  return PRESCRIBE_FLOW_ROUTES.some((route) => pathname.startsWith(route));
+}
+
+const PAGE_NAME_MAP: [string, string][] = [
+  ['/patients/new', 'New Patient'],
+  ['/patients/update/', 'Update Patient'],
+  ['/prescriptions/new', 'New Prescriptions'],
+  ['/orders/new', 'New Order'],
+  ['/orders/ord_', 'Order Details']
+];
+
+function getPageName(pathname: string): string | undefined {
+  const match = PAGE_NAME_MAP.find(([prefix]) => pathname.startsWith(prefix));
+  return match?.[1];
+}
 
 /**
  * Hook to access analytics tracking functions with automatic context injection.
