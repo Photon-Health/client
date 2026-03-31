@@ -946,6 +946,7 @@ export type WebhookConfig = {
 export type Permission =
   | 'create:order'
   | 'edit:profile'
+  | 'edit:profile_self'
   | 'manage:organization'
   | 'manage:user_roles'
   | 'read:client'
