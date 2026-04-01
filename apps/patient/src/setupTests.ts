@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import { PatientAnalytics } from './configs/analytics';
 
 vi.mock('react-ga4', () => ({
   event: vi.fn()
@@ -10,10 +11,12 @@ vi.mock('@datadog/browser-rum', () => ({
     addAction: vi.fn()
   }
 }));
-const mockPatientAnalytics = {
+const mockPatientAnalytics: PatientAnalytics = {
   page: vi.fn(),
   identify: vi.fn(),
-  track: vi.fn()
+  track: vi.fn(),
+  getFlagValue: vi.fn(),
+  getFlagValueSync: vi.fn()
 };
 vi.mock('./configs/analytics', () => ({
   getPatientAnalytics: () => mockPatientAnalytics
