@@ -24,7 +24,9 @@ export type PageViewEvent =
   | { name: 'Signature Attestation Viewed'; attestationVersion: string };
 
 // ---------------------------------------------------------------------------
-// CTA Click Events — majors get unique names, minors share "Minor CTA Clicked"
+// CTA Click Events
+// major events get unique names and represent major milestones in the user journey
+// minor events share the event name "Minor CTA Clicked"
 // ---------------------------------------------------------------------------
 
 export type MajorCtaClickEvent =

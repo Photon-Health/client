@@ -53,15 +53,9 @@ test('page views', async () => {
   const { analyticsEvents } = renderPrescribeWorkflow({}, { attestationStatus: 'NEEDS' });
 
   await waitForSignatureAttestationModal();
-
-  const event = findAnalyticsEvent(
-    analyticsEvents,
-    (d) => d.category === 'pageViewed' && d.name === 'Signature Attestation Viewed'
-  );
+  const event = analyticsEvents.find(isPageView('Signature Attestation Viewed'));
   expect(event?.detail).toEqual(
     expect.objectContaining({
-      category: 'pageViewed',
-      name: 'Signature Attestation Viewed',
       attestationVersion: 'v1',
       timestamp: expect.any(String)
     })
@@ -95,39 +89,31 @@ test('field interactions', async () => {
   await user.click(screen.getByLabelText(/add to personal templates/i));
 
   // Assert each field interaction
-  const fields = findAllAnalyticsEvents(
-    analyticsEvents,
-    (d) => d.category === 'fieldInteraction' && d.name === 'Field Interaction'
-  ).map((e) => ({
+  const fieldInteractionEvents = analyticsEvents.filter(
+    isFieldInteraction({ formName: 'add_prescription_form' })
+  );
+  const fieldInteractions = fieldInteractionEvents.map((e) => ({
     fieldName: (e.detail as AnalyticsDetail).fieldName,
-    isOptional: (e.detail as AnalyticsDetail).isOptional,
-    formName: (e.detail as AnalyticsDetail).formName
+    isOptional: (e.detail as AnalyticsDetail).isOptional
   }));
 
-  expect(fields).toEqual(
+  expect(fieldInteractions).toEqual(
     expect.arrayContaining([
-      { fieldName: 'dispenseQuantity', isOptional: false, formName: 'add_prescription_form' },
-      { fieldName: 'dispenseUnit', isOptional: false, formName: 'add_prescription_form' },
-      { fieldName: 'daysSupply', isOptional: true, formName: 'add_prescription_form' },
-      { fieldName: 'refills', isOptional: true, formName: 'add_prescription_form' },
-      { fieldName: 'instructions', isOptional: false, formName: 'add_prescription_form' },
-      { fieldName: 'pharmacy_notes', isOptional: true, formName: 'add_prescription_form' },
-      { fieldName: 'dispenseAsWritten', isOptional: true, formName: 'add_prescription_form' },
-      { fieldName: 'addToTemplates', isOptional: true, formName: 'add_prescription_form' }
+      { fieldName: 'dispenseQuantity', isOptional: false },
+      { fieldName: 'dispenseUnit', isOptional: false },
+      { fieldName: 'daysSupply', isOptional: true },
+      { fieldName: 'refills', isOptional: true },
+      { fieldName: 'instructions', isOptional: false },
+      { fieldName: 'pharmacy_notes', isOptional: true },
+      { fieldName: 'dispenseAsWritten', isOptional: true },
+      { fieldName: 'addToTemplates', isOptional: true }
     ])
   );
 
-  // Verify each has the required common shape
-  for (const event of findAllAnalyticsEvents(
-    analyticsEvents,
-    (d) => d.category === 'fieldInteraction'
-  )) {
-    const detail = event.detail as AnalyticsDetail;
-    expect(detail).toEqual(
+  // Verify each has the common fields
+  for (const event of fieldInteractionEvents) {
+    expect(event.detail).toEqual(
       expect.objectContaining({
-        category: 'fieldInteraction',
-        name: 'Field Interaction',
-        formName: 'add_prescription_form',
         timestamp: expect.any(String)
       })
     );
@@ -149,38 +135,22 @@ test('pharmacy tab field interactions', async () => {
 
   await user.click(screen.getByText('Local Pickup'));
 
-  const localPickupEvent = findAnalyticsEvent(
-    analyticsEvents,
-    (d) =>
-      d.category === 'fieldInteraction' &&
-      d.name === 'Field Interaction' &&
-      d.tabSelected === 'Local Pickup'
+  const localPickupEvent = analyticsEvents.find(
+    isFieldInteraction({ tabSelected: 'Local Pickup' })
   );
   expect(localPickupEvent?.detail).toEqual(
     expect.objectContaining({
-      category: 'fieldInteraction',
-      name: 'Field Interaction',
       formName: 'select_pharmacy',
-      tabSelected: 'Local Pickup',
       hasPreferredPharmacy: false,
       timestamp: expect.any(String)
     })
   );
 
   await user.click(screen.getByText('Mail Order'));
-  const mailOrderEvent = findAnalyticsEvent(
-    analyticsEvents,
-    (d) =>
-      d.category === 'fieldInteraction' &&
-      d.name === 'Field Interaction' &&
-      d.tabSelected === 'Mail Order'
-  );
+  const mailOrderEvent = analyticsEvents.find(isFieldInteraction({ tabSelected: 'Mail Order' }));
   expect(mailOrderEvent?.detail).toEqual(
     expect.objectContaining({
-      category: 'fieldInteraction',
-      name: 'Field Interaction',
       formName: 'select_pharmacy',
-      tabSelected: 'Mail Order',
       hasPreferredPharmacy: false,
       timestamp: expect.any(String)
     })
@@ -188,26 +158,19 @@ test('pharmacy tab field interactions', async () => {
 
   // Click back to "Send to Patient" tab
   await user.click(screen.getByText('Send to Patient'));
-  const sendToPatientEvent = findAnalyticsEvent(
-    analyticsEvents,
-    (d) =>
-      d.category === 'fieldInteraction' &&
-      d.name === 'Field Interaction' &&
-      d.tabSelected === 'Send to Patient'
+  const sendToPatientEvent = analyticsEvents.find(
+    isFieldInteraction({ tabSelected: 'Send to Patient' })
   );
   expect(sendToPatientEvent?.detail).toEqual(
     expect.objectContaining({
-      category: 'fieldInteraction',
-      name: 'Field Interaction',
       formName: 'select_pharmacy',
-      tabSelected: 'Send to Patient',
       hasPreferredPharmacy: false,
       timestamp: expect.any(String)
     })
   );
 });
 
-test('CTAs', async () => {
+test('Send Order CTAs', async () => {
   const { analyticsEvents, user } = renderPrescribeWorkflow({
     enableOrder: true,
     enableSendToPatient: true,
@@ -219,18 +182,9 @@ test('CTAs', async () => {
   // 1. Add a draft prescription
   await addDraftPrescription(user);
 
-  const draftAdded = findAnalyticsEvent(
-    analyticsEvents,
-    (d) =>
-      d.category === 'ctaClicked' &&
-      d.name === 'Minor CTA Clicked' &&
-      d.ctaName === 'draft prescription added'
-  );
-  expect(draftAdded?.detail).toEqual(
+  const draftAddedEvent = analyticsEvents.find(isMinorCTA({ ctaName: 'draft prescription added' }));
+  expect(draftAddedEvent?.detail).toEqual(
     expect.objectContaining({
-      category: 'ctaClicked',
-      name: 'Minor CTA Clicked',
-      ctaName: 'draft prescription added',
       draftPrescriptionSource: 'form',
       fields: expect.objectContaining({
         treatment: { completed: true },
@@ -249,22 +203,12 @@ test('CTAs', async () => {
   await user.click(screen.getByRole('button', { name: /^send$/i }));
 
   await waitFor(() => {
-    expect(
-      findAnalyticsEvent(
-        analyticsEvents,
-        (d) => d.category === 'ctaClicked' && d.name === 'Order Sent'
-      )
-    ).toBeDefined();
+    expect(analyticsEvents.find(isMajorCTA('Order Sent'))).toBeDefined();
   });
 
-  const orderSent = findAnalyticsEvent(
-    analyticsEvents,
-    (d) => d.category === 'ctaClicked' && d.name === 'Order Sent'
-  );
+  const orderSent = analyticsEvents.find(isMajorCTA('Order Sent'));
   expect(orderSent?.detail).toEqual(
     expect.objectContaining({
-      category: 'ctaClicked',
-      name: 'Order Sent',
       buttonText: 'Send',
       orderId: 'ord_abc',
       prescriptionCount: 1,
@@ -281,20 +225,12 @@ test('attestation CTA', async () => {
   await waitForSignatureAttestationModal();
 
   // Assert page view fired
-  expect(
-    findAnalyticsEvent(
-      analyticsEvents,
-      (d) => d.category === 'pageViewed' && d.name === 'Signature Attestation Viewed'
-    )
-  ).toBeDefined();
+  expect(analyticsEvents.find(isPageView('Signature Attestation Viewed'))).toBeDefined();
 
   // Click cancel
   await user.click(screen.getByRole('button', { name: /cancel/i }));
 
-  const canceled = findAnalyticsEvent(
-    analyticsEvents,
-    (d) => d.category === 'ctaClicked' && d.name === 'Attestation Canceled'
-  );
+  const canceled = analyticsEvents.find(isMajorCTA('Attestation Canceled'));
   expect(canceled?.detail).toEqual(
     expect.objectContaining({
       category: 'ctaClicked',
@@ -381,20 +317,6 @@ function renderPrescribeWorkflow(
   };
 }
 
-function findAnalyticsEvent(
-  analyticsEvents: CustomEvent[],
-  matcher: (detail: AnalyticsDetail) => boolean
-) {
-  return analyticsEvents.find((event) => matcher(event.detail as AnalyticsDetail));
-}
-
-function findAllAnalyticsEvents(
-  analyticsEvents: CustomEvent[],
-  matcher: (detail: AnalyticsDetail) => boolean
-) {
-  return analyticsEvents.filter((event) => matcher(event.detail as AnalyticsDetail));
-}
-
 async function waitForSignatureAttestationModal() {
   await screen.findByText('Prescriber Signature Attestation');
 }
@@ -416,3 +338,43 @@ async function addDraftPrescription(user: ReturnType<typeof userEvent.setup>) {
   );
   await user.click(screen.getByRole('button', { name: /add to drafts/i }));
 }
+
+const isFieldInteraction = (filter: Record<string, unknown> = {}) => {
+  return (event: CustomEvent) => {
+    const detail = event.detail as AnalyticsDetail;
+    if (detail.category !== 'fieldInteraction' || detail.name !== 'Field Interaction') {
+      return false;
+    }
+    return Object.entries(filter).every(([key, value]) => detail[key] === value);
+  };
+};
+
+const isPageView = (pageName: string, filter: Record<string, unknown> = {}) => {
+  return (event: CustomEvent) => {
+    const detail = event.detail as AnalyticsDetail;
+    if (detail.category !== 'pageViewed' || detail.name !== pageName) {
+      return false;
+    }
+    return Object.entries(filter).every(([key, value]) => detail[key] === value);
+  };
+};
+
+const isMajorCTA = (majorCtaName: string, filter: Record<string, unknown> = {}) => {
+  return (event: CustomEvent) => {
+    const detail = event.detail as AnalyticsDetail;
+    if (detail.category !== 'ctaClicked' || detail.name !== majorCtaName) {
+      return false;
+    }
+    return Object.entries(filter).every(([key, value]) => detail[key] === value);
+  };
+};
+
+const isMinorCTA = (filter: Record<string, unknown> = {}) => {
+  return (event: CustomEvent) => {
+    const detail = event.detail as AnalyticsDetail;
+    if (detail.category !== 'ctaClicked' || detail.name !== 'Minor CTA Clicked') {
+      return false;
+    }
+    return Object.entries(filter).every(([key, value]) => detail[key] === value);
+  };
+};
