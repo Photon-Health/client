@@ -121,7 +121,7 @@
     },
     "test": {
       "executor": "nx:run-commands",
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "codegen:boson"],
       "options": {
         "cwd": "apps/app",
         "command": "vitest run"
