@@ -4,64 +4,41 @@ import { afterAll, afterEach, beforeAll, expect, test, vi } from 'vitest';
 import { setupServer } from 'msw/node';
 import { graphql, HttpResponse } from 'msw';
 import { PhotonClient } from '@photonhealth/sdk';
-import { defaultHandlers, PROVIDER, ORGANIZATION } from '@photonhealth/sdk/test-utils';
+import { defaultHandlers, ORGANIZATION, PROVIDER } from '@photonhealth/sdk/test-utils';
 import { ProviderAnalyticsProvider } from './hooks/useProviderAnalytics';
 import { PrescriptionForm } from './views/routes/PrescriptionForm';
 import { PatientForm } from './views/routes/NewPatient/PatientForm';
+import { OrganizationSettings } from './gql/graphql';
 
-// ---------------------------------------------------------------------------
-// MSW
-// ---------------------------------------------------------------------------
+const testProviderUxSettings = {
+  enablePrescribeToOrder: true,
+  enableRxTemplates: true,
+  enableDuplicateRxWarnings: false,
+  enableTreatmentHistory: false,
+  enablePatientRouting: true,
+  enablePickupPharmacies: true,
+  enableDeliveryPharmacies: false,
+  optionalPatientAddress: false
+};
 
 const server = setupServer(
   ...defaultHandlers,
-
-  graphql.query('PatientFormOrgSettingsQuery', () =>
-    HttpResponse.json({
-      data: {
-        organization: {
-          settings: { providerUx: { optionalPatientAddress: false } }
-        }
-      }
-    })
-  ),
-
-  graphql.query('PrescriptionFormOrgSettingsQuery', () =>
-    HttpResponse.json({
-      data: {
-        organization: {
-          settings: {
-            providerUx: {
-              enablePrescribeToOrder: true,
-              enableRxTemplates: true,
-              enableDuplicateRxWarnings: false,
-              enableTreatmentHistory: false,
-              enablePatientRouting: true,
-              enablePickupPharmacies: true,
-              enableDeliveryPharmacies: false,
-              optionalPatientAddress: false
-            }
-          }
-        }
-      }
-    })
-  )
+  createPatientFormOrgSettingsHandler(testProviderUxSettings),
+  createPrescriptionFormOrgSettingsHandler(testProviderUxSettings)
 );
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
+
 afterEach(() => {
   server.resetHandlers();
   vi.clearAllMocks();
 });
+
 afterAll(() => server.close());
 
-// ---------------------------------------------------------------------------
-// Mocks — only what can't go through MSW
-// ---------------------------------------------------------------------------
-
+// Mocking only what can't go through MSW
 const client = new PhotonClient({ clientId: 'test', env: 'tau' });
 client.authentication.getAccessToken = vi.fn(async () => 'test-token');
-
 vi.mock('@photonhealth/react', () => ({
   usePhoton: () => ({
     isAuthenticated: true,
@@ -76,14 +53,8 @@ vi.mock('./configs/providerAnalytics', () => ({
   getProviderAnalytics: () => ({ track: rudderTrackSpy, isInitialized: true })
 }));
 
-// @datadog/browser-rum and setInstrumentationUserContext are mocked globally in setupTests.ts
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
-
 test('PrescriptionForm page view fires with orderWorkflowId, pageName, and context', async () => {
-  renderPrescriptionForm({ patientId: 'pat_123' });
+  renderApp({ patientId: 'pat_123' });
 
   await waitFor(() => {
     expect(rudderTrackSpy).toHaveBeenCalledWith(
@@ -105,7 +76,7 @@ test('PrescriptionForm page view fires with orderWorkflowId, pageName, and conte
 });
 
 test('Major CTA CustomEvent from web component reaches RudderStack enriched', async () => {
-  renderPrescriptionForm({ patientId: 'pat_123' });
+  renderApp({ patientId: 'pat_123' });
 
   const wrapper = await findPrescribeWrapper();
 
@@ -145,7 +116,7 @@ test('Major CTA CustomEvent from web component reaches RudderStack enriched', as
 });
 
 test('Minor CTA CustomEvent maps correctly with enrichment', async () => {
-  renderPrescriptionForm({ patientId: 'pat_123' });
+  renderApp({ patientId: 'pat_123' });
 
   const wrapper = await findPrescribeWrapper();
 
@@ -176,7 +147,7 @@ test('Minor CTA CustomEvent maps correctly with enrichment', async () => {
 });
 
 test('Field Interaction CustomEvent maps correctly with enrichment', async () => {
-  renderPrescriptionForm({ patientId: 'pat_123' });
+  renderApp({ patientId: 'pat_123' });
 
   const wrapper = await findPrescribeWrapper();
 
@@ -211,16 +182,7 @@ test('Field Interaction CustomEvent maps correctly with enrichment', async () =>
 });
 
 test('orderWorkflowId persists across workflow routes', async () => {
-  render(
-    <MemoryRouter initialEntries={['/patients/new']}>
-      <ProviderAnalyticsProvider>
-        <Routes>
-          <Route path="/patients/new" element={<PatientForm />} />
-          <Route path="/prescriptions/new" element={<PrescriptionForm />} />
-        </Routes>
-      </ProviderAnalyticsProvider>
-    </MemoryRouter>
-  );
+  renderApp({ patientId: 'pat_123' }, '/patients/new');
 
   // PatientForm renders <photon-patient-dialog> and sets open=true.
   // Simulate the Solid.js component dispatching the page view event.
@@ -245,7 +207,7 @@ test('orderWorkflowId persists across workflow routes', async () => {
     );
   });
 
-  const patientPageId = rudderTrackSpy.mock.calls.find(
+  const patientPageOrderWorkflowId = rudderTrackSpy.mock.calls.find(
     (args: unknown[]) => args[0] === 'New Patient Page Viewed'
   )?.[1]?.orderWorkflowId;
 
@@ -266,26 +228,25 @@ test('orderWorkflowId persists across workflow routes', async () => {
     );
   });
 
-  const prescriptionPageId = rudderTrackSpy.mock.calls.find(
+  const prescriptionPageOrderWorkflowId = rudderTrackSpy.mock.calls.find(
     (args: unknown[]) => args[0] === 'New Prescriptions Page Viewed'
   )?.[1]?.orderWorkflowId;
 
-  // Same orderWorkflowId should persist across the workflow
-  expect(patientPageId).toBe(prescriptionPageId);
+  expect(patientPageOrderWorkflowId).toBe(prescriptionPageOrderWorkflowId);
 });
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function renderPrescriptionForm(params: { patientId?: string } = {}) {
+function renderApp(params: { patientId?: string } = {}, initialPageOverride?: string) {
   const search = new URLSearchParams();
   if (params.patientId) search.set('patientId', params.patientId);
 
+  const initialPage = initialPageOverride
+    ? initialPageOverride
+    : `/prescriptions/new?${search.toString()}`;
   return render(
-    <MemoryRouter initialEntries={[`/prescriptions/new?${search.toString()}`]}>
+    <MemoryRouter initialEntries={[initialPage]}>
       <ProviderAnalyticsProvider>
         <Routes>
+          <Route path="/patients/new" element={<PatientForm />} />
           <Route path="/prescriptions/new" element={<PrescriptionForm />} />
         </Routes>
       </ProviderAnalyticsProvider>
@@ -295,4 +256,28 @@ function renderPrescriptionForm(params: { patientId?: string } = {}) {
 
 async function findPrescribeWrapper(): Promise<HTMLElement> {
   return screen.findByTestId('multirx-form-wrapper', {}, { timeout: 3000 });
+}
+
+function createPatientFormOrgSettingsHandler(settings: OrganizationSettings['providerUx']) {
+  return graphql.query('PatientFormOrgSettingsQuery', () =>
+    HttpResponse.json({
+      data: {
+        organization: {
+          settings
+        }
+      }
+    })
+  );
+}
+
+function createPrescriptionFormOrgSettingsHandler(settings: OrganizationSettings['providerUx']) {
+  return graphql.query('PrescriptionFormOrgSettingsQuery', () =>
+    HttpResponse.json({
+      data: {
+        organization: {
+          settings
+        }
+      }
+    })
+  );
 }
