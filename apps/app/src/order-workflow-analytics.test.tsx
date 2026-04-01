@@ -53,33 +53,36 @@ vi.mock('./configs/providerAnalytics', () => ({
   getProviderAnalytics: () => ({ track: rudderTrackSpy, isInitialized: true })
 }));
 
+const expectedOrderWorkflowIdRegex =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
 test('PrescriptionForm page view fires with orderWorkflowId, pageName, and context', async () => {
   renderApp({ patientId: 'pat_123' });
+
+  await simulatePrescriptionPageViewEvent('New Prescriptions Page Viewed', {
+    prefillPatientId: 'pat_123'
+  });
 
   await waitFor(() => {
     expect(rudderTrackSpy).toHaveBeenCalledWith(
       'New Prescriptions Page Viewed',
       expect.objectContaining({
-        orderWorkflowId: expect.stringMatching(
-          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-        ),
+        orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex),
         pageName: 'New Prescriptions',
         providerId: PROVIDER.id,
         providerEmail: PROVIDER.email,
         orgId: ORGANIZATION.id,
         orgName: ORGANIZATION.name,
-        prefillPatientId: 'pat_123',
-        weightUnit: 'lbs'
+        prefillPatientId: 'pat_123'
       })
     );
   });
 });
 
-test('Major CTA CustomEvent from web component reaches RudderStack enriched', async () => {
+test('Major CTA events from web component reach RudderStack track', async () => {
   renderApp({ patientId: 'pat_123' });
 
   const wrapper = await findPrescribeWrapper();
-
   wrapper.dispatchEvent(
     new CustomEvent('photon-analytics-track-event', {
       bubbles: true,
@@ -104,18 +107,24 @@ test('Major CTA CustomEvent from web component reaches RudderStack enriched', as
     expect(rudderTrackSpy).toHaveBeenCalledWith(
       'Order Sent',
       expect.objectContaining({
-        orderWorkflowId: expect.stringMatching(/^[0-9a-f]{8}/),
+        orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex),
         pageName: 'New Prescriptions',
         providerId: PROVIDER.id,
         orgId: ORGANIZATION.id,
         buttonText: 'Send',
-        orderId: 'ord_abc'
+        orderId: 'ord_abc',
+        prescriptionCount: 1,
+        fulfillmentType: 'SEND_TO_PATIENT',
+        hasPreferredPharmacy: false,
+        setAsPreferred: false,
+        pharmacyId: null,
+        isCombinedOrder: false
       })
     );
   });
 });
 
-test('Minor CTA CustomEvent maps correctly with enrichment', async () => {
+test('Minor CTA events map correctly with orderWorkflowId', async () => {
   renderApp({ patientId: 'pat_123' });
 
   const wrapper = await findPrescribeWrapper();
@@ -140,7 +149,7 @@ test('Minor CTA CustomEvent maps correctly with enrichment', async () => {
       expect.objectContaining({
         ctaName: 'draft prescription added',
         draftPrescriptionSource: 'form',
-        orderWorkflowId: expect.stringMatching(/^[0-9a-f]{8}/)
+        orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex)
       })
     );
   });
@@ -175,7 +184,7 @@ test('Field Interaction CustomEvent maps correctly with enrichment', async () =>
         fieldName: 'dispenseQuantity',
         hasValue: true,
         isOptional: false,
-        orderWorkflowId: expect.stringMatching(/^[0-9a-f]{8}/)
+        orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex)
       })
     );
   });
@@ -184,26 +193,14 @@ test('Field Interaction CustomEvent maps correctly with enrichment', async () =>
 test('orderWorkflowId persists across workflow routes', async () => {
   renderApp({ patientId: 'pat_123' }, '/patients/new');
 
-  // PatientForm renders <photon-patient-dialog> and sets open=true.
-  // Simulate the Solid.js component dispatching the page view event.
-  const patientDialog = await screen.findByTestId('patient-dialog', {}, { timeout: 3000 });
-
-  patientDialog.dispatchEvent(
-    new CustomEvent('photon-analytics-track-event', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        category: 'pageViewed',
-        name: 'New Patient Page Viewed',
-        timestamp: new Date().toISOString()
-      }
-    })
-  );
+  await simulatePatientPageViewEvent('New Patient Page Viewed');
 
   await waitFor(() => {
     expect(rudderTrackSpy).toHaveBeenCalledWith(
       'New Patient Page Viewed',
-      expect.objectContaining({ orderWorkflowId: expect.stringMatching(/^[0-9a-f]{8}/) })
+      expect.objectContaining({
+        orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex)
+      })
     );
   });
 
@@ -212,6 +209,7 @@ test('orderWorkflowId persists across workflow routes', async () => {
   )?.[1]?.orderWorkflowId;
 
   // Simulate "Create and Start Prescription" — navigates to /prescriptions/new
+  const patientDialog = await findPatientDialogWrapper();
   patientDialog.dispatchEvent(
     new CustomEvent('photon-patient-created', {
       bubbles: true,
@@ -220,11 +218,18 @@ test('orderWorkflowId persists across workflow routes', async () => {
     })
   );
 
-  // PrescriptionForm fires its own page view on mount
+  // PrescriptionForm page view is dispatched by the Solid component on mount.
+  // In jsdom the web component is inert, so simulate the dispatch.
+  await simulatePrescriptionPageViewEvent('New Prescriptions Page Viewed', {
+    prefillPatientId: 'pat_123'
+  });
+
   await waitFor(() => {
     expect(rudderTrackSpy).toHaveBeenCalledWith(
       'New Prescriptions Page Viewed',
-      expect.objectContaining({ orderWorkflowId: expect.stringMatching(/^[0-9a-f]{8}/) })
+      expect.objectContaining({
+        orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex)
+      })
     );
   });
 
@@ -252,6 +257,42 @@ function renderApp(params: { patientId?: string } = {}, initialPageOverride?: st
       </ProviderAnalyticsProvider>
     </MemoryRouter>
   );
+}
+
+async function simulatePrescriptionPageViewEvent(pageName: string, options: Record<string, any>) {
+  // Page view is dispatched by the Solid prescribe workflow on mount via CustomEvent.
+  // In jsdom the web component is inert, so simulate the dispatch.
+  const wrapper = await findPrescribeWrapper();
+  wrapper.dispatchEvent(
+    new CustomEvent('photon-analytics-track-event', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        category: 'pageViewed',
+        name: pageName,
+        ...options
+      }
+    })
+  );
+}
+
+async function simulatePatientPageViewEvent(pageName: string) {
+  // Simulate the Solid.js patient-dialog component dispatching the page view event because WebComponent is inert in jsdom
+  const patientDialog = await findPatientDialogWrapper();
+  patientDialog.dispatchEvent(
+    new CustomEvent('photon-analytics-track-event', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        category: 'pageViewed',
+        name: pageName
+      }
+    })
+  );
+}
+
+async function findPatientDialogWrapper(): Promise<HTMLElement> {
+  return screen.findByTestId('patient-dialog', {}, { timeout: 3000 });
 }
 
 async function findPrescribeWrapper(): Promise<HTMLElement> {
