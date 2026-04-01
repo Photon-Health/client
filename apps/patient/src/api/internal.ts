@@ -136,13 +136,15 @@ export const markOrderAsPickedUp = async (orderId: string) => {
 export const rerouteOrder = async (
   orderId: string,
   pharmacyId: string,
-  patientSelectedPrice: boolean
+  patientSelectedPrice: boolean,
+  reason?: string
 ) => {
   try {
     const response = await graphQLClient.RerouteOrder({
       orderId,
       pharmacyId,
-      patientSelectedPrice
+      patientSelectedPrice,
+      reason: reason || undefined
     });
     if (response?.rerouteOrder) {
       return true;
