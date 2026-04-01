@@ -59,10 +59,7 @@ const expectedOrderWorkflowIdRegex =
 test('PrescriptionForm page view fires with orderWorkflowId, pageName, and context', async () => {
   renderApp({ patientId: 'pat_123' });
 
-  await simulatePrescriptionPageViewEvent('New Prescriptions Page Viewed', {
-    prefillPatientId: 'pat_123'
-  });
-
+  // PrescriptionForm fires track() directly on mount when providerAnalytics.isReady
   await waitFor(() => {
     expect(rudderTrackSpy).toHaveBeenCalledWith(
       'New Prescriptions Page Viewed',
@@ -218,12 +215,7 @@ test('orderWorkflowId persists across workflow routes', async () => {
     })
   );
 
-  // PrescriptionForm page view is dispatched by the Solid component on mount.
-  // In jsdom the web component is inert, so simulate the dispatch.
-  await simulatePrescriptionPageViewEvent('New Prescriptions Page Viewed', {
-    prefillPatientId: 'pat_123'
-  });
-
+  // PrescriptionForm fires track() directly on mount when providerAnalytics.isReady
   await waitFor(() => {
     expect(rudderTrackSpy).toHaveBeenCalledWith(
       'New Prescriptions Page Viewed',

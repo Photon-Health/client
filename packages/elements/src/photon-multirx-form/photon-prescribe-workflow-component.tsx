@@ -1,5 +1,4 @@
 import {
-  dispatchPageViewAnalyticsEvent,
   DraftPrescriptionsProvider,
   PharmacySelectionProvider,
   PrescribeEventDispatchProvider,
@@ -10,7 +9,7 @@ import {
 import { customElement } from 'solid-element';
 import { createFormStore } from '../stores/form';
 import { PrescribeProps, PrescribeWorkflow } from './components/PrescribeWorkflow';
-import { onCleanup, onMount } from 'solid-js';
+import { onCleanup } from 'solid-js';
 import { PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
@@ -38,7 +37,6 @@ export interface PrescribeWorkflowComponentProps extends Omit<PrescribeProps, 'i
 }
 
 export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowComponentProps) => {
-  let pageViewRef!: HTMLDivElement;
   const { actions: patientActions } = PatientStore;
   const { store, actions } = createFormStore({
     dispenseAsWritten: false,
@@ -50,93 +48,75 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
     supervisorId: undefined
   });
 
-  onMount(() => {
-    dispatchPageViewAnalyticsEvent(
-      {
-        name: 'New Prescriptions Page Viewed',
-        prefillPatientId: props.patientId || '',
-        prefillPharmacyId: props.pharmacyId || '',
-        hasPrefillPatientExternalId: !!props.externalOrderId?.trim(),
-        hasPrefillPrescriptionIds: !!props.prescriptionIds?.trim(),
-        hasPrefillTemplateIds: !!props.templateIds?.trim(),
-        hasPrefillWeight: !!props.weight,
-        weightUnit: props.weightUnit || 'lbs'
-      },
-      pageViewRef
-    );
-  });
-
   onCleanup(() => {
     patientActions.clearSelectedPatient();
     actions.reset();
   });
 
   return (
-    <div ref={pageViewRef}>
-      <PrescribeEventDispatchProvider>
-        <RecentOrders patientId={store.patient?.value?.id}>
-          <DraftPrescriptionsProvider
-            patientId={store.patient?.value?.id}
-            templateIdsPrefill={props.templateIds?.split(',').map((id) => id.trim()) || []}
-            templateOverrides={props.templateOverrides || {}}
-            prescriptionIdsPrefill={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
-            enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+    <PrescribeEventDispatchProvider>
+      <RecentOrders patientId={store.patient?.value?.id}>
+        <DraftPrescriptionsProvider
+          patientId={store.patient?.value?.id}
+          templateIdsPrefill={props.templateIds?.split(',').map((id) => id.trim()) || []}
+          templateOverrides={props.templateOverrides || {}}
+          prescriptionIdsPrefill={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
+          enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+        >
+          <PharmacySelectionProvider
+            pharmacyIdProp={props.pharmacyId}
+            enableLocalPickup={props.enableLocalPickup}
+            enableSendToPatient={props.enableSendToPatient}
+            enableDeliveryPharmacies={props.enableDeliveryPharmacies}
+            mailOrderIds={props.mailOrderIds}
+            onFulfillmentTypeChange={(ft) => {
+              actions.updateFormValue({ key: 'fulfillmentType', value: ft || '' });
+            }}
+            onPreferredPharmacyChange={(shouldSet) => {
+              actions.updateFormValue({ key: 'updatePreferredPharmacy', value: shouldSet });
+            }}
           >
-            <PharmacySelectionProvider
-              pharmacyIdProp={props.pharmacyId}
-              enableLocalPickup={props.enableLocalPickup}
-              enableSendToPatient={props.enableSendToPatient}
-              enableDeliveryPharmacies={props.enableDeliveryPharmacies}
-              mailOrderIds={props.mailOrderIds}
-              onFulfillmentTypeChange={(ft) => {
-                actions.updateFormValue({ key: 'fulfillmentType', value: ft || '' });
-              }}
-              onPreferredPharmacyChange={(shouldSet) => {
-                actions.updateFormValue({ key: 'updatePreferredPharmacy', value: shouldSet });
-              }}
+            <PrescribeProvider
+              patientId={store.patient?.value?.id}
+              enableCoverageCheck={props.enableCoverageCheck}
             >
-              <PrescribeProvider
-                patientId={store.patient?.value?.id}
-                enableCoverageCheck={props.enableCoverageCheck}
-              >
-                <style>{tailwind}</style>
-                <style>{shoelaceDarkStyles}</style>
-                <style>{shoelaceLightStyles}</style>
-                <style>{styles}</style>
-                <style>{photonStyles}</style>
-                <PrescribeWorkflow
-                  patientId={props.patientId}
-                  hideSubmit={props.hideSubmit}
-                  hideTemplates={props.hideTemplates}
-                  hidePatientCard={props.hidePatientCard}
-                  enableOrder={props.enableOrder}
-                  enableMedHistory={props.enableMedHistory}
-                  enableMedHistoryLinks={props.enableMedHistoryLinks}
-                  enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
-                  enableCombineAndDuplicate={props.enableCombineAndDuplicate}
-                  optionalPatientAddress={props.optionalPatientAddress}
-                  address={props.address}
-                  weight={props.weight}
-                  weightUnit={props.weightUnit}
-                  additionalNotes={props.additionalNotes}
-                  triggerSubmit={props.triggerSubmit}
-                  toastBuffer={props.toastBuffer}
-                  formStore={store}
-                  formActions={actions}
-                  externalOrderId={props.externalOrderId}
-                  catalogId={props.catalogId}
-                  allowOffCatalogSearch={props.allowOffCatalogSearch}
-                  disableList={props.disableList}
-                  groupId={props.groupId}
-                  // this logic keeps the rx form closed when refilling a particular template/prescription
-                  initialShowForm={!props.templateIds && !props.prescriptionIds}
-                />
-              </PrescribeProvider>
-            </PharmacySelectionProvider>
-          </DraftPrescriptionsProvider>
-        </RecentOrders>
-      </PrescribeEventDispatchProvider>
-    </div>
+              <style>{tailwind}</style>
+              <style>{shoelaceDarkStyles}</style>
+              <style>{shoelaceLightStyles}</style>
+              <style>{styles}</style>
+              <style>{photonStyles}</style>
+              <PrescribeWorkflow
+                patientId={props.patientId}
+                hideSubmit={props.hideSubmit}
+                hideTemplates={props.hideTemplates}
+                hidePatientCard={props.hidePatientCard}
+                enableOrder={props.enableOrder}
+                enableMedHistory={props.enableMedHistory}
+                enableMedHistoryLinks={props.enableMedHistoryLinks}
+                enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
+                enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+                optionalPatientAddress={props.optionalPatientAddress}
+                address={props.address}
+                weight={props.weight}
+                weightUnit={props.weightUnit}
+                additionalNotes={props.additionalNotes}
+                triggerSubmit={props.triggerSubmit}
+                toastBuffer={props.toastBuffer}
+                formStore={store}
+                formActions={actions}
+                externalOrderId={props.externalOrderId}
+                catalogId={props.catalogId}
+                allowOffCatalogSearch={props.allowOffCatalogSearch}
+                disableList={props.disableList}
+                groupId={props.groupId}
+                // this logic keeps the rx form closed when refilling a particular template/prescription
+                initialShowForm={!props.templateIds && !props.prescriptionIds}
+              />
+            </PrescribeProvider>
+          </PharmacySelectionProvider>
+        </DraftPrescriptionsProvider>
+      </RecentOrders>
+    </PrescribeEventDispatchProvider>
   );
 };
 customElement(
