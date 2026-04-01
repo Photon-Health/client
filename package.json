@@ -9,7 +9,8 @@
     "patient:tau": "concurrently \"npx nx run patient:codegen:watch:tau\" \"npx nx run patient:start:tau\"",
     "lint": "npx nx run-many --target=lint",
     "lint:fix": "npx nx run-many --target=lint:fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "patient-tau-url": "./tools/patient_tau_url.sh"
   },
   "private": true,
   "workspaces": [
