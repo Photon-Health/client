@@ -12,10 +12,6 @@ env:
     VITE_AUTH0_AUDIENCE: app_build_vars:VITE_AUTH0_AUDIENCE
     VITE_GRAPHQL_URI: app_build_vars:VITE_GRAPHQL_URI
     VITE_CLINICAL_GRAPHQL_URI: app_build_vars:VITE_CLINICAL_GRAPHQL_URI
-    GITHUP_CLIENT_ID: codebuild_github_token_test:GITHUP_CLIENT_ID
-    GITHUB_APP_ID: codebuild_github_token_test:GITHUB_APP_ID
-    GITHUB_APP_INSTALLATION_ID: codebuild_github_token_test:GITHUB_APP_INSTALLATION_ID
-    GITHUB_APP_PRIVATE_KEY: codebuild_github_token_test:GITHUB_APP_PRIVATE_KEY
 
 phases:
   install:
@@ -68,8 +64,13 @@ phases:
         echo "BRANCH_NAME: $BRANCH_NAME"
         if [ "$CODEBUILD_BUILD_SUCCEEDING" = "1" ] && [ "$VITE_ENV_NAME" = "boson" ] && [ "$BRANCH_NAME" != "neturons/merge" ] && [ "$BRANCH_NAME" != "photons/merge" ]; then
           echo "Requesting Github installation access token..."
-          GITHUB_ACCESS_TOKEN=$(bash ./tools/codebuild_workflow_dispatch.sh $GITHUP_CLIENT_ID $GITHUB_APP_ID $GITHUB_APP_INSTALLATION_ID "$GITHUB_APP_PRIVATE_KEY")
-          echo "Successfully requested token"
+          GITHUB_APP_SECRET=$(aws secretsmanager get-secret-value --secret-id codebuild_github_token_test --query SecretString --output text)
+          GITHUB_CLIENT_ID=$(echo "$GITHUB_APP_SECRET" | jq -r '.GITHUB_CLIENT_ID')
+          GITHUB_APP_ID=$(echo "$GITHUB_APP_SECRET" | jq -r '.GITHUB_APP_ID')
+          GITHUB_APP_INSTALLATION_ID=$(echo "$GITHUB_APP_SECRET" | jq -r '.GITHUB_APP_INSTALLATION_ID')
+          GITHUB_APP_PRIVATE_KEY=$(echo "$GITHUB_APP_SECRET" | jq -r '.GITHUB_APP_PRIVATE_KEY')
+          GITHUB_ACCESS_TOKEN=$(bash ./tools/codebuild_github_access_token.sh $GITHUB_CLIENT_ID $GITHUB_APP_ID $GITHUB_APP_INSTALLATION_ID "$GITHUB_APP_PRIVATE_KEY")
+          echo "Successfully requested token!"
           echo "Sending e2e test workflow dispatch to GitHub..."
           curl -X POST \
             -H "Authorization: token $GITHUB_ACCESS_TOKEN" \
