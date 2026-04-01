@@ -49,7 +49,6 @@ generate_jwt() {
 }
 
 JWT=$(generate_jwt "${client_id}" "${private_key}")
-printf '%s\n' "JWT: $JWT"
 
 response=$(curl --request POST \
 --url "https://api.github.com/app/installations/${installation_id}/access_tokens" \
@@ -57,4 +56,5 @@ response=$(curl --request POST \
 --header "Authorization: Bearer ${JWT}" \
 --header "X-GitHub-Api-Version: 2026-03-10")
 
-echo "${response}"
+token=$(echo "${response}" | jq -r '.token')
+echo "${token}"
