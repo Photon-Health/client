@@ -8,7 +8,6 @@ import {
   Heading,
   HStack,
   Link,
-  Switch,
   Text,
   useToast,
   VStack
@@ -80,9 +79,9 @@ export const Pharmacy = () => {
     setOrder,
     isDemo,
     fetchOrder,
-    showPriceToggle,
     enablePrice,
-    setEnablePrice
+    setEnablePrice,
+    reason
   } = useOrderContext();
   // We don't want to collect data on demo activity
   const patientAnalytics = usePatientAnalytics();
@@ -775,7 +774,7 @@ export const Pharmacy = () => {
       try {
         const patientSelectedPrice = enablePrice;
         const result = isReroute
-          ? await rerouteOrder(order.id, selectedPharmacy.id, patientSelectedPrice)
+          ? await rerouteOrder(order.id, selectedPharmacy.id, patientSelectedPrice, reason)
           : await setOrderPharmacy(
               order.id,
               selectedPharmacy.id,
@@ -1071,28 +1070,7 @@ export const Pharmacy = () => {
     );
   }
 
-  const locationPreview = (
-    <VStack w="full" align="start" spacing={1}>
-      <Text size="sm">{t.showingLabel}</Text>
-      <Link
-        onClick={() => setLocationModalOpen(true)}
-        display="inline"
-        size="sm"
-        data-dd-privacy="mask"
-      >
-        <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
-        {cleanAddress}
-      </Link>
-    </VStack>
-  );
-
-  const setLocationButton = (
-    <Button variant="brand" onClick={() => setLocationModalOpen(true)}>
-      {t.setLoc}
-    </Button>
-  );
   const capsuleEnabled = enableCourier && order?.address?.postalCode && capsulePharmacyId;
-
   const brandedOptions = _.uniq([
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
     // the destructuring for novo and amazon can be removed once we remove brandedOptionsOverrides
@@ -1126,32 +1104,6 @@ export const Pharmacy = () => {
   const showPickupHeading =
     (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;
 
-  const pickupPharmacyOptions = (patientLocation: string) => (
-    <PickupPharmacyCardList
-      location={patientLocation}
-      pharmacies={allPharmacies}
-      preferredPharmacy={effectivePreferredPharmacyId}
-      savingPreferred={savingPreferred}
-      selectedId={selectedId}
-      handleSelect={handleSelect}
-      handleShowMore={handleShowMore}
-      handleSetPreferred={handleSetPreferredPharmacy}
-      loadingMore={isLoading}
-      showingAllPharmacies={showingAllPharmacies}
-      showHeading={showPickupHeading}
-      showPrice={isDemo || !orderIsMultiRx}
-      enableOpenNow={enableOpenNow}
-      enable24Hr={enable24Hr}
-      enablePrice={enablePrice}
-      setEnableOpenNow={setEnableOpenNow}
-      setEnable24Hr={setEnable24Hr}
-      currentPharmacyId={order.pharmacy?.id}
-      setCouponModalOpen={setCouponModalOpen}
-      numberOfBrandedOptions={brandedOptions.length}
-      shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
-    />
-  );
-
   return (
     <Box>
       {!isDemo && <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />}
@@ -1170,58 +1122,34 @@ export const Pharmacy = () => {
       />
 
       <Box bgColor="white">
-        <VStack
-          spacing={4}
-          align="span"
-          pt={4}
-          pb={!showPriceToggle ? 4 : 0} // don't remove, this padding is needed when price toggle section is not shown
-        >
+        <VStack spacing={4} align="span" p={4}>
           <Container px={-3}>
             <VStack spacing={2} align="start" px={4}>
               <Heading as="h3" size="lg">
                 {heading}
               </Heading>
               <HStack justify="space-between" w="full">
-                {patientLocation ? locationPreview : setLocationButton}
+                {patientLocation ? (
+                  <VStack w="full" align="start" spacing={1}>
+                    <Text size="sm">{t.showingLabel}</Text>
+                    <Link
+                      onClick={() => setLocationModalOpen(true)}
+                      display="inline"
+                      size="sm"
+                      data-dd-privacy="mask"
+                    >
+                      <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
+                      {cleanAddress}
+                    </Link>
+                  </VStack>
+                ) : (
+                  <Button variant="brand" onClick={() => setLocationModalOpen(true)}>
+                    {t.setLoc}
+                  </Button>
+                )}
               </HStack>
             </VStack>
           </Container>
-
-          {showPriceToggle ? (
-            <Container px={-3}>
-              <VStack
-                spacing={2}
-                align="start"
-                borderY="2px solid"
-                borderColor="gray.300"
-                py={4}
-                px={4}
-              >
-                <HStack justify="space-between" w="full">
-                  {t.showDiscountCardPrices()}
-                  <Switch
-                    size="lg"
-                    aria-label="Show lowest cash prices"
-                    isChecked={enablePrice}
-                    onChange={(e) => {
-                      setEnablePrice(e.target.checked);
-                      patientAnalytics.track('Patient Toggle Show CashPrice Filter', order, {
-                        enabled: e.target.checked
-                      });
-                    }}
-                  />
-                </HStack>
-                {enablePrice && !orderIsMultiRx ? (
-                  <Box p={3} bgColor="blue.100" borderRadius="lg">
-                    <Text fontSize="sm">
-                      Coupon will be generated after you select a pharmacy.{' '}
-                      <Link onClick={() => setCouponModalOpen(true)}>More info</Link>
-                    </Text>
-                  </Box>
-                ) : null}
-              </VStack>
-            </Container>
-          ) : null}
         </VStack>
       </Box>
 
@@ -1285,7 +1213,29 @@ export const Pharmacy = () => {
                   </VStack>
                 </Card>
               )}
-              {pickupPharmacyOptions(patientLocation)}
+              <PickupPharmacyCardList
+                location={patientLocation}
+                pharmacies={allPharmacies}
+                preferredPharmacy={effectivePreferredPharmacyId}
+                savingPreferred={savingPreferred}
+                selectedId={selectedId}
+                handleSelect={handleSelect}
+                handleShowMore={handleShowMore}
+                handleSetPreferred={handleSetPreferredPharmacy}
+                loadingMore={isLoading}
+                showingAllPharmacies={showingAllPharmacies}
+                showHeading={showPickupHeading}
+                showPrice={isDemo || !orderIsMultiRx}
+                enableOpenNow={enableOpenNow}
+                enable24Hr={enable24Hr}
+                enablePrice={enablePrice}
+                setEnableOpenNow={setEnableOpenNow}
+                setEnable24Hr={setEnable24Hr}
+                currentPharmacyId={order.pharmacy?.id}
+                setCouponModalOpen={setCouponModalOpen}
+                numberOfBrandedOptions={brandedOptions.length}
+                shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
+              />
             </VStack>
           </VStack>
         )}
