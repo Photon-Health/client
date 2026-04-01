@@ -1,4 +1,4 @@
-import { TREATMENT } from './msw-handlers';
+import { TREATMENT } from '@photonhealth/sdk/test-utils';
 
 // todo: remove this MockMedicationSearchElement
 export class MockMedicationSearchElement extends HTMLElement {
