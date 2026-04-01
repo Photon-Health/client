@@ -59,6 +59,8 @@ const renderCanceled = (orderContextValueOverride: Partial<OrderContextType> = {
     setOrder(order: Order): void {},
     enablePrice: false,
     setEnablePrice(enablePrice: boolean): void {},
+    reason: '',
+    setReason: () => {},
     ...orderContextValueOverride
   };
   return render(
