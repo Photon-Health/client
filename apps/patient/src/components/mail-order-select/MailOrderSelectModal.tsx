@@ -77,9 +77,9 @@ export function MailOrderSelectModal({
 
     // track the modal opening event
     if (modalProps.isOpen) {
-      patientAnalytics.track('Patient Mail Order Model Opened', order);
+      patientAnalytics.track('Patient Mail Order Modal Opened', order);
     } else {
-      patientAnalytics.track('Patient Mail Order Model Closed', order);
+      patientAnalytics.track('Patient Mail Order Modal Closed', order);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modalProps.isOpen]);
