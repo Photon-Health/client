@@ -2,8 +2,9 @@ import { graphql, HttpResponse } from 'msw';
 
 // Scoped handlers — for per-test overrides when the same operation name
 // is used by different endpoints with different responses.
+// Tau env: lambdas shares boson's API URL, clinical uses local tau URL.
 const lambdasGql = graphql.link('https://api.boson.health/graphql');
-const clinicalGql = graphql.link('https://clinical-api.boson.health/graphql');
+const clinicalGql = graphql.link('http://clinical-api.tau.health:8080/graphql');
 
 export { lambdasGql, clinicalGql };
 

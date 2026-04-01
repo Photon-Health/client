@@ -134,6 +134,79 @@ test('field interactions', async () => {
   }
 });
 
+test('pharmacy tab field interactions', async () => {
+  const { analyticsEvents, user } = renderPrescribeWorkflow({
+    enableOrder: true,
+    enableSendToPatient: true,
+    enableLocalPickup: true,
+    enableDeliveryPharmacies: true,
+    optionalPatientAddress: true
+  });
+
+  await waitForPrescribeForm();
+
+  await screen.findByText('Send to Patient', {}, { timeout: 3000 });
+
+  await user.click(screen.getByText('Local Pickup'));
+
+  const localPickupEvent = findAnalyticsEvent(
+    analyticsEvents,
+    (d) =>
+      d.category === 'fieldInteraction' &&
+      d.name === 'Field Interaction' &&
+      d.tabSelected === 'Local Pickup'
+  );
+  expect(localPickupEvent?.detail).toEqual(
+    expect.objectContaining({
+      category: 'fieldInteraction',
+      name: 'Field Interaction',
+      formName: 'select_pharmacy',
+      tabSelected: 'Local Pickup',
+      hasPreferredPharmacy: false,
+      timestamp: expect.any(String)
+    })
+  );
+
+  await user.click(screen.getByText('Mail Order'));
+  const mailOrderEvent = findAnalyticsEvent(
+    analyticsEvents,
+    (d) =>
+      d.category === 'fieldInteraction' &&
+      d.name === 'Field Interaction' &&
+      d.tabSelected === 'Mail Order'
+  );
+  expect(mailOrderEvent?.detail).toEqual(
+    expect.objectContaining({
+      category: 'fieldInteraction',
+      name: 'Field Interaction',
+      formName: 'select_pharmacy',
+      tabSelected: 'Mail Order',
+      hasPreferredPharmacy: false,
+      timestamp: expect.any(String)
+    })
+  );
+
+  // Click back to "Send to Patient" tab
+  await user.click(screen.getByText('Send to Patient'));
+  const sendToPatientEvent = findAnalyticsEvent(
+    analyticsEvents,
+    (d) =>
+      d.category === 'fieldInteraction' &&
+      d.name === 'Field Interaction' &&
+      d.tabSelected === 'Send to Patient'
+  );
+  expect(sendToPatientEvent?.detail).toEqual(
+    expect.objectContaining({
+      category: 'fieldInteraction',
+      name: 'Field Interaction',
+      formName: 'select_pharmacy',
+      tabSelected: 'Send to Patient',
+      hasPreferredPharmacy: false,
+      timestamp: expect.any(String)
+    })
+  );
+});
+
 test('CTAs', async () => {
   const { analyticsEvents, user } = renderPrescribeWorkflow({
     enableOrder: true,

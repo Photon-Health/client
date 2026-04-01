@@ -5,34 +5,24 @@ import { DISPENSE_UNIT, PATIENT } from './msw-handlers';
 /**
  * Creates a PhotonClient for testing.
  *
- * - apolloClinical: real fetch, intercepted by MSW
- * - apollo: real fetch for query/mutate (intercepted by MSW),
+ * - apolloClinical: real fetch -  intercepted by MSW
+ * - apollo: real fetch - intercepted by MSW
  *   watchQuery overridden (Observable pattern doesn't resolve with MSW in jsdom)
  * - auth: getAccessToken stubbed to skip Auth0
  */
 export function createTestClient() {
-  const client = new PhotonClient({ clientId: 'test-client-id', env: 'boson' });
+  const client = new PhotonClient({ clientId: 'test-client-id', env: 'tau' });
   client.authentication.getAccessToken = vi.fn(async () => 'test-token');
 
   // watchQuery returns an Observable, not a fetch — MSW can't intercept it.
-  // Override only this method; query/mutate go through real HttpLink → MSW.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (client.apollo as any).watchQuery = vi.fn(() => ({
-    subscribe: ({ next }: { next: (value: { data: Record<string, unknown> }) => void }) => {
-      queueMicrotask(() =>
-        next({
-          data: {
-            patient: {
-              id: PATIENT.id,
-              name: { full: PATIENT.name.full },
-              orders: []
-            }
-          }
-        })
-      );
-      return { unsubscribe: () => undefined };
-    }
-  }));
+  // Override on both apollo clients; query/mutate still go through real HttpLink → MSW.
+  mockWatchQuery(client.apollo, {
+    patient: { id: PATIENT.id, name: { full: PATIENT.name.full }, orders: [] }
+  });
+  mockWatchQuery(client.apolloClinical, {
+    // services clinical API include treatmentHistory resource
+    patient: { id: PATIENT.id, treatmentHistory: [] }
+  });
 
   return client;
 }
@@ -77,4 +67,14 @@ export function createTestClientStore(client: PhotonClient) {
       }
     }
   };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mockWatchQuery(apolloClient: any, defaultData: Record<string, unknown>) {
+  apolloClient.watchQuery = vi.fn(() => ({
+    subscribe: ({ next }: { next: (value: { data: Record<string, unknown> }) => void }) => {
+      queueMicrotask(() => next({ data: defaultData }));
+      return { unsubscribe: () => undefined };
+    }
+  }));
 }
