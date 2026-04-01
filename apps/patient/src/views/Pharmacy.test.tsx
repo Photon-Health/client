@@ -143,7 +143,7 @@ describe('Pharmacy page', () => {
       getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
       setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
     });
-    test('shows offers when they are available and price toggle is enabled', async () => {
+    test('shows offers when they are available and price is enabled', async () => {
       const singlePrescriptionOrder = generateOrder({
         id: 'ord_testId777',
         state: 'ROUTING',
@@ -178,7 +178,7 @@ describe('Pharmacy page', () => {
       renderApp();
       await navigateToPharmacyScreen();
 
-      // Price toggle is already enabled by default, so offers should show
+      // Price is already enabled by default, so offers should show
       // Wait for offers to load and check they are displayed
       expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
       expect(await screen.findByText('Delivers in 1-2 days')).toBeInTheDocument();
@@ -186,7 +186,7 @@ describe('Pharmacy page', () => {
       expect(await screen.findByText('Prime Rx Price')).toBeInTheDocument();
     }, 10_000);
 
-    test('shows offers when they are available and price toggle is enabled - doing the same thing again', async () => {
+    test('shows offers when they are available and price is enabled - doing the same thing again', async () => {
       const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
       const singlePrescriptionOrder = generateOrder({
@@ -223,7 +223,7 @@ describe('Pharmacy page', () => {
       renderApp();
       await navigateToPharmacyScreen();
 
-      // Price toggle is already enabled by default, so offers should show
+      // Price is already enabled by default, so offers should show
       // Wait for offers to load and check they are displayed
       expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
       expect(await screen.findByText('Delivers in 1-2 days')).toBeInTheDocument();
@@ -378,10 +378,6 @@ describe('Pharmacy page', () => {
       renderApp();
       await navigateToPharmacyScreen();
 
-      // Enable price toggle
-      const priceToggle = screen.getByRole('checkbox', { name: 'Show lowest cash prices' });
-      await userEvent.click(priceToggle);
-
       // Wait for component to render
       await screen.findByText('Select a pharmacy');
 
@@ -468,15 +464,11 @@ describe('Pharmacy page', () => {
       renderApp();
       await navigateToPharmacyScreen();
 
-      // Enable price toggle
-      const priceToggle = screen.getByRole('checkbox', { name: 'Show lowest cash prices' });
-      await userEvent.click(priceToggle);
-
       // Should show location information
       expect(await screen.findByText('Showing pharmacies near')).toBeInTheDocument();
       expect(await screen.findByText('123 Main St, New York, NY 10001')).toBeInTheDocument();
 
-      // Current behavior: offers are not shown even with address and price toggle enabled
+      // Current behavior: offers are not shown even with address and price is enabled
       // This documents the current state where offers functionality is not working
       expect(screen.queryByText('Delivery')).not.toBeInTheDocument();
       expect(screen.queryByText('Get delivered')).not.toBeInTheDocument();
@@ -488,50 +480,6 @@ describe('Pharmacy page', () => {
       expect(screen.getByText('Get your medication at a nearby pharmacy')).toBeInTheDocument();
     }, 10_000);
   });
-
-  test('shows enabled price toggle when order has 1 prescription', async () => {
-    const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
-    const getOrderMock = vi.mocked(getOrder);
-    const singlePrescriptionOrder = generateOrder({
-      id: 'ord_testId777',
-      state: 'ROUTING',
-      patient: generatePatient(),
-      fills: [generateFill('test-treatment')]
-    });
-    getOrderMock.mockResolvedValue(singlePrescriptionOrder);
-    const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
-    getPharmaciesByLocationMock.mockResolvedValue({
-      pharmaciesByLocation: [
-        generatePharmacy({
-          id: 'phr_testId123',
-          name: 'Test Local Pickup Pharmacy',
-          price: 444,
-          retailPrice: 1000
-        })
-      ]
-    });
-    const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
-    setOrderPharmacyMock.mockResolvedValue(true);
-
-    renderApp();
-
-    await navigateToPharmacyScreen();
-
-    const priceToggle = screen.getByRole('checkbox', { name: 'Show lowest cash prices' });
-    expect(priceToggle).toBeInTheDocument();
-    expect(priceToggle).toBeEnabled();
-
-    expect(screen.getByText('Coupon Price')).toBeInTheDocument();
-    expect(screen.getByText('$444')).toBeInTheDocument();
-    expect(screen.getAllByText('Retail')).toHaveLength(2);
-    expect(screen.getByText('$1000')).toBeInTheDocument();
-
-    const includePriceOptions = getPharmaciesByLocationMock.mock.calls.map((call) => {
-      const options = call[0];
-      return options.includePrice;
-    });
-    expect(includePriceOptions).not.toContain(false);
-  }, 10_000);
 
   test('puts preferred pharmacy at the top of the pickup list', async () => {
     const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
@@ -640,47 +588,6 @@ describe('Pharmacy page', () => {
   }, 10_000);
 
   describe('multi-rx offers', () => {
-    test('hides price toggle when order has 2+ prescriptions and defaults to cash prices', async () => {
-      const { fetchOfferBundles } = await import('./pharmacy.utils');
-      vi.mocked(fetchOfferBundles).mockResolvedValueOnce([]);
-      const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
-      const getOrderMock = vi.mocked(getOrder);
-      const multiPrescriptionOrder = generateOrder({
-        id: 'ord_testId888',
-        state: 'ROUTING',
-        patient: generatePatient(),
-        fills: [generateFill('test-treatment-1'), generateFill('test-treatment-2')]
-      });
-      getOrderMock.mockResolvedValue(multiPrescriptionOrder);
-      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
-      getPharmaciesByLocationMock.mockResolvedValue({
-        pharmaciesByLocation: [
-          generatePharmacy({
-            id: 'phr_testId123',
-            name: 'Test Local Pickup Pharmacy'
-          })
-        ]
-      });
-      const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
-      setOrderPharmacyMock.mockResolvedValue(true);
-
-      renderApp();
-
-      expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
-      await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
-      expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
-
-      const priceToggle = screen.queryByRole('checkbox', { name: 'Show lowest cash prices' });
-      expect(priceToggle).not.toBeInTheDocument();
-
-      const callArgs = getPharmaciesByLocationMock.mock.calls.map((call) => call[0].includePrice);
-      expect(callArgs).toContain(true);
-
-      // ensure price UI is not showing in the cards
-      expect(screen.queryByText('Coupon Price')).not.toBeInTheDocument();
-      expect(screen.queryByText('Retail')).not.toBeInTheDocument();
-    }, 10_000);
-
     test('shows the cheaper offer when both CASH and PRIME_RX offers are available', async () => {
       const { fetchOfferBundles } = await import('./pharmacy.utils');
       vi.mocked(fetchOfferBundles).mockResolvedValueOnce([

@@ -8,7 +8,6 @@ import {
   Heading,
   HStack,
   Link,
-  Switch,
   Text,
   useToast,
   VStack
@@ -80,7 +79,6 @@ export const Pharmacy = () => {
     setOrder,
     isDemo,
     fetchOrder,
-    showPriceToggle,
     enablePrice,
     setEnablePrice,
     reason
@@ -1124,12 +1122,7 @@ export const Pharmacy = () => {
       />
 
       <Box bgColor="white">
-        <VStack
-          spacing={4}
-          align="span"
-          pt={4}
-          pb={!showPriceToggle ? 4 : 0} // don't remove, this padding is needed when price toggle section is not shown
-        >
+        <VStack spacing={4} align="span" p={4}>
           <Container px={-3}>
             <VStack spacing={2} align="start" px={4}>
               <Heading as="h3" size="lg">
@@ -1157,42 +1150,6 @@ export const Pharmacy = () => {
               </HStack>
             </VStack>
           </Container>
-
-          {showPriceToggle ? (
-            <Container px={-3}>
-              <VStack
-                spacing={2}
-                align="start"
-                borderY="2px solid"
-                borderColor="gray.300"
-                py={4}
-                px={4}
-              >
-                <HStack justify="space-between" w="full">
-                  {t.showDiscountCardPrices()}
-                  <Switch
-                    size="lg"
-                    aria-label="Show lowest cash prices"
-                    isChecked={enablePrice}
-                    onChange={(e) => {
-                      setEnablePrice(e.target.checked);
-                      patientAnalytics.track('Patient Toggle Show CashPrice Filter', order, {
-                        enabled: e.target.checked
-                      });
-                    }}
-                  />
-                </HStack>
-                {enablePrice && !orderIsMultiRx ? (
-                  <Box p={3} bgColor="blue.100" borderRadius="lg">
-                    <Text fontSize="sm">
-                      Coupon will be generated after you select a pharmacy.{' '}
-                      <Link onClick={() => setCouponModalOpen(true)}>More info</Link>
-                    </Text>
-                  </Box>
-                ) : null}
-              </VStack>
-            </Container>
-          ) : null}
         </VStack>
       </Box>
 
