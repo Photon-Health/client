@@ -76,7 +76,7 @@ phases:
             -H "Authorization: token $GITHUB_ACCESS_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             https://api.github.com/repos/Photon-Health/client/actions/workflows/pr-e2e-tests.yml/dispatches \
-            -d "{\"ref\":\"$CODEBUILD_WEBHOOK_HEAD_REF\",\"inputs\":{\"branch\":\"$BRANCH_NAME\",\"output_dir\":\"$OUTPUT_DIR\",\"sha\":\"$CODEBUILD_RESOLVED_SOURCE_VERSION\",\"app\":\"app\"}}"
+            -d "{\"ref\":\"$CODEBUILD_WEBHOOK_HEAD_REF\",\"inputs\":{\"output_dir\":\"$OUTPUT_DIR\",\"sha\":\"$CODEBUILD_RESOLVED_SOURCE_VERSION\",\"app\":\"app\"}}"
         fi
       - echo Installing Datadog CI
       - npm install -g @datadog/datadog-ci

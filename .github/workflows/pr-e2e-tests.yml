@@ -2,8 +2,6 @@ name: Playwright e2e Tests
 on:
   workflow_dispatch:
     inputs:
-      branch:
-        required: true
       app:
         required: true
         options:
@@ -56,12 +54,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.branch }}
+          ref: ${{ inputs.sha }}
 
       - name: Print config used in workflow
         run: |
           echo "app: ${{ inputs.app }}"
-          echo "branch: ${{ inputs.branch }}"
           echo "sha: ${{ inputs.sha }}"
           echo "e2e: ${{ needs.define-config.outputs.e2e }}"
           echo "codegen: ${{ needs.define-config.outputs.codegen }}"
