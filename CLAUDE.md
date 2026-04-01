@@ -363,7 +363,7 @@ The React clinical app listens for element events with `addEventListener` and ty
 
 **Page/integration tests** (`apps/patient/src/views/*.test.tsx`, `Navigation.test.tsx`) — render full page components with `createMemoryRouter` + `RouterProvider` and test user flows across route transitions. These mock the API layer (`vi.mock('../api')`), GraphQL client, analytics, and heavy child components, then assert on screen content and navigation behavior. They use test data generators from `src/test-utils/generators.ts` which provide factory functions like `generateOrder()`, `generatePatient()`, `generateFill()`, etc. with sensible defaults and `Partial<>` overrides.
 
-**Unit tests** (`apps/patient/src/utils/*.test.ts`, `packages/components/src/**/**.test.ts`) — pure function tests with no rendering. Test files sit alongside their source files. Examples: `formatters.test.ts`, `shouldShowPriceToggle.test.tsx`, `conversionFactors.test.ts`.
+**Unit tests** (`apps/patient/src/utils/*.test.ts`, `packages/components/src/**/**.test.ts`) — pure function tests with no rendering. Test files sit alongside their source files. Examples: `formatters.test.ts`, `conversionFactors.test.ts`, `deliveryPromise.test.ts`.
 
 **Component tests** (`packages/components/src/**/*.test.tsx`) — Solid.js component tests using `@solidjs/testing-library`. Test individual UI components like `ComboBox`, `Input`, `PharmacySelect`, `PatientMedHistory`, and `DoseCalculator`.
 
