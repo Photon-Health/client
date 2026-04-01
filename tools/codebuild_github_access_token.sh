@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
-client_id=$1
-app_id=$2
-installation_id=$3
-private_key=$4
+secret_id=$1
+
+secret=$(aws secretsmanager get-secret-value --secret-id "${secret_id}" --query SecretString --output text)
+client_id=$(echo "$secret" | jq -r '.GITHUB_CLIENT_ID')
+installation_id=$(echo "$secret" | jq -r '.GITHUB_APP_INSTALLATION_ID')
+private_key=$(echo "$secret" | jq -r '.GITHUB_APP_PRIVATE_KEY')
 
 # Copied from https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-json-web-token-jwt-for-a-github-app#example-using-bash-to-generate-a-jwt
 generate_jwt() {
