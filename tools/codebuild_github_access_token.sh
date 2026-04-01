@@ -59,4 +59,10 @@ response=$(curl --request POST \
 --header "X-GitHub-Api-Version: 2026-03-10")
 
 token=$(echo "${response}" | jq -r '.token')
+
+if [ -z "${token}" ] || [ "${token}" = "null" ]; then
+    echo "Error: failed to obtain GitHub access token. Response: ${response}" >&2
+    exit 1
+fi
+
 echo "${token}"
