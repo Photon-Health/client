@@ -53,7 +53,9 @@ export const Profile = () => {
   const user = data?.me;
   const organization = data?.organization;
 
-  const canEdit = usePermissions(['edit:profile']) || usePermissions(['edit:profile_self']);
+  const hasEditProfile = usePermissions(['edit:profile']);
+  const hasEditProfileSelf = usePermissions(['edit:profile_self']);
+  const canEdit = hasEditProfile || hasEditProfileSelf;
 
   const initialValues: yup.InferType<typeof profileFormSchema> = {
     name: {
