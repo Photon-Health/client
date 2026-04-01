@@ -1,48 +1,23 @@
 import { graphql, HttpResponse } from 'msw';
+import { DISPENSE_UNIT, ORGANIZATION, PATIENT, PROVIDER, TREATMENT } from './fixtures';
+
+/**
+ * Unscoped MSW GraphQL handlers — match by operation name regardless of endpoint URL.
+ * Use these as the base handler set; add scoped `graphql.link()` overrides per-test
+ * when the same operation name needs different responses per endpoint.
+ */
 
 // Scoped handlers — for per-test overrides when the same operation name
 // is used by different endpoints with different responses.
 // Tau env: lambdas shares boson's API URL, clinical uses local tau URL.
-const lambdasGql = graphql.link('https://api.boson.health/graphql');
-const clinicalGql = graphql.link('http://clinical-api.tau.health:8080/graphql');
+export const lambdasGql = graphql.link('https://api.boson.health/graphql');
+export const clinicalGql = graphql.link('http://clinical-api.tau.health:8080/graphql');
 
-export { lambdasGql, clinicalGql };
-
-export const PATIENT = {
-  __typename: 'Patient',
-  id: 'pat_123',
-  externalId: 'ext_pat_123',
-  name: {
-    __typename: 'HumanName',
-    full: 'Sally Patient',
-    first: 'Sally',
-    middle: null,
-    last: 'Patient',
-    title: 'MD'
-  },
-  dateOfBirth: '1990-01-01',
-  sex: 'FEMALE',
-  gender: 'female',
-  email: 'sally@example.com',
-  phone: '+17185551234',
-  address: null,
-  preferredPharmacies: []
-};
-
-export const TREATMENT = {
-  __typename: 'Treatment',
-  id: 'trt_123',
-  name: 'Amoxicillin 500mg capsule',
-  codes: {}
-};
-
-export const DISPENSE_UNIT = {
-  id: 'du_123',
-  name: 'Tablet'
-};
+// ---------------------------------------------------------------------------
+// Clinical API operations (via apolloClinical / services)
+// ---------------------------------------------------------------------------
 
 const servicesHandlers = [
-  // Clinical API operations (via apolloClinical)
   clinicalGql.query('GetCurrentUserSignatureAttestationStatus', () =>
     HttpResponse.json({
       data: {
@@ -69,6 +44,15 @@ const servicesHandlers = [
     })
   ),
 
+  clinicalGql.query('AnalyticsContextQuery', () =>
+    HttpResponse.json({
+      data: {
+        me: PROVIDER,
+        organization: ORGANIZATION
+      }
+    })
+  ),
+
   clinicalGql.mutation('AgreeToSignatureAttestation', () =>
     HttpResponse.json({
       data: { agreeToSignatureAttestation: true }
@@ -82,20 +66,15 @@ const servicesHandlers = [
   )
 ];
 
-const lambdasHandlers = [
-  // Lambdas API operations (via apollo)
-  // Components use 'GetPatient', SDK uses 'patient'
-  lambdasGql.query('GetPatient', () =>
-    HttpResponse.json({
-      data: { patient: PATIENT }
-    })
-  ),
+// ---------------------------------------------------------------------------
+// Lambdas API operations (via apollo)
+// ---------------------------------------------------------------------------
 
-  lambdasGql.query('patient', () =>
-    HttpResponse.json({
-      data: { patient: PATIENT }
-    })
-  ),
+const lambdasHandlers = [
+  // Components use 'GetPatient', SDK uses 'patient'
+  lambdasGql.query('GetPatient', () => HttpResponse.json({ data: { patient: PATIENT } })),
+
+  lambdasGql.query('patient', () => HttpResponse.json({ data: { patient: PATIENT } })),
 
   lambdasGql.query('GetPatientOrders', () =>
     HttpResponse.json({
@@ -142,17 +121,13 @@ const lambdasHandlers = [
 
   lambdasGql.mutation('createOrder', () =>
     HttpResponse.json({
-      data: {
-        createOrder: { __typename: 'Order', id: 'ord_abc' }
-      }
+      data: { createOrder: { __typename: 'Order', id: 'ord_abc' } }
     })
   ),
 
   lambdasGql.query('dispenseUnits', () =>
     HttpResponse.json({
-      data: {
-        dispenseUnits: [{ __typename: 'DispenseUnit', ...DISPENSE_UNIT }]
-      }
+      data: { dispenseUnits: [{ __typename: 'DispenseUnit', ...DISPENSE_UNIT }] }
     })
   ),
 

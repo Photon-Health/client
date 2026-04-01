@@ -80,7 +80,11 @@ export const PatientForm = () => {
 
   return (
     <div>
-      <photon-patient-dialog ref={ref} optional-patient-address={optionalPatientAddress} />
+      <photon-patient-dialog
+        ref={ref}
+        data-testid="patient-dialog"
+        optional-patient-address={optionalPatientAddress}
+      />
     </div>
   );
 };

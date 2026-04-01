@@ -39,8 +39,8 @@ test('user can create patient then add, edit, and delete a draft prescription', 
 
   const patientPageViewEvents = await findByEventName(page, 'New Patient Page Viewed');
   expect(patientPageViewEvents.length).toBeGreaterThan(0);
-  const prescribeFlowId = patientPageViewEvents[0].properties.prescribeFlowId;
-  expect(prescribeFlowId).toBeTruthy();
+  const orderWorkflowId = patientPageViewEvents[0].properties.orderWorkflowId;
+  expect(orderWorkflowId).toBeTruthy();
 
   await expectEventCount(page, 'New Prescriptions Page Viewed', 1);
   const openedEvent = await expectEventProperties(page, 'New Prescriptions Page Viewed', {
@@ -53,8 +53,8 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   });
   expect(openedEvent.properties.prefillPatientId).toBeTruthy();
 
-  // Same prescribeFlowId should carry over from patient form to prescription form
-  expect(openedEvent.properties.prescribeFlowId).toBe(prescribeFlowId);
+  // Same orderWorkflowId should carry over from patient form to prescription form
+  expect(openedEvent.properties.orderWorkflowId).toBe(orderWorkflowId);
 
   // add draft
   await medSearchInput.fill('Amoxicillin');

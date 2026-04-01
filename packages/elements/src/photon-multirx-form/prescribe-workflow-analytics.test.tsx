@@ -10,7 +10,12 @@ import {
   type PrescribeWorkflowComponentProps
 } from './photon-prescribe-workflow-component';
 import { createTestClient, createTestClientStore } from '../test-utils/createTestClient';
-import { clinicalGql, defaultHandlers, DISPENSE_UNIT, TREATMENT } from '../test-utils/msw-handlers';
+import {
+  clinicalGql,
+  defaultHandlers,
+  DISPENSE_UNIT,
+  TREATMENT
+} from '@photonhealth/sdk/test-utils';
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
 
 vi.mock('solid-element', () => ({

@@ -1,6 +1,6 @@
 import { PhotonClient } from '@photonhealth/sdk';
 import { vi } from 'vitest';
-import { DISPENSE_UNIT, PATIENT } from './msw-handlers';
+import { DISPENSE_UNIT, PATIENT } from '@photonhealth/sdk/test-utils';
 
 /**
  * Creates a PhotonClient for testing.

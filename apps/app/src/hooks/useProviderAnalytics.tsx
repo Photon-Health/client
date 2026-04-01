@@ -91,15 +91,15 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
 
   // useRef (not useState) so the ID is available synchronously on the first render —
   // some components fire form_opened analytics events during that initial render.
-  const prescribeFlowIdRef = useRef<string | null>(null);
+  const orderWorkflowIdRef = useRef<string | null>(null);
 
-  const isOnPrescribeFlowRoute = isPrescribeFlowRoute(pathname);
-  if (isOnPrescribeFlowRoute && !prescribeFlowIdRef.current) {
-    prescribeFlowIdRef.current = crypto.randomUUID();
-    console.log(`📊 [Analytics] Changed Prescribe Flow ID to ${prescribeFlowIdRef.current}`);
-  } else if (!isOnPrescribeFlowRoute) {
-    prescribeFlowIdRef.current = null;
-    console.log(`📊 [Analytics] Changed Prescribe Flow ID to null`);
+  const isOnOrderWorkflowRoute = isOrderWorkflowRoute(pathname);
+  if (isOnOrderWorkflowRoute && !orderWorkflowIdRef.current) {
+    orderWorkflowIdRef.current = crypto.randomUUID();
+    console.log(`📊 [Analytics] Changed Order Workflow ID to ${orderWorkflowIdRef.current}`);
+  } else if (!isOnOrderWorkflowRoute) {
+    orderWorkflowIdRef.current = null;
+    console.log(`📊 [Analytics] Changed Order Workflow ID to null`);
   }
 
   // Fetch me + organization data via GraphQL
@@ -147,8 +147,8 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
   const track = useCallback(
     (eventName: string, properties: ApiObject = {}) => {
       const event: ApiObject = { ...contextData, pageName, ...properties };
-      if (prescribeFlowIdRef.current) {
-        event.prescribeFlowId = prescribeFlowIdRef.current;
+      if (orderWorkflowIdRef.current) {
+        event.orderWorkflowId = orderWorkflowIdRef.current;
       }
       getProviderAnalytics().track(eventName, event);
     },
@@ -177,7 +177,7 @@ const PRESCRIBE_FLOW_ROUTES = [
   '/orders/ord_'
 ];
 
-function isPrescribeFlowRoute(pathname: string): boolean {
+function isOrderWorkflowRoute(pathname: string): boolean {
   return PRESCRIBE_FLOW_ROUTES.some((route) => pathname.startsWith(route));
 }
 

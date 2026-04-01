@@ -203,6 +203,7 @@ export const PrescriptionForm = () => {
       {user?.org_id ? (
         <photon-multirx-form-wrapper
           ref={ref}
+          data-testid="multirx-form-wrapper"
           template-ids={templateIds}
           patient-id={patientId}
           pharmacy-id={pharmacyId}
