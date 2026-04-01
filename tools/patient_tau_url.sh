@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Convert an orders.boson.health URL from the shortlinks table
+# to one eng can access for local development
+
 url=$1
 
 if [ -z "$url" ]; then
@@ -14,5 +17,7 @@ if [ -z "$order_id" ]; then
   exit 1
 fi
 
-echo -e "\nPATIENT URL:"
-echo "http://localhost:3001/?token=$order_id&orderId=$order_id"
+tau_url=$(echo "http://localhost:3001/?token=$order_id&orderId=$order_id")
+
+echo -e "\nOpening in the browser:\n$tau_url"
+open $tau_url
