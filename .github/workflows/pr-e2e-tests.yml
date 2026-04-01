@@ -9,6 +9,8 @@ on:
         options:
         - app
         - patient
+      sha:
+        required: true
       output_dir:
         required: true
 
@@ -56,15 +58,11 @@ jobs:
         with:
           ref: ${{ inputs.branch }}
 
-      - name: Get branch SHA
-        id: get-sha
-        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-
-      - name: Echo config
+      - name: Print config used in workflow
         run: |
           echo "app: ${{ inputs.app }}"
           echo "branch: ${{ inputs.branch }}"
-          echo "sha: ${{ steps.get-sha.outputs.sha }}"
+          echo "sha: ${{ inputs.sha }}"
           echo "e2e: ${{ needs.define-config.outputs.e2e }}"
           echo "codegen: ${{ needs.define-config.outputs.codegen }}"
           echo "base_url: ${{ needs.define-config.outputs.base_url }}"
@@ -76,7 +74,7 @@ jobs:
         id: create-check
         env:
           APP_NAME: ${{ inputs.app }}
-          SHA: ${{ steps.get-sha.outputs.sha }}
+          SHA: ${{ inputs.sha }}
           DETAILS_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         with:
           script: |
