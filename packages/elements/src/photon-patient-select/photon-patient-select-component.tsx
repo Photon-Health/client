@@ -12,14 +12,9 @@ import { PatientStore } from '../stores/patient';
 import { PhotonClient } from '@photonhealth/sdk';
 
 const Component = (props: {
-  label?: string;
-  required: boolean;
   invalid: boolean;
   helpText?: string;
   selected?: string;
-  formName?: string;
-  disabled: boolean;
-  forceLabelSize: boolean;
   sdk?: PhotonClient;
 }) => {
   let ref: any;
@@ -71,10 +66,7 @@ const Component = (props: {
     >
       <PhotonDropdown
         data={getData()}
-        label={props.label}
-        forceLabelSize={props.forceLabelSize}
-        required={props.required}
-        disabled={props.disabled}
+        required={false}
         placeholder="Select patient..."
         invalid={props.invalid}
         isLoading={store.patients.isLoading || store.selectedPatient.isLoading}
@@ -109,14 +101,9 @@ const Component = (props: {
 customElement(
   'photon-patient-select',
   {
-    label: undefined,
-    required: false,
     invalid: false,
     helpText: undefined,
     selected: undefined,
-    formName: undefined,
-    disabled: false,
-    forceLabelSize: false,
     sdk: undefined
   },
   Component
