@@ -166,7 +166,6 @@ export const PatientCard = (props: {
             help-text={props.store.patient?.error}
             on:photon-patient-selected={updatePatient}
             selected={props.store.patient?.value?.id ?? props.patientId}
-            sdk={props.client!.getSDK()}
           />
         </Card>
       </Show>

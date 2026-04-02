@@ -9,14 +9,8 @@ import { PhotonDropdown } from '../photon-dropdown';
 import { Patient } from '@photonhealth/sdk/dist/types';
 import { createEffect, createMemo, onMount, untrack } from 'solid-js';
 import { PatientStore } from '../stores/patient';
-import { PhotonClient } from '@photonhealth/sdk';
 
-const Component = (props: {
-  invalid: boolean;
-  helpText?: string;
-  selected?: string;
-  sdk?: PhotonClient;
-}) => {
+const PatientSelect = (props: { invalid: boolean; helpText?: string; selected?: string }) => {
   let ref: any;
   //context
   const client = usePhoton();
@@ -52,7 +46,7 @@ const Component = (props: {
   createEffect(async () => {
     if (props.selected && !store.selectedPatient.data) {
       untrack(async () => {
-        await actions.getSelectedPatient(client ? client!.getSDK() : props.sdk!, props.selected!);
+        await actions.getSelectedPatient(client.getSDK(), props.selected!);
       });
     }
   });
@@ -103,8 +97,7 @@ customElement(
   {
     invalid: false,
     helpText: undefined,
-    selected: undefined,
-    sdk: undefined
+    selected: undefined
   },
-  Component
+  PatientSelect
 );
