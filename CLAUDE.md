@@ -295,6 +295,45 @@ Analytics applies only to the clinical and patient apps — **not** to `packages
 
 **Datadog RUM:** Initialized in `src/instrumentation/index.ts` via `initializeInstrumentation()`. User context (org, email) is set via `setInstrumentationUserContext()` which is called automatically by `ProviderAnalyticsProvider` when the user authenticates.
 
+**Prescribe Workflow Analytics (Embed Events):** The prescribe workflow lives in Solid.js web components (`packages/elements`, `packages/components`), which cannot call RudderStack directly (they're published to npm and must not bundle customer-conflicting singletons). Instead, analytics events bubble up as CustomEvents through Shadow DOM to the React clinical app, which forwards them to RudderStack.
+
+*Event categories and types* — defined in `packages/sdk/src/clinicalAnalyticsTypes.ts`:
+
+| Category | Type | Description |
+|----------|------|-------------|
+| `pageViewed` | `PageViewEvent` | Page/view lifecycle — each variant has a unique `name` (e.g. "New Prescriptions Page Viewed", "Signature Attestation Viewed") |
+| `ctaClicked` | `CtaClickEvent` | Call-to-action clicks, split into **major** and **minor** (see below) |
+| `fieldInteraction` | `FieldInteractionEvent` | Form field completeness — all share `name: 'Field Interaction'` with `formName`, `fieldName`, `hasValue`, `isOptional` |
+
+CTA click events have two sub-types:
+- **Major CTAs** (`MajorCtaClickEvent`) — milestone events with unique `name` values: "Patient Created", "Patient Updated", "Order Sent", "Prescriptions Activated", "Attestation Agreed", "Attestation Canceled", "Order Canceled". Each carries context-specific fields (e.g. `orderId`, `prescriptionCount`, `fulfillmentType`).
+- **Minor CTAs** (`MinorCtaClickEvent`) — all share `name: 'Minor CTA Clicked'`, distinguished by `ctaName`: "draft prescription added", "edit draft", "delete draft", "add to medication history", "yes combine orders", "no send new order", "screening alert acknowledged", "screening alert canceled", "edit patient", "select pharmacy".
+
+*Type-safe dispatch* — `AnalyticsEventMap` (in the SDK) maps each `AnalyticsCategory` to its event type. The generic function `dispatchAnalyticsTrackEvent<C>(category, event)` enforces that the category and event type are always coupled at compile time.
+
+*Dispatch mechanism* — `PrescribeEventDispatchProvider` (`packages/components/src/systems/PrescribeEventDispatchProvider.tsx`) is a Solid.js context provider that wraps a `<div ref={ref}>`. It exposes `dispatchAnalyticsTrackEvent` (which closes over the ref) via `usePrescribeEventDispatch()`. Consumers call it like:
+```tsx
+const { dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
+dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Order Sent', buttonText: 'Send', ... });
+dispatchAnalyticsTrackEvent('fieldInteraction', { name: 'Field Interaction', formName: '...', ... });
+dispatchAnalyticsTrackEvent('pageViewed', { name: 'New Prescriptions Page Viewed', ... });
+```
+This dispatches a `photon-analytics-track-event` CustomEvent (`composed: true, bubbles: true`) with `detail: { ...event, category, timestamp }`.
+
+*Listener side* — React form components (`PatientForm`, `UpdatePatientForm`, `PrescriptionForm` in `apps/app/src/views/routes/`) listen on the element ref via `addEventListener('photon-analytics-track-event', ...)`. The handler calls `trackAnalyticsEvent()` (`src/instrumentation/analyticsTrackEventListenerUtils.ts`) which extracts the `name` field as the RudderStack event name and flattens any field snapshot properties with a `snap_` prefix (e.g. `{ firstName: { completed: true } }` → `{ snap_first_name: true }`).
+
+*Field snapshots* — `buildFieldSnapshot()` and `buildPrescriptionSnapshot()` (`packages/components/src/analytics/buildFieldSnapshot.ts`) capture form completeness state. `PATIENT_FORM_FIELDS` and `DRAFT_PRESCRIPTION_FORM_FIELDS` define which fields are tracked. These snapshots are included in CTA click events (e.g. "Patient Created", "draft prescription added") as the `fields` property.
+
+*Key files:*
+
+| File | Purpose |
+|------|---------|
+| `packages/sdk/src/clinicalAnalyticsTypes.ts` | Event type definitions (`AnalyticsCategory`, `AnalyticsEventMap`, `PageViewEvent`, `CtaClickEvent`, `FieldInteractionEvent`) |
+| `packages/components/src/analytics/dispatchAnalyticsTrackEvent.ts` | Generic dispatch function — creates and fires the CustomEvent |
+| `packages/components/src/analytics/buildFieldSnapshot.ts` | Field snapshot utilities and form field constants |
+| `packages/components/src/systems/PrescribeEventDispatchProvider.tsx` | Solid.js context provider exposing `dispatchAnalyticsTrackEvent` via `usePrescribeEventDispatch()` |
+| `apps/app/src/instrumentation/analyticsTrackEventListenerUtils.ts` | Listener-side event-to-RudderStack mapping and field snapshot flattening |
+
 #### Patient App (`apps/patient`)
 
 **RudderStack:** Uses a singleton `patientAnalytics` instance exported from `src/configs/analytics.ts`.
