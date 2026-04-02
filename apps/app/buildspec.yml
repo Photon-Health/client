@@ -64,7 +64,7 @@ phases:
         echo "BRANCH_NAME: $BRANCH_NAME"
         if [ "$CODEBUILD_BUILD_SUCCEEDING" = "1" ] && [ "$VITE_ENV_NAME" = "boson" ] && [ "$BRANCH_NAME" != "neturons/merge" ] && [ "$BRANCH_NAME" != "photons/merge" ]; then
           echo "Requesting Github installation access token..."
-          GITHUB_ACCESS_TOKEN=$(bash ./tools/codebuild_github_access_token.sh codebuild_github_token_test)
+          GITHUB_ACCESS_TOKEN=$(bash ./tools/codebuild_github_access_token.sh codebuild_github_token)
           echo "Successfully requested token!"
           echo "Sending e2e test workflow dispatch to GitHub..."
           curl -X POST \
