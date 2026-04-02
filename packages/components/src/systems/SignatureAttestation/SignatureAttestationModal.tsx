@@ -119,8 +119,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   const {
     dispatchSignatureAttestationAgreed,
     dispatchSignatureAttestationCanceled,
-    dispatchPageViewAnalyticsEvent,
-    dispatchCtaAnalyticsEvent
+    dispatchAnalyticsTrackEvent
   } = usePrescribeEventDispatch();
   const [status, setStatus] = createSignal<Status>({ status: 'LOADING' });
   const [submitting, setSubmitting] = createSignal(false);
@@ -161,7 +160,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   createEffect(() => {
     const curr = status();
     if (curr.status === 'NEEDS ATTESTATION') {
-      dispatchPageViewAnalyticsEvent({
+      dispatchAnalyticsTrackEvent('pageViewed', {
         name: 'Signature Attestation Viewed',
         attestationVersion: curr.version
       });
@@ -183,7 +182,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
       if (res.data?.agreeToSignatureAttestation) {
         setSubmitting(false);
         setStatus({ status: 'COMPLETE' });
-        dispatchCtaAnalyticsEvent({
+        dispatchAnalyticsTrackEvent('ctaClicked', {
           name: 'Attestation Agreed',
           buttonText: 'I Agree',
           attestationVersion: curr.version
@@ -220,7 +219,10 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
           <AgreementCard
             onAgree={onAgree}
             onCancel={() => {
-              dispatchCtaAnalyticsEvent({ name: 'Attestation Canceled', buttonText: 'Cancel' });
+              dispatchAnalyticsTrackEvent('ctaClicked', {
+                name: 'Attestation Canceled',
+                buttonText: 'Cancel'
+              });
               dispatchSignatureAttestationCanceled();
             }}
             disabled={submitting()}

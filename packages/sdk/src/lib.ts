@@ -34,7 +34,8 @@ export type {
   CtaClickEvent,
   FieldInteractionEvent,
   PhotonEmbedAnalyticsEventInput,
-  AnalyticsCategory
+  AnalyticsCategory,
+  AnalyticsEventMap
 } from './clinicalAnalyticsTypes';
 
 const version: string = pkg?.version ?? 'unknown';

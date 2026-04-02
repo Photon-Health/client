@@ -2,8 +2,8 @@ import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createContext, JSXElement, useContext } from 'solid-js';
 import { ScreeningAlertType } from './ScreeningAlerts';
-import { dispatchAnalyticsTrackEvent } from '../analytics/dispatchAnalyticsTrackEvent';
-import type { CtaClickEvent, FieldInteractionEvent, PageViewEvent } from '@photonhealth/sdk';
+import { dispatchAnalyticsTrackEvent as _dispatchAnalyticsTrackEvent } from '../analytics/dispatchAnalyticsTrackEvent';
+import type { AnalyticsCategory, AnalyticsEventMap } from '@photonhealth/sdk';
 
 const PrescribeEventDispatchContext = createContext<{
   dispatchFormValidate: (canSubmit: boolean, form: any) => void;
@@ -19,9 +19,10 @@ const PrescribeEventDispatchContext = createContext<{
   dispatchClinicalAlertCancel: (alerts: ScreeningAlertType[]) => void;
   dispatchSignatureAttestationAgreed: () => void;
   dispatchSignatureAttestationCanceled: () => void;
-  dispatchPageViewAnalyticsEvent: (event: PageViewEvent) => void;
-  dispatchCtaAnalyticsEvent: (event: CtaClickEvent) => void;
-  dispatchFieldInteractionAnalyticsEvent: (event: FieldInteractionEvent) => void;
+  dispatchAnalyticsTrackEvent: <C extends AnalyticsCategory>(
+    category: C,
+    event: AnalyticsEventMap[C]
+  ) => void;
 }>();
 
 interface DraftPrescriptionProviderProps {
@@ -170,12 +171,10 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref?.dispatchEvent(event);
   };
 
-  const dispatchPageViewAnalyticsEvent = (event: PageViewEvent) =>
-    dispatchAnalyticsTrackEvent('pageViewed', event, ref);
-  const dispatchCtaAnalyticsEvent = (event: CtaClickEvent) =>
-    dispatchAnalyticsTrackEvent('ctaClicked', event, ref);
-  const dispatchFieldInteractionAnalyticsEvent = (event: FieldInteractionEvent) =>
-    dispatchAnalyticsTrackEvent('fieldInteraction', event, ref);
+  const dispatchAnalyticsTrackEvent = <C extends AnalyticsCategory>(
+    category: C,
+    event: AnalyticsEventMap[C]
+  ) => _dispatchAnalyticsTrackEvent(category, event, ref);
 
   const value = {
     dispatchFormValidate,
@@ -191,9 +190,7 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     dispatchClinicalAlertCancel,
     dispatchSignatureAttestationAgreed,
     dispatchSignatureAttestationCanceled,
-    dispatchPageViewAnalyticsEvent,
-    dispatchCtaAnalyticsEvent,
-    dispatchFieldInteractionAnalyticsEvent
+    dispatchAnalyticsTrackEvent
   };
 
   return (

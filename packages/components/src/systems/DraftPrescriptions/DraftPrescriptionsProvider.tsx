@@ -163,7 +163,7 @@ const createPrefillPrescriptionsOnApi = async ({
 };
 
 export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps) => {
-  const { dispatchDraftPrescriptionCreated, dispatchCtaAnalyticsEvent } =
+  const { dispatchDraftPrescriptionCreated, dispatchAnalyticsTrackEvent } =
     usePrescribeEventDispatch();
   const [, recentOrdersActions] = useRecentOrders();
   const client = usePhotonClient();
@@ -194,7 +194,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
           setDraftPrescriptions((prev) => [...prev, ...newRxs]);
           newRxs.forEach((rx) => {
             dispatchDraftPrescriptionCreated(rx);
-            dispatchCtaAnalyticsEvent({
+            dispatchAnalyticsTrackEvent('ctaClicked', {
               name: 'Minor CTA Clicked',
               ctaName: 'draft prescription added',
               draftPrescriptionSource: 'prefill',
@@ -266,7 +266,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       createdPrescription = created;
       setDraftPrescriptions((prev) => [...prev, created]);
       dispatchDraftPrescriptionCreated(created);
-      dispatchCtaAnalyticsEvent({
+      dispatchAnalyticsTrackEvent('ctaClicked', {
         name: 'Minor CTA Clicked',
         ctaName: 'draft prescription added',
         draftPrescriptionSource: draftPrescriptionSource,

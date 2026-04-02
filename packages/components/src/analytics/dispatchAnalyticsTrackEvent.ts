@@ -1,17 +1,6 @@
-import type {
-  AnalyticsCategory,
-  CtaClickEvent,
-  FieldInteractionEvent,
-  PageViewEvent
-} from '@photonhealth/sdk';
+import type { AnalyticsCategory, AnalyticsEventMap } from '@photonhealth/sdk';
 
 type AnalyticsRef = { dispatchEvent(event: CustomEvent): void };
-
-type AnalyticsEventMap = {
-  pageViewed: PageViewEvent;
-  ctaClicked: CtaClickEvent;
-  fieldInteraction: FieldInteractionEvent;
-};
 
 export const dispatchAnalyticsTrackEvent = <C extends AnalyticsCategory>(
   category: C,

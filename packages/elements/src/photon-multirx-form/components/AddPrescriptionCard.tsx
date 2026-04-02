@@ -72,8 +72,7 @@ export const AddPrescriptionCard = (props: {
   disableList?: DisableList;
 }) => {
   const { tryCreatePrescription } = useDraftPrescriptions();
-  const { dispatchOrderError, dispatchFieldInteractionAnalyticsEvent } =
-    usePrescribeEventDispatch();
+  const { dispatchOrderError, dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
   const [searchText, setSearchText] = createSignal<string>('');
@@ -199,7 +198,7 @@ export const AddPrescriptionCard = (props: {
                 value: e.detail.data
               });
             }
-            dispatchFieldInteractionAnalyticsEvent({
+            dispatchAnalyticsTrackEvent('fieldInteraction', {
               name: 'Field Interaction',
               formName: 'add_prescription_form',
               fieldName: 'treatment',
@@ -249,7 +248,7 @@ export const AddPrescriptionCard = (props: {
                 key: 'dispenseAsWritten',
                 value: checked
               });
-              dispatchFieldInteractionAnalyticsEvent({
+              dispatchAnalyticsTrackEvent('fieldInteraction', {
                 name: 'Field Interaction',
                 formName: 'add_prescription_form',
                 fieldName: 'dispenseAsWritten',
@@ -275,7 +274,7 @@ export const AddPrescriptionCard = (props: {
                     });
                   }}
                   onBlur={(e) => {
-                    dispatchFieldInteractionAnalyticsEvent({
+                    dispatchAnalyticsTrackEvent('fieldInteraction', {
                       name: 'Field Interaction',
                       formName: 'add_prescription_form',
                       fieldName: 'dispenseQuantity',
@@ -307,7 +306,7 @@ export const AddPrescriptionCard = (props: {
                 });
               }}
               onBlur={(e) => {
-                dispatchFieldInteractionAnalyticsEvent({
+                dispatchAnalyticsTrackEvent('fieldInteraction', {
                   name: 'Field Interaction',
                   formName: 'add_prescription_form',
                   fieldName: 'dispenseUnit',
@@ -359,7 +358,7 @@ export const AddPrescriptionCard = (props: {
                 });
               }}
               onBlur={(e) => {
-                dispatchFieldInteractionAnalyticsEvent({
+                dispatchAnalyticsTrackEvent('fieldInteraction', {
                   name: 'Field Interaction',
                   formName: 'add_prescription_form',
                   fieldName: 'daysSupply',
@@ -383,7 +382,7 @@ export const AddPrescriptionCard = (props: {
                 });
               }}
               onBlur={(e) => {
-                dispatchFieldInteractionAnalyticsEvent({
+                dispatchAnalyticsTrackEvent('fieldInteraction', {
                   name: 'Field Interaction',
                   formName: 'add_prescription_form',
                   fieldName: 'refills',
@@ -409,7 +408,7 @@ export const AddPrescriptionCard = (props: {
               });
             }}
             onBlur={(value: string) => {
-              dispatchFieldInteractionAnalyticsEvent({
+              dispatchAnalyticsTrackEvent('fieldInteraction', {
                 name: 'Field Interaction',
                 formName: 'add_prescription_form',
                 fieldName: 'instructions',
@@ -430,7 +429,7 @@ export const AddPrescriptionCard = (props: {
               });
             }}
             onBlur={(value: string) => {
-              dispatchFieldInteractionAnalyticsEvent({
+              dispatchAnalyticsTrackEvent('fieldInteraction', {
                 name: 'Field Interaction',
                 formName: 'add_prescription_form',
                 fieldName: 'pharmacy_notes',
@@ -456,7 +455,7 @@ export const AddPrescriptionCard = (props: {
               });
             }}
             onBlur={(e) => {
-              dispatchFieldInteractionAnalyticsEvent({
+              dispatchAnalyticsTrackEvent('fieldInteraction', {
                 name: 'Field Interaction',
                 formName: 'add_prescription_form',
                 fieldName: 'doNotFillBeforeDate',
@@ -477,7 +476,7 @@ export const AddPrescriptionCard = (props: {
                   key: 'addToTemplates',
                   value: checked
                 });
-                dispatchFieldInteractionAnalyticsEvent({
+                dispatchAnalyticsTrackEvent('fieldInteraction', {
                   name: 'Field Interaction',
                   formName: 'add_prescription_form',
                   fieldName: 'addToTemplates',

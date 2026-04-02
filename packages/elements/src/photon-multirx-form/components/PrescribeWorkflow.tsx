@@ -144,7 +144,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchOrderError,
     dispatchClinicalAlertAcknowledge,
     dispatchClinicalAlertCancel,
-    dispatchCtaAnalyticsEvent
+    dispatchAnalyticsTrackEvent
   } = usePrescribeEventDispatch();
   const [needsSupervisor, setNeedsSupervisor] = createSignal<boolean>(false);
 
@@ -408,7 +408,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const activatePrescriptionsOnApi = async () => {
     try {
       await tryUpdatePrescriptionStates(prescriptionIds(), PrescriptionState.Active);
-      dispatchCtaAnalyticsEvent({
+      dispatchAnalyticsTrackEvent('ctaClicked', {
         name: 'Prescriptions Activated',
         buttonText: 'Send',
         prescriptionCount: draftPrescriptions().length
@@ -499,7 +499,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         return;
       }
       dispatchOrderCreated(orderData!.createOrder);
-      dispatchCtaAnalyticsEvent({
+      dispatchAnalyticsTrackEvent('ctaClicked', {
         name: 'Order Sent',
         buttonText: 'Send',
         orderId: orderData!.createOrder.id,
@@ -585,7 +585,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             setIsScreeningAlertWarningOpen(false);
             combineOrSubmit();
             dispatchClinicalAlertAcknowledge(screeningAlerts());
-            dispatchCtaAnalyticsEvent({
+            dispatchAnalyticsTrackEvent('ctaClicked', {
               name: 'Minor CTA Clicked',
               ctaName: 'screening alert acknowledged',
               screeningAlertCount: screeningAlerts().length
@@ -595,7 +595,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             setIsLoading(false);
             setIsScreeningAlertWarningOpen(false);
             dispatchClinicalAlertCancel(screeningAlerts());
-            dispatchCtaAnalyticsEvent({
+            dispatchAnalyticsTrackEvent('ctaClicked', {
               name: 'Minor CTA Clicked',
               ctaName: 'screening alert canceled',
               screeningAlertCount: screeningAlerts().length

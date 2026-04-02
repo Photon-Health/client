@@ -61,7 +61,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
   const { selectedCoverageOption } = usePrescribe();
   const pharmacySelectionContext = usePharmacySelectionContext();
   const unroutablePharmacyIds = () => pharmacySelectionContext.unroutablePharmacyIds();
-  const { dispatchFieldInteractionAnalyticsEvent } = usePrescribeEventDispatch();
+  const { dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
   const hasAddress = createMemo(() => Boolean(props.address?.trim()));
 
   const [localPharmId, setLocalPharmId] = createSignal<string | undefined>();
@@ -127,7 +127,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
     const type = fulfillmentOptions.find((option) => option.name === newTab)?.fulfillmentType;
     pharmacySelectionContext.setFulfillmentType(parseFulfillmentType(type));
 
-    dispatchFieldInteractionAnalyticsEvent({
+    dispatchAnalyticsTrackEvent('fieldInteraction', {
       name: 'Field Interaction',
       formName: 'select_pharmacy',
       tabSelected: newTab,
@@ -185,7 +185,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
                 }}
                 setPreferred={(shouldSetPreferred) => {
                   pharmacySelectionContext.setUpdatePreferredPharmacy(shouldSetPreferred);
-                  dispatchFieldInteractionAnalyticsEvent({
+                  dispatchAnalyticsTrackEvent('fieldInteraction', {
                     name: 'Field Interaction',
                     formName: 'select_pharmacy',
                     tabSelected: TabNamesEnum.localPickup,

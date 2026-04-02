@@ -70,7 +70,7 @@ type VariablesCreateOrder = {
 export default function RecentOrdersCombineDialog() {
   let ref: Ref<any> | undefined;
   const { draftPrescriptions } = useDraftPrescriptions();
-  const { dispatchOrderCreated, dispatchOrderCombined, dispatchCtaAnalyticsEvent } =
+  const { dispatchOrderCreated, dispatchOrderCombined, dispatchAnalyticsTrackEvent } =
     usePrescribeEventDispatch();
 
   const client = usePhotonClient();
@@ -122,7 +122,10 @@ export default function RecentOrdersCombineDialog() {
 
     setIsCombiningOrders(true);
     dispatchDatadogAction('prescribe-combine-dialog-combining', {}, ref);
-    dispatchCtaAnalyticsEvent({ name: 'Minor CTA Clicked', ctaName: 'yes combine orders' });
+    dispatchAnalyticsTrackEvent('ctaClicked', {
+      name: 'Minor CTA Clicked',
+      ctaName: 'yes combine orders'
+    });
 
     const fills = draftPrescriptions().map((prescription) => ({ prescriptionId: prescription.id }));
     try {
@@ -133,7 +136,7 @@ export default function RecentOrdersCombineDialog() {
 
       // Trigger message to redirect to order page
       dispatchOrderCombined(updatedOrder.updateOrder as Order);
-      dispatchCtaAnalyticsEvent({
+      dispatchAnalyticsTrackEvent('ctaClicked', {
         name: 'Order Sent',
         buttonText: 'Send',
         orderId: order.id,
@@ -165,7 +168,7 @@ export default function RecentOrdersCombineDialog() {
         });
 
         dispatchOrderCreated(newOrder.createOrder as Order);
-        dispatchCtaAnalyticsEvent({
+        dispatchAnalyticsTrackEvent('ctaClicked', {
           name: 'Order Sent',
           buttonText: 'Send',
           orderId: newOrder.createOrder.id,
@@ -269,7 +272,7 @@ export default function RecentOrdersCombineDialog() {
             size="xl"
             onClick={() => {
               dispatchDatadogAction('prescribe-combine-dialog-not-combining', {}, ref);
-              dispatchCtaAnalyticsEvent({
+              dispatchAnalyticsTrackEvent('ctaClicked', {
                 name: 'Minor CTA Clicked',
                 ctaName: 'no send new order'
               });

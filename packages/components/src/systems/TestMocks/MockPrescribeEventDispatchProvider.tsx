@@ -15,9 +15,7 @@ type PrescribeEventDispatchContextType = {
   dispatchClinicalAlertCancel: (...args: never[]) => void;
   dispatchSignatureAttestationAgreed: (...args: never[]) => void;
   dispatchSignatureAttestationCanceled: (...args: never[]) => void;
-  dispatchPageViewAnalyticsEvent: (...args: never[]) => void;
-  dispatchCtaAnalyticsEvent: (...args: never[]) => void;
-  dispatchFieldInteractionAnalyticsEvent: (...args: never[]) => void;
+  dispatchAnalyticsTrackEvent: (...args: never[]) => void;
 };
 
 export const MockPrescribeEventDispatchContext = createContext<PrescribeEventDispatchContextType>();
@@ -36,9 +34,7 @@ export const mockPrescribeEventDispatchValues = (): PrescribeEventDispatchContex
   dispatchClinicalAlertCancel: vi.fn(),
   dispatchSignatureAttestationAgreed: vi.fn(),
   dispatchSignatureAttestationCanceled: vi.fn(),
-  dispatchPageViewAnalyticsEvent: vi.fn(),
-  dispatchCtaAnalyticsEvent: vi.fn(),
-  dispatchFieldInteractionAnalyticsEvent: vi.fn()
+  dispatchAnalyticsTrackEvent: vi.fn()
 });
 
 export function MockPrescribeEventDispatchProvider(props: { children: JSXElement }) {

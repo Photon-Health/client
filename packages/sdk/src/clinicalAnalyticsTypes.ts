@@ -116,6 +116,15 @@ export type FieldInteractionEvent =
   | { name: 'Field Interaction'; formName: string; patientId: string };
 
 // ---------------------------------------------------------------------------
+// Event map — used by dispatchAnalyticsTrackEvent generic
+// ---------------------------------------------------------------------------
+export type AnalyticsEventMap = {
+  pageViewed: PageViewEvent;
+  ctaClicked: CtaClickEvent;
+  fieldInteraction: FieldInteractionEvent;
+};
+
+// ---------------------------------------------------------------------------
 // Combined type — the CustomEvent detail shape used by the listener side
 // ---------------------------------------------------------------------------
 export type PhotonEmbedAnalyticsEventInput =

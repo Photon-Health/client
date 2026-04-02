@@ -63,8 +63,7 @@ export const PatientCard = (props: {
   hidePatientCard?: boolean;
   optionalPatientAddress?: boolean;
 }) => {
-  const { dispatchFieldInteractionAnalyticsEvent, dispatchCtaAnalyticsEvent } =
-    usePrescribeEventDispatch();
+  const { dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
   const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
   const [showEditPatientView, setShowEditPatientView] = createSignal(false);
   const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
@@ -96,7 +95,7 @@ export const PatientCard = (props: {
       value: e.detail.patient
     });
     if (trackInteraction) {
-      dispatchFieldInteractionAnalyticsEvent({
+      dispatchAnalyticsTrackEvent('fieldInteraction', {
         name: 'Field Interaction',
         formName: 'add_prescription_form',
         patientId: e.detail.patient.id
@@ -181,7 +180,7 @@ export const PatientCard = (props: {
             editPatient={
               props?.enableOrder && !showAddressForm()
                 ? () => {
-                    dispatchCtaAnalyticsEvent({
+                    dispatchAnalyticsTrackEvent('ctaClicked', {
                       name: 'Minor CTA Clicked',
                       ctaName: 'edit patient'
                     });
@@ -225,7 +224,7 @@ export const PatientCard = (props: {
             open={showAddMedDialog()}
             on:photon-medication-selected={(e: { detail: { medication: Treatment } }) => {
               setNewMedication(e.detail.medication);
-              dispatchCtaAnalyticsEvent({
+              dispatchAnalyticsTrackEvent('ctaClicked', {
                 name: 'Minor CTA Clicked',
                 ctaName: 'add to medication history'
               });
