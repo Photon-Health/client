@@ -4,8 +4,8 @@ import { Alert } from './particles/Alert';
 import Checkbox from './particles/Checkbox';
 import DispenseUnitSelect from './particles/DispenseUnitSelect';
 import Input from './particles/Input';
-import AddressAutocompleteInput from './particles/AddressAutocompleteInput';
 import type { ParsedAddress } from './particles/AddressAutocompleteInput';
+import AddressAutocompleteInput from './particles/AddressAutocompleteInput';
 import { InputGroup } from './particles/InputGroup';
 import DateInput from './particles/DateInput';
 import Select from './particles/Select';
@@ -72,11 +72,7 @@ import {
   PrescribeEventDispatchProvider,
   usePrescribeEventDispatch
 } from './systems/PrescribeEventDispatchProvider';
-import {
-  dispatchCtaAnalyticsEvent,
-  dispatchFieldInteractionAnalyticsEvent,
-  dispatchPageViewAnalyticsEvent
-} from './analytics/dispatchAnalyticsTrackEvent';
+import { dispatchAnalyticsTrackEvent } from './analytics/dispatchAnalyticsTrackEvent';
 import {
   buildFieldSnapshot,
   DRAFT_PRESCRIPTION_FORM_FIELDS,
@@ -144,9 +140,7 @@ export {
   CALENDAR_DATE_FORMAT,
   PrescribeEventDispatchProvider,
   usePrescribeEventDispatch,
-  dispatchCtaAnalyticsEvent,
-  dispatchFieldInteractionAnalyticsEvent,
-  dispatchPageViewAnalyticsEvent,
+  dispatchAnalyticsTrackEvent,
   buildFieldSnapshot,
   PATIENT_FORM_FIELDS,
   DRAFT_PRESCRIPTION_FORM_FIELDS

@@ -2,11 +2,7 @@ import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createContext, JSXElement, useContext } from 'solid-js';
 import { ScreeningAlertType } from './ScreeningAlerts';
-import {
-  dispatchCtaAnalyticsEvent as dispatchCtaFn,
-  dispatchFieldInteractionAnalyticsEvent as dispatchFieldInteractionFn,
-  dispatchPageViewAnalyticsEvent as dispatchPageViewFn
-} from '../analytics/dispatchAnalyticsTrackEvent';
+import { dispatchAnalyticsTrackEvent } from '../analytics/dispatchAnalyticsTrackEvent';
 import type { CtaClickEvent, FieldInteractionEvent, PageViewEvent } from '@photonhealth/sdk';
 
 const PrescribeEventDispatchContext = createContext<{
@@ -174,10 +170,12 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref?.dispatchEvent(event);
   };
 
-  const dispatchPageViewAnalyticsEvent = (event: PageViewEvent) => dispatchPageViewFn(event, ref);
-  const dispatchCtaAnalyticsEvent = (event: CtaClickEvent) => dispatchCtaFn(event, ref);
+  const dispatchPageViewAnalyticsEvent = (event: PageViewEvent) =>
+    dispatchAnalyticsTrackEvent('pageViewed', event, ref);
+  const dispatchCtaAnalyticsEvent = (event: CtaClickEvent) =>
+    dispatchAnalyticsTrackEvent('ctaClicked', event, ref);
   const dispatchFieldInteractionAnalyticsEvent = (event: FieldInteractionEvent) =>
-    dispatchFieldInteractionFn(event, ref);
+    dispatchAnalyticsTrackEvent('fieldInteraction', event, ref);
 
   const value = {
     dispatchFormValidate,

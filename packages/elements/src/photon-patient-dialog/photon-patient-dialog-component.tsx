@@ -3,8 +3,7 @@ import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import {
   buildFieldSnapshot,
   Button,
-  dispatchCtaAnalyticsEvent,
-  dispatchPageViewAnalyticsEvent,
+  dispatchAnalyticsTrackEvent,
   PATIENT_FORM_FIELDS,
   usePhoton
 } from '@photonhealth/components';
@@ -84,7 +83,8 @@ const Component = (props: PatientDialogProps) => {
 
   createEffect(() => {
     if (props.open) {
-      dispatchPageViewAnalyticsEvent(
+      dispatchAnalyticsTrackEvent(
+        'pageViewed',
         {
           name: props.patientId ? 'Update Patient Page Viewed' : 'New Patient Page Viewed'
         },
@@ -173,7 +173,8 @@ const Component = (props: PatientDialogProps) => {
         const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
         await updatePatientMutation({ variables: patientData, awaitRefetchQueries: false });
         dispatchUpdate(props.patientId, didClickCreatePatientAndPrescription);
-        dispatchCtaAnalyticsEvent(
+        dispatchAnalyticsTrackEvent(
+          'ctaClicked',
           {
             name: 'Patient Updated',
             buttonText: didClickCreatePatientAndPrescription
@@ -194,7 +195,8 @@ const Component = (props: PatientDialogProps) => {
         });
         const patientId = patient?.data?.createPatient?.id || '';
         dispatchCreated(patientId, didClickCreatePatientAndPrescription);
-        dispatchCtaAnalyticsEvent(
+        dispatchAnalyticsTrackEvent(
+          'ctaClicked',
           {
             name: 'Patient Created',
             buttonText: didClickCreatePatientAndPrescription

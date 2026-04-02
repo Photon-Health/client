@@ -1,3 +1,5 @@
+export type AnalyticsCategory = 'pageViewed' | 'ctaClicked' | 'fieldInteraction';
+
 export interface FieldCompletionSnapshot {
   [fieldName: string]: { completed: boolean };
 }

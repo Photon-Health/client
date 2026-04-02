@@ -1,16 +1,16 @@
 import { customElement } from 'solid-element';
 import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
-import type { PharmacyOption } from '@photonhealth/components';
 import {
   AddressAutocompleteInput,
   Card,
   DateInput,
-  dispatchFieldInteractionAnalyticsEvent,
+  dispatchAnalyticsTrackEvent,
   GenderSelect,
   Icon,
   Input,
   InputGroup,
+  PharmacyOption,
   PharmacySearch,
   PhoneInput,
   SEX_OPTIONS,
@@ -230,7 +230,8 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   const formName = props.patientId ? 'update_patient_form' : 'new_patient_form';
 
   const trackFieldInteraction = (fieldName: string, hasValue: boolean, isOptional = false) => {
-    dispatchFieldInteractionAnalyticsEvent(
+    dispatchAnalyticsTrackEvent(
+      'fieldInteraction',
       { name: 'Field Interaction', formName, fieldName, hasValue, isOptional },
       ref
     );
