@@ -50,3 +50,19 @@ if (typeof window !== 'undefined' && !('IntersectionObserver' in window)) {
 }
 
 vi.stubGlobal('scrollTo', vi.fn());
+
+// Fixes bug in Chakra UI https://github.com/chakra-ui/chakra-ui/issues/6036
+// useBreakpointValue causes bug during unit tests
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn()
+  }))
+});
