@@ -30,7 +30,6 @@ export const Status = () => {
   const patientAnalytics = usePatientAnalytics();
   usePageAnalytics({ pageName: 'Order Status' });
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
-  const [renderChangeReasons, setRenderChangeReasons] = useState(false);
   const { isOpen, onClose, onOpen } = useDisclosure();
 
   const [searchParams] = useSearchParams();
@@ -72,13 +71,6 @@ export const Status = () => {
       fulfillmentType: fulfillmentType
     });
   };
-
-  useEffect(() => {
-    if (canOrderReroute) {
-      const isEnabled = patientAnalytics.getFlagValueSync('change_pharmacy_reasons', false);
-      setRenderChangeReasons(isEnabled);
-    }
-  }, [canOrderReroute]);
 
   const handleDemoStatusPage = async (demoUserPhone: string, selectedDemoPharmacy: Pharmacy) => {
     const isMailOrder = !!order.pharmacy?.fulfillmentTypes?.includes('MAIL_ORDER');
@@ -164,7 +156,8 @@ export const Status = () => {
   };
 
   const handleReroute = () => {
-    if (renderChangeReasons) {
+    const isEnabled = patientAnalytics.getFlagValueSync('change_pharmacy_reasons', false);
+    if (isEnabled) {
       onOpen();
       return;
     }
@@ -366,9 +359,7 @@ export const Status = () => {
       <VStack w="full" pb={6}>
         <PoweredBy />
       </VStack>
-      {renderChangeReasons && (
-        <ChangePharmacyReasons isOpen={isOpen} onClose={onClose} onSelect={handleSelectReason} />
-      )}
+      <ChangePharmacyReasons isOpen={isOpen} onClose={onClose} onSelect={handleSelectReason} />
     </VStack>
   );
 };
