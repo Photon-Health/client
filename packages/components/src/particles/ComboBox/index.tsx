@@ -145,21 +145,35 @@ function ComboOptions(props: { children?: JSX.Element }) {
 export interface ComboOptionProps {
   key: string;
   value: any;
+  disabled?: boolean;
   children?: JSX.Element;
 }
 
 function ComboOption(props: ComboOptionProps) {
   const [state, { setSelected, setActive }] = useContext(ComboBoxContext);
 
+  if (props.disabled) {
+    return (
+      <li
+        class="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-400"
+        role="option"
+        aria-disabled="true"
+        tabindex="-1"
+      >
+        <span class="block truncate">{props.children}</span>
+      </li>
+    );
+  }
+
   const optionClass = createMemo(() =>
-    clsx('relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900 cursor-pointer', {
+    clsx('relative cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900', {
       'bg-blue-600 text-white': state.active === props.key
     })
   );
 
-  const iconClass = createMemo(() => {
-    return clsx(state.active === props.key ? 'text-white' : 'text-blue-600');
-  });
+  const iconClass = createMemo(() =>
+    clsx(state.active === props.key ? 'text-white' : 'text-blue-600')
+  );
 
   return (
     <li

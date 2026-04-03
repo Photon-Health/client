@@ -36,6 +36,8 @@ export const PatientSelect = (props: {
     props.onSelect(patient);
   };
 
+  const loading = () => props.store.patients.isLoading || props.store.selectedPatient.isLoading;
+
   return (
     <ComboBox
       value={props.store.selectedPatient.data || {}}
@@ -47,14 +49,23 @@ export const PatientSelect = (props: {
       }}
     >
       <ComboBox.Input
-        loading={props.store.patients.isLoading || props.store.selectedPatient.isLoading}
+        loading={loading()}
         placeholder="Select patient..."
         onInput={(e) => handleSearch(e.currentTarget.value)}
         displayValue={(p: Patient) => {
           return p.name?.full || '';
         }}
       />
-      <Show when={getData().length > 0}>
+      <Show
+        when={getData().length > 0}
+        fallback={
+          <ComboBox.Options>
+            <ComboBox.Option key={''} value={null} disabled={true}>
+              {loading() ? 'Loading...' : 'No patients found'}
+            </ComboBox.Option>
+          </ComboBox.Options>
+        }
+      >
         <ComboBox.Options>
           <For each={getData()}>
             {(p: Patient) => (
