@@ -11,10 +11,12 @@ import { PhotonFormWrapper } from '../photon-form-wrapper';
 import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import gql from 'graphql-tag';
 import { PatientActions, PatientStore } from '../stores/patient';
+import { Patient } from '@photonhealth/sdk/dist/types';
 
 type PatientDialogProps = {
   store: PatientStore;
   actions: PatientActions;
+  patient?: Patient;
   patientId: string;
   open: boolean;
   hideCreatePrescription: boolean;
@@ -33,7 +35,6 @@ const Component = (props: PatientDialogProps) => {
   const [loading, setLoading] = createSignal(false);
   const [isCreatePrescription, setIsCreatePrescription] = createSignal<boolean>(false);
   const [formStore, setFormStore] = createSignal<any>(undefined);
-  const [selectedStore, setSelectedStore] = createSignal<any>(undefined);
   const [actions, setActions] = createSignal<any>(undefined);
   const [globalError, setGlobalError] = createSignal<string | undefined>(undefined);
   const [hasAnyAddressField, setHasAnyAddressField] = createSignal<boolean>(false);
@@ -99,7 +100,6 @@ const Component = (props: PatientDialogProps) => {
   const submitForm = async (
     store: any,
     actions: any,
-    pStore: any,
     didClickCreatePatientAndPrescription = false
   ) => {
     setGlobalError(undefined);
@@ -122,23 +122,23 @@ const Component = (props: PatientDialogProps) => {
       return true;
     }
 
-    if (
-      store['preferredPharmacy']!.value &&
-      pStore.selectedPatient.data?.preferredPharmacies &&
-      pStore.selectedPatient.data?.preferredPharmacies.length !== 0 &&
-      !pStore.selectedPatient.data?.preferredPharmacies
-        ?.map((x: any) => x?.id)
-        .filter((x: any) => x !== null)
-        .includes(store['preferredPharmacy']!.value)
-    ) {
+    const existingPharmacyIds = props.patient?.preferredPharmacies
+      ?.map((x: any) => x?.id)
+      .filter((x: any) => x !== null);
+    const preferredPharmacyChanged =
+      store['preferredPharmacy'].value &&
+      existingPharmacyIds &&
+      existingPharmacyIds.length !== 0 &&
+      !existingPharmacyIds.includes(store['preferredPharmacy'].value);
+    if (preferredPharmacyChanged) {
       // remove existing preferred pharmacy in order to add the new one
-      const removePreferredPharmacyMutation = client!
+      const removePreferredPharmacyMutation = client
         .getSDK()
         .clinical.patient.removePatientPreferredPharmacy({});
       await removePreferredPharmacyMutation({
         variables: {
           patientId: props.patientId,
-          pharmacyId: pStore.selectedPatient.data?.preferredPharmacies![0]!.id
+          pharmacyId: props.patient?.preferredPharmacies![0]!.id
         },
         awaitRefetchQueries: false
       });
@@ -249,7 +249,7 @@ const Component = (props: PatientDialogProps) => {
                   size="lg"
                   disabled={loading()}
                   loading={loading() && isCreatePrescription()}
-                  onClick={() => submitForm(formStore(), actions(), selectedStore(), true)}
+                  onClick={() => submitForm(formStore(), actions(), true)}
                 >
                   {props?.patientId ? 'Save' : 'Create'} and start prescription
                 </Button>
@@ -261,7 +261,7 @@ const Component = (props: PatientDialogProps) => {
                   variant={props?.hideCreatePrescription ? 'primary' : 'secondary'}
                   disabled={loading()}
                   loading={loading() && !isCreatePrescription()}
-                  onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
+                  onClick={() => submitForm(formStore(), actions(), false)}
                 >
                   {props?.patientId ? 'Save' : 'Create'}
                 </Button>
@@ -283,7 +283,6 @@ const Component = (props: PatientDialogProps) => {
                 on:photon-form-updated={(e: any) => {
                   setFormStore(e.detail.form);
                   setActions(Object.assign({}, e.detail.actions, { resetStores: e.detail.reset }));
-                  setSelectedStore(e.detail.selected);
                   // Check if any address field has a value
                   const form = e.detail.form;
                   setHasAnyAddressField(
@@ -296,7 +295,7 @@ const Component = (props: PatientDialogProps) => {
                     )
                   );
                 }}
-                p-store={props.store}
+                patient={props.patient}
                 p-actions={props.actions}
                 patient-id={props.patientId}
                 optional-patient-address={props.optionalPatientAddress}
@@ -313,6 +312,7 @@ customElement(
   {
     store: {} as PatientStore,
     actions: {} as PatientActions,
+    patient: undefined,
     patientId: '',
     hideCreatePrescription: false,
     open: false,

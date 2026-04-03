@@ -19,7 +19,8 @@ import {
   StateSelect
 } from '@photonhealth/components';
 import { createFormStore } from '../stores/form';
-import { PatientActions, PatientStore } from '../stores/patient';
+import { PatientActions } from '../stores/patient';
+import type { Patient } from '@photonhealth/sdk/dist/types';
 import tailwind from '../tailwind.css?inline';
 import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import { email, empty, message, notFutureDate, zipString } from '../validators';
@@ -40,7 +41,7 @@ const getPatientAddress = (store: any) => {
 };
 
 const PatientForm = (props: {
-  pStore: PatientStore;
+  patient?: Patient;
   pActions: PatientActions;
   loading: boolean;
   patientId: string;
@@ -48,21 +49,20 @@ const PatientForm = (props: {
 }) => {
   let ref: any;
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
-  const patient = () => props.pStore.selectedPatient.data;
   const { store, actions } = createFormStore({
-    firstName: patient()?.name.first,
-    lastName: patient()?.name.last,
-    dateOfBirth: patient()?.dateOfBirth,
-    phone: patient()?.phone,
-    gender: patient()?.gender,
-    sex: patient()?.sex,
-    email: patient()?.email,
-    address_street1: patient()?.address?.street1,
-    address_street2: patient()?.address?.street2,
-    address_city: patient()?.address?.city,
-    address_state: patient()?.address?.state,
-    address_zip: patient()?.address?.postalCode,
-    preferredPharmacy: patient()?.preferredPharmacies?.[0]?.id
+    firstName: props.patient?.name.first,
+    lastName: props.patient?.name.last,
+    dateOfBirth: props.patient?.dateOfBirth,
+    phone: props.patient?.phone,
+    gender: props.patient?.gender,
+    sex: props.patient?.sex,
+    email: props.patient?.email,
+    address_street1: props.patient?.address?.street1,
+    address_street2: props.patient?.address?.street2,
+    address_city: props.patient?.address?.city,
+    address_state: props.patient?.address?.state,
+    address_zip: props.patient?.address?.postalCode,
+    preferredPharmacy: props.patient?.preferredPharmacies?.[0]?.id
   });
   actions.registerValidator({
     key: 'firstName',
@@ -116,7 +116,6 @@ const PatientForm = (props: {
       detail: {
         form: store,
         actions: actions,
-        selected: props.pStore,
         optionalPatientAddress: props.optionalPatientAddress,
         reset: () => {
           actions.reset();
@@ -143,7 +142,7 @@ const PatientForm = (props: {
   });
 
   const preferredPharmacy = createMemo(() => {
-    const pref = patient()?.preferredPharmacies?.[0];
+    const pref = props.patient?.preferredPharmacies?.[0];
     if (!pref) return;
 
     const address = pref.address as PharmacyOption['address'];
@@ -349,7 +348,7 @@ const PatientForm = (props: {
                   <AddressFields />
                 </Show>
                 <button
-                  class="mb-4 mt-8 flex items-center md:!hidden"
+                  class="mb-4 mt-4 flex items-center md:!hidden"
                   aria-expanded={showOptionalFields()}
                   aria-controls="optional-fields-section"
                   onClick={() => setShowOptionalFields((value) => !value)}
@@ -419,7 +418,7 @@ const PatientForm = (props: {
 customElement(
   'photon-patient-form',
   {
-    pStore: {} as PatientStore,
+    patient: undefined,
     pActions: {} as PatientActions,
     loading: false,
     patientId: '',
