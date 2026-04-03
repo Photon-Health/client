@@ -30,6 +30,7 @@
     },
     "test": {
       "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
       "options": {
         "cwd": "packages/elements",
         "command": "vitest run"

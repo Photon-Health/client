@@ -5,11 +5,6 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "jest": {
-    "transformIgnorePatterns": [
-      "/node_modules/@photonhealth/react"
-    ]
-  },
   "dependencies": {
     "@photonhealth/elements": "*",
     "@photonhealth/react": "*",

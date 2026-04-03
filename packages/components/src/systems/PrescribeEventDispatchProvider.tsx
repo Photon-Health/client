@@ -2,8 +2,8 @@ import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createContext, JSXElement, useContext } from 'solid-js';
 import { ScreeningAlertType } from './ScreeningAlerts';
-import { dispatchAnalyticsTrackEvent } from '../analytics/dispatchAnalyticsTrackEvent';
-import { PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
+import { dispatchAnalyticsTrackEvent as _dispatchAnalyticsTrackEvent } from '../analytics/dispatchAnalyticsTrackEvent';
+import type { AnalyticsCategory, AnalyticsEventMap } from '@photonhealth/sdk';
 
 const PrescribeEventDispatchContext = createContext<{
   dispatchFormValidate: (canSubmit: boolean, form: any) => void;
@@ -19,7 +19,11 @@ const PrescribeEventDispatchContext = createContext<{
   dispatchClinicalAlertCancel: (alerts: ScreeningAlertType[]) => void;
   dispatchSignatureAttestationAgreed: () => void;
   dispatchSignatureAttestationCanceled: () => void;
-  dispatchAnalytics: (detail: PhotonEmbedAnalyticsEventInput) => void;
+  dispatchAttestationResolved: () => void;
+  dispatchAnalyticsTrackEvent: <C extends AnalyticsCategory>(
+    category: C,
+    event: AnalyticsEventMap[C]
+  ) => void;
 }>();
 
 interface DraftPrescriptionProviderProps {
@@ -168,9 +172,19 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref?.dispatchEvent(event);
   };
 
-  const dispatchAnalytics = (detail: PhotonEmbedAnalyticsEventInput) => {
-    dispatchAnalyticsTrackEvent(detail, ref);
+  const dispatchAttestationResolved = () => {
+    const event = new CustomEvent('photon-signature-attestation-resolved', {
+      composed: true,
+      bubbles: true,
+      detail: {}
+    });
+    ref?.dispatchEvent(event);
   };
+
+  const dispatchAnalyticsTrackEvent = <C extends AnalyticsCategory>(
+    category: C,
+    event: AnalyticsEventMap[C]
+  ) => _dispatchAnalyticsTrackEvent(category, event, ref);
 
   const value = {
     dispatchFormValidate,
@@ -186,7 +200,8 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     dispatchClinicalAlertCancel,
     dispatchSignatureAttestationAgreed,
     dispatchSignatureAttestationCanceled,
-    dispatchAnalytics
+    dispatchAttestationResolved,
+    dispatchAnalyticsTrackEvent
   };
 
   return (

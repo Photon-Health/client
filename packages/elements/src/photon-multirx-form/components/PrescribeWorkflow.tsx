@@ -144,7 +144,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchOrderError,
     dispatchClinicalAlertAcknowledge,
     dispatchClinicalAlertCancel,
-    dispatchAnalytics
+    dispatchAnalyticsTrackEvent
   } = usePrescribeEventDispatch();
   const [needsSupervisor, setNeedsSupervisor] = createSignal<boolean>(false);
 
@@ -408,11 +408,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const activatePrescriptionsOnApi = async () => {
     try {
       await tryUpdatePrescriptionStates(prescriptionIds(), PrescriptionState.Active);
-      dispatchAnalytics({
-        trackEventType: 'draft_prescriptions_activated',
-        properties: {
-          prescriptionCount: draftPrescriptions().length
-        }
+      dispatchAnalyticsTrackEvent('ctaClicked', {
+        name: 'Prescriptions Activated',
+        buttonText: 'Send',
+        prescriptionCount: draftPrescriptions().length
       });
     } catch (err) {
       dispatchPrescriptionsError([err as Error]);
@@ -500,17 +499,16 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         return;
       }
       dispatchOrderCreated(orderData!.createOrder);
-      dispatchAnalytics({
-        trackEventType: 'order_created',
-        properties: {
-          orderId: orderData!.createOrder.id,
-          prescriptionCount: draftPrescriptions().length,
-          fulfillmentType: pharmacySelectionContext.fulfillmentType() || 'SEND_TO_PATIENT',
-          hasPreferredPharmacy: hasPreferredPharmacy(),
-          setAsPreferred: pharmacySelectionContext.updatePreferredPharmacy(),
-          pharmacyId: pharmacyId || null,
-          isCombinedOrder: false
-        }
+      dispatchAnalyticsTrackEvent('ctaClicked', {
+        name: 'Order Sent',
+        buttonText: 'Send',
+        orderId: orderData!.createOrder.id,
+        prescriptionCount: draftPrescriptions().length,
+        fulfillmentType: pharmacySelectionContext.fulfillmentType() || 'SEND_TO_PATIENT',
+        hasPreferredPharmacy: hasPreferredPharmacy(),
+        setAsPreferred: pharmacySelectionContext.updatePreferredPharmacy(),
+        pharmacyId: pharmacyId || null,
+        isCombinedOrder: false
       });
     } catch (err) {
       dispatchOrderError([err as GraphQLFormattedError]);
@@ -587,18 +585,20 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             setIsScreeningAlertWarningOpen(false);
             combineOrSubmit();
             dispatchClinicalAlertAcknowledge(screeningAlerts());
-            dispatchAnalytics({
-              trackEventType: 'screening_alert_acknowledged',
-              properties: { screeningAlertCount: screeningAlerts().length }
+            dispatchAnalyticsTrackEvent('ctaClicked', {
+              name: 'Screening Alert Acknowledged',
+              screeningAlertCount: screeningAlerts().length,
+              buttonText: 'Send'
             });
           }}
           onRevisitPrescriptions={() => {
             setIsLoading(false);
             setIsScreeningAlertWarningOpen(false);
             dispatchClinicalAlertCancel(screeningAlerts());
-            dispatchAnalytics({
-              trackEventType: 'screening_alert_canceled',
-              properties: { screeningAlertCount: screeningAlerts().length }
+            dispatchAnalyticsTrackEvent('ctaClicked', {
+              name: 'Screening Alert Canceled',
+              screeningAlertCount: screeningAlerts().length,
+              buttonText: 'Cancel'
             });
           }}
         />
