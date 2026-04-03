@@ -6,15 +6,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
-import {
-  buildPrescriptionFormInteractionPayload,
-  buildSignatureAttestationFormInteractionPayload
-} from '../../instrumentation/analyticsTrackEventListenerUtils';
-import {
-  type PhotonEmbedAnalyticsEventInput,
-  type PrescriptionFormAnalyticsEvent,
-  prescriptionFormEventTypes
-} from '@photonhealth/sdk';
+import { trackAnalyticsEvent } from '../../instrumentation/analyticsTrackEventListenerUtils';
+import type { PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
 
 declare global {
   namespace JSX {
@@ -79,37 +72,6 @@ export const PrescriptionForm = () => {
   const providerAnalyticsRef = useRef(providerAnalytics);
   providerAnalyticsRef.current = providerAnalytics;
 
-  const prescriptionFormOpenWasTracked = useRef(false);
-  useEffect(() => {
-    if (providerAnalytics.isReady && !prescriptionFormOpenWasTracked.current) {
-      prescriptionFormOpenWasTracked.current = true;
-      providerAnalytics.track(
-        'clinicalapp_prescription_form_track_events',
-        buildPrescriptionFormInteractionPayload({
-          trackEventType: 'prescription_form_opened',
-          properties: {
-            prefillPatientId: patientId || '',
-            prefillPharmacyId: pharmacyId || '',
-            hasPrefillPatientExternalId: !!externalId?.trim(),
-            hasPrefillPrescriptionIds: !!prescriptionIds?.trim(),
-            hasPrefillTemplateIds: !!templateIds?.trim(),
-            hasPrefillWeight: !!weight?.trim(),
-            weightUnit: weightUnit
-          }
-        })
-      );
-    }
-  }, [
-    providerAnalytics,
-    patientId,
-    pharmacyId,
-    externalId,
-    prescriptionIds,
-    templateIds,
-    weight,
-    weightUnit
-  ]);
-
   useEffect(() => {
     if (!ref.current) return;
     const abortController = new AbortController();
@@ -117,24 +79,27 @@ export const PrescriptionForm = () => {
     const listenerOptions = { signal: abortControllerSignal };
 
     ref.current.addEventListener(
+      'photon-signature-attestation-resolved',
+      () => {
+        // we always resolve user's signature attestation before showing the New Prescription page.
+        // If attestation is required, we show a Signature Attestation required screen first.
+        providerAnalyticsRef.current.track('New Prescriptions Page Viewed', {
+          prefillPatientId: patientId || '',
+          prefillPharmacyId: pharmacyId || '',
+          hasPrefillPatientExternalId: !!externalId?.trim(),
+          hasPrefillPrescriptionIds: !!prescriptionIds?.trim(),
+          hasPrefillTemplateIds: !!templateIds?.trim(),
+          hasPrefillWeight: !!weight?.trim(),
+          weightUnit: weightUnit
+        });
+      },
+      listenerOptions
+    );
+
+    ref.current.addEventListener(
       'photon-analytics-track-event',
       (e: { detail: PhotonEmbedAnalyticsEventInput }) => {
-        const { trackEventType } = e.detail;
-        if (
-          trackEventType === 'signature_attestation_shown' ||
-          trackEventType === 'signature_attestation_agreed' ||
-          trackEventType === 'signature_attestation_canceled'
-        ) {
-          providerAnalyticsRef.current.track(
-            'clinicalapp_signature_attestation_form_track_events',
-            buildSignatureAttestationFormInteractionPayload(e.detail)
-          );
-        } else if (prescriptionFormEventTypes.has(trackEventType)) {
-          providerAnalyticsRef.current.track(
-            'clinicalapp_prescription_form_track_events',
-            buildPrescriptionFormInteractionPayload(e.detail as PrescriptionFormAnalyticsEvent)
-          );
-        }
+        trackAnalyticsEvent(e.detail, providerAnalyticsRef.current.track);
       },
       listenerOptions
     );
@@ -231,6 +196,7 @@ export const PrescriptionForm = () => {
       {user?.org_id ? (
         <photon-multirx-form-wrapper
           ref={ref}
+          data-testid="multirx-form-wrapper"
           template-ids={templateIds}
           patient-id={patientId}
           pharmacy-id={pharmacyId}

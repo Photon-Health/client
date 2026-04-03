@@ -1,4 +1,4 @@
-import { ApiObject, RudderAnalytics } from '@rudderstack/analytics-js';
+import { ApiObject, IdentifyTraits, RudderAnalytics } from '@rudderstack/analytics-js';
 
 const RUDDERSTACK_WRITE_KEY = import.meta.env.VITE_RUDDERSTACK_WRITE_KEY;
 const RUDDERSTACK_DATA_PLANE_URL = import.meta.env.VITE_RUDDERSTACK_DATA_PLANE_URL;
@@ -25,6 +25,16 @@ export class ProviderAnalytics {
   }
 
   /**
+   * Identify the current user so all subsequent events are attributed to them.
+   */
+  identify(userId: string, traits: IdentifyTraits = {}) {
+    if (!this.rudderanalytics || !this.isInitialized) {
+      return;
+    }
+    this.rudderanalytics.identify(userId, traits);
+  }
+
+  /**
    * Track a user event (e.g., button click, form submission)
    * @param eventName - Name of the event (e.g., 'Button Clicked', 'Form Submitted')
    * @param properties - Event properties including context data
@@ -38,6 +48,17 @@ export class ProviderAnalytics {
       environment: this.environment,
       ...properties
     };
+
+    const isNonProductionEnvironment =
+      this.environment === 'boson' ||
+      this.environment === 'neutron' ||
+      this.environment === 'tau' ||
+      this.environment === 'local' ||
+      this.environment === 'development';
+
+    if (isNonProductionEnvironment) {
+      console.log(`📊 [Analytics] ${eventName}`, trackProperties);
+    }
 
     this.rudderanalytics.track(eventName, trackProperties);
   }
