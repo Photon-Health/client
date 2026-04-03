@@ -50,6 +50,7 @@ export interface ComboBoxProps {
   children?: JSX.Element;
   value?: any;
   onChange?: (value: any) => void;
+  onOpen?: () => void;
   loading?: boolean;
   setSelected: (selected: any) => void;
 }
@@ -68,6 +69,9 @@ export function ComboBox(props: ComboBoxProps) {
     {
       setOpen(open: boolean) {
         setState('open', open);
+        if (open && props.onOpen) {
+          props.onOpen();
+        }
       },
       setSelected(selected: any) {
         // set selected will call the prop setSelected to ideally update props.value
@@ -183,7 +187,7 @@ interface ComboBoxInputProps {
 function ComboInput(props: ComboBoxInputProps & InputProps) {
   const [state, { setOpen, setSelected }] = useComboBox();
   const [inputGroupState] = useInputGroup();
-  const [local, restInput] = splitProps(props, ['onInput', 'value']);
+  const [local, restInput] = splitProps(props, ['onInput', 'onClick', 'value']);
   const [localValue, setLocalValue] = createSignal('');
   let inputContainer: HTMLElement;
 
@@ -217,11 +221,17 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
           {...restInput}
           aria-label={props.label}
           value={localValue() || ''}
-          onClick={() => setOpen(!state.open)}
+          onClick={(e) => {
+            setOpen(!state.open);
+            if (local?.onClick) {
+              // @ts-ignore
+              local.onClick(e);
+            }
+          }}
           onInput={(e) => {
             if (local?.onInput) {
               // @ts-ignore
-              local?.onInput(e);
+              local.onInput(e);
             }
             setLocalValue(e.currentTarget.value);
             setOpen(true);
@@ -241,15 +251,15 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
           <span class="text-sm text-gray-400">Clear</span>
         </button>
       </Show>
-      <button
-        class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2"
-        onClick={() => setOpen(!state.open)}
-        aria-label="Show options"
-      >
-        <Show when={!inputGroupState.loading && !props.loading}>
+      <Show when={!inputGroupState.loading && !props.loading}>
+        <button
+          class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2"
+          onClick={() => setOpen(!state.open)}
+          aria-label="Show options"
+        >
           <Icon name="chevronUpDown" class="text-gray-400" />
-        </Show>
-      </button>
+        </button>
+      </Show>
     </>
   );
 }

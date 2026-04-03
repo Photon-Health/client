@@ -75,6 +75,14 @@ export const createPatientStore = () => {
     }
   });
 
+  const setSelectedPatient = (patient: Patient) => {
+    setStore('selectedPatient', {
+      ...store.selectedPatient,
+      isLoading: false,
+      data: patient
+    });
+  };
+
   const getSelectedPatient = async (client: PhotonClient, id: string) => {
     setStore('selectedPatient', {
       ...store.selectedPatient,
@@ -186,6 +194,7 @@ export const createPatientStore = () => {
     actions: {
       getPatients,
       getSelectedPatient,
+      setSelectedPatient,
       clearSelectedPatient,
       reset
     }

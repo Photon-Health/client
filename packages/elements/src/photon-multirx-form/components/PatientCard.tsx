@@ -102,7 +102,7 @@ export const PatientCard = (props: {
   };
 
   createEffect(() => {
-    if (patientStore?.selectedPatient?.data && props?.patientId) {
+    if (patientStore?.selectedPatient?.data && props.patientId) {
       // update patient when passed-in patient (patientId) is fetched
       updateFormPatient(patientStore?.selectedPatient?.data, { trackInteraction: false });
     }
@@ -152,7 +152,6 @@ export const PatientCard = (props: {
             actions={patientActions}
             invalid={props.store.patient?.error ?? false}
             helpText={props.store.patient?.error}
-            selected={patientId()}
             onSelect={updateFormPatient}
           />
         </Card>

@@ -8,6 +8,7 @@ import {
   useContext
 } from 'solid-js';
 import { createStore } from 'solid-js/store';
+import clsx from 'clsx';
 
 interface InputGroupState {
   id: string;
@@ -87,6 +88,10 @@ export function useInputGroup() {
 export interface InputGroupProps {
   label: string | JSX.Element;
   subLabel?: string;
+  /**
+   * If true, label will only be visible to screen readers
+   */
+  hideLabel?: boolean;
   error?: string;
   showOptionalSubtext?: boolean;
   helpText?: string | JSX.Element;
@@ -128,9 +133,11 @@ function InputGroupWrapper(props: InputGroupProps) {
         <div>
           <Show when={isLabelString()}>
             <label
-              class={`block text-sm font-normal leading-6 text-gray-700 pb-1 ${
-                props?.subLabel ? 'mb-0' : ''
-              }`}
+              class={clsx(
+                'block text-sm font-normal leading-6 text-gray-700 pb-1',
+                props?.subLabel ? 'mb-0' : '',
+                props?.hideLabel && 'sr-only'
+              )}
               for={state.id}
             >
               {props.label}

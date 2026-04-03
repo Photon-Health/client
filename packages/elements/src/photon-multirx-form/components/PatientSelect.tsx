@@ -1,10 +1,10 @@
 //Photon
-import { usePhoton } from '@photonhealth/components';
+import { ComboBox, InputGroup, usePhoton } from '@photonhealth/components';
 import { PhotonDropdown } from '../../photon-dropdown';
 
 //Types
 import { Patient } from '@photonhealth/sdk/dist/types';
-import { createEffect, createMemo, onMount, untrack } from 'solid-js';
+import { createMemo, For, onMount, Show } from 'solid-js';
 import { PatientActions, PatientStore } from '../../stores/patient';
 
 export const PatientSelect = (props: {
@@ -12,7 +12,6 @@ export const PatientSelect = (props: {
   actions: PatientActions;
   invalid: boolean;
   helpText?: string;
-  selected?: string;
   onSelect: (patient: Patient) => void;
 }) => {
   let ref: any;
@@ -35,13 +34,10 @@ export const PatientSelect = (props: {
     }
   });
 
-  createEffect(async () => {
-    if (props.selected && !props.store.selectedPatient.data) {
-      untrack(async () => {
-        await props.actions.getSelectedPatient(client.getSDK(), props.selected!);
-      });
-    }
-  });
+  const handleSelect = (patient: Patient) => {
+    props.actions.setSelectedPatient(patient);
+    props.onSelect(patient);
+  };
 
   return (
     <div
@@ -50,6 +46,42 @@ export const PatientSelect = (props: {
         props.onSelect(e.detail.data);
       }}
     >
+      <InputGroup
+        label="Select patient"
+        hideLabel={true}
+        loading={props.store.patients.isLoading || props.store.selectedPatient.isLoading}
+        helpText={props.helpText}
+      >
+        <ComboBox
+          value={props.store.selectedPatient.data || {}}
+          setSelected={handleSelect}
+          onOpen={() => {
+            if (props.store.patients.data.length === 0) {
+              props.actions.getPatients(client!.getSDK());
+            }
+          }}
+        >
+          <ComboBox.Input
+            placeholder="Select patient..."
+            // onInput={(e) => setFilteredSupervisors(filterSupervisors(e.currentTarget.value || ''))}
+            displayValue={(p: Patient) => {
+              console.log({ value: p });
+              return p.name?.full || '';
+            }}
+          />
+          <Show when={getData().length > 0}>
+            <ComboBox.Options>
+              <For each={getData()}>
+                {(p: Patient) => (
+                  <ComboBox.Option key={p.id} value={p}>
+                    {p.name?.full || ''}
+                  </ComboBox.Option>
+                )}
+              </For>
+            </ComboBox.Options>
+          </Show>
+        </ComboBox>
+      </InputGroup>
       <PhotonDropdown
         data={getData()}
         required={false}
