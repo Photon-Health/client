@@ -129,13 +129,19 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
     [data]
   );
 
-  // Set Datadog instrumentation context when data is loaded
+  // Set Datadog instrumentation context and identify user for RudderStack when data is loaded
   useEffect(() => {
     if (data?.me && data?.organization) {
       setInstrumentationUserContext({
         org_id: data.organization.id,
         email: data.me.email,
         name: data.me.name?.full ?? '',
+        customer_id: data.organization.customer?.id
+      });
+      getProviderAnalytics().identify(data.me.id, {
+        email: data.me.email,
+        name: data.me.name?.full ?? '',
+        org_id: data.organization.id,
         customer_id: data.organization.customer?.id
       });
     }

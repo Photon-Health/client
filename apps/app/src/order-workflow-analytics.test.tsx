@@ -49,8 +49,13 @@ vi.mock('@photonhealth/react', () => ({
 }));
 
 const rudderTrackSpy = vi.fn();
+const rudderIdentifySpy = vi.fn();
 vi.mock('./configs/providerAnalytics', () => ({
-  getProviderAnalytics: () => ({ track: rudderTrackSpy, isInitialized: true })
+  getProviderAnalytics: () => ({
+    track: rudderTrackSpy,
+    isInitialized: true,
+    identify: rudderIdentifySpy
+  })
 }));
 
 const expectedOrderWorkflowIdRegex =
@@ -61,6 +66,12 @@ test('PrescriptionForm page view fires with orderWorkflowId, pageName, and conte
 
   // PrescriptionForm fires track() directly on mount when providerAnalytics.isReady
   await waitFor(() => {
+    expect(rudderIdentifySpy).toHaveBeenCalledWith(PROVIDER.id, {
+      email: PROVIDER.email,
+      name: PROVIDER.name.full,
+      org_id: ORGANIZATION.id,
+      customer_id: ORGANIZATION.customer.id
+    });
     expect(rudderTrackSpy).toHaveBeenCalledWith(
       'New Prescriptions Page Viewed',
       expect.objectContaining({

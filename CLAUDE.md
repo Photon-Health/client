@@ -34,9 +34,9 @@ npx nx run elements:lint # Lint elements only
 ### Testing
 
 ```bash
-# Clinical app (Jest)
+# Clinical app (Vitest)
 npx nx run app:test                      # Run all tests
-npx nx run app:test -- --testPathPattern="MyComponent"  # Run single test file
+npx nx run app:test -- MyComponent       # Run single test file
 
 # Patient app (Vitest)
 npx nx run patient:test                  # Run all tests (single run)
@@ -390,7 +390,7 @@ The React clinical app listens for element events with `addEventListener` and ty
 
 | Project | Framework | Runner |
 |---------|-----------|--------|
-| Clinical app (`apps/app`) | Jest + React Testing Library | `npx nx run app:test` |
+| Clinical app (`apps/app`) | Vitest + React Testing Library | `npx nx run app:test` |
 | Patient app (`apps/patient`) | Vitest + React Testing Library | `npx nx run patient:test` |
 | Components (`packages/components`) | Vitest + Solid Testing Library | `npx nx run components:test` |
 | Elements (`packages/elements`) | Vitest | `npx nx run elements:test` |
@@ -413,7 +413,7 @@ The React clinical app listens for element events with `addEventListener` and ty
 All new utility functions, views, and components must include tests. Match the test type to the code:
 - New utility/helper functions → unit tests
 - New patient app views → page-level integration tests (with mocked API/analytics/router)
-- New clinical app views → React Testing Library tests (with `jest.mock` for API/analytics) following the same patterns as patient app tests, adapted for Jest. Also expand Playwright E2E coverage for critical user flows.
+- New clinical app views → React Testing Library tests with MSW for API mocking, following the same patterns as patient app tests. Also expand Playwright E2E coverage for critical user flows.
 - New Solid.js components in `packages/components` → component tests with `@solidjs/testing-library`
 - New React hooks → hook tests with `renderHook`
 
@@ -422,7 +422,7 @@ All new utility functions, views, and components must include tests. Match the t
 - Keep tests **brief and focused**. For unit tests of pure functions, prefer single-assertion, bite-sized tests. For page-level and integration tests that interact with rendered UI, longer tests with multiple assertions are fine.
 - Use **fuzzy matching** assertions where possible (e.g. `toHaveTextContent`, `toMatch`, `expect.objectContaining`) to avoid brittle tests that break on insignificant changes.
 - Prefer **`@testing-library`** (`@testing-library/react`, `@solidjs/testing-library`) for unit and component tests — query by role/text, not implementation details.
-- **Mocking**: Avoid mocks when possible. Use mocks only when a third-party library makes it difficult to render a component, or to harness legacy code that was never originally tested just to get a component/page to render without refactoring. MSW is the desired direction for API mocking but no reusable pattern has been established yet — for now, `jest.mock`/`vi.mock` is acceptable.
+- **Mocking**: Prefer **MSW** (`msw`) for API mocking — the clinical app has shared default handlers in `@photonhealth/sdk/test-utils` (see `order-workflow-analytics.test.tsx` for the established pattern). Use `vi.mock` only when MSW can't cover the case (e.g. mocking non-HTTP modules, auth state, or third-party libraries that are difficult to render). Avoid mocks when possible.
 - **Component vs. page-level tests**: When adding tests for a component, ask the engineer whether the component is complex enough to warrant isolated component tests, or if it can be implicitly covered by a page-level test that exercises it in context.
 - Test files use `.test.ts` or `.test.tsx` extension and live alongside source files
 - Test files are excluded from ESLint (configured in `.eslintrc.json` ignorePatterns)

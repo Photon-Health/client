@@ -1,4 +1,4 @@
-import { ApiObject, RudderAnalytics } from '@rudderstack/analytics-js';
+import { ApiObject, IdentifyTraits, RudderAnalytics } from '@rudderstack/analytics-js';
 
 const RUDDERSTACK_WRITE_KEY = import.meta.env.VITE_RUDDERSTACK_WRITE_KEY;
 const RUDDERSTACK_DATA_PLANE_URL = import.meta.env.VITE_RUDDERSTACK_DATA_PLANE_URL;
@@ -22,6 +22,16 @@ export class ProviderAnalytics {
     this.rudderanalytics = new RudderAnalytics();
     this.rudderanalytics.load(RUDDERSTACK_WRITE_KEY, RUDDERSTACK_DATA_PLANE_URL);
     this.isInitialized = true;
+  }
+
+  /**
+   * Identify the current user so all subsequent events are attributed to them.
+   */
+  identify(userId: string, traits: IdentifyTraits = {}) {
+    if (!this.rudderanalytics || !this.isInitialized) {
+      return;
+    }
+    this.rudderanalytics.identify(userId, traits);
   }
 
   /**
