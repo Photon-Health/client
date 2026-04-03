@@ -19,7 +19,6 @@ import {
   StateSelect
 } from '@photonhealth/components';
 import { createFormStore } from '../stores/form';
-import { PatientActions } from '../stores/patient';
 import type { Patient } from '@photonhealth/sdk/dist/types';
 import tailwind from '../tailwind.css?inline';
 import photonStyles from '@photonhealth/components/dist/index.css?inline';
@@ -42,7 +41,6 @@ const getPatientAddress = (store: any) => {
 
 const PatientForm = (props: {
   patient?: Patient;
-  pActions: PatientActions;
   loading: boolean;
   patientId: string;
   optionalPatientAddress: boolean;
@@ -119,7 +117,6 @@ const PatientForm = (props: {
         optionalPatientAddress: props.optionalPatientAddress,
         reset: () => {
           actions.reset();
-          props.pActions.reset();
         }
       }
     });
@@ -419,7 +416,6 @@ customElement(
   'photon-patient-form',
   {
     patient: undefined,
-    pActions: {} as PatientActions,
     loading: false,
     patientId: '',
     optionalPatientAddress: false

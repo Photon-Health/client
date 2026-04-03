@@ -10,12 +10,9 @@ import {
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import gql from 'graphql-tag';
-import { PatientActions, PatientStore } from '../stores/patient';
 import { Patient } from '@photonhealth/sdk/dist/types';
 
 type PatientDialogProps = {
-  store: PatientStore;
-  actions: PatientActions;
   patient?: Patient;
   patientId: string;
   open: boolean;
@@ -296,7 +293,6 @@ const Component = (props: PatientDialogProps) => {
                   );
                 }}
                 patient={props.patient}
-                p-actions={props.actions}
                 patient-id={props.patientId}
                 optional-patient-address={props.optionalPatientAddress}
               />
@@ -310,8 +306,6 @@ const Component = (props: PatientDialogProps) => {
 customElement(
   'photon-patient-dialog',
   {
-    store: {} as PatientStore,
-    actions: {} as PatientActions,
     patient: undefined,
     patientId: '',
     hideCreatePrescription: false,
