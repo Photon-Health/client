@@ -1,7 +1,6 @@
 import './photon-client';
 import './photon-auth-button';
 import './photon-login';
-import './photon-patient-select';
 import './photon-authenticated';
 import './photon-multirx-form';
 import './photon-card';

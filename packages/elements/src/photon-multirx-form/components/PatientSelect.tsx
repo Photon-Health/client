@@ -1,21 +1,19 @@
-//Solid
-import { customElement } from 'solid-element';
-
 //Photon
 import { usePhoton } from '@photonhealth/components';
-import { PhotonDropdown } from '../photon-dropdown';
+import { PhotonDropdown } from '../../photon-dropdown';
 
 //Types
 import { Patient } from '@photonhealth/sdk/dist/types';
 import { createEffect, createMemo, onMount, untrack } from 'solid-js';
-import { PatientActions, PatientStore } from '../stores/patient';
+import { PatientActions, PatientStore } from '../../stores/patient';
 
-const PatientSelect = (props: {
+export const PatientSelect = (props: {
   store: PatientStore;
   actions: PatientActions;
   invalid: boolean;
   helpText?: string;
   selected?: string;
+  onSelect: (patient: Patient) => void;
 }) => {
   let ref: any;
   //context
@@ -25,17 +23,6 @@ const PatientSelect = (props: {
   onMount(() => {
     props.actions.reset();
   });
-
-  const dispatchSelected = (patient: Patient) => {
-    const event = new CustomEvent('photon-patient-selected', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        patient
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
 
   const getData = createMemo(() => {
     if (props.store.selectedPatient.data) {
@@ -60,7 +47,7 @@ const PatientSelect = (props: {
     <div
       ref={ref}
       on:photon-data-selected={(e: any) => {
-        dispatchSelected(e.detail.data);
+        props.onSelect(e.detail.data);
       }}
     >
       <PhotonDropdown
@@ -97,14 +84,3 @@ const PatientSelect = (props: {
     </div>
   );
 };
-customElement(
-  'photon-patient-select',
-  {
-    store: {} as PatientStore,
-    actions: {} as PatientActions,
-    invalid: false,
-    helpText: undefined,
-    selected: undefined
-  },
-  PatientSelect
-);
