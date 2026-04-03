@@ -232,7 +232,7 @@ New web components should only be created for substantial functionality intended
 | `<photon-multirx-form-wrapper>` | Internal | Wraps `<photon-prescribe-workflow>` with dialog/order UI for the clinical app |
 | `<photon-med-history>` | External | Patient medication history |
 | `<photon-patient-dialog>` | Deprecated | Create/edit patient dialog (internal use only) |
-| `<photon-patient-select>`, `<photon-text-input>`, etc. | Deprecated | Generic primitives (internal use only, not for external customers) |
+| Other elements | Deprecated | Generic primitives (internal use only, not for external customers) |
 
 **Communication pattern — CustomEvents:**
 
@@ -331,7 +331,7 @@ When migrating a deprecated element to a plain Solid.js component, use an increm
 
 ### Deprecated elements still bundled
 
-All deprecated primitive elements (`photon-text-input`, `photon-checkbox`, `photon-dropdown`, `photon-patient-select`, etc.) are still imported in `packages/elements/src/index.ts` and included in the production bundle. Since they're only used internally as building blocks, they could be converted to plain Solid.js components in `packages/components` and removed from the web component registry to reduce bundle size.
+All deprecated primitive elements (`photon-checkbox`, `photon-dropdown`, etc.) are still imported in `packages/elements/src/index.ts` and included in the production bundle. Since they're only used internally as building blocks, they could be converted to plain Solid.js components in `packages/components` and removed from the web component registry to reduce bundle size.
 
 ### SDK codegen is incomplete and GraphQL documents are scattered
 
