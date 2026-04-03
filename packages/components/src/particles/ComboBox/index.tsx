@@ -168,6 +168,7 @@ function ComboOption(props: ComboOptionProps) {
       tabindex="-1"
       onClick={() => setSelected(props.value)}
       onMouseEnter={() => setActive(props.key)}
+      onMouseLeave={() => setActive('')}
     >
       <span class="block truncate">{props.children}</span>
       <Show when={state.selected?.id === props.key}>

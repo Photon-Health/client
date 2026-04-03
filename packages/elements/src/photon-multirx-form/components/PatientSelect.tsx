@@ -6,6 +6,7 @@ import { PhotonDropdown } from '../../photon-dropdown';
 import { Patient } from '@photonhealth/sdk/dist/types';
 import { createMemo, For, onMount, Show } from 'solid-js';
 import { PatientActions, PatientStore } from '../../stores/patient';
+import { debounce } from '@solid-primitives/scheduled';
 
 export const PatientSelect = (props: {
   store: PatientStore;
@@ -33,6 +34,12 @@ export const PatientSelect = (props: {
       return props.store.patients.data;
     }
   });
+
+  const handleSearch = debounce((s: string) => {
+    props.actions.getPatients(client!.getSDK(), {
+      name: s
+    });
+  }, 250);
 
   const handleSelect = (patient: Patient) => {
     props.actions.setSelectedPatient(patient);
@@ -63,7 +70,7 @@ export const PatientSelect = (props: {
         >
           <ComboBox.Input
             placeholder="Select patient..."
-            // onInput={(e) => setFilteredSupervisors(filterSupervisors(e.currentTarget.value || ''))}
+            onInput={(e) => handleSearch(e.currentTarget.value)}
             displayValue={(p: Patient) => {
               console.log({ value: p });
               return p.name?.full || '';
