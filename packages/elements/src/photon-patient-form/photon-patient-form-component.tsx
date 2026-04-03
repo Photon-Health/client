@@ -1,7 +1,6 @@
 import { customElement } from 'solid-element';
 import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
-import type { PharmacyOption } from '@photonhealth/components';
 import {
   AddressAutocompleteInput,
   Card,
@@ -11,6 +10,7 @@ import {
   Icon,
   Input,
   InputGroup,
+  PharmacyOption,
   PharmacySearch,
   PhoneInput,
   SEX_OPTIONS,
@@ -227,12 +227,12 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
     return prefOption;
   });
 
-  const trackFieldInteraction = (fieldName: string, hasValue: boolean) => {
+  const formName = props.patientId ? 'update_patient_form' : 'new_patient_form';
+
+  const trackFieldInteraction = (fieldName: string, hasValue: boolean, isOptional = false) => {
     dispatchAnalyticsTrackEvent(
-      {
-        trackEventType: 'patient_field_interaction',
-        properties: { fieldName, hasValue }
-      },
+      'fieldInteraction',
+      { name: 'Field Interaction', formName, fieldName, hasValue, isOptional },
       ref
     );
   };
@@ -261,7 +261,9 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
             onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
               actions.updateFormValue({ key: 'address_street1', value: e.currentTarget.value });
             }}
-            onBlur={(e) => trackFieldInteraction('address_street1', Boolean(e.currentTarget.value))}
+            onBlur={(e) =>
+              trackFieldInteraction('address_street1', Boolean(e.currentTarget.value), true)
+            }
             onAddressSelect={(address) => {
               actions.updateFormValue({ key: 'address_street1', value: address.street1 });
               actions.updateFormValue({ key: 'address_street2', value: address.street2 });
@@ -278,7 +280,9 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
             onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
               actions.updateFormValue({ key: 'address_street2', value: e.currentTarget.value });
             }}
-            onBlur={(e) => trackFieldInteraction('address_street2', Boolean(e.currentTarget.value))}
+            onBlur={(e) =>
+              trackFieldInteraction('address_street2', Boolean(e.currentTarget.value), true)
+            }
           />
         </InputGroup>
 
@@ -292,7 +296,9 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
             onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
               actions.updateFormValue({ key: 'address_city', value: e.currentTarget.value });
             }}
-            onBlur={(e) => trackFieldInteraction('address_city', Boolean(e.currentTarget.value))}
+            onBlur={(e) =>
+              trackFieldInteraction('address_city', Boolean(e.currentTarget.value), true)
+            }
           />
         </InputGroup>
 
@@ -309,7 +315,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                   actions.updateFormValue({ key: 'address_state', value: e.currentTarget.value });
                 }}
                 onBlur={(e) =>
-                  trackFieldInteraction('address_state', Boolean(e.currentTarget.value))
+                  trackFieldInteraction('address_state', Boolean(e.currentTarget.value), true)
                 }
               />
             </InputGroup>
@@ -327,7 +333,9 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                 onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
                   actions.updateFormValue({ key: 'address_zip', value: e.currentTarget.value });
                 }}
-                onBlur={(e) => trackFieldInteraction('address_zip', Boolean(e.currentTarget.value))}
+                onBlur={(e) =>
+                  trackFieldInteraction('address_zip', Boolean(e.currentTarget.value), true)
+                }
               />
             </InputGroup>
           </div>
@@ -451,7 +459,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                         actions.updateFormValue({ key: 'gender', value: e.currentTarget.value })
                       }
                       onBlur={() =>
-                        trackFieldInteraction('gender', Boolean(store['gender']?.value))
+                        trackFieldInteraction('gender', Boolean(store['gender']?.value), true)
                       }
                     />
                   </InputGroup>
@@ -463,7 +471,9 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                       onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
                         actions.updateFormValue({ key: 'email', value: e.currentTarget.value });
                       }}
-                      onBlur={(e) => trackFieldInteraction('email', Boolean(e.currentTarget.value))}
+                      onBlur={(e) =>
+                        trackFieldInteraction('email', Boolean(e.currentTarget.value), true)
+                      }
                     />
                   </InputGroup>
 

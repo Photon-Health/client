@@ -18,6 +18,7 @@
       "@client/settings": ["packages/settings/src/index.ts"],
       "@photonhealth/react": ["packages/react/src/index.ts"],
       "@photonhealth/sdk": ["packages/sdk/src/lib.ts"],
+      "@photonhealth/sdk/test-utils": ["packages/sdk/src/test-utils/index.ts"],
       "@photonhealth/components/*": ["packages/components/src/*"]
     }
   },

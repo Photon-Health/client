@@ -1,7 +1,5 @@
 import { Page } from '@playwright/test';
 
-export const RX_FORM_EVENT = 'clinicalapp_prescription_form_track_events';
-
 type CapturedEvent = { event: string; properties: Record<string, unknown> };
 
 const capturedByPage = new WeakMap<Page, CapturedEvent[]>();
