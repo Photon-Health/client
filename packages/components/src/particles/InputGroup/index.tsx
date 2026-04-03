@@ -8,7 +8,6 @@ import {
   useContext
 } from 'solid-js';
 import { createStore } from 'solid-js/store';
-import clsx from 'clsx';
 
 interface InputGroupState {
   id: string;
@@ -88,10 +87,6 @@ export function useInputGroup() {
 export interface InputGroupProps {
   label: string | JSX.Element;
   subLabel?: string;
-  /**
-   * If true, label will only be visible to screen readers
-   */
-  hideLabel?: boolean;
   error?: string;
   showOptionalSubtext?: boolean;
   helpText?: string | JSX.Element;
@@ -103,11 +98,8 @@ export interface InputGroupProps {
 
 function InputGroupWrapper(props: InputGroupProps) {
   const [state, { setError, setLoading, setDisabled, setRequired }] = useContext(InputGroupContext);
-  const ariaDescribedBy = props.error
-    ? `${state.id}-error`
-    : props.helpText
-    ? `${state.id}-help`
-    : undefined;
+  const ariaDescribedBy = () =>
+    props.error ? `${state.id}-error` : props.helpText ? `${state.id}-help` : undefined;
 
   createEffect(() => {
     setError(props.error || '');
@@ -133,11 +125,9 @@ function InputGroupWrapper(props: InputGroupProps) {
         <div>
           <Show when={isLabelString()}>
             <label
-              class={clsx(
-                'block text-sm font-normal leading-6 text-gray-700 pb-1',
-                props?.subLabel ? 'mb-0' : '',
-                props?.hideLabel && 'sr-only'
-              )}
+              class={`block text-sm font-normal leading-6 text-gray-700 pb-1 ${
+                props?.subLabel ? 'mb-0' : ''
+              }`}
               for={state.id}
             >
               {props.label}
@@ -164,7 +154,7 @@ function InputGroupWrapper(props: InputGroupProps) {
         <Show when={props.error || props.helpText}>
           <p
             class={`text-sm ${props.error ? 'text-red-400' : 'text-gray-500'}`}
-            id={ariaDescribedBy}
+            id={ariaDescribedBy()}
           >
             {props.error || props.helpText}
           </p>

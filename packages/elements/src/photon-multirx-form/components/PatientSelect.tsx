@@ -1,5 +1,5 @@
 //Photon
-import { ComboBox, InputGroup, usePhoton } from '@photonhealth/components';
+import { ComboBox, usePhoton } from '@photonhealth/components';
 
 //Types
 import { Patient } from '@photonhealth/sdk/dist/types';
@@ -37,41 +37,34 @@ export const PatientSelect = (props: {
   };
 
   return (
-    <div>
-      <InputGroup
-        label="Select patient"
-        hideLabel={true}
+    <ComboBox
+      value={props.store.selectedPatient.data || {}}
+      setSelected={handleSelect}
+      onOpen={() => {
+        if (props.store.patients.data.length === 0) {
+          props.actions.getPatients(client!.getSDK());
+        }
+      }}
+    >
+      <ComboBox.Input
         loading={props.store.patients.isLoading || props.store.selectedPatient.isLoading}
-      >
-        <ComboBox
-          value={props.store.selectedPatient.data || {}}
-          setSelected={handleSelect}
-          onOpen={() => {
-            if (props.store.patients.data.length === 0) {
-              props.actions.getPatients(client!.getSDK());
-            }
-          }}
-        >
-          <ComboBox.Input
-            placeholder="Select patient..."
-            onInput={(e) => handleSearch(e.currentTarget.value)}
-            displayValue={(p: Patient) => {
-              return p.name?.full || '';
-            }}
-          />
-          <Show when={getData().length > 0}>
-            <ComboBox.Options>
-              <For each={getData()}>
-                {(p: Patient) => (
-                  <ComboBox.Option key={p.id} value={p}>
-                    {p.name?.full || ''}
-                  </ComboBox.Option>
-                )}
-              </For>
-            </ComboBox.Options>
-          </Show>
-        </ComboBox>
-      </InputGroup>
-    </div>
+        placeholder="Select patient..."
+        onInput={(e) => handleSearch(e.currentTarget.value)}
+        displayValue={(p: Patient) => {
+          return p.name?.full || '';
+        }}
+      />
+      <Show when={getData().length > 0}>
+        <ComboBox.Options>
+          <For each={getData()}>
+            {(p: Patient) => (
+              <ComboBox.Option key={p.id} value={p}>
+                {p.name?.full || ''}
+              </ComboBox.Option>
+            )}
+          </For>
+        </ComboBox.Options>
+      </Show>
+    </ComboBox>
   );
 };
