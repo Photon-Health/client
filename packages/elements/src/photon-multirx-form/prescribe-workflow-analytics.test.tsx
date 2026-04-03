@@ -58,7 +58,7 @@ test('page views', async () => {
   const { analyticsEvents } = renderPrescribeWorkflow({}, { attestationStatus: 'NEEDS' });
 
   await waitForSignatureAttestationModal();
-  const event = analyticsEvents.find(isPageView('Signature Attestation Viewed'));
+  const event = analyticsEvents.find(isPageView('Signature Attestation Page Viewed'));
   expect(event?.detail).toEqual(
     expect.objectContaining({
       attestationVersion: 'v1',
@@ -230,7 +230,7 @@ test('attestation CTA', async () => {
   await waitForSignatureAttestationModal();
 
   // Assert page view fired
-  expect(analyticsEvents.find(isPageView('Signature Attestation Viewed'))).toBeDefined();
+  expect(analyticsEvents.find(isPageView('Signature Attestation Page Viewed'))).toBeDefined();
 
   // Click cancel
   await user.click(screen.getByRole('button', { name: /cancel/i }));
@@ -244,6 +244,55 @@ test('attestation CTA', async () => {
       timestamp: expect.any(String)
     })
   );
+});
+
+test('photon-signature-attestation-resolved fires when no attestation needed', async () => {
+  const { attestationResolvedEvents } = renderPrescribeWorkflow();
+
+  await waitFor(
+    () => {
+      expect(attestationResolvedEvents.length).toEqual(1);
+    },
+    { timeout: 5000 }
+  );
+});
+
+test('photon-signature-attestation-resolved does not fire before user agrees when attestation required', async () => {
+  const { attestationResolvedEvents, user } = renderPrescribeWorkflow(
+    {},
+    { attestationStatus: 'NEEDS' }
+  );
+
+  await waitForSignatureAttestationModal();
+
+  // Must not have fired yet — user hasn't agreed
+  expect(attestationResolvedEvents.length).toBe(0);
+
+  await user.click(screen.getByRole('button', { name: /agree/i }));
+
+  await waitFor(() => {
+    expect(attestationResolvedEvents.length).toEqual(1);
+  });
+});
+
+test('Signature Attestation Page Viewed fires before photon-signature-attestation-resolved when attestation required', async () => {
+  const { analyticsEvents, attestationResolvedEvents, user } = renderPrescribeWorkflow(
+    {},
+    { attestationStatus: 'NEEDS' }
+  );
+
+  await waitForSignatureAttestationModal();
+
+  // Attestation Viewed must have fired already
+  expect(analyticsEvents.find(isPageView('Signature Attestation Page Viewed'))).toBeDefined();
+  // But resolved must not have fired yet
+  expect(attestationResolvedEvents.length).toBe(0);
+
+  await user.click(screen.getByRole('button', { name: /agree/i }));
+
+  await waitFor(() => {
+    expect(attestationResolvedEvents.length).toEqual(1);
+  });
 });
 
 function renderPrescribeWorkflow(
@@ -274,9 +323,14 @@ function renderPrescribeWorkflow(
   const eventListenerHost = document.createElement('div');
 
   const analyticsEvents: CustomEvent[] = [];
+  const attestationResolvedEvents: Event[] = [];
 
   eventListenerHost.addEventListener('photon-analytics-track-event', (event: Event) => {
     analyticsEvents.push(event as CustomEvent);
+  });
+
+  eventListenerHost.addEventListener('photon-signature-attestation-resolved', (event: Event) => {
+    attestationResolvedEvents.push(event);
   });
 
   document.body.append(eventListenerHost);
@@ -318,6 +372,7 @@ function renderPrescribeWorkflow(
   return {
     ...view,
     analyticsEvents,
+    attestationResolvedEvents,
     user: userEvent.setup()
   };
 }

@@ -15,6 +15,7 @@ type PrescribeEventDispatchContextType = {
   dispatchClinicalAlertCancel: (...args: never[]) => void;
   dispatchSignatureAttestationAgreed: (...args: never[]) => void;
   dispatchSignatureAttestationCanceled: (...args: never[]) => void;
+  dispatchAttestationResolved: (...args: never[]) => void;
   dispatchAnalyticsTrackEvent: (...args: never[]) => void;
 };
 
@@ -34,6 +35,7 @@ export const mockPrescribeEventDispatchValues = (): PrescribeEventDispatchContex
   dispatchClinicalAlertCancel: vi.fn(),
   dispatchSignatureAttestationAgreed: vi.fn(),
   dispatchSignatureAttestationCanceled: vi.fn(),
+  dispatchAttestationResolved: vi.fn(),
   dispatchAnalyticsTrackEvent: vi.fn()
 });
 

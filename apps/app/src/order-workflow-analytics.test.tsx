@@ -61,10 +61,29 @@ vi.mock('./configs/providerAnalytics', () => ({
 const expectedOrderWorkflowIdRegex =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
-test('PrescriptionForm page view fires with orderWorkflowId, pageName, and context', async () => {
+test('New Prescriptions Page Viewed does not fire before Signature Attestation agreement', async () => {
   renderApp({ patientId: 'pat_123' });
 
-  // PrescriptionForm fires track() directly on mount when providerAnalytics.isReady
+  // Wait for provider analytics to be ready (identify fires when data loads)
+  await waitFor(() => {
+    expect(rudderIdentifySpy).toHaveBeenCalled();
+  });
+
+  // Page view must NOT have fired yet — it should wait for photon-signature-attestation-resolved
+  expect(rudderTrackSpy).not.toHaveBeenCalledWith(
+    'New Prescriptions Page Viewed',
+    expect.anything()
+  );
+});
+
+test('New Prescriptions Page Viewed fires after Signature attestation status is resolved, with correct context', async () => {
+  renderApp({ patientId: 'pat_123' });
+
+  const wrapper = await findPrescribeWrapper();
+  wrapper.dispatchEvent(
+    new CustomEvent('photon-signature-attestation-resolved', { bubbles: true, composed: true })
+  );
+
   await waitFor(() => {
     expect(rudderIdentifySpy).toHaveBeenCalledWith(PROVIDER.id, {
       email: PROVIDER.email,
@@ -227,7 +246,12 @@ test('orderWorkflowId persists across workflow routes', async () => {
     })
   );
 
-  // PrescriptionForm fires track() directly on mount when providerAnalytics.isReady
+  // Simulate the Solid-side attestation resolving, which triggers New Prescriptions Page Viewed
+  const prescribeWrapper = await findPrescribeWrapper();
+  prescribeWrapper.dispatchEvent(
+    new CustomEvent('photon-signature-attestation-resolved', { bubbles: true, composed: true })
+  );
+
   await waitFor(() => {
     expect(rudderTrackSpy).toHaveBeenCalledWith(
       'New Prescriptions Page Viewed',
@@ -260,23 +284,6 @@ function renderApp(params: { patientId?: string } = {}, initialPageOverride?: st
         </Routes>
       </ProviderAnalyticsProvider>
     </MemoryRouter>
-  );
-}
-
-async function simulatePrescriptionPageViewEvent(pageName: string, options: Record<string, any>) {
-  // Page view is dispatched by the Solid prescribe workflow on mount via CustomEvent.
-  // In jsdom the web component is inert, so simulate the dispatch.
-  const wrapper = await findPrescribeWrapper();
-  wrapper.dispatchEvent(
-    new CustomEvent('photon-analytics-track-event', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        category: 'pageViewed',
-        name: pageName,
-        ...options
-      }
-    })
   );
 }
 

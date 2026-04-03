@@ -119,6 +119,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   const {
     dispatchSignatureAttestationAgreed,
     dispatchSignatureAttestationCanceled,
+    dispatchAttestationResolved,
     dispatchAnalyticsTrackEvent
   } = usePrescribeEventDispatch();
   const [status, setStatus] = createSignal<Status>({ status: 'LOADING' });
@@ -154,6 +155,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   createEffect(() => {
     if (status().status === 'COMPLETE') {
       dispatchSignatureAttestationAgreed();
+      dispatchAttestationResolved();
     }
   });
 
@@ -161,7 +163,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
     const curr = status();
     if (curr.status === 'NEEDS ATTESTATION') {
       dispatchAnalyticsTrackEvent('pageViewed', {
-        name: 'Signature Attestation Viewed',
+        name: 'Signature Attestation Page Viewed',
         attestationVersion: curr.version
       });
     }
@@ -177,16 +179,16 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
     }
     const curr = status();
     if (curr.status === 'NEEDS ATTESTATION') {
+      dispatchAnalyticsTrackEvent('ctaClicked', {
+        name: 'Signature Attestation Agreed',
+        buttonText: 'I Agree',
+        attestationVersion: curr.version
+      });
       setSubmitting(true);
       const res = await agreeToSignatureAttestation(props.client)(curr.version);
       if (res.data?.agreeToSignatureAttestation) {
         setSubmitting(false);
         setStatus({ status: 'COMPLETE' });
-        dispatchAnalyticsTrackEvent('ctaClicked', {
-          name: 'Signature Attestation Agreed',
-          buttonText: 'I Agree',
-          attestationVersion: curr.version
-        });
       } else if (res.error || res.errors) {
         setSubmitting(false);
         setStatus({

@@ -23,7 +23,7 @@ export type PageViewEvent =
       hasPrefillWeight: boolean;
       weightUnit: string;
     }
-  | { name: 'Signature Attestation Viewed'; attestationVersion: string };
+  | { name: 'Signature Attestation Page Viewed'; attestationVersion: string };
 
 // ---------------------------------------------------------------------------
 // CTA Click Events — each variant has a unique, descriptive name

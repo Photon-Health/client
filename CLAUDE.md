@@ -301,7 +301,7 @@ Analytics applies only to the clinical and patient apps — **not** to `packages
 
 | Category | Type | Description |
 |----------|------|-------------|
-| `pageViewed` | `PageViewEvent` | Page/view lifecycle — each variant has a unique `name` (e.g. "New Prescriptions Page Viewed", "Signature Attestation Viewed") |
+| `pageViewed` | `PageViewEvent` | Page/view lifecycle — each variant has a unique `name` (e.g. "New Prescriptions Page Viewed", "Signature Attestation Page Viewed") |
 | `ctaClicked` | `CtaClickEvent` | Call-to-action clicks — each variant has a unique descriptive `name` |
 | `fieldInteraction` | `FieldInteractionEvent` | Form field completeness — all share `name: 'Field Interaction'` with `formName`, `fieldName`, `hasValue`, `isOptional` |
 

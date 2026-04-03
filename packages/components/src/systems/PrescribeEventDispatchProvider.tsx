@@ -19,6 +19,7 @@ const PrescribeEventDispatchContext = createContext<{
   dispatchClinicalAlertCancel: (alerts: ScreeningAlertType[]) => void;
   dispatchSignatureAttestationAgreed: () => void;
   dispatchSignatureAttestationCanceled: () => void;
+  dispatchAttestationResolved: () => void;
   dispatchAnalyticsTrackEvent: <C extends AnalyticsCategory>(
     category: C,
     event: AnalyticsEventMap[C]
@@ -171,6 +172,15 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref?.dispatchEvent(event);
   };
 
+  const dispatchAttestationResolved = () => {
+    const event = new CustomEvent('photon-signature-attestation-resolved', {
+      composed: true,
+      bubbles: true,
+      detail: {}
+    });
+    ref?.dispatchEvent(event);
+  };
+
   const dispatchAnalyticsTrackEvent = <C extends AnalyticsCategory>(
     category: C,
     event: AnalyticsEventMap[C]
@@ -190,6 +200,7 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     dispatchClinicalAlertCancel,
     dispatchSignatureAttestationAgreed,
     dispatchSignatureAttestationCanceled,
+    dispatchAttestationResolved,
     dispatchAnalyticsTrackEvent
   };
 

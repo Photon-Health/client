@@ -72,36 +72,29 @@ export const PrescriptionForm = () => {
   const providerAnalyticsRef = useRef(providerAnalytics);
   providerAnalyticsRef.current = providerAnalytics;
 
-  const prescriptionFormOpenWasTracked = useRef(false);
-  useEffect(() => {
-    if (providerAnalytics.isReady && !prescriptionFormOpenWasTracked.current) {
-      prescriptionFormOpenWasTracked.current = true;
-      providerAnalytics.track('New Prescriptions Page Viewed', {
-        prefillPatientId: patientId || '',
-        prefillPharmacyId: pharmacyId || '',
-        hasPrefillPatientExternalId: !!externalId?.trim(),
-        hasPrefillPrescriptionIds: !!prescriptionIds?.trim(),
-        hasPrefillTemplateIds: !!templateIds?.trim(),
-        hasPrefillWeight: !!weight?.trim(),
-        weightUnit: weightUnit
-      });
-    }
-  }, [
-    providerAnalytics,
-    patientId,
-    pharmacyId,
-    externalId,
-    prescriptionIds,
-    templateIds,
-    weight,
-    weightUnit
-  ]);
-
   useEffect(() => {
     if (!ref.current) return;
     const abortController = new AbortController();
     const { signal: abortControllerSignal } = abortController;
     const listenerOptions = { signal: abortControllerSignal };
+
+    ref.current.addEventListener(
+      'photon-signature-attestation-resolved',
+      () => {
+        // we always resolve user's signature attestation before showing the New Prescription page.
+        // If attestation is required, we show a Signature Attestation required screen first.
+        providerAnalyticsRef.current.track('New Prescriptions Page Viewed', {
+          prefillPatientId: patientId || '',
+          prefillPharmacyId: pharmacyId || '',
+          hasPrefillPatientExternalId: !!externalId?.trim(),
+          hasPrefillPrescriptionIds: !!prescriptionIds?.trim(),
+          hasPrefillTemplateIds: !!templateIds?.trim(),
+          hasPrefillWeight: !!weight?.trim(),
+          weightUnit: weightUnit
+        });
+      },
+      listenerOptions
+    );
 
     ref.current.addEventListener(
       'photon-analytics-track-event',
