@@ -150,8 +150,6 @@ export const PatientCard = (props: {
           <PatientSelect
             store={patientStore}
             actions={patientActions}
-            invalid={props.store.patient?.error ?? false}
-            helpText={props.store.patient?.error}
             onSelect={updateFormPatient}
           />
         </Card>
