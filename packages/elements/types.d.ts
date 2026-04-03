@@ -10,7 +10,6 @@ declare module 'solid-js' {
       'photon-card': unknown;
       'photon-patient-form': unknown;
       'photon-patient-dialog': unknown;
-      'photon-update-patient-dialog': unknown;
       'photon-prescribe-workflow': unknown;
       'sl-input': unknown;
       'sl-dropdown': unknown;
