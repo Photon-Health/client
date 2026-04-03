@@ -187,7 +187,7 @@ test('Send Order CTAs', async () => {
   // 1. Add a draft prescription
   await addDraftPrescription(user);
 
-  const draftAddedEvent = analyticsEvents.find(isMinorCTA({ ctaName: 'draft prescription added' }));
+  const draftAddedEvent = analyticsEvents.find(isCTA('Draft Prescription Added'));
   expect(draftAddedEvent?.detail).toEqual(
     expect.objectContaining({
       draftPrescriptionSource: 'form',
@@ -208,10 +208,10 @@ test('Send Order CTAs', async () => {
   await user.click(screen.getByRole('button', { name: /^send$/i }));
 
   await waitFor(() => {
-    expect(analyticsEvents.find(isMajorCTA('Order Sent'))).toBeDefined();
+    expect(analyticsEvents.find(isCTA('Order Sent'))).toBeDefined();
   });
 
-  const orderSent = analyticsEvents.find(isMajorCTA('Order Sent'));
+  const orderSent = analyticsEvents.find(isCTA('Order Sent'));
   expect(orderSent?.detail).toEqual(
     expect.objectContaining({
       buttonText: 'Send',
@@ -235,7 +235,7 @@ test('attestation CTA', async () => {
   // Click cancel
   await user.click(screen.getByRole('button', { name: /cancel/i }));
 
-  const canceled = analyticsEvents.find(isMajorCTA('Attestation Canceled'));
+  const canceled = analyticsEvents.find(isCTA('Attestation Canceled'));
   expect(canceled?.detail).toEqual(
     expect.objectContaining({
       category: 'ctaClicked',
@@ -364,20 +364,10 @@ const isPageView = (pageName: string, filter: Record<string, unknown> = {}) => {
   };
 };
 
-const isMajorCTA = (majorCtaName: string, filter: Record<string, unknown> = {}) => {
+const isCTA = (ctaName: string, filter: Record<string, unknown> = {}) => {
   return (event: CustomEvent) => {
     const detail = event.detail as AnalyticsDetail;
-    if (detail.category !== 'ctaClicked' || detail.name !== majorCtaName) {
-      return false;
-    }
-    return Object.entries(filter).every(([key, value]) => detail[key] === value);
-  };
-};
-
-const isMinorCTA = (filter: Record<string, unknown> = {}) => {
-  return (event: CustomEvent) => {
-    const detail = event.detail as AnalyticsDetail;
-    if (detail.category !== 'ctaClicked' || detail.name !== 'Minor CTA Clicked') {
+    if (detail.category !== 'ctaClicked' || detail.name !== ctaName) {
       return false;
     }
     return Object.entries(filter).every(([key, value]) => detail[key] === value);

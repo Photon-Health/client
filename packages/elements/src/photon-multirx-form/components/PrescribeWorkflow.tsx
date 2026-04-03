@@ -586,9 +586,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             combineOrSubmit();
             dispatchClinicalAlertAcknowledge(screeningAlerts());
             dispatchAnalyticsTrackEvent('ctaClicked', {
-              name: 'Minor CTA Clicked',
-              ctaName: 'screening alert acknowledged',
-              screeningAlertCount: screeningAlerts().length
+              name: 'Screening Alert Acknowledged',
+              screeningAlertCount: screeningAlerts().length,
+              buttonText: 'Send'
             });
           }}
           onRevisitPrescriptions={() => {
@@ -596,9 +596,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             setIsScreeningAlertWarningOpen(false);
             dispatchClinicalAlertCancel(screeningAlerts());
             dispatchAnalyticsTrackEvent('ctaClicked', {
-              name: 'Minor CTA Clicked',
-              ctaName: 'screening alert canceled',
-              screeningAlertCount: screeningAlerts().length
+              name: 'Screening Alert Canceled',
+              screeningAlertCount: screeningAlerts().length,
+              buttonText: 'Cancel'
             });
           }}
         />

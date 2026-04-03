@@ -709,8 +709,7 @@ export const Order = () => {
                           onClick={async () => {
                             setUpdating(true);
                             try {
-                              track('Minor CTA Clicked', {
-                                ctaName: 'select pharmacy',
+                              track('Pharmacy Selected', {
                                 orderId: id,
                                 pharmacyId
                               });

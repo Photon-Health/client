@@ -26,12 +26,10 @@ export type PageViewEvent =
   | { name: 'Signature Attestation Viewed'; attestationVersion: string };
 
 // ---------------------------------------------------------------------------
-// CTA Click Events
-// major events get unique names and represent major milestones in the user journey
-// minor events share the event name "Minor CTA Clicked"
+// CTA Click Events — each variant has a unique, descriptive name
 // ---------------------------------------------------------------------------
 
-export type MajorCtaClickEvent =
+export type CtaClickEvent =
   | {
       name: 'Patient Created';
       buttonText: string;
@@ -60,39 +58,21 @@ export type MajorCtaClickEvent =
   | { name: 'Prescriptions Activated'; buttonText: string; prescriptionCount: number }
   | { name: 'Attestation Agreed'; buttonText: string; attestationVersion: string }
   | { name: 'Attestation Canceled'; buttonText: string }
-  | { name: 'Order Canceled'; buttonText: string; orderId: string };
-
-export type MinorCtaClickEvent =
+  | { name: 'Order Canceled'; buttonText: string; orderId: string }
   | {
-      name: 'Minor CTA Clicked';
-      ctaName: 'draft prescription added';
+      name: 'Draft Prescription Added';
       draftPrescriptionSource: DraftPrescriptionSource;
       fields?: FieldCompletionSnapshot;
     }
-  | { name: 'Minor CTA Clicked'; ctaName: 'edit draft' }
-  | { name: 'Minor CTA Clicked'; ctaName: 'delete draft' }
-  | { name: 'Minor CTA Clicked'; ctaName: 'add to medication history' }
-  | { name: 'Minor CTA Clicked'; ctaName: 'yes combine orders' }
-  | { name: 'Minor CTA Clicked'; ctaName: 'no send new order' }
-  | {
-      name: 'Minor CTA Clicked';
-      ctaName: 'screening alert acknowledged';
-      screeningAlertCount: number;
-    }
-  | {
-      name: 'Minor CTA Clicked';
-      ctaName: 'screening alert canceled';
-      screeningAlertCount: number;
-    }
-  | { name: 'Minor CTA Clicked'; ctaName: 'edit patient' }
-  | {
-      name: 'Minor CTA Clicked';
-      ctaName: 'select pharmacy';
-      orderId: string;
-      pharmacyId: string;
-    };
-
-export type CtaClickEvent = MajorCtaClickEvent | MinorCtaClickEvent;
+  | { name: 'Draft Prescription Edited' }
+  | { name: 'Draft Prescription Deleted' }
+  | { name: 'Added To Medication History' }
+  | { name: 'Combine Orders Confirmed'; buttonText: string }
+  | { name: 'Combine Orders Rejected'; buttonText: string }
+  | { name: 'Patient Edited' }
+  | { name: 'Screening Alert Acknowledged'; screeningAlertCount: number; buttonText: string }
+  | { name: 'Screening Alert Canceled'; screeningAlertCount: number; buttonText: string }
+  | { name: 'Pharmacy Selected'; orderId: string; pharmacyId: string };
 
 // ---------------------------------------------------------------------------
 // Field Interaction Events — all share "Field Interaction"

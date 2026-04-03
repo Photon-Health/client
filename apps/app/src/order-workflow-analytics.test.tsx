@@ -115,6 +115,7 @@ test('Major CTA events from web component reach RudderStack track', async () => 
     expect(rudderTrackSpy).toHaveBeenCalledWith(
       'Order Sent',
       expect.objectContaining({
+        category: 'ctaClicked',
         orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex),
         pageName: 'New Prescriptions',
         providerId: PROVIDER.id,
@@ -132,7 +133,7 @@ test('Major CTA events from web component reach RudderStack track', async () => 
   });
 });
 
-test('Minor CTA events map correctly with orderWorkflowId', async () => {
+test('CTA events map correctly with orderWorkflowId and category', async () => {
   renderApp({ patientId: 'pat_123' });
 
   const wrapper = await findPrescribeWrapper();
@@ -143,8 +144,7 @@ test('Minor CTA events map correctly with orderWorkflowId', async () => {
       composed: true,
       detail: {
         category: 'ctaClicked',
-        name: 'Minor CTA Clicked',
-        ctaName: 'draft prescription added',
+        name: 'Draft Prescription Added',
         draftPrescriptionSource: 'form',
         timestamp: new Date().toISOString()
       }
@@ -153,9 +153,9 @@ test('Minor CTA events map correctly with orderWorkflowId', async () => {
 
   await waitFor(() => {
     expect(rudderTrackSpy).toHaveBeenCalledWith(
-      'Minor CTA Clicked',
+      'Draft Prescription Added',
       expect.objectContaining({
-        ctaName: 'draft prescription added',
+        category: 'ctaClicked',
         draftPrescriptionSource: 'form',
         orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex)
       })
@@ -188,6 +188,7 @@ test('Field Interaction CustomEvent maps correctly with enrichment', async () =>
     expect(rudderTrackSpy).toHaveBeenCalledWith(
       'Field Interaction',
       expect.objectContaining({
+        category: 'fieldInteraction',
         formName: 'add_prescription_form',
         fieldName: 'dispenseQuantity',
         hasValue: true,

@@ -181,8 +181,7 @@ export const PatientCard = (props: {
               props?.enableOrder && !showAddressForm()
                 ? () => {
                     dispatchAnalyticsTrackEvent('ctaClicked', {
-                      name: 'Minor CTA Clicked',
-                      ctaName: 'edit patient'
+                      name: 'Patient Edited'
                     });
                     setShowEditPatientView(true);
                   }
@@ -224,10 +223,7 @@ export const PatientCard = (props: {
             open={showAddMedDialog()}
             on:photon-medication-selected={(e: { detail: { medication: Treatment } }) => {
               setNewMedication(e.detail.medication);
-              dispatchAnalyticsTrackEvent('ctaClicked', {
-                name: 'Minor CTA Clicked',
-                ctaName: 'add to medication history'
-              });
+              dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Added To Medication History' });
             }}
             on:photon-medication-closed={() => {
               setShowAddMedDialog(false);

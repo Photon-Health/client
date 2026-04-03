@@ -65,10 +65,7 @@ export const DraftPrescriptionCard = (props: {
       editPrescription();
       onConfirm?.();
       dispatchDraftPrescriptionDeleted();
-      dispatchAnalyticsTrackEvent('ctaClicked', {
-        name: 'Minor CTA Clicked',
-        ctaName: 'edit draft'
-      });
+      dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Draft Prescription Edited' });
     } else {
       setEditDialogOpen(true);
       setEditDialogConfirm(onConfirm);
@@ -89,7 +86,7 @@ export const DraftPrescriptionCard = (props: {
     editDialogConfirm()?.();
     setEditDialogConfirm(undefined);
     dispatchDraftPrescriptionDeleted();
-    dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Minor CTA Clicked', ctaName: 'edit draft' });
+    dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Draft Prescription Edited' });
   };
   const handleEditCancel = () => {
     setEditDialogOpen(false);
@@ -102,10 +99,7 @@ export const DraftPrescriptionCard = (props: {
       const deletedRx = draftPrescriptions().find((rx) => rx.id === deletedId);
       deletePrescription(deletedId);
       dispatchDraftPrescriptionDeleted(deletedRx);
-      dispatchAnalyticsTrackEvent('ctaClicked', {
-        name: 'Minor CTA Clicked',
-        ctaName: 'delete draft'
-      });
+      dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Draft Prescription Deleted' });
     }
 
     setDeleteDialogOpen(false);

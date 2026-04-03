@@ -29,8 +29,6 @@ export type {
   DraftPrescriptionSource,
   ClinicalAppEventName,
   PageViewEvent,
-  MajorCtaClickEvent,
-  MinorCtaClickEvent,
   CtaClickEvent,
   FieldInteractionEvent,
   PhotonEmbedAnalyticsEventInput,

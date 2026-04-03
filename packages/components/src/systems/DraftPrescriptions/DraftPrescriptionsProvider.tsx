@@ -195,8 +195,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
           newRxs.forEach((rx) => {
             dispatchDraftPrescriptionCreated(rx);
             dispatchAnalyticsTrackEvent('ctaClicked', {
-              name: 'Minor CTA Clicked',
-              ctaName: 'draft prescription added',
+              name: 'Draft Prescription Added',
               draftPrescriptionSource: 'prefill',
               fields: buildPrescriptionSnapshot(rx)
             });
@@ -267,8 +266,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       setDraftPrescriptions((prev) => [...prev, created]);
       dispatchDraftPrescriptionCreated(created);
       dispatchAnalyticsTrackEvent('ctaClicked', {
-        name: 'Minor CTA Clicked',
-        ctaName: 'draft prescription added',
+        name: 'Draft Prescription Added',
         draftPrescriptionSource: draftPrescriptionSource,
         fields: buildPrescriptionSnapshot(prescriptionFormData, {
           addToTemplates: options?.addToTemplates,

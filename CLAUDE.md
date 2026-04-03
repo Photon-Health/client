@@ -302,12 +302,11 @@ Analytics applies only to the clinical and patient apps — **not** to `packages
 | Category | Type | Description |
 |----------|------|-------------|
 | `pageViewed` | `PageViewEvent` | Page/view lifecycle — each variant has a unique `name` (e.g. "New Prescriptions Page Viewed", "Signature Attestation Viewed") |
-| `ctaClicked` | `CtaClickEvent` | Call-to-action clicks, split into **major** and **minor** (see below) |
+| `ctaClicked` | `CtaClickEvent` | Call-to-action clicks — each variant has a unique descriptive `name` |
 | `fieldInteraction` | `FieldInteractionEvent` | Form field completeness — all share `name: 'Field Interaction'` with `formName`, `fieldName`, `hasValue`, `isOptional` |
 
 CTA click events have two sub-types:
-- **Major CTAs** (`MajorCtaClickEvent`) — milestone events with unique `name` values: "Patient Created", "Patient Updated", "Order Sent", "Prescriptions Activated", "Attestation Agreed", "Attestation Canceled", "Order Canceled". Each carries context-specific fields (e.g. `orderId`, `prescriptionCount`, `fulfillmentType`).
-- **Minor CTAs** (`MinorCtaClickEvent`) — all share `name: 'Minor CTA Clicked'`, distinguished by `ctaName`: "draft prescription added", "edit draft", "delete draft", "add to medication history", "yes combine orders", "no send new order", "screening alert acknowledged", "screening alert canceled", "edit patient", "select pharmacy".
+CTA event names: "Patient Created", "Patient Updated", "Order Sent", "Prescriptions Activated", "Attestation Agreed", "Attestation Canceled", "Order Canceled", "Draft Prescription Added", "Draft Prescription Edited", "Draft Prescription Deleted", "Added To Medication History", "Combine Orders Confirmed", "Combine Orders Rejected", "Screening Alert Acknowledged", "Screening Alert Canceled", "Pharmacy Selected".
 
 *Type-safe dispatch* — `AnalyticsEventMap` (in the SDK) maps each `AnalyticsCategory` to its event type. The generic function `dispatchAnalyticsTrackEvent<C>(category, event)` enforces that the category and event type are always coupled at compile time.
 

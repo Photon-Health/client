@@ -25,7 +25,7 @@ export function trackAnalyticsEvent(
   detail: PhotonEmbedAnalyticsEventInput,
   track: (eventName: ClinicalAppEventName, payload: ApiObject) => void
 ) {
-  const { name, category: _category, ...rest } = detail;
+  const { name, ...rest } = detail;
 
   // Flatten field completion snapshots (CTA events)
   const payload = { ...rest } as Record<string, unknown>;

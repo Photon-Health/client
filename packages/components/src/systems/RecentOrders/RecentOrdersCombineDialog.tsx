@@ -123,8 +123,8 @@ export default function RecentOrdersCombineDialog() {
     setIsCombiningOrders(true);
     dispatchDatadogAction('prescribe-combine-dialog-combining', {}, ref);
     dispatchAnalyticsTrackEvent('ctaClicked', {
-      name: 'Minor CTA Clicked',
-      ctaName: 'yes combine orders'
+      name: 'Combine Orders Confirmed',
+      buttonText: 'Yes, combine orders'
     });
 
     const fills = draftPrescriptions().map((prescription) => ({ prescriptionId: prescription.id }));
@@ -273,8 +273,8 @@ export default function RecentOrdersCombineDialog() {
             onClick={() => {
               dispatchDatadogAction('prescribe-combine-dialog-not-combining', {}, ref);
               dispatchAnalyticsTrackEvent('ctaClicked', {
-                name: 'Minor CTA Clicked',
-                ctaName: 'no send new order'
+                name: 'Combine Orders Rejected',
+                buttonText: 'No, send new order'
               });
               state.createOrder?.();
               setIsCreatingOrder(true);
