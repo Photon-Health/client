@@ -235,11 +235,11 @@ test('attestation CTA', async () => {
   // Click cancel
   await user.click(screen.getByRole('button', { name: /cancel/i }));
 
-  const canceled = analyticsEvents.find(isCTA('Attestation Canceled'));
+  const canceled = analyticsEvents.find(isCTA('Signature Attestation Canceled'));
   expect(canceled?.detail).toEqual(
     expect.objectContaining({
       category: 'ctaClicked',
-      name: 'Attestation Canceled',
+      name: 'Signature Attestation Canceled',
       buttonText: 'Cancel',
       timestamp: expect.any(String)
     })

@@ -56,8 +56,8 @@ export type CtaClickEvent =
       isCombinedOrder: boolean;
     }
   | { name: 'Prescriptions Activated'; buttonText: string; prescriptionCount: number }
-  | { name: 'Attestation Agreed'; buttonText: string; attestationVersion: string }
-  | { name: 'Attestation Canceled'; buttonText: string }
+  | { name: 'Signature Attestation Agreed'; buttonText: string; attestationVersion: string }
+  | { name: 'Signature Attestation Canceled'; buttonText: string }
   | { name: 'Order Canceled'; buttonText: string; orderId: string }
   | {
       name: 'Draft Prescription Added';

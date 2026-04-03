@@ -183,7 +183,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
         setSubmitting(false);
         setStatus({ status: 'COMPLETE' });
         dispatchAnalyticsTrackEvent('ctaClicked', {
-          name: 'Attestation Agreed',
+          name: 'Signature Attestation Agreed',
           buttonText: 'I Agree',
           attestationVersion: curr.version
         });
@@ -220,7 +220,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
             onAgree={onAgree}
             onCancel={() => {
               dispatchAnalyticsTrackEvent('ctaClicked', {
-                name: 'Attestation Canceled',
+                name: 'Signature Attestation Canceled',
                 buttonText: 'Cancel'
               });
               dispatchSignatureAttestationCanceled();

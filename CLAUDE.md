@@ -306,7 +306,7 @@ Analytics applies only to the clinical and patient apps — **not** to `packages
 | `fieldInteraction` | `FieldInteractionEvent` | Form field completeness — all share `name: 'Field Interaction'` with `formName`, `fieldName`, `hasValue`, `isOptional` |
 
 CTA click events have two sub-types:
-CTA event names: "Patient Created", "Patient Updated", "Order Sent", "Prescriptions Activated", "Attestation Agreed", "Attestation Canceled", "Order Canceled", "Draft Prescription Added", "Draft Prescription Edited", "Draft Prescription Deleted", "Added To Medication History", "Combine Orders Confirmed", "Combine Orders Rejected", "Screening Alert Acknowledged", "Screening Alert Canceled", "Pharmacy Selected".
+CTA event names: "Patient Created", "Patient Updated", "Order Sent", "Prescriptions Activated", "Signature Attestation Agreed", "Signature Attestation Canceled", "Order Canceled", "Draft Prescription Added", "Draft Prescription Edited", "Draft Prescription Deleted", "Added To Medication History", "Combine Orders Confirmed", "Combine Orders Rejected", "Screening Alert Acknowledged", "Screening Alert Canceled", "Pharmacy Selected".
 
 *Type-safe dispatch* — `AnalyticsEventMap` (in the SDK) maps each `AnalyticsCategory` to its event type. The generic function `dispatchAnalyticsTrackEvent<C>(category, event)` enforces that the category and event type are always coupled at compile time.
 
