@@ -29,7 +29,6 @@
     "@graphql-codegen/client-preset": "^4.1.0",
     "@graphql-codegen/typescript-graphql-request": "^6.2.0",
     "@nx/eslint-plugin": "22.5.4",
-    "@nx/jest": "22.5.4",
     "@nx/js": "22.5.4",
     "@nx/react": "22.5.4",
     "@nx/workspace": "22.5.4",
