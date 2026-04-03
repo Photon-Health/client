@@ -4,7 +4,7 @@ import {
   expectEventCount,
   expectEventProperties,
   expectFieldInteraction,
-  expectMinorCtaCount,
+  expectCtaCount,
   findByEventName
 } from './utils/analytics_expect';
 
@@ -79,11 +79,9 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   await expectFieldInteraction(page, 'refills', 1);
   await expectFieldInteraction(page, 'instructions', 1);
   await page.getByRole('button', { name: 'Add to drafts' }).click();
-  await expectMinorCtaCount(page, 'draft prescription added', 1);
-  const draftAddedEvents = await findByEventName(page, 'Minor CTA Clicked');
-  const firstDraftAdded = draftAddedEvents.find(
-    (e) => e.properties.ctaName === 'draft prescription added'
-  );
+  await expectCtaCount(page, 'Draft Prescription Added', 1);
+  const draftAddedEvents = await findByEventName(page, 'Draft Prescription Added');
+  const firstDraftAdded = draftAddedEvents[0];
   expect(firstDraftAdded?.properties).toEqual(
     expect.objectContaining({
       draftPrescriptionSource: 'form',
@@ -104,7 +102,7 @@ test('user can create patient then add, edit, and delete a draft prescription', 
 
   // edit draft
   await page.getByTitle('Edit').click();
-  await expectMinorCtaCount(page, 'edit draft', 1);
+  await expectCtaCount(page, 'Draft Prescription Edited', 1);
   await expect(medSearchInput).toHaveValue(/Amoxicillin/i);
   await page.getByLabel('Quantity').fill('60');
   await page.getByRole('button', { name: 'Add to drafts' }).click();
@@ -113,7 +111,7 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   await expect(page.getByText('Draft Prescriptions')).toBeVisible({ timeout: 10_000 });
   await expect(page.getByText(/Amoxicillin/i)).toBeVisible();
 
-  await expectMinorCtaCount(page, 'draft prescription added', 2);
+  await expectCtaCount(page, 'Draft Prescription Added', 2);
 
   await page.getByRole('button', { name: 'Send' }).click();
   await page.waitForURL(/\/orders\/ord_/);

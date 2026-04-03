@@ -50,19 +50,8 @@ export async function expectEventProperties(
 }
 
 /**
- * Finds Minor CTA Clicked events with a specific ctaName.
+ * Asserts expected count of CTA events with a specific event name.
  */
-export async function findMinorCta(page: Page, ctaName: string) {
-  const events = await findByEventName(page, 'Minor CTA Clicked');
-  return events.filter((e) => e.properties.ctaName === ctaName);
-}
-
-/**
- * Asserts expected count of Minor CTA Clicked events with a specific ctaName.
- */
-export async function expectMinorCtaCount(page: Page, ctaName: string, expectedCount: number) {
-  await expect(async () => {
-    const events = await findMinorCta(page, ctaName);
-    expect(events.length).toBe(expectedCount);
-  }).toPass({ timeout: 10_000 });
+export async function expectCtaCount(page: Page, ctaName: string, expectedCount: number) {
+  await expectEventCount(page, ctaName, expectedCount);
 }
