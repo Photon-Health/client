@@ -10,7 +10,6 @@ import { customElement } from 'solid-element';
 import { createFormStore } from '../stores/form';
 import { PrescribeProps, PrescribeWorkflow } from './components/PrescribeWorkflow';
 import { onCleanup } from 'solid-js';
-import { PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
 import photonStyles from '@photonhealth/components/dist/index.css?inline';
@@ -37,7 +36,6 @@ interface PrescribeWorkflowComponentProps extends Omit<PrescribeProps, 'initialS
 }
 
 const Component = (props: PrescribeWorkflowComponentProps) => {
-  const { actions: patientActions } = PatientStore;
   const { store, actions } = createFormStore({
     dispenseAsWritten: false,
     patient: undefined,
@@ -49,7 +47,6 @@ const Component = (props: PrescribeWorkflowComponentProps) => {
   });
 
   onCleanup(() => {
-    patientActions.clearSelectedPatient();
     actions.reset();
   });
 

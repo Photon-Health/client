@@ -48,7 +48,7 @@ const PATIENT_ORDER_FIELDS = gql`
   }
 `;
 
-const createPatientStore = () => {
+export const createPatientStore = () => {
   const [store, setStore] = createStore<{
     patients: {
       data: Patient[];
@@ -192,4 +192,5 @@ const createPatientStore = () => {
   };
 };
 
-export const PatientStore = createPatientStore();
+export type PatientStore = ReturnType<typeof createPatientStore>['store'];
+export type PatientActions = ReturnType<typeof createPatientStore>['actions'];

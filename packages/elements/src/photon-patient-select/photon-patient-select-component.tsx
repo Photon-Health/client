@@ -8,17 +8,22 @@ import { PhotonDropdown } from '../photon-dropdown';
 //Types
 import { Patient } from '@photonhealth/sdk/dist/types';
 import { createEffect, createMemo, onMount, untrack } from 'solid-js';
-import { PatientStore } from '../stores/patient';
+import { PatientActions, PatientStore } from '../stores/patient';
 
-const PatientSelect = (props: { invalid: boolean; helpText?: string; selected?: string }) => {
+const PatientSelect = (props: {
+  store: PatientStore;
+  actions: PatientActions;
+  invalid: boolean;
+  helpText?: string;
+  selected?: string;
+}) => {
   let ref: any;
   //context
   const client = usePhoton();
-  const { store, actions } = PatientStore;
   let fetchMore: unknown;
 
   onMount(() => {
-    actions.reset();
+    props.actions.reset();
   });
 
   const dispatchSelected = (patient: Patient) => {
@@ -33,20 +38,20 @@ const PatientSelect = (props: { invalid: boolean; helpText?: string; selected?: 
   };
 
   const getData = createMemo(() => {
-    if (store.selectedPatient.data) {
+    if (props.store.selectedPatient.data) {
       return [
-        store.selectedPatient.data,
-        ...store.patients.data.filter((x) => x?.id !== store.selectedPatient.data!.id)
+        props.store.selectedPatient.data,
+        ...props.store.patients.data.filter((x) => x?.id !== props.store.selectedPatient.data!.id)
       ];
     } else {
-      return store.patients.data;
+      return props.store.patients.data;
     }
   });
 
   createEffect(async () => {
-    if (props.selected && !store.selectedPatient.data) {
+    if (props.selected && !props.store.selectedPatient.data) {
       untrack(async () => {
-        await actions.getSelectedPatient(client.getSDK(), props.selected!);
+        await props.actions.getSelectedPatient(client.getSDK(), props.selected!);
       });
     }
   });
@@ -63,21 +68,21 @@ const PatientSelect = (props: { invalid: boolean; helpText?: string; selected?: 
         required={false}
         placeholder="Select patient..."
         invalid={props.invalid}
-        isLoading={store.patients.isLoading || store.selectedPatient.isLoading}
-        hasMore={store.patients.data.length % 25 === 0 && !store.patients.finished}
+        isLoading={props.store.patients.isLoading || props.store.selectedPatient.isLoading}
+        hasMore={props.store.patients.data.length % 25 === 0 && !props.store.patients.finished}
         displayAccessor={(p) => p?.name?.full || ''}
         onSearchChange={async (s: string) =>
-          (fetchMore = await actions.getPatients(client!.getSDK(), {
+          (fetchMore = await props.actions.getPatients(client!.getSDK(), {
             name: s
           }))
         }
         onOpen={async () => {
-          if (store.patients.data.length == 0) {
-            fetchMore = await actions.getPatients(client!.getSDK());
+          if (props.store.patients.data.length == 0) {
+            fetchMore = await props.actions.getPatients(client!.getSDK());
           }
         }}
         onHide={async () => {
-          fetchMore = await actions.getPatients(client!.getSDK());
+          fetchMore = await props.actions.getPatients(client!.getSDK());
         }}
         fetchMore={async () => {
           if (fetchMore) {
@@ -87,7 +92,7 @@ const PatientSelect = (props: { invalid: boolean; helpText?: string; selected?: 
         }}
         noDataMsg={'No patients found'}
         helpText={props.helpText}
-        selectedData={store.selectedPatient.data}
+        selectedData={props.store.selectedPatient.data}
       />
     </div>
   );
@@ -95,6 +100,8 @@ const PatientSelect = (props: { invalid: boolean; helpText?: string; selected?: 
 customElement(
   'photon-patient-select',
   {
+    store: {} as PatientStore,
+    actions: {} as PatientActions,
     invalid: false,
     helpText: undefined,
     selected: undefined

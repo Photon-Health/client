@@ -11,7 +11,7 @@ import {
 } from '@photonhealth/components';
 import { Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
-import { PatientStore } from '../../stores/patient';
+import { createPatientStore } from '../../stores/patient';
 import type { Address } from './PrescribeWorkflow';
 
 const hasUsableAddress = (address?: {
@@ -38,7 +38,7 @@ const patientAddressValidator = message(
   'Please enter an address for patient...'
 );
 
-interface PatientCardStoreProp {
+interface FormStore {
   patient?: {
     value?: { id: string; address: any; preferredPharmacies?: any[] };
     error: boolean;
@@ -49,7 +49,7 @@ interface PatientCardStoreProp {
 }
 
 export const PatientCard = (props: {
-  store: PatientCardStoreProp;
+  store: FormStore;
   actions: Record<string, (...args: any) => any>;
   patientId?: string;
   client?: PhotonClientStore;
@@ -67,7 +67,7 @@ export const PatientCard = (props: {
   const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
   const [showEditPatientView, setShowEditPatientView] = createSignal(false);
   const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
-  const { actions, store } = PatientStore;
+  const { actions: patientActions, store: patientStore } = createPatientStore();
   const [isUpdating, setIsUpdating] = createSignal(false);
 
   onMount(() => {
@@ -85,11 +85,11 @@ export const PatientCard = (props: {
 
     if (props?.patientId) {
       // fetch patient on mount when patientId is passed
-      actions.getSelectedPatient(props.client!.getSDK(), props.patientId);
+      patientActions.getSelectedPatient(props.client!.getSDK(), props.patientId);
     }
   });
 
-  const updatePatient = (e: any, { trackInteraction = true } = {}) => {
+  const updateFormPatient = (e: any, { trackInteraction = true } = {}) => {
     props.actions.updateFormValue({
       key: 'patient',
       value: e.detail.patient
@@ -111,24 +111,22 @@ export const PatientCard = (props: {
   };
 
   createEffect(() => {
-    if (store?.selectedPatient?.data && props?.patientId) {
+    if (patientStore?.selectedPatient?.data && props?.patientId) {
       // update patient when passed-in patient (patientId) is fetched
-      updatePatient(
-        { detail: { patient: store?.selectedPatient?.data } },
+      updateFormPatient(
+        { detail: { patient: patientStore?.selectedPatient?.data } },
         { trackInteraction: false }
       );
     }
   });
 
-  const currentPatientId = createMemo(
-    // prefer the passed-in patientId if it exists
-    () => props?.patientId || (props.store.patient?.value?.id as string)
-  );
-
   // Listen for changes to the patient
   const patientId = createMemo(() => {
-    if (isUpdating()) return '';
-    return currentPatientId() ?? '';
+    if (isUpdating()) {
+      return '';
+    }
+    // prefer the passed-in patientId if it exists
+    return props?.patientId || props.store.patient?.value?.id || '';
   });
 
   const hasAddress = createMemo(() => {
@@ -157,15 +155,17 @@ export const PatientCard = (props: {
       <Show when={!props?.patientId}>
         <Card addChildrenDivider={true}>
           <div class="flex items-center justify-between">
-            <Text color="gray">{props?.patientId ? 'Patient' : 'Select Patient'}</Text>
+            <Text color="gray">Select Patient</Text>
           </div>
 
           {/* Show Dropdown when no patientId is passed */}
           <photon-patient-select
+            store={patientStore}
+            actions={patientActions}
             invalid={props.store.patient?.error ?? false}
             help-text={props.store.patient?.error}
-            on:photon-patient-selected={updatePatient}
-            selected={props.store.patient?.value?.id ?? props.patientId}
+            selected={patientId()}
+            on:photon-patient-selected={updateFormPatient}
           />
         </Card>
       </Show>
@@ -183,11 +183,18 @@ export const PatientCard = (props: {
             address={props?.address || props.store.patient?.value?.address}
           />
           <photon-patient-dialog
+            store={patientStore}
+            actions={patientActions}
             hide-create-prescription={true}
             open={showEditPatientView()}
+            patient-id={patientId()}
+            optional-patient-address={props.optionalPatientAddress}
             on:photon-patient-updated={() => {
               setIsUpdating(true);
-              actions.getSelectedPatient(props.client!.getSDK(), props.store.patient!.value!.id);
+              patientActions.getSelectedPatient(
+                props.client!.getSDK(),
+                props.store.patient!.value!.id
+              );
               // Force a rerender of the above PatientInfo by quickly setting the patientId to null and then putting it back
               setTimeout(() => {
                 setIsUpdating(false);
@@ -197,8 +204,6 @@ export const PatientCard = (props: {
             on:photon-patient-closed={() => {
               setShowEditPatientView(false);
             }}
-            patient-id={patientId()}
-            optional-patient-address={props.optionalPatientAddress}
           />
         </div>
       </Show>

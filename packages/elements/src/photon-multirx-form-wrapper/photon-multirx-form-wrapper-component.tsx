@@ -10,7 +10,6 @@ import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
 import { createMemo, createSignal, onMount } from 'solid-js';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
-import { PatientStore } from '../stores/patient';
 
 const shouldWarn = (form: any) => {
   return (
@@ -79,7 +78,6 @@ const Component = (props: {
   const [isCreateOrder, setIsCreateOrder] = createSignal<boolean>(false);
   const [continueSaveOnly, setContinueSaveOnly] = createSignal<boolean>(false);
   const [triggerSubmit, setTriggerSubmit] = createSignal<boolean>(false);
-  const { actions: patientActions } = PatientStore;
   const [attestationAgreed, setAttestationAgreed] = createSignal<boolean>(false);
   const [draftPrescriptionCount, setDraftPrescriptionCount] = createSignal<number>(0);
 
@@ -245,7 +243,6 @@ const Component = (props: {
         closeBody="You will not be able to recover unsaved prescriptions."
         onClosed={() => {
           dispatchClosed();
-          patientActions.clearSelectedPatient();
         }}
         checkShouldWarn={() => shouldWarn(form)}
         title="New prescriptions"
@@ -343,7 +340,6 @@ const Component = (props: {
               }}
               on:photon-signature-attestation-canceled={() => {
                 dispatchClosed();
-                patientActions.clearSelectedPatient();
               }}
               on:photon-clinical-alert-cancel={(e: any) => {
                 e.stopPropagation();

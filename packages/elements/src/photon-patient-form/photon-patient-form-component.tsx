@@ -20,7 +20,7 @@ import {
   usePhoton
 } from '@photonhealth/components';
 import { createFormStore } from '../stores/form';
-import { PatientStore } from '../stores/patient';
+import { PatientActions, PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
 import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import { email, empty, message, notFutureDate, zipString } from '../validators';
@@ -45,11 +45,15 @@ const getPatientAddress = (pStore: any, store: any) => {
   return '';
 };
 
-const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean }) => {
+const PatientForm = (props: {
+  pStore: PatientStore;
+  pActions: PatientActions;
+  patientId: string;
+  optionalPatientAddress: boolean;
+}) => {
   let ref: any;
   const client = usePhoton();
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
-  const { store: pStore, actions: pActions } = PatientStore;
   const { store, actions } = createFormStore({
     firstName: undefined,
     lastName: undefined,
@@ -110,9 +114,9 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
   onMount(() => {
     if (props.patientId) {
-      pActions.getSelectedPatient(client!.getSDK(), props.patientId);
+      props.pActions.getSelectedPatient(client!.getSDK(), props.patientId);
     } else {
-      pActions.clearSelectedPatient();
+      props.pActions.clearSelectedPatient();
     }
   });
 
@@ -123,11 +127,11 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
       detail: {
         form: form,
         actions: actions,
-        selected: pStore,
+        selected: props.pStore,
         optionalPatientAddress: props.optionalPatientAddress,
         reset: () => {
           actions.reset();
-          pActions.reset();
+          props.pActions.reset();
         }
       }
     });
@@ -135,59 +139,59 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   };
 
   createEffect(() => {
-    if (pStore.selectedPatient.data) {
+    if (props.pStore.selectedPatient.data) {
       // if it's the update patient form, prefill the form with the patient's data
       actions.updateFormValue({
         key: 'firstName',
-        value: pStore.selectedPatient.data.name.first
+        value: props.pStore.selectedPatient.data.name.first
       });
       actions.updateFormValue({
         key: 'lastName',
-        value: pStore.selectedPatient.data.name.last
+        value: props.pStore.selectedPatient.data.name.last
       });
       actions.updateFormValue({
         key: 'dateOfBirth',
-        value: pStore.selectedPatient.data.dateOfBirth
+        value: props.pStore.selectedPatient.data.dateOfBirth
       });
       actions.updateFormValue({
         key: 'phone',
-        value: pStore.selectedPatient.data.phone
+        value: props.pStore.selectedPatient.data.phone
       });
       actions.updateFormValue({
         key: 'gender',
-        value: pStore.selectedPatient.data.gender
+        value: props.pStore.selectedPatient.data.gender
       });
       actions.updateFormValue({
         key: 'sex',
-        value: pStore.selectedPatient.data.sex
+        value: props.pStore.selectedPatient.data.sex
       });
       actions.updateFormValue({
         key: 'email',
-        value: pStore.selectedPatient.data.email
+        value: props.pStore.selectedPatient.data.email
       });
       actions.updateFormValue({
         key: 'address_street1',
-        value: pStore.selectedPatient.data.address?.street1
+        value: props.pStore.selectedPatient.data.address?.street1
       });
       actions.updateFormValue({
         key: 'address_street2',
-        value: pStore.selectedPatient.data.address?.street2
+        value: props.pStore.selectedPatient.data.address?.street2
       });
       actions.updateFormValue({
         key: 'address_city',
-        value: pStore.selectedPatient.data.address?.city
+        value: props.pStore.selectedPatient.data.address?.city
       });
       actions.updateFormValue({
         key: 'address_state',
-        value: pStore.selectedPatient.data.address?.state
+        value: props.pStore.selectedPatient.data.address?.state
       });
       actions.updateFormValue({
         key: 'address_zip',
-        value: pStore.selectedPatient.data.address?.postalCode
+        value: props.pStore.selectedPatient.data.address?.postalCode
       });
       actions.updateFormValue({
         key: 'preferredPharmacy',
-        value: pStore.selectedPatient.data.preferredPharmacies?.[0]?.id
+        value: props.pStore.selectedPatient.data.preferredPharmacies?.[0]?.id
       });
     }
   });
@@ -208,12 +212,12 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   });
 
   onCleanup(() => {
-    pActions.clearSelectedPatient();
+    props.pActions.clearSelectedPatient();
     actions.reset();
   });
 
   const preferredPharmacy = createMemo(() => {
-    const pref = pStore.selectedPatient.data?.preferredPharmacies?.[0];
+    const pref = props.pStore.selectedPatient.data?.preferredPharmacies?.[0];
     if (!pref) return;
 
     const address = pref.address as PharmacyOption['address'];
@@ -257,7 +261,9 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
           required={isAddressRequired()}
         >
           <AddressAutocompleteInput
-            value={store['address_street1']?.value ?? pStore.selectedPatient.data?.address?.street1}
+            value={
+              store['address_street1']?.value ?? props.pStore.selectedPatient.data?.address?.street1
+            }
             onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
               actions.updateFormValue({ key: 'address_street1', value: e.currentTarget.value });
             }}
@@ -274,7 +280,9 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
         <InputGroup label="Street 2" error={store['address_street2']?.error}>
           <Input
-            value={store['address_street2']?.value ?? pStore.selectedPatient.data?.address?.street2}
+            value={
+              store['address_street2']?.value ?? props.pStore.selectedPatient.data?.address?.street2
+            }
             onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
               actions.updateFormValue({ key: 'address_street2', value: e.currentTarget.value });
             }}
@@ -288,7 +296,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
           required={isAddressRequired()}
         >
           <Input
-            value={store['address_city']?.value ?? pStore.selectedPatient.data?.address?.city}
+            value={store['address_city']?.value ?? props.pStore.selectedPatient.data?.address?.city}
             onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
               actions.updateFormValue({ key: 'address_city', value: e.currentTarget.value });
             }}
@@ -304,7 +312,9 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
               required={isAddressRequired()}
             >
               <StateSelect
-                value={store['address_state']?.value ?? pStore.selectedPatient.data?.address?.state}
+                value={
+                  store['address_state']?.value ?? props.pStore.selectedPatient.data?.address?.state
+                }
                 onChange={(e) => {
                   actions.updateFormValue({ key: 'address_state', value: e.currentTarget.value });
                 }}
@@ -322,7 +332,8 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
             >
               <Input
                 value={
-                  store['address_zip']?.value ?? pStore.selectedPatient.data?.address?.postalCode
+                  store['address_zip']?.value ??
+                  props.pStore.selectedPatient.data?.address?.postalCode
                 }
                 onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
                   actions.updateFormValue({ key: 'address_zip', value: e.currentTarget.value });
@@ -340,13 +351,13 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
     <div class="w-full h-full relative" ref={ref}>
       <style>{tailwind}</style>
       <style>{photonStyles}</style>
-      <Show when={pStore.selectedPatient.isLoading}>
+      <Show when={props.pStore.selectedPatient.isLoading}>
         <div class="w-full flex justify-center">
           <Spinner color="green" />
         </div>
       </Show>
 
-      <Show when={!pStore.selectedPatient.isLoading}>
+      <Show when={!props.pStore.selectedPatient.isLoading}>
         <PhotonAuthorized permissions={['write:patient']}>
           <div class="flex flex-col gap-8">
             <Card>
@@ -357,7 +368,9 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                 <div class="flex flex-col">
                   <InputGroup label="First name" error={store['firstName']?.error} required>
                     <Input
-                      value={store['firstName']?.value ?? pStore.selectedPatient.data?.name.first}
+                      value={
+                        store['firstName']?.value ?? props.pStore.selectedPatient.data?.name.first
+                      }
                       onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
                         actions.updateFormValue({
                           key: 'firstName',
@@ -372,7 +385,9 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
                   <InputGroup label="Last name" error={store['lastName']?.error} required>
                     <Input
-                      value={store['lastName']?.value ?? pStore.selectedPatient.data?.name.last}
+                      value={
+                        store['lastName']?.value ?? props.pStore.selectedPatient.data?.name.last
+                      }
                       onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
                         actions.updateFormValue({
                           key: 'lastName',
@@ -388,7 +403,8 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                   <InputGroup label="Date of birth" error={store['dateOfBirth']?.error} required>
                     <DateInput
                       value={
-                        store['dateOfBirth']?.value ?? pStore.selectedPatient.data?.dateOfBirth
+                        store['dateOfBirth']?.value ??
+                        props.pStore.selectedPatient.data?.dateOfBirth
                       }
                       onDateChange={(value) => {
                         actions.updateFormValue({ key: 'dateOfBirth', value });
@@ -401,7 +417,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
                   <InputGroup label="Mobile number" error={store['phone']?.error} required>
                     <PhoneInput
-                      value={store['phone']?.value ?? pStore.selectedPatient.data?.phone}
+                      value={store['phone']?.value ?? props.pStore.selectedPatient.data?.phone}
                       onPhoneChange={(value) => {
                         actions.updateFormValue({ key: 'phone', value });
                       }}
@@ -411,7 +427,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
                   <InputGroup label="Sex at birth" error={store['sex']?.error} required>
                     <SexSelect
-                      value={store['sex']?.value ?? pStore.selectedPatient.data?.sex}
+                      value={store['sex']?.value ?? props.pStore.selectedPatient.data?.sex}
                       onChange={(e) =>
                         actions.updateFormValue({ key: 'sex', value: e.currentTarget.value })
                       }
@@ -446,7 +462,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                   </Show>
                   <InputGroup label="Gender" error={store['gender']?.error}>
                     <GenderSelect
-                      value={store['gender']?.value ?? pStore.selectedPatient.data?.gender}
+                      value={store['gender']?.value ?? props.pStore.selectedPatient.data?.gender}
                       onChange={(e) =>
                         actions.updateFormValue({ key: 'gender', value: e.currentTarget.value })
                       }
@@ -459,7 +475,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                   <InputGroup label="Email" error={store['email']?.error}>
                     <Input
                       type="email"
-                      value={store['email']?.value ?? pStore.selectedPatient.data?.email}
+                      value={store['email']?.value ?? props.pStore.selectedPatient.data?.email}
                       onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
                         actions.updateFormValue({ key: 'email', value: e.currentTarget.value });
                       }}
@@ -469,7 +485,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
                   <p class="font-sans text-sm m-0 mt-6">Preferred pharmacy</p>
                   <PharmacySearch
-                    address={getPatientAddress(pStore, store)}
+                    address={getPatientAddress(props.pStore, store)}
                     setPharmacy={(pharmacy: any) => {
                       actions.updateFormValue({
                         key: 'preferredPharmacy',
@@ -490,4 +506,13 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   );
 };
 
-customElement('photon-patient-form', { patientId: '', optionalPatientAddress: false }, PatientForm);
+customElement(
+  'photon-patient-form',
+  {
+    pStore: {} as PatientStore,
+    pActions: {} as PatientActions,
+    patientId: '',
+    optionalPatientAddress: false
+  },
+  PatientForm
+);
