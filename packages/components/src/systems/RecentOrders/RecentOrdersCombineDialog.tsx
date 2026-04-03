@@ -70,7 +70,7 @@ type VariablesCreateOrder = {
 export default function RecentOrdersCombineDialog() {
   let ref: Ref<any> | undefined;
   const { draftPrescriptions } = useDraftPrescriptions();
-  const { dispatchOrderCreated, dispatchOrderCombined, dispatchAnalytics } =
+  const { dispatchOrderCreated, dispatchOrderCombined, dispatchAnalyticsTrackEvent } =
     usePrescribeEventDispatch();
 
   const client = usePhotonClient();
@@ -95,7 +95,7 @@ export default function RecentOrdersCombineDialog() {
   createEffect(() => {
     if (state.isCombineDialogOpen) {
       dispatchDatadogAction('prescribe-combine-dialog-open', {}, ref);
-      dispatchAnalytics({ trackEventType: 'combine_orders_viewed' });
+      // Analytics for button clicks are dispatched in onCombineOrdersClick and the "No" button handler
     }
   });
 
@@ -122,6 +122,10 @@ export default function RecentOrdersCombineDialog() {
 
     setIsCombiningOrders(true);
     dispatchDatadogAction('prescribe-combine-dialog-combining', {}, ref);
+    dispatchAnalyticsTrackEvent('ctaClicked', {
+      name: 'Combine Orders Confirmed',
+      buttonText: 'Yes, combine orders'
+    });
 
     const fills = draftPrescriptions().map((prescription) => ({ prescriptionId: prescription.id }));
     try {
@@ -132,17 +136,16 @@ export default function RecentOrdersCombineDialog() {
 
       // Trigger message to redirect to order page
       dispatchOrderCombined(updatedOrder.updateOrder as Order);
-      dispatchAnalytics({
-        trackEventType: 'order_created',
-        properties: {
-          orderId: order.id,
-          prescriptionCount: draftPrescriptions().length,
-          fulfillmentType: null,
-          hasPreferredPharmacy: false,
-          setAsPreferred: false,
-          pharmacyId: null,
-          isCombinedOrder: true
-        }
+      dispatchAnalyticsTrackEvent('ctaClicked', {
+        name: 'Order Sent',
+        buttonText: 'Send',
+        orderId: order.id,
+        prescriptionCount: draftPrescriptions().length,
+        fulfillmentType: null,
+        hasPreferredPharmacy: false,
+        setAsPreferred: false,
+        pharmacyId: null,
+        isCombinedOrder: true
       });
 
       setIsCombiningOrders(false);
@@ -165,17 +168,16 @@ export default function RecentOrdersCombineDialog() {
         });
 
         dispatchOrderCreated(newOrder.createOrder as Order);
-        dispatchAnalytics({
-          trackEventType: 'order_created',
-          properties: {
-            orderId: newOrder.createOrder.id,
-            prescriptionCount: draftPrescriptions().length,
-            fulfillmentType: 'SEND_TO_PATIENT',
-            hasPreferredPharmacy: false,
-            setAsPreferred: false,
-            pharmacyId: null,
-            isCombinedOrder: false
-          }
+        dispatchAnalyticsTrackEvent('ctaClicked', {
+          name: 'Order Sent',
+          buttonText: 'Send',
+          orderId: newOrder.createOrder.id,
+          prescriptionCount: draftPrescriptions().length,
+          fulfillmentType: 'SEND_TO_PATIENT',
+          hasPreferredPharmacy: false,
+          setAsPreferred: false,
+          pharmacyId: null,
+          isCombinedOrder: false
         });
         setIsCombiningOrders(false);
       } catch {
@@ -270,6 +272,10 @@ export default function RecentOrdersCombineDialog() {
             size="xl"
             onClick={() => {
               dispatchDatadogAction('prescribe-combine-dialog-not-combining', {}, ref);
+              dispatchAnalyticsTrackEvent('ctaClicked', {
+                name: 'Combine Orders Rejected',
+                buttonText: 'No, send new order'
+              });
               state.createOrder?.();
               setIsCreatingOrder(true);
             }}
