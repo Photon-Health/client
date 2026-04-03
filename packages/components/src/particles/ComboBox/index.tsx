@@ -91,10 +91,8 @@ export function ComboBox(props: ComboBoxProps) {
   ];
 
   createEffect(() => {
-    if (props.value?.id !== state.selected?.id) {
-      // update internal selected state when the passed value changes
-      setState('selected', props.value);
-    }
+    // update internal selected state when the passed value changes
+    setState('selected', props.value);
   });
 
   return (
