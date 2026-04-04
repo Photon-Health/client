@@ -39,29 +39,30 @@ const getPatientAddress = (store: any) => {
   return '';
 };
 
+const patientToFormValues = (patient: Patient | undefined) => ({
+  firstName: patient?.name.first,
+  lastName: patient?.name.last,
+  dateOfBirth: patient?.dateOfBirth,
+  phone: patient?.phone,
+  gender: patient?.gender,
+  sex: patient?.sex,
+  email: patient?.email,
+  address_street1: patient?.address?.street1,
+  address_street2: patient?.address?.street2,
+  address_city: patient?.address?.city,
+  address_state: patient?.address?.state,
+  address_zip: patient?.address?.postalCode,
+  preferredPharmacy: patient?.preferredPharmacies?.[0]?.id
+});
+
 const PatientForm = (props: {
   patient?: Patient;
   loading: boolean;
-  patientId: string;
   optionalPatientAddress: boolean;
 }) => {
   let ref: any;
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
-  const { store, actions } = createFormStore({
-    firstName: props.patient?.name.first,
-    lastName: props.patient?.name.last,
-    dateOfBirth: props.patient?.dateOfBirth,
-    phone: props.patient?.phone,
-    gender: props.patient?.gender,
-    sex: props.patient?.sex,
-    email: props.patient?.email,
-    address_street1: props.patient?.address?.street1,
-    address_street2: props.patient?.address?.street2,
-    address_city: props.patient?.address?.city,
-    address_state: props.patient?.address?.state,
-    address_zip: props.patient?.address?.postalCode,
-    preferredPharmacy: props.patient?.preferredPharmacies?.[0]?.id
-  });
+  const { store, actions } = createFormStore(patientToFormValues(props.patient));
   actions.registerValidator({
     key: 'firstName',
     validator: message(size(string(), 1, Infinity), 'Please enter a first name.')
@@ -105,8 +106,6 @@ const PatientForm = (props: {
     validator: message(zipString(), 'Please enter a valid zip code.')
   });
 
-  // TODO: a customer might be listening to this event
-  // so we can't quite remove it
   const dispatchFormUpdated = (store: any) => {
     const event = new CustomEvent('photon-form-updated', {
       composed: true,
@@ -136,6 +135,13 @@ const PatientForm = (props: {
 
   createEffect(() => {
     dispatchFormUpdated(store);
+  });
+
+  createEffect(() => {
+    const values = patientToFormValues(props.patient);
+    for (const [key, value] of Object.entries(values)) {
+      actions.updateFormValue({ key, value });
+    }
   });
 
   const preferredPharmacy = createMemo(() => {
@@ -398,7 +404,7 @@ const PatientForm = (props: {
                         value: pharmacy.id
                       });
                     }}
-                    patientId={props.patientId}
+                    patientId={props.patient?.id}
                     initialValue={preferredPharmacy()}
                     hidePreferred
                   />
@@ -417,7 +423,6 @@ customElement(
   {
     patient: undefined,
     loading: false,
-    patientId: '',
     optionalPatientAddress: false
   },
   PatientForm

@@ -168,17 +168,15 @@ export const PatientCard = (props: {
             address={props?.address || props.store.patient?.value?.address}
           />
           <photon-patient-dialog
-            store={patientStore}
-            actions={patientActions}
+            patient={patientStore.selectedPatient.data}
             hide-create-prescription={true}
             open={showEditPatientView()}
-            patient-id={patientId()}
             optional-patient-address={props.optionalPatientAddress}
             on:photon-patient-updated={() => {
               setIsUpdating(true);
               patientActions.getSelectedPatient(
                 props.client!.getSDK(),
-                props.store.patient!.value!.id
+                patientStore.selectedPatient.data!.id
               );
               // Force a rerender of the above PatientInfo by quickly setting the patientId to null and then putting it back
               setTimeout(() => {
