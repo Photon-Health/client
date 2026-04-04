@@ -1,8 +1,9 @@
 import { customElement } from 'solid-element';
-import { createEffect, createSignal, onMount, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, onMount, Show } from 'solid-js';
 import {
   buildFieldSnapshot,
   Button,
+  createQuery,
   dispatchAnalyticsTrackEvent,
   PATIENT_FORM_FIELDS,
   usePhoton
@@ -13,15 +14,51 @@ import gql from 'graphql-tag';
 import { Patient } from '@photonhealth/sdk/dist/types';
 
 type PatientDialogProps = {
-  patient?: Patient;
+  patientId?: string;
   open: boolean;
   hideCreatePrescription: boolean;
   optionalPatientAddress: boolean;
 };
 
-const PATIENT_FIELDS = gql`
-  fragment PatientFields on Patient {
+const HAS_PATIENTS_FIELDS = gql`
+  fragment HasPatientsFields on Patient {
     id
+  }
+`;
+
+const GET_PATIENT_FOR_FORM = gql`
+  query GetPatientForForm($id: ID!) {
+    patient(id: $id) {
+      id
+      name {
+        first
+        last
+      }
+      dateOfBirth
+      phone
+      gender
+      sex
+      email
+      address {
+        street1
+        street2
+        city
+        state
+        postalCode
+      }
+      preferredPharmacies {
+        id
+        name
+        address {
+          city
+          country
+          postalCode
+          state
+          street1
+          street2
+        }
+      }
+    }
   }
 `;
 
@@ -36,10 +73,19 @@ const Component = (props: PatientDialogProps) => {
   const [hasAnyAddressField, setHasAnyAddressField] = createSignal<boolean>(false);
   const [hasPatients, setHasPatients] = createSignal<boolean>(false);
 
+  const queryOptions = createMemo(() => ({
+    variables: { id: props.patientId },
+    client: client.sdk.apollo,
+    skip: !props.patientId,
+    fetchPolicy: 'network-only' as const
+  }));
+
+  const patientQuery = createQuery<{ patient: Patient }>(GET_PATIENT_FOR_FORM, queryOptions);
+
   onMount(async () => {
     try {
       const { data } = await client.sdk.clinical.patient.getPatients({
-        fragment: { PatientFields: PATIENT_FIELDS }
+        fragment: { HasPatientsFields: HAS_PATIENTS_FIELDS }
       });
       setHasPatients(data && data.patients.length > 0);
     } catch (err) {
@@ -86,7 +132,7 @@ const Component = (props: PatientDialogProps) => {
       dispatchAnalyticsTrackEvent(
         {
           trackEventType: 'patient_form_opened',
-          properties: { isEdit: Boolean(props.patient) }
+          properties: { isEdit: Boolean(props.patientId) }
         },
         ref
       );
@@ -118,7 +164,8 @@ const Component = (props: PatientDialogProps) => {
       return true;
     }
 
-    const existingPharmacyIds = props.patient?.preferredPharmacies
+    const fetchedPatient = patientQuery()?.patient;
+    const existingPharmacyIds = fetchedPatient?.preferredPharmacies
       ?.map((x: any) => x?.id)
       .filter((x: any) => x !== null);
     const preferredPharmacyChanged =
@@ -133,8 +180,8 @@ const Component = (props: PatientDialogProps) => {
         .clinical.patient.removePatientPreferredPharmacy({});
       await removePreferredPharmacyMutation({
         variables: {
-          patientId: props.patient!.id,
-          pharmacyId: props.patient!.preferredPharmacies![0]!.id
+          patientId: fetchedPatient!.id,
+          pharmacyId: fetchedPatient!.preferredPharmacies![0]!.id
         },
         awaitRefetchQueries: false
       });
@@ -142,7 +189,7 @@ const Component = (props: PatientDialogProps) => {
 
     const includeAddress = shouldValidateAddress;
     const patientData = {
-      ...(props.patient ? { id: props.patient.id } : {}),
+      ...(props.patientId ? { id: props.patientId } : {}),
       name: {
         first: store['firstName']!.value,
         last: store['lastName']!.value
@@ -167,17 +214,16 @@ const Component = (props: PatientDialogProps) => {
         : []
     };
     try {
-      if (props.patient) {
-        const patientId = props.patient.id;
+      if (props.patientId) {
         // if patientId is provided, update the patient.
         const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
         await updatePatientMutation({ variables: patientData, awaitRefetchQueries: false });
-        dispatchUpdate(patientId, didClickCreatePatientAndPrescription);
+        dispatchUpdate(props.patientId, didClickCreatePatientAndPrescription);
         dispatchAnalyticsTrackEvent(
           {
             trackEventType: 'patient_updated',
             properties: {
-              patientId: patientId,
+              patientId: props.patientId,
               didClickCreatePatientAndPrescription,
               fields: buildFieldSnapshot(store, PATIENT_FORM_FIELDS)
             }
@@ -223,7 +269,7 @@ const Component = (props: PatientDialogProps) => {
               {
                 trackEventType: 'patient_form_closed',
                 properties: {
-                  isEdit: Boolean(props.patient),
+                  isEdit: Boolean(props.patientId),
                   fields: formStore()
                     ? buildFieldSnapshot(formStore(), PATIENT_FORM_FIELDS)
                     : undefined
@@ -234,8 +280,8 @@ const Component = (props: PatientDialogProps) => {
             dispatchClosed();
             props.open = false;
           }}
-          title={props.patient ? 'Edit patient' : 'New patient'}
-          titleIconName={props.patient ? 'pencil-square' : 'person-plus'}
+          title={props.patientId ? 'Edit patient' : 'New patient'}
+          titleIconName={props.patientId ? 'pencil-square' : 'person-plus'}
           footer={
             <>
               <Show when={!props?.hideCreatePrescription}>
@@ -246,7 +292,7 @@ const Component = (props: PatientDialogProps) => {
                   loading={loading() && isCreatePrescription()}
                   onClick={() => submitForm(formStore(), actions(), true)}
                 >
-                  {props.patient ? 'Save' : 'Create'} and start prescription
+                  {props.patientId ? 'Save' : 'Create'} and start prescription
                 </Button>
               </Show>
               <Show when={!!hasPatients() || !!props?.hideCreatePrescription}>
@@ -258,7 +304,7 @@ const Component = (props: PatientDialogProps) => {
                   loading={loading() && !isCreatePrescription()}
                   onClick={() => submitForm(formStore(), actions(), false)}
                 >
-                  {props.patient ? 'Save' : 'Create'}
+                  {props.patientId ? 'Save' : 'Create'}
                 </Button>
               </Show>
             </>
@@ -290,7 +336,8 @@ const Component = (props: PatientDialogProps) => {
                     )
                   );
                 }}
-                patient={props.patient}
+                patient={patientQuery()?.patient}
+                loading={patientQuery.loading}
                 optional-patient-address={props.optionalPatientAddress}
               />
             </>
@@ -303,7 +350,7 @@ const Component = (props: PatientDialogProps) => {
 customElement(
   'photon-patient-dialog',
   {
-    patient: undefined,
+    patientId: '',
     hideCreatePrescription: false,
     open: false,
     optionalPatientAddress: false

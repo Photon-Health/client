@@ -168,7 +168,7 @@ export const PatientCard = (props: {
             address={props?.address || props.store.patient?.value?.address}
           />
           <photon-patient-dialog
-            patient={patientStore.selectedPatient.data}
+            patient-id={patientId()}
             hide-create-prescription={true}
             open={showEditPatientView()}
             optional-patient-address={props.optionalPatientAddress}
