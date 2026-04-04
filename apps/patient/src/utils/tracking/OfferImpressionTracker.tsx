@@ -62,16 +62,7 @@ const OfferImpressionTracker = ({
           multiMedOffer: rxIds.size > 1,
           hasRefills: rxIds.size < order.fills.length,
           tags: offer?.tags,
-          promotions:
-            offer && 'medications' in offer
-              ? offer.medications?.flatMap(
-                  (med) =>
-                    med.promotions?.map((promo) => ({
-                      medicationName: med.name,
-                      ...promo
-                    })) ?? []
-                )
-              : null
+          medicationCosts: offer?.medications
         });
       }
     }
