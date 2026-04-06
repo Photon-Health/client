@@ -4,7 +4,6 @@ import { GoogleServiceProvider, PhotonContext, SDKProvider } from '@photonhealth
 import { afterAll, afterEach, beforeAll, expect, test, vi } from 'vitest';
 import { setupServer } from 'msw/node';
 import { HttpResponse } from 'msw';
-import { PatientStore } from '../stores/patient';
 import {
   PhotonPrescribeWorkflowComponent,
   type PrescribeWorkflowComponentProps
@@ -47,7 +46,6 @@ afterEach(async () => {
   cleanup();
   server.resetHandlers();
   vi.clearAllMocks();
-  await PatientStore.actions.reset();
 });
 
 afterAll(() => server.close());

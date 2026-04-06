@@ -159,7 +159,7 @@ const PatientForm = (props: {
     return prefOption;
   });
 
-  const formName = props.patientId ? 'update_patient_form' : 'new_patient_form';
+  const formName = props.patient ? 'update_patient_form' : 'new_patient_form';
 
   const trackFieldInteraction = (fieldName: string, hasValue: boolean, isOptional = false) => {
     dispatchAnalyticsTrackEvent(
