@@ -74,9 +74,16 @@ export const PatientCard = (props: {
       });
     }
 
-    if (props?.patientId) {
+    if (props.patientId) {
       // fetch patient on mount when patientId is passed
       patientActions.getSelectedPatient(props.client!.getSDK(), props.patientId);
+    }
+  });
+
+  createEffect(() => {
+    if (props.patientId && patientStore.selectedPatient.data) {
+      // update patient when passed-in patient (patientId) is fetched
+      updateFormPatient(patientStore.selectedPatient.data, { trackInteraction: false });
     }
   });
 
@@ -101,20 +108,13 @@ export const PatientCard = (props: {
     }
   };
 
-  createEffect(() => {
-    if (patientStore?.selectedPatient?.data && props.patientId) {
-      // update patient when passed-in patient (patientId) is fetched
-      updateFormPatient(patientStore?.selectedPatient?.data, { trackInteraction: false });
-    }
-  });
-
   // Listen for changes to the patient
   const patientId = createMemo(() => {
     if (isUpdating()) {
       return '';
     }
     // prefer the passed-in patientId if it exists
-    return props?.patientId || props.store.patient?.value?.id || '';
+    return props.patientId || props.store.patient?.value?.id || '';
   });
 
   const hasAddress = createMemo(() => {
@@ -140,7 +140,7 @@ export const PatientCard = (props: {
 
   return (
     <div class="flex flex-col gap-8">
-      <Show when={!props?.patientId}>
+      <Show when={!props.patientId}>
         <Card addChildrenDivider={true}>
           <div class="flex items-center justify-between">
             <Text color="gray">Select Patient</Text>
@@ -148,9 +148,16 @@ export const PatientCard = (props: {
 
           {/* Show Dropdown when no patientId is passed */}
           <PatientSelect
-            store={patientStore}
-            actions={patientActions}
-            onSelect={updateFormPatient}
+            selectedPatient={patientStore.selectedPatient.data}
+            patients={patientStore.patients.data}
+            loading={patientStore.patients.isLoading || patientStore.selectedPatient.isLoading}
+            onSearch={(name) =>
+              patientActions.getPatients(props.client!.getSDK(), name ? { name } : undefined)
+            }
+            onSelect={(patient: Patient) => {
+              patientActions.setSelectedPatient(patient);
+              updateFormPatient(patient);
+            }}
           />
         </Card>
       </Show>
@@ -158,14 +165,14 @@ export const PatientCard = (props: {
         <div>
           <PatientInfo
             patientId={patientId()}
-            weight={props?.weight}
-            weightUnit={props?.weightUnit}
+            weight={props.weight}
+            weightUnit={props.weightUnit}
             editPatient={
-              props?.enableOrder && !showAddressForm()
+              props.enableOrder && !showAddressForm()
                 ? () => setShowEditPatientView(true)
                 : undefined
             }
-            address={props?.address || props.store.patient?.value?.address}
+            address={props.address || props.store.patient?.value?.address}
           />
           <photon-patient-dialog
             patient-id={patientId()}

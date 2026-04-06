@@ -1,55 +1,45 @@
 //Photon
-import { ComboBox, usePhoton } from '@photonhealth/components';
+import { ComboBox } from '@photonhealth/components';
 
 //Types
 import { Patient } from '@photonhealth/sdk/dist/types';
 import { createMemo, For, Show } from 'solid-js';
-import { PatientActions, PatientStore } from '../../stores/patient';
 import { debounce } from '@solid-primitives/scheduled';
 
 export const PatientSelect = (props: {
-  store: PatientStore;
-  actions: PatientActions;
+  selectedPatient?: Patient;
+  patients: Patient[];
+  loading: boolean;
+  onSearch: (name?: string) => void;
   onSelect: (patient: Patient) => void;
 }) => {
-  const client = usePhoton();
-
-  const getData = createMemo(() => {
-    if (props.store.selectedPatient.data) {
+  const data = createMemo(() => {
+    if (props.selectedPatient) {
       return [
-        props.store.selectedPatient.data,
-        ...props.store.patients.data.filter((x) => x?.id !== props.store.selectedPatient.data!.id)
+        props.selectedPatient,
+        ...props.patients.filter((x) => x.id !== props.selectedPatient!.id)
       ];
     } else {
-      return props.store.patients.data;
+      return props.patients;
     }
   });
 
   const handleSearch = debounce((s: string) => {
-    props.actions.getPatients(client!.getSDK(), {
-      name: s
-    });
+    props.onSearch(s);
   }, 250);
-
-  const handleSelect = (patient: Patient) => {
-    props.actions.setSelectedPatient(patient);
-    props.onSelect(patient);
-  };
-
-  const loading = () => props.store.patients.isLoading || props.store.selectedPatient.isLoading;
 
   return (
     <ComboBox
-      value={props.store.selectedPatient.data || {}}
-      setSelected={handleSelect}
+      value={props.selectedPatient || {}}
+      setSelected={props.onSelect}
       onOpen={() => {
-        if (props.store.patients.data.length === 0) {
-          props.actions.getPatients(client!.getSDK());
+        if (props.patients.length === 0) {
+          props.onSearch();
         }
       }}
     >
       <ComboBox.Input
-        loading={loading()}
+        loading={props.loading}
         placeholder="Select patient..."
         onInput={(e) => handleSearch(e.currentTarget.value)}
         displayValue={(p: Patient) => {
@@ -57,17 +47,17 @@ export const PatientSelect = (props: {
         }}
       />
       <Show
-        when={getData().length > 0}
+        when={data().length > 0}
         fallback={
           <ComboBox.Options>
             <ComboBox.Option key={''} value={null} disabled={true}>
-              {loading() ? 'Loading...' : 'No patients found'}
+              {props.loading ? 'Loading...' : 'No patients found'}
             </ComboBox.Option>
           </ComboBox.Options>
         }
       >
         <ComboBox.Options>
-          <For each={getData()}>
+          <For each={data()}>
             {(p: Patient) => (
               <ComboBox.Option key={p.id} value={p}>
                 {p.name?.full || ''}
