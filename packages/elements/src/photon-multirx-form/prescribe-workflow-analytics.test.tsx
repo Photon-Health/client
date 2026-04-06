@@ -17,10 +17,6 @@ import {
 } from '@photonhealth/sdk/test-utils';
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
 
-vi.mock('solid-element', () => ({
-  customElement: vi.fn()
-}));
-
 const server = setupServer(...defaultHandlers);
 
 beforeAll(() => {
