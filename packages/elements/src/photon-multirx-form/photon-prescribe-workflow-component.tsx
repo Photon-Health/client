@@ -23,7 +23,7 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
-interface PrescribeWorkflowComponentProps extends Omit<PrescribeProps, 'initialShowForm'> {
+export interface PrescribeWorkflowComponentProps extends Omit<PrescribeProps, 'initialShowForm'> {
   templateIds?: string;
   templateOverrides?: TemplateOverrides;
   prescriptionIds?: string;
@@ -35,7 +35,7 @@ interface PrescribeWorkflowComponentProps extends Omit<PrescribeProps, 'initialS
   mailOrderIds?: string;
 }
 
-const Component = (props: PrescribeWorkflowComponentProps) => {
+export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowComponentProps) => {
   const { store, actions } = createFormStore({
     dispenseAsWritten: false,
     patient: undefined,
@@ -150,5 +150,5 @@ customElement(
     disableList: undefined,
     groupId: undefined
   },
-  Component
+  PhotonPrescribeWorkflowComponent
 );

@@ -54,7 +54,7 @@ export const PatientCard = (props: {
   hidePatientCard?: boolean;
   optionalPatientAddress?: boolean;
 }) => {
-  const { dispatchAnalytics } = usePrescribeEventDispatch();
+  const { dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
   const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
   const [showEditPatientView, setShowEditPatientView] = createSignal(false);
   const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
@@ -93,9 +93,10 @@ export const PatientCard = (props: {
       value: patient
     });
     if (trackInteraction) {
-      dispatchAnalytics({
-        trackEventType: 'prescription_patient_changed',
-        properties: { patientId: patient.id }
+      dispatchAnalyticsTrackEvent('fieldInteraction', {
+        name: 'Field Interaction',
+        formName: 'add_prescription_form',
+        patientId: patient.id
       });
     }
     if (props.enableOrder && !props.address) {
@@ -170,7 +171,12 @@ export const PatientCard = (props: {
             weightUnit={props.weightUnit}
             editPatient={
               props.enableOrder && !showAddressForm()
-                ? () => setShowEditPatientView(true)
+                ? () => {
+                    dispatchAnalyticsTrackEvent('ctaClicked', {
+                      name: 'Patient Edited'
+                    });
+                    setShowEditPatientView(true);
+                  }
                 : undefined
             }
             address={props.address || props.store.patient?.value?.address}
@@ -212,9 +218,7 @@ export const PatientCard = (props: {
             open={showAddMedDialog()}
             on:photon-medication-selected={(e: { detail: { medication: Treatment } }) => {
               setNewMedication(e.detail.medication);
-              dispatchAnalytics({
-                trackEventType: 'add_to_medication_history'
-              });
+              dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Added To Medication History' });
             }}
             on:photon-medication-closed={() => {
               setShowAddMedDialog(false);

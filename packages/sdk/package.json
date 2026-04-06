@@ -38,6 +38,10 @@
     },
     "./dist/clinical-api/types": {
       "import": "./dist/graphql/clinical-api/gql/graphql.ts"
+    },
+    "./test-utils": {
+      "import": "./src/test-utils/index.ts",
+      "default": "./src/test-utils/index.ts"
     }
   },
   "types": "./dist/lib.d.ts",

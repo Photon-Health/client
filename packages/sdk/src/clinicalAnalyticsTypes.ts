@@ -1,228 +1,118 @@
+export type AnalyticsCategory = 'pageViewed' | 'ctaClicked' | 'fieldInteraction';
+
 export interface FieldCompletionSnapshot {
   [fieldName: string]: { completed: boolean };
 }
 
-// ---------------------------------------------------------------------------
-// Typesafe form analytics events (photon-analytics-track-event CustomEvent)
-// ---------------------------------------------------------------------------
-
-export type PatientFormTrackEventType =
-  | 'patient_form_opened'
-  | 'patient_created'
-  | 'patient_updated'
-  | 'patient_form_closed'
-  | 'patient_field_interaction';
-
-export type SignatureAttestationTrackEventType =
-  | 'signature_attestation_shown'
-  | 'signature_attestation_agreed'
-  | 'signature_attestation_canceled';
-
-export type PrescriptionFormTrackEventType =
-  | 'prescription_form_opened'
-  | 'prescription_patient_changed'
-  | 'add_to_medication_history'
-  | 'draft_prescription_added'
-  | 'draft_prescription_deleted'
-  | 'draft_prescription_edited'
-  | 'draft_prescriptions_activated'
-  | 'order_created'
-  | 'screening_alert_acknowledged'
-  | 'screening_alert_canceled'
-  | 'combine_orders_viewed'
-  | 'prescription_form_closed'
-  | 'prescription_field_interaction'
-  | 'pharmacy_interaction';
-
-export const prescriptionFormEventTypes: Set<string> = new Set<PrescriptionFormTrackEventType>([
-  'prescription_form_opened',
-  'prescription_patient_changed',
-  'add_to_medication_history',
-  'draft_prescription_added',
-  'draft_prescription_deleted',
-  'draft_prescription_edited',
-  'order_created',
-  'combine_orders_viewed',
-  'draft_prescriptions_activated',
-  'screening_alert_acknowledged',
-  'screening_alert_canceled',
-  'prescription_form_closed',
-  'prescription_field_interaction',
-  'pharmacy_interaction'
-]);
-
-export type FormTrackEventType =
-  | PatientFormTrackEventType
-  | SignatureAttestationTrackEventType
-  | PrescriptionFormTrackEventType;
-
-// fields lives inside properties for events that support a field snapshot —
-// keeps dispatch calls to a single object and makes clear which events carry
-// snapshot data.
-type EmptyProperties = Record<string, never>;
-type PatientFormOpened = { trackEventType: 'patient_form_opened'; properties: { isEdit: boolean } };
-type PatientCreated = {
-  trackEventType: 'patient_created';
-  properties: {
-    patientId: string;
-    didClickCreatePatientAndPrescription: boolean;
-    fields?: FieldCompletionSnapshot;
-  };
-};
-type PatientUpdated = {
-  trackEventType: 'patient_updated';
-  properties: {
-    patientId: string;
-    didClickCreatePatientAndPrescription: boolean;
-    fields?: FieldCompletionSnapshot;
-  };
-};
-type PatientFormClosed = {
-  trackEventType: 'patient_form_closed';
-  properties: { isEdit: boolean; fields?: FieldCompletionSnapshot };
-};
-type PatientFieldInteraction = {
-  trackEventType: 'patient_field_interaction';
-  properties: { fieldName: string; hasValue: boolean };
-};
-
-type SigAttestationShown = {
-  trackEventType: 'signature_attestation_shown';
-  properties: { attestationVersion: string };
-};
-type SigAttestationAgreed = {
-  trackEventType: 'signature_attestation_agreed';
-  properties: { attestationVersion: string };
-};
-type SigAttestationCanceled = {
-  trackEventType: 'signature_attestation_canceled';
-  properties?: EmptyProperties;
-};
-
-type PrescriptionFormOpened = {
-  trackEventType: 'prescription_form_opened';
-  properties: {
-    prefillPatientId: string;
-    prefillPharmacyId: string;
-    hasPrefillPatientExternalId: boolean;
-    hasPrefillTemplateIds: boolean;
-    hasPrefillPrescriptionIds: boolean;
-    hasPrefillWeight: boolean;
-    weightUnit: string;
-  };
-};
-type PrescriptionPatientChanged = {
-  trackEventType: 'prescription_patient_changed';
-  properties: { patientId: string };
-};
-
-type AddToMedicationHistory = {
-  trackEventType: 'add_to_medication_history';
-  properties?: EmptyProperties;
-};
-
 export type DraftPrescriptionSource = 'form' | 'med_history_refill' | 'prefill';
 
-type DraftPrescriptionAdded = {
-  trackEventType: 'draft_prescription_added';
-  properties: {
-    draftPrescriptionSource: DraftPrescriptionSource;
-    fields?: FieldCompletionSnapshot;
-  };
-};
-type DraftPrescriptionDeleted = {
-  trackEventType: 'draft_prescription_deleted';
-  properties?: EmptyProperties;
-};
-type DraftPrescriptionEdited = {
-  trackEventType: 'draft_prescription_edited';
-  properties?: EmptyProperties;
-};
-type OrderCreated = {
-  trackEventType: 'order_created';
-  properties: {
-    orderId: string;
-    prescriptionCount: number;
-    fulfillmentType: string | null;
-    hasPreferredPharmacy: boolean;
-    setAsPreferred: boolean;
-    pharmacyId: string | null;
-    isCombinedOrder: boolean;
-  };
-};
-type DraftPrescriptionsActivated = {
-  trackEventType: 'draft_prescriptions_activated';
-  properties: {
-    prescriptionCount: number;
-  };
-};
-type CombineOrdersViewed = {
-  trackEventType: 'combine_orders_viewed';
-  properties?: EmptyProperties;
-};
-type ScreeningAlertAcknowledged = {
-  trackEventType: 'screening_alert_acknowledged';
-  properties: { screeningAlertCount: number };
-};
-type ScreeningAlertCanceled = {
-  trackEventType: 'screening_alert_canceled';
-  properties: { screeningAlertCount: number };
-};
-type PrescriptionFormClosed = {
-  trackEventType: 'prescription_form_closed';
-  properties: { hadUnsavedWork: boolean; fields?: FieldCompletionSnapshot };
-};
-type PrescriptionFieldInteraction = {
-  trackEventType: 'prescription_field_interaction';
-  properties: { fieldName: string; hasValue: boolean };
-};
-type PharmacyInteraction = {
-  trackEventType: 'pharmacy_interaction';
-  properties: {
-    tabSelected: string;
-    hasPreferredPharmacy: boolean;
-    setAsPreferred?: boolean;
-  };
+// ---------------------------------------------------------------------------
+// Page View Events — each page gets a unique event name
+// ---------------------------------------------------------------------------
+
+export type PageViewEvent =
+  | { name: 'New Patient Page Viewed' }
+  | { name: 'Update Patient Page Viewed' }
+  | {
+      name: 'New Prescriptions Page Viewed';
+      prefillPatientId: string;
+      prefillPharmacyId: string;
+      hasPrefillPatientExternalId: boolean;
+      hasPrefillTemplateIds: boolean;
+      hasPrefillPrescriptionIds: boolean;
+      hasPrefillWeight: boolean;
+      weightUnit: string;
+    }
+  | { name: 'Signature Attestation Page Viewed'; attestationVersion: string };
+
+// ---------------------------------------------------------------------------
+// CTA Click Events — each variant has a unique, descriptive name
+// ---------------------------------------------------------------------------
+
+export type CtaClickEvent =
+  | {
+      name: 'Patient Created';
+      buttonText: string;
+      patientId: string;
+      didClickCreatePatientAndPrescription: boolean;
+      fields?: FieldCompletionSnapshot;
+    }
+  | {
+      name: 'Patient Updated';
+      buttonText: string;
+      patientId: string;
+      didClickCreatePatientAndPrescription: boolean;
+      fields?: FieldCompletionSnapshot;
+    }
+  | {
+      name: 'Order Sent';
+      buttonText: string;
+      orderId: string;
+      prescriptionCount: number;
+      fulfillmentType: string | null;
+      hasPreferredPharmacy: boolean;
+      setAsPreferred: boolean;
+      pharmacyId: string | null;
+      isCombinedOrder: boolean;
+    }
+  | { name: 'Prescriptions Activated'; buttonText: string; prescriptionCount: number }
+  | { name: 'Signature Attestation Agreed'; buttonText: string; attestationVersion: string }
+  | { name: 'Signature Attestation Canceled'; buttonText: string }
+  | { name: 'Order Canceled'; buttonText: string; orderId: string }
+  | {
+      name: 'Draft Prescription Added';
+      draftPrescriptionSource: DraftPrescriptionSource;
+      fields?: FieldCompletionSnapshot;
+    }
+  | { name: 'Draft Prescription Edited' }
+  | { name: 'Draft Prescription Deleted' }
+  | { name: 'Added To Medication History' }
+  | { name: 'Combine Orders Confirmed'; buttonText: string }
+  | { name: 'Combine Orders Rejected'; buttonText: string }
+  | { name: 'Patient Edited' }
+  | { name: 'Screening Alert Acknowledged'; screeningAlertCount: number; buttonText: string }
+  | { name: 'Screening Alert Canceled'; screeningAlertCount: number; buttonText: string }
+  | { name: 'Pharmacy Selected'; orderId: string; pharmacyId: string };
+
+// ---------------------------------------------------------------------------
+// Field Interaction Events — all share "Field Interaction"
+// ---------------------------------------------------------------------------
+
+export type FieldInteractionEvent =
+  | {
+      name: 'Field Interaction';
+      formName: string;
+      fieldName: string;
+      hasValue: boolean;
+      isOptional: boolean;
+    }
+  | {
+      name: 'Field Interaction';
+      formName: string;
+      tabSelected: string;
+      hasPreferredPharmacy: boolean;
+      setAsPreferred?: boolean;
+    }
+  | { name: 'Field Interaction'; formName: string; patientId: string };
+
+// ---------------------------------------------------------------------------
+// Event map — used by dispatchAnalyticsTrackEvent generic
+// ---------------------------------------------------------------------------
+export type AnalyticsEventMap = {
+  pageViewed: PageViewEvent;
+  ctaClicked: CtaClickEvent;
+  fieldInteraction: FieldInteractionEvent;
 };
 
-// Input type passed to dispatchAnalyticsTrackEvent — no timestamp (added by the dispatch fn).
-// Do NOT derive an "input" type via Omit on the full detail type; Omit doesn't distribute
-// over unions and collapses the discriminant.
+// ---------------------------------------------------------------------------
+// Combined type — the CustomEvent detail shape used by the listener side
+// ---------------------------------------------------------------------------
 export type PhotonEmbedAnalyticsEventInput =
-  | PatientFormOpened
-  | PatientCreated
-  | PatientUpdated
-  | PatientFormClosed
-  | PatientFieldInteraction
-  | SigAttestationShown
-  | SigAttestationAgreed
-  | SigAttestationCanceled
-  | PrescriptionFormOpened
-  | PrescriptionPatientChanged
-  | AddToMedicationHistory
-  | DraftPrescriptionAdded
-  | DraftPrescriptionDeleted
-  | DraftPrescriptionEdited
-  | OrderCreated
-  | CombineOrdersViewed
-  | DraftPrescriptionsActivated
-  | ScreeningAlertAcknowledged
-  | ScreeningAlertCanceled
-  | PrescriptionFormClosed
-  | PrescriptionFieldInteraction
-  | PharmacyInteraction;
+  | ({ category: 'pageViewed' } & PageViewEvent)
+  | ({ category: 'ctaClicked' } & CtaClickEvent)
+  | ({ category: 'fieldInteraction' } & FieldInteractionEvent);
 
-export type PatientFormAnalyticsEvent = Extract<
-  PhotonEmbedAnalyticsEventInput,
-  { trackEventType: PatientFormTrackEventType }
->;
-
-export type SignatureAttestationAnalyticsEvent = Extract<
-  PhotonEmbedAnalyticsEventInput,
-  { trackEventType: SignatureAttestationTrackEventType }
->;
-
-export type PrescriptionFormAnalyticsEvent = Extract<
-  PhotonEmbedAnalyticsEventInput,
-  { trackEventType: PrescriptionFormTrackEventType }
->;
+// ---------------------------------------------------------------------------
+// RudderStack event names — resolved dynamically by the listener side
+// ---------------------------------------------------------------------------
+export type ClinicalAppEventName = string;

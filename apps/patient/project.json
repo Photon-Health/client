@@ -121,6 +121,7 @@
     },
     "test": {
       "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
       "options": {
         "cwd": "apps/patient",
         "command": "vitest run"
