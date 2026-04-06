@@ -82,8 +82,8 @@ const Component = (props: {
         displayAccessor={(p) => {
           if (!p) return '';
           const element = (
-            <div>
-              <span>{p.name?.full}</span> <span style="color:grey">{p.dateOfBirth}</span>
+            <div class="flex justify-between items-center">
+              <span>{p.name?.full}</span> <span class="text-sm text-gray-500">{p.dateOfBirth}</span>
             </div>
           );
           return element;
