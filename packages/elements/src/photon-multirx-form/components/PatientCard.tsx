@@ -3,6 +3,7 @@ import { createEffect, createMemo, createSignal, onMount, Show } from 'solid-js'
 import {
   AddressForm,
   Card,
+  PatientSelect,
   PatientInfo,
   PatientMedHistory,
   PhotonClientStore,
@@ -13,7 +14,6 @@ import { Patient, Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { createPatientStore } from '../../stores/patient';
 import type { Address } from './PrescribeWorkflow';
-import { PatientSelect } from './PatientSelect';
 
 const hasUsableAddress = (address?: {
   street1?: string;

@@ -1,5 +1,4 @@
-//Photon
-import { ComboBox } from '@photonhealth/components';
+import { ComboBox } from '../particles/ComboBox';
 
 //Types
 import { Patient } from '@photonhealth/sdk/dist/types';
