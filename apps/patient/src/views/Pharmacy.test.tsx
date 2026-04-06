@@ -231,72 +231,6 @@ describe('Pharmacy page', () => {
       expect(await screen.findByText('Prime Rx Price')).toBeInTheDocument();
     }, 10_000);
 
-    test('shows the cheaper offer when both CASH and PRIME_RX offers are available', async () => {
-      const { fetchOfferBundles } = await import('./pharmacy.utils');
-      vi.mocked(fetchOfferBundles).mockResolvedValueOnce([
-        {
-          costType: 'CASH',
-          deliveryEstimate: 'Delivers in 2-3 days',
-          costAmount: 9.99,
-          costAmountTitle: 'Cash Price',
-          retailAmount: 100.0,
-          retailAmountTitle: 'Retail',
-          pharmacy: {
-            id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-            name: 'Amazon Pharmacy',
-            fulfillmentTypes: ['MAIL_ORDER']
-          },
-          tags: [],
-          medications: [{ name: 'Metformin 500mg', amount: 9.99, retailAmount: 100.0 }]
-        },
-        {
-          costType: 'PRIME_RX',
-          deliveryEstimate: 'Delivers in 1-2 days',
-          costAmount: 19.99,
-          costAmountTitle: 'Prime Rx Price',
-          retailAmount: 100.0,
-          retailAmountTitle: 'Retail',
-          pharmacy: {
-            id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-            name: 'Amazon Pharmacy',
-            fulfillmentTypes: ['MAIL_ORDER']
-          },
-          tags: [],
-          medications: [{ name: 'Metformin 500mg', amount: 19.99, retailAmount: 100.0 }]
-        }
-      ]);
-
-      const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
-      vi.mocked(getOrder).mockResolvedValue(
-        generateOrder({
-          id: 'ord_testId777',
-          state: 'ROUTING',
-          patient: generatePatient(),
-          fills: [generateFill('test-treatment')],
-          address: {
-            street1: '123 Main St',
-            city: 'New York',
-            state: 'NY',
-            postalCode: '10001',
-            country: 'US'
-          }
-        })
-      );
-      vi.mocked(getPharmaciesByLocation).mockResolvedValue({
-        pharmaciesByLocation: [
-          generatePharmacy({ id: 'phr_testId123', name: 'Test Local Pickup Pharmacy' })
-        ]
-      });
-      vi.mocked(setOrderPharmacy).mockResolvedValue(true);
-
-      renderApp();
-      await navigateToPharmacyScreen();
-
-      expect(await screen.findByText('$9.99')).toBeInTheDocument();
-      expect(await screen.findByText('Cash Price')).toBeInTheDocument();
-      expect(screen.queryByText('Prime Rx Price')).not.toBeInTheDocument();
-    }, 10_000);
-
     test('does not show offers when no offers are available', async () => {
       // Override the mock to return empty array for this test
       const { fetchOfferBundles } = await import('./pharmacy.utils');
@@ -588,13 +522,13 @@ describe('Pharmacy page', () => {
   }, 10_000);
 
   describe('multi-rx offers', () => {
-    test('shows the cheaper offer when both CASH and PRIME_RX offers are available', async () => {
+    test('shows Total Price title for mixed CASH and PRIME_RX bundle', async () => {
       const { fetchOfferBundles } = await import('./pharmacy.utils');
       vi.mocked(fetchOfferBundles).mockResolvedValueOnce([
         {
-          costType: 'CASH',
-          costAmount: 29.98,
-          costAmountTitle: 'Cash Price',
+          costType: 'MIXED',
+          costAmount: 21.98,
+          costAmountTitle: 'Total Price',
           retailAmount: 200.0,
           retailAmountTitle: 'Retail',
           deliveryEstimate: 'Delivers in 2-3 days',
@@ -605,26 +539,8 @@ describe('Pharmacy page', () => {
           },
           tags: [],
           medications: [
-            { name: 'Metformin', amount: 9.99, retailAmount: 100.0 },
-            { name: 'Lisinopril', amount: 19.99, retailAmount: 100.0 }
-          ]
-        },
-        {
-          costType: 'PRIME_RX',
-          costAmount: 39.99,
-          costAmountTitle: 'Prime Rx Price',
-          retailAmount: 200.0,
-          retailAmountTitle: 'Retail',
-          deliveryEstimate: 'Delivers in 1-2 days',
-          pharmacy: {
-            id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-            name: 'Amazon Pharmacy',
-            fulfillmentTypes: ['MAIL_ORDER']
-          },
-          tags: [],
-          medications: [
-            { name: 'Metformin', amount: 19.99, retailAmount: 100.0 },
-            { name: 'Lisinopril', amount: 20.0, retailAmount: 100.0 }
+            { name: 'Metformin', pricingType: 'CASH', amount: 9.99, retailAmount: 100.0 },
+            { name: 'Lisinopril', pricingType: 'PRIME_RX', amount: 11.99, retailAmount: 100.0 }
           ]
         }
       ]);
@@ -654,9 +570,8 @@ describe('Pharmacy page', () => {
       renderApp();
       await navigateToPharmacyScreen();
 
-      expect(await screen.findByText('$29.98')).toBeInTheDocument();
-      expect(await screen.findByText('Cash Price')).toBeInTheDocument();
-      expect(screen.queryByText('Prime Rx Price')).not.toBeInTheDocument();
+      expect(await screen.findByText('$21.98')).toBeInTheDocument();
+      expect(await screen.findByText('Total Price')).toBeInTheDocument();
     }, 10_000);
 
     test('shows per-medication prices and promotions for multi-rx bundle offers', async () => {
