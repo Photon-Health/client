@@ -294,9 +294,16 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
   private rudderanalytics?: RudderAnalytics;
   private environment = 'development';
   private mixpanelEnabled: boolean = false;
+  private isNonProduction = true;
 
   constructor() {
     this.environment = ENVIRONMENT;
+    this.isNonProduction =
+      ENVIRONMENT === 'boson' ||
+      ENVIRONMENT === 'neutron' ||
+      ENVIRONMENT === 'tau' ||
+      ENVIRONMENT === 'local' ||
+      ENVIRONMENT === 'development';
 
     if (RUDDERSTACK_WRITE_KEY && RUDDERSTACK_DATA_PLANE_URL) {
       this.rudderanalytics = new RudderAnalytics();
@@ -353,14 +360,7 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
     };
 
     if (this.rudderanalytics && options.toRudderStack) {
-      const isNonProductionEnvironment =
-        this.environment === 'boson' ||
-        this.environment === 'neutron' ||
-        this.environment === 'tau' ||
-        this.environment === 'local' ||
-        this.environment === 'development';
-
-      if (isNonProductionEnvironment) {
+      if (this.isNonProduction) {
         console.log(`📊 [Analytics] ${eventName}`, trackProperties);
       }
 
@@ -369,6 +369,10 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
 
     if (this.mixpanelEnabled && options.toMixpanel) {
       mixpanel.track(eventName, trackProperties);
+
+      if (this.isNonProduction) {
+        console.log(`📊 [Analytics: To Mixpanel] ${eventName}`, trackProperties);
+      }
     }
   }
 
@@ -397,19 +401,35 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
     flagName: K,
     fallback: FlagValues[K]
   ): Promise<FlagValues[K]> {
+    let flagValue: FlagValues[K];
+
     if (this.mixpanelEnabled) {
-      return mixpanel.flags.get_variant_value(flagName, fallback);
+      flagValue = await mixpanel.flags.get_variant_value(flagName, fallback);
+    } else {
+      flagValue = fallback;
     }
 
-    return fallback;
+    if (this.isNonProduction) {
+      console.log(`📊 [Analytics: Feature Flag] ${flagName}`, flagValue);
+    }
+
+    return flagValue;
   }
 
   getFlagValueSync<K extends FlagNames>(flagName: K, fallback: FlagValues[K]): FlagValues[K] {
+    let flagValue: FlagValues[K];
+
     if (this.mixpanelEnabled) {
-      return mixpanel.flags.get_variant_value_sync(flagName, fallback);
+      flagValue = mixpanel.flags.get_variant_value_sync(flagName, fallback);
+    } else {
+      flagValue = fallback;
     }
 
-    return fallback;
+    if (this.isNonProduction) {
+      console.log(`📊 [Analytics: Feature Flag] ${flagName}`, flagValue);
+    }
+
+    return flagValue;
   }
 }
 
