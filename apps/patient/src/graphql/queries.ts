@@ -484,6 +484,7 @@ export const GET_OFFER_BUNDLES = gql`
         deliveryEstimate {
           deliveryPromise
         }
+        pricingType
         prescription {
           treatment {
             id
@@ -491,6 +492,9 @@ export const GET_OFFER_BUNDLES = gql`
           }
         }
       }
+      amountTitle
+      retailAmountTitle
+      deliveryEstimate
       pricingType
       supplier
     }
