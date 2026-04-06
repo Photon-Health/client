@@ -102,7 +102,7 @@ function subheaderText(props: OrderStatusHeaderProps) {
     return 'Please review your order for details.';
   }
   if (props.exception === 'PHARMACY_UNREACHABLE') {
-    return "We're unable to get updates for your order. You can call your current pharmacy or change pharmacies below.";
+    return 'Please allow a few hours for the pharmacy to process your prescription. If you need it sooner, contact your pharmacy or change pharmacies below.';
   }
   if (props.exception === 'PHARMACY_CLOSED') {
     return 'Your pharmacy is closed. You can change it if you need your order sooner.';
@@ -262,7 +262,8 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
   const derivedProps = { ...props, status: derivedStatus };
 
   const header = headerText(derivedProps);
-  const displayProgressBar = props.exception !== 'EXTERNAL_TRANSFER';
+  const displayProgressBar =
+    !props.exception || !['EXTERNAL_TRANSFER', 'PHARMACY_UNREACHABLE'].includes(props.exception);
   const subheader = props.subHeaderOverride || subheaderText(derivedProps);
   const color = progressLevel(derivedProps);
   const progressBar = progress(derivedProps);
