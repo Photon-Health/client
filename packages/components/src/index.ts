@@ -79,6 +79,8 @@ import {
   PATIENT_FORM_FIELDS
 } from './analytics/buildFieldSnapshot';
 import { PatientSelect } from './systems/PatientSelect';
+import { hasUsableAddress } from './utils/hasUsableAddress';
+import { orderNeedsPatientAddress } from './utils/orderNeedsPatientAddress';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
 
@@ -145,7 +147,9 @@ export {
   buildFieldSnapshot,
   PATIENT_FORM_FIELDS,
   DRAFT_PRESCRIPTION_FORM_FIELDS,
-  PatientSelect
+  PatientSelect,
+  hasUsableAddress,
+  orderNeedsPatientAddress
 };
 
 // Export types

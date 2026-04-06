@@ -10,27 +10,9 @@ import {
   Text,
   usePrescribeEventDispatch
 } from '@photonhealth/components';
-import { Patient, Treatment } from '@photonhealth/sdk/dist/types';
+import { Address, Patient, Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { createPatientStore } from '../../stores/patient';
-import type { Address } from './PrescribeWorkflow';
-
-const hasUsableAddress = (address?: {
-  street1?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-}) => {
-  if (!address) {
-    return false;
-  }
-  return Boolean(
-    address.street1?.trim() &&
-      address.city?.trim() &&
-      address.state?.trim() &&
-      address.postalCode?.trim()
-  );
-};
 
 const patientValidator = message(record(string(), any()), 'Please select a patient...');
 
@@ -52,6 +34,7 @@ export const PatientCard = (props: {
   enableMedHistoryLinks?: boolean;
   enableMedHistoryRefillButton?: boolean;
   hidePatientCard?: boolean;
+  showAddressForm: boolean;
   optionalPatientAddress?: boolean;
 }) => {
   const { dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
@@ -81,7 +64,7 @@ export const PatientCard = (props: {
   });
 
   createEffect(() => {
-    if (props.patientId && patientStore.selectedPatient.data) {
+    if (patientStore.selectedPatient.data) {
       // update patient when passed-in patient (patientId) is fetched
       updateFormPatient(patientStore.selectedPatient.data, { trackInteraction: false });
     }
@@ -99,6 +82,8 @@ export const PatientCard = (props: {
         patientId: patient.id
       });
     }
+    // TODO: keep this logic here for now,
+    // need to investigate how different addresses are stored in formStore
     if (props.enableOrder && !props.address) {
       // update address when you want to allow send order
       // but the address hasn't been manually overridden
@@ -115,28 +100,7 @@ export const PatientCard = (props: {
       return '';
     }
     // prefer the passed-in patientId if it exists
-    return props.patientId || props.store.patient?.value?.id || '';
-  });
-
-  const hasAddress = createMemo(() => {
-    const address = props.store.address?.value || props.store.patient?.value?.address;
-    return hasUsableAddress(address);
-  });
-  const hasPreferredPharmacy = createMemo(() => {
-    return Boolean(props.store.patient?.value?.preferredPharmacies?.length);
-  });
-
-  // Show the address form only if the patient doesnt have an address
-  // and the address is not marked as optional in the provider UX
-  const showAddressForm = createMemo(() => {
-    if (!props.store.patient?.value?.id || !props.enableOrder) {
-      return false;
-    }
-    if (!props.optionalPatientAddress) {
-      return !hasAddress();
-    }
-    // optionalpatientaddress skips address requirement unless a preferred pharmacy is set
-    return hasPreferredPharmacy() && !hasAddress();
+    return props.patientId || patientStore.selectedPatient.data?.id || '';
   });
 
   return (
@@ -170,7 +134,9 @@ export const PatientCard = (props: {
             weight={props.weight}
             weightUnit={props.weightUnit}
             editPatient={
-              props.enableOrder && !showAddressForm()
+              // If showAddressForm, don't enable Edit patient button
+              // until patient address is collected
+              props.enableOrder && !props.showAddressForm
                 ? () => {
                     dispatchAnalyticsTrackEvent('ctaClicked', {
                       name: 'Patient Edited'
@@ -226,7 +192,7 @@ export const PatientCard = (props: {
           />
         </div>
       </Show>
-      <Show when={showAddressForm()}>
+      <Show when={props.showAddressForm && patientId()}>
         <AddressForm
           patientId={patientId()}
           setAddress={(address: Address) => {

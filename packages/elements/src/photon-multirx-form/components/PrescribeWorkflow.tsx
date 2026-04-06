@@ -13,9 +13,11 @@ import {
   AddressForm,
   Alert,
   Button,
+  hasUsableAddress,
   RecentOrders,
   ScreeningAlertAcknowledgementDialog,
   ScreeningAlertType,
+  orderNeedsPatientAddress,
   SignatureAttestationModal,
   Spinner,
   Toaster,
@@ -26,48 +28,16 @@ import {
   usePrescribeEventDispatch,
   useRecentOrders
 } from '@photonhealth/components';
-import { MeUserQuery, types } from '@photonhealth/sdk';
-import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
+import { MeUserQuery } from '@photonhealth/sdk';
+import {
+  Address,
+  AddressInput,
+  Prescription,
+  PrescriptionState
+} from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
 import { SupervisorCard } from './SupervisorCard';
-
-const hasUsableAddress = (address?: {
-  street1?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-}) => {
-  if (!address) {
-    return false;
-  }
-  return Boolean(
-    address.street1?.trim() &&
-      address.city?.trim() &&
-      address.state?.trim() &&
-      address.postalCode?.trim()
-  );
-};
-
-const fulfillmentNeedsAddress = (fulfillmentType?: string) => {
-  return (
-    fulfillmentType === types.FulfillmentType.PickUp ||
-    fulfillmentType === types.FulfillmentType.MailOrder
-  );
-};
-
-const shouldBlockOrderWithoutAddress = (fulfillmentType?: string, hasAddress?: boolean) => {
-  return fulfillmentNeedsAddress(fulfillmentType) && !hasAddress;
-};
-
-export type Address = {
-  city: string;
-  postalCode: string;
-  state: string;
-  street1: string;
-  street2?: string;
-  country?: string;
-};
 
 export interface DisabledItem {
   treatmentIds?: string[];
@@ -87,7 +57,11 @@ export type PrescribeProps = {
   enableMedHistoryRefillButton: boolean;
   enableCombineAndDuplicate: boolean;
   optionalPatientAddress: boolean;
-  address?: Address;
+  /**
+   * Provide an address to set on the order.
+   * Always overrides the patient address.
+   */
+  address?: Omit<AddressInput, 'name'>;
   weight?: number;
   weightUnit?: string;
   additionalNotes?: string;
@@ -129,9 +103,15 @@ const calculateNeedsSupervisor = ({ title, state }: { title?: string; state?: st
   ['NP', 'PA'].includes(title) &&
   ['CA', 'FL', 'GA', 'MI', 'MO', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA'].includes(state.toUpperCase());
 
+enum PatientAddressFormPosition {
+  PatientInfo = 'patient-info',
+  PharmacySelect = 'pharmacy-select'
+}
+
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
   let prescriptionRef: HTMLDivElement | undefined;
+  const client = usePhoton();
 
   const { draftPrescriptions, prescriptionIds, tryUpdatePrescriptionStates, isLoadingPrefills } =
     useDraftPrescriptions();
@@ -148,7 +128,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   } = usePrescribeEventDispatch();
   const [needsSupervisor, setNeedsSupervisor] = createSignal<boolean>(false);
 
-  const client = usePhoton();
   const [showForm, setShowForm] = createSignal<boolean>(props.initialShowForm);
   const [errors, setErrors] = createSignal<FormError[]>([]);
   const [isLoading, setIsLoading] = createSignal<boolean>(true);
@@ -158,26 +137,62 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   );
   const [, recentOrdersActions] = useRecentOrders();
   const [screeningAlerts, setScreeningAlerts] = createSignal<ScreeningAlertType[]>([]);
-
   const [overrideScreenAlerts, setOverrideScreenAlerts] = createSignal<boolean>(false);
+  const [isScreeningAlertWarningOpen, setIsScreeningAlertWarningOpen] = createSignal(false);
 
-  const hasPatientAddress = createMemo(() => {
-    const address = props.formStore?.address?.value ?? props.formStore?.patient?.value?.address;
-    return hasUsableAddress(address);
+  // TODO: should we separate orderAddress and patientAddress?
+  // and maybe address to submit
+  const orderAddress = createMemo((): Address | undefined => {
+    if (props.formStore?.address?.value && hasUsableAddress(props.formStore?.address?.value)) {
+      return props.formStore?.address?.value;
+    }
+    if (
+      props.formStore?.patient?.value?.address &&
+      hasUsableAddress(props.formStore?.patient?.value?.address)
+    ) {
+      return props.formStore?.patient?.value?.address;
+    }
+    return undefined;
   });
+
+  const formattedAddress = createMemo(() => {
+    const patientAddress = () => orderAddress() ?? ({} as Address);
+    const address: AddressInput = {
+      name: patientAddress().name,
+      street1: patientAddress().street1,
+      street2: patientAddress().street2 || '',
+      city: patientAddress().city,
+      state: patientAddress().state,
+      postalCode: patientAddress().postalCode,
+      country: 'US'
+    };
+
+    return address;
+  });
+
+  const needsPatientAddress = () =>
+    orderNeedsPatientAddress({
+      optionalPatientAddress: props.optionalPatientAddress,
+      fulfillmentType: pharmacySelectionContext.fulfillmentType(),
+      orderAddressOverride: props.address || null
+    });
+
+  const patientAddressFormPosition = () => {
+    // If order doesn't need a patient address, don't ask for it
+    if (!needsPatientAddress()) {
+      return null;
+    }
+    // - If patient address is optional, still ask for it if
+    //   prescriber chooses a pharmacy type that requires patient address
+    // - If patient address is required, ask for it earlier in the prescribe flow
+    return props.optionalPatientAddress
+      ? PatientAddressFormPosition.PharmacySelect
+      : PatientAddressFormPosition.PatientInfo;
+  };
+
   const hasPreferredPharmacy = createMemo(() => {
     return Boolean(props.formStore?.patient?.value?.preferredPharmacies?.length);
   });
-
-  const forceAddressForm = createMemo(() => {
-    if (!props.optionalPatientAddress || !props.enableOrder) {
-      return false;
-    }
-    return (
-      fulfillmentNeedsAddress(pharmacySelectionContext.fulfillmentType()) && !hasPatientAddress()
-    );
-  });
-  const [isScreeningAlertWarningOpen, setIsScreeningAlertWarningOpen] = createSignal(false);
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
   let prefillNotes = '';
@@ -191,14 +206,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   }
 
   onMount(async () => {
-    if (props.address) {
-      // if manually overriding address, update the store on mount
-      props.formActions.updateFormValue({
-        key: 'address',
-        value: props.address
-      });
-    }
-
     ref.addEventListener('photon-ticket-created-duplicate', () => {
       // need to reset all the form data
       clearForm(props.formActions, prefillNotes ? { notes: prefillNotes } : undefined);
@@ -239,27 +246,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const hasPrescribePermission = createMemo(() =>
     checkHasPermission(['write:prescription'], client?.authentication.state.permissions || [])
   );
-
-  const hasValidAddress = createMemo(() => {
-    const patientAddress =
-      props.formStore?.address?.value ?? props.formStore?.patient?.value?.address;
-    return patientAddress && patientAddress.street1;
-  });
-
-  const addressId = createMemo(() => {
-    const patientAddress =
-      props.formStore?.address?.value ?? props.formStore?.patient?.value?.address;
-    return patientAddress?.id;
-  });
-
-  const formattedAddress = createMemo(() => {
-    // remove unnecessary fields, and add country and street2 if missing
-    const patientAddress =
-      props.formStore?.address?.value ?? props.formStore?.patient?.value?.address ?? {};
-    const { __typename, name, ...filteredPatientAddress } = patientAddress;
-    const address = { street2: '', country: 'US', ...filteredPatientAddress };
-    return address;
-  });
 
   const removeDuplicateTreatments = (
     prescriptions: ScreenablePrescription[]
@@ -330,7 +316,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     return recentOrdersActions.setIsCombineDialogOpen(
       true,
       () => submitForm(),
-      addressId(),
+      orderAddress()?.id || undefined,
       formattedAddress()
     );
   };
@@ -351,13 +337,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       });
     }
 
-    if (
-      props.enableOrder &&
-      shouldBlockOrderWithoutAddress(
-        pharmacySelectionContext.fulfillmentType(),
-        hasPatientAddress()
-      )
-    ) {
+    if (props.enableOrder && needsPatientAddress() && !orderAddress()) {
       setIsLoading(false);
       triggerToast({
         status: 'error',
@@ -374,6 +354,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     }
 
     const requiresAddress =
+      // TODO: why does hasPreferredPharmacy factor into it?
       props.enableOrder && (!props.optionalPatientAddress || hasPreferredPharmacy());
     const keys = requiresAddress ? ['patient', 'address'] : ['patient'];
     props.formActions.validate(keys);
@@ -479,9 +460,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           patientId: props.formStore.patient?.value.id,
           pharmacyId,
           fulfillmentType: pharmacySelectionContext.fulfillmentType() || '',
-          ...(addressId()
-            ? { addressId: addressId() }
-            : hasValidAddress()
+          // Either specify an existing address in the DB
+          // or pass a new address
+          ...(orderAddress()?.id
+            ? { addressId: orderAddress()?.id }
+            : orderAddress()
             ? { address: formattedAddress() }
             : {}),
           fills: prescriptionIds().map((id) => ({
@@ -640,6 +623,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 enableMedHistoryLinks={props.enableMedHistoryLinks ?? false}
                 enableMedHistoryRefillButton={props.enableMedHistoryRefillButton ?? false}
                 hidePatientCard={props.hidePatientCard}
+                showAddressForm={
+                  props.enableOrder &&
+                  patientAddressFormPosition() === PatientAddressFormPosition.PatientInfo
+                }
                 optionalPatientAddress={props.optionalPatientAddress}
               />
               <Show
@@ -702,7 +689,14 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 <Show when={props.enableOrder && !pharmacySelectionContext.isAutoRouted()}>
                   <OrderCard store={props.formStore} />
                 </Show>
-                <Show when={forceAddressForm() && props.formStore.patient?.value?.id}>
+                <Show
+                  when={
+                    props.enableOrder &&
+                    patientAddressFormPosition() === PatientAddressFormPosition.PharmacySelect &&
+                    // Once patient is selected, show patient address form if needed
+                    props.formStore.patient?.value?.id
+                  }
+                >
                   <AddressForm
                     patientId={props.formStore.patient?.value?.id}
                     showRequiredBanner={false}

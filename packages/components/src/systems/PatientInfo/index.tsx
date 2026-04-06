@@ -1,6 +1,6 @@
 import { JSXElement, Show, createMemo } from 'solid-js';
 import { parsePhoneNumber } from 'awesome-phonenumber';
-import { Patient } from '@photonhealth/sdk/dist/types';
+import { Address, Patient } from '@photonhealth/sdk/dist/types';
 import Button from '../../particles/Button';
 import Text from '../../particles/Text';
 import Card from '../../particles/Card';
@@ -25,16 +25,6 @@ const InfoRow = (props: InfoRowProps) => {
   );
 };
 
-export type Address = {
-  id?: string;
-  city: string;
-  postalCode: string;
-  state: string;
-  street1: string;
-  street2?: string;
-  country?: string;
-};
-
 type PatientInfoProps = {
   patient?: Patient;
   loading?: boolean;
@@ -46,7 +36,7 @@ type PatientInfoProps = {
 
 export default function PatientInfo(props: PatientInfoProps) {
   const address = createMemo(() => {
-    return props.address || props.patient?.address;
+    return props.address;
   });
 
   const phoneNumber = createMemo(() => {

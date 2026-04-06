@@ -1,6 +1,11 @@
-import { Button, triggerToast, usePhoton } from '@photonhealth/components';
+import {
+  Button,
+  hasUsableAddress,
+  orderNeedsPatientAddress,
+  triggerToast,
+  usePhoton
+} from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/index.css?inline';
-import { types } from '@photonhealth/sdk';
 import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
 import { createMemo, createSignal, onMount } from 'solid-js';
@@ -19,26 +24,6 @@ const shouldWarn = (form: any) => {
     form()['refills']?.value ||
     form()['treatment']?.value
   );
-};
-
-const hasUsableAddress = (address?: { id?: string }) => {
-  return Boolean(address?.id);
-};
-
-const fulfillmentNeedsAddress = (fulfillmentType?: string) => {
-  return (
-    fulfillmentType === types.FulfillmentType.PickUp ||
-    fulfillmentType === types.FulfillmentType.MailOrder
-  );
-};
-
-const shouldBlockOrderWithoutAddress = (
-  fulfillmentType?: string,
-  address?: {
-    id?: string;
-  }
-) => {
-  return fulfillmentNeedsAddress(fulfillmentType) && !hasUsableAddress(address);
 };
 
 const Component = (props: {
@@ -115,7 +100,14 @@ const Component = (props: {
   const attemptCreateOrder = () => {
     const fulfillmentType = form()?.fulfillmentType?.value;
     const address = form()?.address?.value ?? form()?.patient?.value?.address;
-    if (shouldBlockOrderWithoutAddress(fulfillmentType, address)) {
+    if (
+      orderNeedsPatientAddress({
+        optionalPatientAddress: props.optionalPatientAddress,
+        fulfillmentType: fulfillmentType,
+        orderAddressOverride: null
+      }) &&
+      !hasUsableAddress(address)
+    ) {
       setTriggerSubmit(false);
       return triggerToast({
         status: 'error',

@@ -42,7 +42,7 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
     treatment: undefined,
     pharmacy: undefined,
     errors: [],
-    address: undefined,
+    address: props.address,
     supervisorId: undefined
   });
 
@@ -50,11 +50,13 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
     actions.reset();
   });
 
+  const patientId = () => store.patient?.value?.id;
+
   return (
     <PrescribeEventDispatchProvider>
-      <RecentOrders patientId={store.patient?.value?.id}>
+      <RecentOrders patientId={patientId()}>
         <DraftPrescriptionsProvider
-          patientId={store.patient?.value?.id}
+          patientId={patientId()}
           templateIdsPrefill={props.templateIds?.split(',').map((id) => id.trim()) || []}
           templateOverrides={props.templateOverrides || {}}
           prescriptionIdsPrefill={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
@@ -74,7 +76,7 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
             }}
           >
             <PrescribeProvider
-              patientId={store.patient?.value?.id}
+              patientId={patientId()}
               enableCoverageCheck={props.enableCoverageCheck}
             >
               <style>{tailwind}</style>
