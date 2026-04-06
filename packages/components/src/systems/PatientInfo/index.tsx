@@ -36,7 +36,7 @@ export type Address = {
 };
 
 type PatientInfoProps = {
-  patient: Patient;
+  patient?: Patient;
   loading?: boolean;
   weight?: number;
   weightUnit?: string;
@@ -46,12 +46,12 @@ type PatientInfoProps = {
 
 export default function PatientInfo(props: PatientInfoProps) {
   const address = createMemo(() => {
-    return props.address || props.patient.address;
+    return props.address || props.patient?.address;
   });
 
   const phoneNumber = createMemo(() => {
-    if (props.patient.phone) {
-      const pn = parsePhoneNumber(props.patient.phone);
+    if (props.patient?.phone) {
+      const pn = parsePhoneNumber(props.patient?.phone);
       return pn.valid ? pn.number.national : props.patient.phone;
     }
     return '';
@@ -69,7 +69,7 @@ export default function PatientInfo(props: PatientInfoProps) {
       </div>
       <div class="pt-2" data-dd-privacy="mask">
         <Text size="lg" bold sampleLoadingText="Sally Patient">
-          {props.patient.name.full || 'N/A'}
+          {props.patient?.name.full || 'N/A'}
         </Text>
         <Collapsible
           openLabel="Show less"
