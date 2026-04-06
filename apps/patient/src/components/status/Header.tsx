@@ -296,20 +296,22 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
           {thirdBar}
         </HStack>
       )}
-      {(props.status === 'CREATED' || props.status === 'SENT') && props.patientDesiredReadyAt && (
-        <HStack
-          borderWidth={1}
-          borderRadius="xl"
-          borderColor="#EAECF0"
-          shadow="md"
-          p={4}
-          w="full"
-          justify="space-between"
-        >
-          <Text>Requested Pickup:</Text>
-          <Text as="b">{patientDesiredReadyByText(props.patientDesiredReadyAt)}</Text>
-        </HStack>
-      )}
+      {(props.status === 'CREATED' || props.status === 'SENT') &&
+        props.patientDesiredReadyAt &&
+        displayProgressBar && (
+          <HStack
+            borderWidth={1}
+            borderRadius="xl"
+            borderColor="#EAECF0"
+            shadow="md"
+            p={4}
+            w="full"
+            justify="space-between"
+          >
+            <Text>Requested Pickup:</Text>
+            <Text as="b">{patientDesiredReadyByText(props.patientDesiredReadyAt)}</Text>
+          </HStack>
+        )}
     </VStack>
   );
 };
