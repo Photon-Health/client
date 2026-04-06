@@ -1,37 +1,11 @@
-import { createSignal, createEffect, JSXElement, Show, createMemo } from 'solid-js';
-import gql from 'graphql-tag';
+import { JSXElement, Show, createMemo } from 'solid-js';
 import { parsePhoneNumber } from 'awesome-phonenumber';
 import { Patient } from '@photonhealth/sdk/dist/types';
-import { usePhotonClient } from '../SDKProvider';
 import Button from '../../particles/Button';
 import Text from '../../particles/Text';
 import Card from '../../particles/Card';
 import formatDate from '../../utils/formatDate';
 import Collapsible from '../../particles/Collapsible';
-
-const GET_PATIENT = gql`
-  query GetPatient($id: ID!) {
-    patient(id: $id) {
-      id
-      name {
-        full
-      }
-      email
-      phone
-      sex
-      gender
-      dateOfBirth
-      address {
-        id
-        street1
-        street2
-        city
-        state
-        postalCode
-      }
-    }
-  }
-`;
 
 type InfoRowProps = {
   label: string;
@@ -62,42 +36,23 @@ export type Address = {
 };
 
 type PatientInfoProps = {
-  patientId: string;
+  patient: Patient;
+  loading?: boolean;
   weight?: number;
   weightUnit?: string;
   editPatient?: () => void;
-  updatedAt?: number;
   address?: Address;
 };
 
 export default function PatientInfo(props: PatientInfoProps) {
-  const client = usePhotonClient();
-  const [patient, setPatient] = createSignal<Patient | undefined>(undefined);
-
-  const fetchPatient = async () => {
-    const { data } = await client!.apollo.query({
-      query: GET_PATIENT,
-      variables: { id: props.patientId }
-    });
-    if (data?.patient) {
-      setPatient(data?.patient);
-    }
-  };
-
-  createEffect(() => {
-    if (props.patientId) {
-      fetchPatient();
-    }
-  });
-
   const address = createMemo(() => {
-    return props.address || patient()?.address;
+    return props.address || props.patient.address;
   });
 
   const phoneNumber = createMemo(() => {
-    if (patient()?.phone) {
-      const pn = parsePhoneNumber(patient()?.phone);
-      return pn.valid ? pn.number.national : patient()?.phone;
+    if (props.patient.phone) {
+      const pn = parsePhoneNumber(props.patient.phone);
+      return pn.valid ? pn.number.national : props.patient.phone;
     }
     return '';
   });
@@ -106,15 +61,15 @@ export default function PatientInfo(props: PatientInfoProps) {
     <Card addChildrenDivider={true}>
       <div class="flex items-center justify-between">
         <Text color="gray">Patient Info</Text>
-        <Show when={props?.editPatient}>
-          <Button variant="secondary" size="sm" onClick={props?.editPatient}>
+        <Show when={props.editPatient}>
+          <Button variant="secondary" size="sm" onClick={props.editPatient}>
             Edit patient
           </Button>
         </Show>
       </div>
       <div class="pt-2" data-dd-privacy="mask">
-        <Text size="lg" bold loading={!patient()} sampleLoadingText="Sally Patient">
-          {patient()?.name.full || 'N/A'}
+        <Text size="lg" bold sampleLoadingText="Sally Patient">
+          {props.patient.name.full || 'N/A'}
         </Text>
         <Collapsible
           openLabel="Show less"
@@ -129,31 +84,35 @@ export default function PatientInfo(props: PatientInfoProps) {
             <table class="table-auto">
               <tbody>
                 <InfoRow label="Email">
-                  <Text size="sm" loading={!patient()} sampleLoadingText="fake@email.com">
-                    {patient()?.email || 'N/A'}
+                  <Text size="sm" loading={props.loading} sampleLoadingText="fake@email.com">
+                    {props.patient?.email || 'N/A'}
                   </Text>
                 </InfoRow>
                 <InfoRow label="Phone">
-                  <Text size="sm" loading={!patient()} sampleLoadingText="555-555-5555">
+                  <Text size="sm" loading={props.loading} sampleLoadingText="555-555-5555">
                     {phoneNumber() || 'N/A'}
                   </Text>
                 </InfoRow>
                 <InfoRow label="Address">
-                  <Show when={!patient() || address()} fallback={<div>N/A</div>}>
+                  <Show when={!props.patient || address()} fallback={<div>N/A</div>}>
                     <div>
-                      <Text size="sm" loading={!patient()} sampleLoadingText="123 Fake St">
+                      <Text size="sm" loading={props.loading} sampleLoadingText="123 Fake St">
                         {address()?.street1}
                       </Text>
                     </div>
-                    <Show when={!patient() || address()?.street2}>
+                    <Show when={!props.patient || address()?.street2}>
                       <div>
-                        <Text size="sm" loading={!patient()} sampleLoadingText="Apt 3">
+                        <Text size="sm" loading={props.loading} sampleLoadingText="Apt 3">
                           {address()?.street2}
                         </Text>
                       </div>
                     </Show>
                     <div>
-                      <Text size="sm" loading={!patient()} sampleLoadingText="Brooklyn, NY 11221">
+                      <Text
+                        size="sm"
+                        loading={props.loading}
+                        sampleLoadingText="Brooklyn, NY 11221"
+                      >
                         {address()?.city}, {address()?.state} {address()?.postalCode}
                       </Text>
                     </div>
@@ -165,23 +124,23 @@ export default function PatientInfo(props: PatientInfoProps) {
             <table class="table-auto">
               <tbody>
                 <InfoRow label="DOB">
-                  <Text size="sm" loading={!patient()} sampleLoadingText="female">
-                    {formatDate(patient()?.dateOfBirth || 'N/A')}
+                  <Text size="sm" loading={props.loading} sampleLoadingText="female">
+                    {formatDate(props.patient?.dateOfBirth || 'N/A')}
                   </Text>
                 </InfoRow>
                 <InfoRow label="Weight">
-                  <Text size="sm" loading={!patient()} sampleLoadingText="150 lbs">
+                  <Text size="sm" loading={props.loading} sampleLoadingText="150 lbs">
                     {props?.weight ? `${props.weight} ${props.weightUnit}` : 'N/A'}
                   </Text>
                 </InfoRow>
                 <InfoRow label="Sex">
-                  <Text size="sm" loading={!patient()} sampleLoadingText="female">
-                    {patient()?.sex || 'N/A'}
+                  <Text size="sm" loading={props.loading} sampleLoadingText="female">
+                    {props.patient?.sex || 'N/A'}
                   </Text>
                 </InfoRow>
                 <InfoRow label="Gender">
-                  <Text size="sm" loading={!patient()} sampleLoadingText="female">
-                    {patient()?.gender || 'N/A'}
+                  <Text size="sm" loading={props.loading} sampleLoadingText="female">
+                    {props.patient?.gender || 'N/A'}
                   </Text>
                 </InfoRow>
               </tbody>

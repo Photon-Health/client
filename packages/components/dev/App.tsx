@@ -11,7 +11,6 @@ import {
   triggerToast,
   useDraftPrescriptions
 } from '../src';
-import PatientInfo from '../src/systems/PatientInfo';
 import PickupPharmacySearch from '../src/systems/PharmacySearch';
 import DoseCalculator from '../src/systems/DoseCalculator';
 import Button from '../src/particles/Button';
@@ -94,11 +93,6 @@ const App = () => {
             >
               <PharmacySelectionProvider>
                 <PrescribeProvider patientId={patientId} enableCoverageCheck={true}>
-                  <div class="mb-10">
-                    <h2>Patient Info</h2>
-                    <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
-                  </div>
-
                   <div class="mb-10">
                     <h2>Draft Prescriptions</h2>
                   </div>

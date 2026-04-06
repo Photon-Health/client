@@ -161,10 +161,11 @@ export const PatientCard = (props: {
           />
         </Card>
       </Show>
-      <Show when={patientId() && !props.hidePatientCard}>
+      <Show when={!props.hidePatientCard && patientId()}>
         <div>
           <PatientInfo
-            patientId={patientId()}
+            patient={patientStore.selectedPatient.data!}
+            loading={patientStore.selectedPatient.isLoading}
             weight={props.weight}
             weightUnit={props.weightUnit}
             editPatient={
