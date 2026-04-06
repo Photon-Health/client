@@ -79,7 +79,15 @@ const Component = (props: {
         invalid={props.invalid}
         isLoading={store.patients.isLoading || store.selectedPatient.isLoading}
         hasMore={store.patients.data.length % 25 === 0 && !store.patients.finished}
-        displayAccessor={(p) => p?.name?.full || ''}
+        displayAccessor={(p) => {
+          if (!p) return '';
+          const element = (
+            <div>
+              <span>{p.name?.full}</span> <span>{p.dateOfBirth}</span>
+            </div>
+          );
+          return element;
+        }}
         onSearchChange={async (s: string) =>
           (fetchMore = await actions.getPatients(client!.getSDK(), {
             name: s
