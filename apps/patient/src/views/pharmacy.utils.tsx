@@ -1,5 +1,4 @@
 import { getOfferBundles } from '../api';
-import { getLatestDelivery } from '../utils/deliveryPromise';
 import { PHARMACY_BRANDING } from '../components/pharmacy-card-list';
 import {
   EnrichedPharmacy,
@@ -40,19 +39,16 @@ export async function fetchOfferBundles(order: Order): Promise<OfferBundleDetail
   const amazonOffers = bundles
     .filter((bundle) => bundle.supplier === 'AMAZON_PHARMACY')
     .map((bundle) => {
-      const deliveryPromises = bundle.medications
-        .map((m) => m.deliveryEstimate?.deliveryPromise)
-        .filter((promise) => promise !== undefined);
-
       return {
-        deliveryEstimate: getLatestDelivery(deliveryPromises),
+        deliveryEstimate: bundle.deliveryEstimate,
         costType: bundle.pricingType,
         costAmount: bundle.aggregateCost?.totalAmount,
-        costAmountTitle: bundle.medications[0]?.medicationPrice?.amountTitle, // should move amount titles to the top level instead of per medication in the API but for now we'll just use the first one since we expect them to be the same across medications
+        costAmountTitle: bundle.amountTitle,
         retailAmount: bundle.aggregateCost?.totalRetailAmount,
-        retailAmountTitle: bundle.medications[0]?.medicationPrice?.retailAmountTitle, // same as costAmountTitle, should be moved to top level eventually
+        retailAmountTitle: bundle.retailAmountTitle,
         medications: bundle.medications.map((m) => ({
           name: m.prescription?.treatment?.name,
+          pricingType: m.pricingType,
           amount: m.medicationPrice?.amount,
           retailAmount: m.medicationPrice?.retailAmount,
           promotions: m.medicationPrice?.promotions
