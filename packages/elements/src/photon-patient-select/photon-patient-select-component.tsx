@@ -83,7 +83,7 @@ const Component = (props: {
           if (!p) return '';
           const element = (
             <div>
-              <span>{p.name?.full}</span> <span>{p.dateOfBirth}</span>
+              <span>{p.name?.full}</span> <span style="color:grey">{p.dateOfBirth}</span>
             </div>
           );
           return element;
