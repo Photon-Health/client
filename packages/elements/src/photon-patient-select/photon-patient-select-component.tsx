@@ -110,15 +110,19 @@ const Component = (props: {
         invalid={props.invalid}
         isLoading={store.patients.isLoading || store.selectedPatient.isLoading}
         hasMore={store.patients.data.length % 25 === 0 && !store.patients.finished}
-        displayAccessor={(p) => {
+        displayAccessor={(p, groupDisplay) => {
           if (!p) return '';
-          const element = (
-            <div class="flex justify-between items-center">
-              <span>{p.name?.full}</span>{' '}
-              <span class="text-sm text-gray-500">{formatDate(String(p.dateOfBirth))}</span>
-            </div>
-          );
-          return element;
+          // What to display if we're rending a list.
+          if (groupDisplay) {
+            return (
+              <div class="flex justify-between items-center">
+                <span>{p.name?.full}</span>{' '}
+                <span class="text-sm text-gray-500">{formatDate(String(p.dateOfBirth))}</span>
+              </div>
+            );
+          }
+
+          return p.name.full;
         }}
         onSearchChange={async (s: string) =>
           (fetchMore = await actions.getPatients(client!.getSDK(), {
