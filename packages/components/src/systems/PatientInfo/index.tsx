@@ -35,10 +35,6 @@ type PatientInfoProps = {
 };
 
 export default function PatientInfo(props: PatientInfoProps) {
-  const address = createMemo(() => {
-    return props.address;
-  });
-
   const phoneNumber = createMemo(() => {
     if (props.patient?.phone) {
       const pn = parsePhoneNumber(props.patient?.phone);
@@ -84,16 +80,16 @@ export default function PatientInfo(props: PatientInfoProps) {
                   </Text>
                 </InfoRow>
                 <InfoRow label="Address">
-                  <Show when={!props.patient || address()} fallback={<div>N/A</div>}>
+                  <Show when={!props.patient || props.address} fallback={<div>N/A</div>}>
                     <div>
                       <Text size="sm" loading={props.loading} sampleLoadingText="123 Fake St">
-                        {address()?.street1}
+                        {props.address?.street1}
                       </Text>
                     </div>
-                    <Show when={!props.patient || address()?.street2}>
+                    <Show when={!props.patient || props.address?.street2}>
                       <div>
                         <Text size="sm" loading={props.loading} sampleLoadingText="Apt 3">
-                          {address()?.street2}
+                          {props.address?.street2}
                         </Text>
                       </div>
                     </Show>
@@ -103,7 +99,7 @@ export default function PatientInfo(props: PatientInfoProps) {
                         loading={props.loading}
                         sampleLoadingText="Brooklyn, NY 11221"
                       >
-                        {address()?.city}, {address()?.state} {address()?.postalCode}
+                        {props.address?.city}, {props.address?.state} {props.address?.postalCode}
                       </Text>
                     </div>
                   </Show>

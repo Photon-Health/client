@@ -1,37 +1,22 @@
 import { createMemo } from 'solid-js';
 import { Card, PharmacySelect, Text } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/index.css?inline';
+import { Address } from '@photonhealth/sdk/dist/types';
 
-const hasUsableAddress = (address?: {
-  street1?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
+export const OrderCard = (props: {
+  patientId: string;
+  address?: Address;
+  hasPreferredPharmacy: boolean;
 }) => {
-  if (!address) {
-    return false;
-  }
-  return Boolean(
-    address.street1?.trim() &&
-      address.city?.trim() &&
-      address.state?.trim() &&
-      address.postalCode?.trim()
-  );
-};
-
-export const OrderCard = (props: { store: Record<string, any> }) => {
-  const patientIds = createMemo(() =>
-    props.store['patient']?.value ? [props.store['patient']?.value?.id] : []
-  );
+  const patientIds = createMemo(() => (props.patientId ? [props.patientId] : []));
 
   const address = createMemo(() => {
-    const address = props.store['address']?.value ?? props.store['patient']?.value?.address;
-    if (!hasUsableAddress(address)) {
+    if (!props.address) {
       return '';
     }
-    return `${address.street1} ${address.street2 || ''} ${address.city}, ${address.state} ${
-      address.postalCode
-    }`;
+    return `${props.address.street1} ${props.address.street2 || ''} ${props.address.city}, ${
+      props.address.state
+    } ${props.address.postalCode}`;
   });
 
   return (
@@ -44,7 +29,7 @@ export const OrderCard = (props: { store: Record<string, any> }) => {
         <PharmacySelect
           patientIds={patientIds()}
           address={address()}
-          hasPreferredPharmacy={Boolean(props.store['patient']?.value?.preferredPharmacies?.length)}
+          hasPreferredPharmacy={props.hasPreferredPharmacy}
         />
       </Card>
     </div>

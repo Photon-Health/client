@@ -140,11 +140,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const [overrideScreenAlerts, setOverrideScreenAlerts] = createSignal<boolean>(false);
   const [isScreeningAlertWarningOpen, setIsScreeningAlertWarningOpen] = createSignal(false);
 
-  // TODO: should we separate orderAddress and patientAddress?
-  // and maybe address to submit
   const orderAddress = createMemo((): Address | undefined => {
-    if (props.formStore?.address?.value && hasUsableAddress(props.formStore?.address?.value)) {
-      return props.formStore?.address?.value;
+    if (props.address && hasUsableAddress(props.address)) {
+      return props.address;
     }
     if (
       props.formStore?.patient?.value?.address &&
@@ -687,7 +685,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   <SupervisorCard actions={props.formActions} store={props.formStore} />
                 </Show>
                 <Show when={props.enableOrder && !pharmacySelectionContext.isAutoRouted()}>
-                  <OrderCard store={props.formStore} />
+                  <OrderCard
+                    patientId={props.formStore?.patient?.value?.id}
+                    address={orderAddress()}
+                    hasPreferredPharmacy={hasPreferredPharmacy()}
+                  />
                 </Show>
                 <Show
                   when={

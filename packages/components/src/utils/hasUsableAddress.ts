@@ -6,9 +6,7 @@ export const hasUsableAddress = (
   if (!address) {
     return false;
   }
-  if (address.id) {
-    return true;
-  }
+
   return Boolean(
     address.street1?.trim() &&
       address.city?.trim() &&

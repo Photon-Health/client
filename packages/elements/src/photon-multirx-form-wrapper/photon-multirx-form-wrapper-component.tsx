@@ -99,14 +99,14 @@ const Component = (props: {
 
   const attemptCreateOrder = () => {
     const fulfillmentType = form()?.fulfillmentType?.value;
-    const address = form()?.address?.value ?? form()?.patient?.value?.address;
+    const patientAddress = form()?.patient?.value?.address;
     if (
       orderNeedsPatientAddress({
         optionalPatientAddress: props.optionalPatientAddress,
         fulfillmentType: fulfillmentType,
         orderAddressOverride: null
       }) &&
-      !hasUsableAddress(address)
+      !hasUsableAddress(patientAddress)
     ) {
       setTriggerSubmit(false);
       return triggerToast({
