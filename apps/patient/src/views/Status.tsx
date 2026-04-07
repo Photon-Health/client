@@ -156,7 +156,10 @@ export const Status = () => {
   };
 
   const handleReroute = () => {
-    const isEnabled = patientAnalytics.getFlagValueSync('change_pharmacy_reasons', false);
+    const hideChangePharmacy = order.exceptions.find((e) => e.exceptionType === 'ORDER_ERROR');
+    const isEnabled =
+      patientAnalytics.getFlagValueSync('change_pharmacy_reasons', false) && !hideChangePharmacy;
+
     if (isEnabled) {
       onOpen();
       return;
