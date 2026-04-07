@@ -155,7 +155,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const [showForm, setShowForm] = createSignal<boolean>(props.initialShowForm);
   const [errors, setErrors] = createSignal<FormError[]>([]);
   const [isLoading, setIsLoading] = createSignal<boolean>(true);
-  const [isEditing, setIsEditing] = createSignal<boolean>(false);
   const [authenticated, setAuthenticated] = createSignal<boolean>(
     client?.authentication.state.isAuthenticated || false
   );
@@ -562,12 +561,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
-  const handleDraftPrescriptionCreated = () => {
-    if (isEditing()) {
-      setIsEditing(false);
-    }
-  };
-
   return (
     <div ref={ref}>
       <Show
@@ -663,7 +656,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 <Show when={props.enableCombineAndDuplicate}>
                   <RecentOrders.Card />
                 </Show>
-                <Show when={showForm() || isEditing()}>
+                <Show when={showForm()}>
                   <div ref={prescriptionRef}>
                     <AddPrescriptionCard
                       hideAddToTemplates={props.hideTemplates}
@@ -679,7 +672,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       draftedPrescriptionChanged={function () {
                         screenDraftedPrescriptions();
                       }}
-                      onDraftPrescriptionCreated={handleDraftPrescriptionCreated}
                       screeningAlerts={screeningAlerts()}
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
@@ -691,7 +683,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   prescriptionRef={prescriptionRef}
                   actions={props.formActions}
                   store={props.formStore}
-                  setIsEditing={setIsEditing}
+                  setIsEditing={() => setShowForm(true)}
                   handleDraftPrescriptionsChange={function () {
                     screenDraftedPrescriptions();
                   }}
