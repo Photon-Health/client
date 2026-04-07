@@ -11,6 +11,37 @@ import { createEffect, createMemo, onMount, untrack } from 'solid-js';
 import { PatientStore } from '../stores/patient';
 import { PhotonClient } from '@photonhealth/sdk';
 
+const monthNumberToAbreviation = new Map([
+  ['01', 'Jan'],
+  ['02', 'Feb'],
+  ['03', 'Mar'],
+  ['04', 'Apr'],
+  ['05', 'May'],
+  ['06', 'Jun'],
+  ['07', 'Jul'],
+  ['08', 'Aug'],
+  ['09', 'Sep'],
+  ['10', 'Oct'],
+  ['11', 'Nov'],
+  ['12', 'Dec']
+]);
+
+/**
+ * @param rawDate Patient AWSDate in the form of YYYY-MM-DD
+ * Change the ambiguous AWS Date form into something more human readable
+ * In the form of DD-MMM-YYYY
+ */
+function formatDate(rawDate: string): string {
+  const dateSplit = rawDate.split('-');
+  const day = dateSplit[2];
+  const month = dateSplit[1];
+  const year = dateSplit[0];
+  if (!monthNumberToAbreviation.has(month)) {
+    return 'Unknown';
+  }
+  return `${day}-${monthNumberToAbreviation.get(month)}-${year}`;
+}
+
 const Component = (props: {
   label?: string;
   required: boolean;
@@ -83,7 +114,8 @@ const Component = (props: {
           if (!p) return '';
           const element = (
             <div class="flex justify-between items-center">
-              <span>{p.name?.full}</span> <span class="text-sm text-gray-500">{p.dateOfBirth}</span>
+              <span>{p.name?.full}</span>{' '}
+              <span class="text-sm text-gray-500">{formatDate(String(p.dateOfBirth))}</span>
             </div>
           );
           return element;
