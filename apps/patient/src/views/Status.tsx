@@ -156,9 +156,12 @@ export const Status = () => {
   };
 
   const handleReroute = () => {
-    const hideChangePharmacy = order.exceptions.find((e) => e.exceptionType === 'ORDER_ERROR');
+    const hasUnresolvedOrderError = order.exceptions.some(
+      (e) => e.exceptionType === 'ORDER_ERROR' && !e.resolvedAt
+    );
     const isEnabled =
-      patientAnalytics.getFlagValueSync('change_pharmacy_reasons', false) && !hideChangePharmacy;
+      patientAnalytics.getFlagValueSync('change_pharmacy_reasons', false) &&
+      !hasUnresolvedOrderError;
 
     if (isEnabled) {
       onOpen();
