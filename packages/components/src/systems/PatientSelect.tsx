@@ -9,6 +9,7 @@ export const PatientSelect = (props: {
   selectedPatient?: Patient;
   patients: Patient[];
   loading: boolean;
+  onInitialFetch: () => void;
   onSearch: (name?: string) => void;
   onSelect: (patient: Patient) => void;
 }) => {
@@ -33,7 +34,7 @@ export const PatientSelect = (props: {
       setSelected={props.onSelect}
       onOpen={() => {
         if (props.patients.length === 0) {
-          props.onSearch();
+          props.onInitialFetch();
         }
       }}
     >

@@ -162,6 +162,7 @@ export const PatientCard = (props: {
             selectedPatient={store.selectedPatient.data}
             patients={store.patients.data}
             loading={store.patients.isLoading || store.selectedPatient.isLoading}
+            onInitialFetch={() => actions.getPatients(props.client!.getSDK())}
             onSearch={(name) =>
               actions.getPatients(props.client!.getSDK(), name ? { name } : undefined)
             }
