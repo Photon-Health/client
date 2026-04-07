@@ -1,5 +1,6 @@
-import { createSignal } from 'solid-js';
+import { createSignal, Show } from 'solid-js';
 import {
+  Button,
   Card,
   CoverageOption,
   DraftPrescriptionList,
@@ -23,6 +24,7 @@ export const DraftPrescriptionCard = (props: {
   screeningAlerts: ScreeningAlertType[];
   routingConstraints: RoutingConstraint[];
   enableOrder: boolean;
+  onAddDraft?: () => void;
 }) => {
   const { dispatchDraftPrescriptionDeleted, dispatchAnalyticsTrackEvent } =
     usePrescribeEventDispatch();
@@ -148,14 +150,21 @@ export const DraftPrescriptionCard = (props: {
         </p>
       </photon-dialog>
       <Card addChildrenDivider={true}>
-        <div class="flex items-center space-x-2 text-slate-500">
-          <Text color="gray" class="pr-2">
-            Draft Prescriptions
-          </Text>
-          <PhotonTooltip
-            maxWidth="300px"
-            tip="Each prescription will include the prescriber’s digital signature and the date it was written when the order is sent to the pharmacy."
-          />
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2 text-slate-500">
+            <Text color="gray" class="pr-2">
+              Draft Prescriptions
+            </Text>
+            <PhotonTooltip
+              maxWidth="300px"
+              tip="Each prescription will include the prescriber’s digital signature and the date it was written when the order is sent to the pharmacy."
+            />
+          </div>
+          <Show when={props.onAddDraft}>
+            <Button variant="secondary" size="sm" onClick={props.onAddDraft}>
+              + Add
+            </Button>
+          </Show>
         </div>
         <DraftPrescriptionList
           handleDelete={(draftId: string) => {
