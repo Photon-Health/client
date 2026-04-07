@@ -153,7 +153,7 @@ function ComboOption(props: ComboOptionProps) {
   if (props.disabled) {
     return (
       <li
-        class="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-400"
+        class="relative cursor-default select-none py-2 px-3 text-gray-400"
         role="option"
         aria-disabled="true"
         tabindex="-1"
@@ -163,31 +163,27 @@ function ComboOption(props: ComboOptionProps) {
     );
   }
 
-  const optionClass = createMemo(() =>
-    clsx('relative cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900', {
-      'bg-blue-600 text-white': state.active === props.key
-    })
-  );
-
-  const iconClass = createMemo(() =>
-    clsx(state.active === props.key ? 'text-white' : 'text-blue-600')
-  );
-
   return (
     <li
-      class={optionClass()}
+      class={clsx('flex items-center cursor-pointer select-none py-2 px-3 text-gray-900', {
+        'bg-blue-600 text-white': state.active === props.key
+      })}
       role="option"
       tabindex="-1"
       onClick={() => setSelected(props.value)}
       onMouseEnter={() => setActive(props.key)}
       onMouseLeave={() => setActive('')}
     >
-      <span class="block truncate">{props.children}</span>
-      <Show when={state.selected?.id === props.key}>
-        <span class="absolute inset-y-0 right-0 flex items-center pr-4">
-          <Icon name="checkCircle" class={iconClass()} />
-        </span>
-      </Show>
+      <span class="w-full truncate">{props.children}</span>
+      <Icon
+        name="checkCircle"
+        class={clsx(
+          'ml-2 shrink-0',
+          // Use visibility prop so Icon still occupies space when invisible
+          state.selected?.id === props.key ? 'visible' : 'invisible',
+          state.active === props.key ? 'text-white' : 'text-blue-600'
+        )}
+      />
     </li>
   );
 }

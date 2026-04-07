@@ -60,7 +60,10 @@ export const PatientSelect = (props: {
           <For each={data()}>
             {(p: Patient) => (
               <ComboBox.Option key={p.id} value={p}>
-                {p.name?.full || ''}
+                <div class="flex justify-between items-center">
+                  <span>{p.name.full}</span>
+                  <span class="text-gray-500">{p.dateOfBirth}</span>
+                </div>
               </ComboBox.Option>
             )}
           </For>
