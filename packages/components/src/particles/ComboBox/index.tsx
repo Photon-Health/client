@@ -144,11 +144,12 @@ export interface ComboOptionProps {
   key: string;
   value: any;
   disabled?: boolean;
-  children?: JSX.Element;
+  children?: JSX.Element | ((props: { active: boolean }) => JSX.Element);
 }
 
 function ComboOption(props: ComboOptionProps) {
   const [state, { setSelected, setActive }] = useContext(ComboBoxContext);
+  const active = () => state.active === props.key;
 
   if (props.disabled) {
     return (
@@ -158,7 +159,11 @@ function ComboOption(props: ComboOptionProps) {
         aria-disabled="true"
         tabindex="-1"
       >
-        <span class="block truncate">{props.children}</span>
+        <span class="block truncate">
+          {typeof props.children === 'function'
+            ? props.children({ active: active() })
+            : props.children}
+        </span>
       </li>
     );
   }
@@ -166,7 +171,7 @@ function ComboOption(props: ComboOptionProps) {
   return (
     <li
       class={clsx('flex items-center cursor-pointer select-none py-2 px-3 text-gray-900', {
-        'bg-blue-600 text-white': state.active === props.key
+        'bg-blue-600 text-white': active()
       })}
       role="option"
       tabindex="-1"
@@ -174,14 +179,18 @@ function ComboOption(props: ComboOptionProps) {
       onMouseEnter={() => setActive(props.key)}
       onMouseLeave={() => setActive('')}
     >
-      <span class="w-full truncate">{props.children}</span>
+      <span class="w-full truncate">
+        {typeof props.children === 'function'
+          ? props.children({ active: active() })
+          : props.children}
+      </span>
       <Icon
         name="checkCircle"
         class={clsx(
           'ml-2 shrink-0',
           // Use visibility prop so Icon still occupies space when invisible
           state.selected?.id === props.key ? 'visible' : 'invisible',
-          state.active === props.key ? 'text-white' : 'text-blue-600'
+          active() ? 'text-white' : 'text-blue-600'
         )}
       />
     </li>
