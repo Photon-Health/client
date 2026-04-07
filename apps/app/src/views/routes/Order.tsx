@@ -709,7 +709,7 @@ export const Order = () => {
                           onClick={async () => {
                             setUpdating(true);
                             try {
-                              track('Pharmacy Selected by Provider', {
+                              track('Pharmacy Selected', {
                                 orderId: id,
                                 pharmacyId
                               });

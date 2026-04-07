@@ -72,7 +72,7 @@ export type CtaClickEvent =
   | { name: 'Patient Edited' }
   | { name: 'Screening Alert Acknowledged'; screeningAlertCount: number; buttonText: string }
   | { name: 'Screening Alert Canceled'; screeningAlertCount: number; buttonText: string }
-  | { name: 'Pharmacy Selected by Provider'; orderId: string; pharmacyId: string };
+  | { name: 'Pharmacy Selected'; orderId: string; pharmacyId: string };
 
 // ---------------------------------------------------------------------------
 // Field Interaction Events — all share "Field Interaction"
