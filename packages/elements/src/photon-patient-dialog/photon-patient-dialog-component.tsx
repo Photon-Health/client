@@ -1,5 +1,5 @@
 import { customElement } from 'solid-element';
-import { createEffect, createSignal, onMount, Show } from 'solid-js';
+import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import {
   buildFieldSnapshot,
   Button,
@@ -9,6 +9,7 @@ import {
 } from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import photonStyles from '@photonhealth/components/dist/index.css?inline';
+import { PatientStore } from '../stores/patient';
 import gql from 'graphql-tag';
 import { PatientForm } from './PatientForm';
 
@@ -36,8 +37,15 @@ const Component = (props: PatientDialogProps) => {
   const [globalError, setGlobalError] = createSignal<string | undefined>(undefined);
   const [hasAnyAddressField, setHasAnyAddressField] = createSignal<boolean>(false);
   const [hasPatients, setHasPatients] = createSignal<boolean>(false);
+  const { store: pStore, actions: pActions } = PatientStore;
 
   onMount(async () => {
+    if (props.patientId) {
+      pActions.getSelectedPatient(client!.getSDK(), props.patientId);
+    } else {
+      pActions.clearSelectedPatient();
+    }
+
     try {
       const { data } = await client.sdk.clinical.patient.getPatients({
         fragment: { PatientFields: PATIENT_FIELDS }
@@ -47,6 +55,12 @@ const Component = (props: PatientDialogProps) => {
       console.log(err);
       // We don't want this request failing to cause the entire component to throw
     }
+  });
+
+  onCleanup(() => {
+    // Component is used as the full page for /patients/update route
+    // so need to clear PatientStore when user navigates away
+    pActions.clearSelectedPatient();
   });
 
   const dispatchUpdate = (patientId: string, didClickCreatePatientAndPrescription = false) => {
@@ -269,7 +283,6 @@ const Component = (props: PatientDialogProps) => {
                 </div>
               </Show>
               <PatientForm
-                slot="form"
                 onUpdate={({ form, actions, reset, selected }: any) => {
                   setFormStore(form);
                   setActions(Object.assign({}, actions, { resetStores: reset }));
@@ -287,6 +300,7 @@ const Component = (props: PatientDialogProps) => {
                 }}
                 patientId={props.patientId}
                 optionalPatientAddress={props.optionalPatientAddress}
+                initialPatientLoading={props.patientId ? !pStore.selectedPatient.data : false}
               />
             </>
           }

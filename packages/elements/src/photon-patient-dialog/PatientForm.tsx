@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, onCleanup, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
 import {
   AddressAutocompleteInput,
@@ -15,8 +15,7 @@ import {
   SEX_OPTIONS,
   SexSelect,
   Spinner,
-  StateSelect,
-  usePhoton
+  StateSelect
 } from '@photonhealth/components';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
@@ -45,10 +44,10 @@ const formatPatientAddress = (pStore: any, store: any) => {
 export const PatientForm = (props: {
   patientId: string;
   optionalPatientAddress: boolean;
+  initialPatientLoading: boolean;
   onUpdate: (detail: any) => void;
 }) => {
   let ref: any;
-  const client = usePhoton();
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
   const { store: pStore, actions: pActions } = PatientStore;
   const { store, actions } = createFormStore({
@@ -107,14 +106,6 @@ export const PatientForm = (props: {
   actions.registerValidator({
     key: 'address_zip',
     validator: message(zipString(), 'Please enter a valid zip code.')
-  });
-
-  onMount(() => {
-    if (props.patientId) {
-      pActions.getSelectedPatient(client!.getSDK(), props.patientId);
-    } else {
-      pActions.clearSelectedPatient();
-    }
   });
 
   // Leftover from when PatientForm was photon-patient-form-component
@@ -215,7 +206,6 @@ export const PatientForm = (props: {
   });
 
   onCleanup(() => {
-    pActions.clearSelectedPatient();
     actions.reset();
   });
 
@@ -353,18 +343,18 @@ export const PatientForm = (props: {
 
   return (
     <div class="w-full h-full relative" ref={ref}>
-      <Show when={pStore.selectedPatient.isLoading}>
+      <Show when={props.initialPatientLoading}>
         <div class="w-full flex justify-center">
           <Spinner color="green" />
         </div>
       </Show>
 
-      <Show when={!pStore.selectedPatient.isLoading}>
+      <Show when={!props.initialPatientLoading}>
         <PhotonAuthorized permissions={['write:patient']}>
           <div class="flex flex-col gap-8">
             <Card>
               <div>
-                <p class="font-sans text-lg flex-grow" role="heading" aria-level="2">
+                <p class="font-sans text-lg flex-grow my-2" role="heading" aria-level="2">
                   Patient info
                 </p>
                 <div class="flex flex-col">
