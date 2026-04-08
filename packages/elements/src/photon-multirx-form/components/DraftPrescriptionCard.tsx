@@ -150,35 +150,40 @@ export const DraftPrescriptionCard = (props: {
         </p>
       </photon-dialog>
       <Card addChildrenDivider={true}>
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-2 text-slate-500">
-            <Text color="gray" class="pr-2">
-              Draft Prescriptions
-            </Text>
-            <PhotonTooltip
-              maxWidth="300px"
-              tip="Each prescription will include the prescriber’s digital signature and the date it was written when the order is sent to the pharmacy."
-            />
-          </div>
+        <div class="flex items-center space-x-2 text-slate-500">
+          <Text color="gray" class="pr-2">
+            Draft Prescriptions
+          </Text>
+          <PhotonTooltip
+            maxWidth="300px"
+            tip="Each prescription will include the prescriber's digital signature and the date it was written when the order is sent to the pharmacy."
+          />
+        </div>
+        <div>
+          <DraftPrescriptionList
+            handleDelete={(draftId: string) => {
+              setDeleteDialogOpen(true);
+              setDeleteDraftId(draftId);
+            }}
+            handleEdit={(draft) => {
+              checkEditPrescription(draft);
+            }}
+            handleSwapToOtherPrescription={handleSwapToOtherPrescription}
+            screeningAlerts={props.screeningAlerts}
+            routingConstraints={props.routingConstraints}
+            enableOrder={props.enableOrder}
+          />
           <Show when={props.onAddDraft}>
-            <Button variant="secondary" size="sm" onClick={props.onAddDraft}>
-              + Add
+            <Button
+              variant="secondary"
+              class="w-full xs:w-fit mt-5"
+              size="lg"
+              onClick={props.onAddDraft}
+            >
+              Add another
             </Button>
           </Show>
         </div>
-        <DraftPrescriptionList
-          handleDelete={(draftId: string) => {
-            setDeleteDialogOpen(true);
-            setDeleteDraftId(draftId);
-          }}
-          handleEdit={(draft) => {
-            checkEditPrescription(draft);
-          }}
-          handleSwapToOtherPrescription={handleSwapToOtherPrescription}
-          screeningAlerts={props.screeningAlerts}
-          routingConstraints={props.routingConstraints}
-          enableOrder={props.enableOrder}
-        />
       </Card>
     </div>
   );
