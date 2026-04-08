@@ -74,6 +74,9 @@ export type PrescribeProps = {
   allowOffCatalogSearch?: boolean;
   disableList?: DisableList;
   groupId?: string;
+  /**
+   * This logic keeps the rx form closed when refilling a particular template/prescription
+   */
   initialShowForm: boolean;
 };
 
@@ -131,7 +134,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const [showForm, setShowForm] = createSignal<boolean>(props.initialShowForm);
   const [errors, setErrors] = createSignal<FormError[]>([]);
   const [isLoading, setIsLoading] = createSignal<boolean>(true);
-  const [isEditing, setIsEditing] = createSignal<boolean>(false);
   const [authenticated, setAuthenticated] = createSignal<boolean>(
     client?.authentication.state.isAuthenticated || false
   );
@@ -540,12 +542,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
-  const handleDraftPrescriptionCreated = () => {
-    if (isEditing()) {
-      setIsEditing(false);
-    }
-  };
-
   return (
     <div ref={ref}>
       <Show
@@ -645,7 +641,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 <Show when={props.enableCombineAndDuplicate}>
                   <RecentOrders.Card />
                 </Show>
-                <Show when={showForm() || isEditing()}>
+                <Show when={showForm()}>
                   <div ref={prescriptionRef}>
                     <AddPrescriptionCard
                       hideAddToTemplates={props.hideTemplates}
@@ -661,7 +657,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       draftedPrescriptionChanged={function () {
                         screenDraftedPrescriptions();
                       }}
-                      onDraftPrescriptionCreated={handleDraftPrescriptionCreated}
                       screeningAlerts={screeningAlerts()}
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
@@ -673,13 +668,16 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   prescriptionRef={prescriptionRef}
                   actions={props.formActions}
                   store={props.formStore}
-                  setIsEditing={setIsEditing}
+                  setIsEditing={() => setShowForm(true)}
                   handleDraftPrescriptionsChange={function () {
                     screenDraftedPrescriptions();
                   }}
                   screeningAlerts={screeningAlerts()}
                   routingConstraints={pharmacySelectionContext.routingConstraints()}
                   enableOrder={props.enableOrder}
+                  // If rx form is hidden, we need a button to toggle it to visible
+                  // If rx form is visible, we don't need the button
+                  onAddAnotherClick={!showForm() ? () => setShowForm(true) : undefined}
                 />
                 <Show when={props.enableOrder && needsSupervisor()}>
                   <SupervisorCard actions={props.formActions} store={props.formStore} />
@@ -733,12 +731,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       </For>
                     </div>
                   </Show>
-                  <div class="flex flex-row justify-end gap-2">
-                    <Show when={!showForm()}>
-                      <Button variant="secondary" onClick={() => setShowForm(true)}>
-                        Add Prescription
-                      </Button>
-                    </Show>
+                  <div class="flex flex-row justify-end">
                     <Button loading={isLoadingPrefills() || isLoading()} onClick={combineOrSubmit}>
                       Send
                     </Button>

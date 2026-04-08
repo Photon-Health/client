@@ -107,7 +107,6 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
                 allowOffCatalogSearch={props.allowOffCatalogSearch}
                 disableList={props.disableList}
                 groupId={props.groupId}
-                // this logic keeps the rx form closed when refilling a particular template/prescription
                 initialShowForm={!props.templateIds && !props.prescriptionIds}
               />
             </PrescribeProvider>
