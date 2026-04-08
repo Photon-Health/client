@@ -156,13 +156,15 @@ export const Status = () => {
   };
 
   const handleReroute = () => {
+    const isEnabled = patientAnalytics.getFlagValueSync('change_pharmacy_reasons', false);
     const hasUnresolvedOrderError = order.exceptions.some(
       (e) => e.exceptionType === 'ORDER_ERROR' && !e.resolvedAt
     );
-    const isEnabled =
-      patientAnalytics.getFlagValueSync('change_pharmacy_reasons', false) &&
-      !hasUnresolvedOrderError;
 
+    if (hasUnresolvedOrderError) {
+      handleSelectReason('Order Error');
+      return;
+    }
     if (isEnabled) {
       onOpen();
       return;
