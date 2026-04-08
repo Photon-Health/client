@@ -15,6 +15,7 @@ import Input, { InputProps } from '../Input';
 import { createStore } from 'solid-js/store';
 import clsx from 'clsx';
 import { useInputGroup } from '../InputGroup';
+import { Dynamic } from 'solid-js/web';
 
 interface ComboBoxState {
   open: boolean;
@@ -144,7 +145,8 @@ export interface ComboOptionProps {
   key: string;
   value: any;
   disabled?: boolean;
-  children?: JSX.Element | ((props: { active: boolean }) => JSX.Element);
+  children?: JSX.Element;
+  render?: any;
 }
 
 function ComboOption(props: ComboOptionProps) {
@@ -160,9 +162,11 @@ function ComboOption(props: ComboOptionProps) {
         tabindex="-1"
       >
         <span class="block truncate">
-          {typeof props.children === 'function'
-            ? props.children({ active: active() })
-            : props.children}
+          {props.render ? (
+            <Dynamic component={props.render} value={props.value} active={active()} />
+          ) : (
+            props.children
+          )}
         </span>
       </li>
     );
@@ -180,9 +184,11 @@ function ComboOption(props: ComboOptionProps) {
       onMouseLeave={() => setActive('')}
     >
       <span class="w-full truncate">
-        {typeof props.children === 'function'
-          ? props.children({ active: active() })
-          : props.children}
+        {props.render ? (
+          <Dynamic component={props.render} value={props.value} active={active()} />
+        ) : (
+          props.children
+        )}
       </span>
       <Icon
         name="checkCircle"
