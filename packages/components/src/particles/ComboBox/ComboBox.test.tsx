@@ -141,3 +141,27 @@ test('disabled option is rendered but cannot be selected', async () => {
   await user.click(disabledOption);
   expect(setSelected).not.toHaveBeenCalled();
 });
+
+test('option renders render prop component with internal state', async () => {
+  const user = userEvent.setup();
+  const CustomOption = (props: { value: Option; active: boolean }) => (
+    <span>{`${props.value.label} - ${props.active ? 'active' : 'inactive'}`}</span>
+  );
+
+  render(() => (
+    <ComboBox setSelected={vi.fn()} value={undefined}>
+      <ComboBox.Input label="Test Label" displayValue={(val) => val?.label ?? ''} />
+      <ComboBox.Options>
+        <ComboBox.Option key={OPTIONS[0].id} value={OPTIONS[0]} render={CustomOption}>
+          {OPTIONS[0].label}
+        </ComboBox.Option>
+      </ComboBox.Options>
+    </ComboBox>
+  ));
+
+  await openComboBox(user, 'Test Label');
+  screen.getByText(`${OPTIONS[0].label} - inactive`);
+
+  await user.hover(screen.getByRole('option'));
+  screen.getByText(`${OPTIONS[0].label} - active`);
+});
