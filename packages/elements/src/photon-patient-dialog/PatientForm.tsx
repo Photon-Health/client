@@ -1,4 +1,3 @@
-import { customElement } from 'solid-element';
 import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
 import {
@@ -21,14 +20,12 @@ import {
 } from '@photonhealth/components';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
-import tailwind from '../tailwind.css?inline';
-import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import { email, empty, message, notFutureDate, zipString } from '../validators';
 
 import { isZip } from '../utils';
 import { PhotonAuthorized } from '../photon-authorized';
 
-const getPatientAddress = (pStore: any, store: any) => {
+const formatPatientAddress = (pStore: any, store: any) => {
   const patientAddress = pStore.selectedPatient.data?.address;
   if (
     store['address_zip']?.value &&
@@ -45,7 +42,11 @@ const getPatientAddress = (pStore: any, store: any) => {
   return '';
 };
 
-const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean }) => {
+export const PatientForm = (props: {
+  patientId: string;
+  optionalPatientAddress: boolean;
+  onUpdate: (detail: any) => void;
+}) => {
   let ref: any;
   const client = usePhoton();
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
@@ -116,22 +117,28 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
     }
   });
 
+  // Leftover from when PatientForm was photon-patient-form-component
+  // We no longer use this event internally but
+  // no way of knowing if customer is listening for this event
   const dispatchFormUpdated = (form: any) => {
+    const detail = {
+      form: form,
+      actions: actions,
+      selected: pStore,
+      optionalPatientAddress: props.optionalPatientAddress,
+      reset: () => {
+        actions.reset();
+        pActions.reset();
+      }
+    };
     const event = new CustomEvent('photon-form-updated', {
       composed: true,
       bubbles: true,
-      detail: {
-        form: form,
-        actions: actions,
-        selected: pStore,
-        optionalPatientAddress: props.optionalPatientAddress,
-        reset: () => {
-          actions.reset();
-          pActions.reset();
-        }
-      }
+      detail
     });
     ref?.dispatchEvent(event);
+
+    props.onUpdate(detail);
   };
 
   createEffect(() => {
@@ -346,8 +353,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
   return (
     <div class="w-full h-full relative" ref={ref}>
-      <style>{tailwind}</style>
-      <style>{photonStyles}</style>
       <Show when={pStore.selectedPatient.isLoading}>
         <div class="w-full flex justify-center">
           <Spinner color="green" />
@@ -479,7 +484,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
 
                   <p class="font-sans text-sm m-0 mt-6">Preferred pharmacy</p>
                   <PharmacySearch
-                    address={getPatientAddress(pStore, store)}
+                    address={formatPatientAddress(pStore, store)}
                     setPharmacy={(pharmacy: any) => {
                       actions.updateFormValue({
                         key: 'preferredPharmacy',
@@ -499,5 +504,3 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
     </div>
   );
 };
-
-customElement('photon-patient-form', { patientId: '', optionalPatientAddress: false }, PatientForm);
