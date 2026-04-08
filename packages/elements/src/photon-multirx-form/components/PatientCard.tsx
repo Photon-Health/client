@@ -5,11 +5,12 @@ import {
   Card,
   PatientInfo,
   PatientMedHistory,
+  PatientSelect,
   PhotonClientStore,
   Text,
   usePrescribeEventDispatch
 } from '@photonhealth/components';
-import { Treatment } from '@photonhealth/sdk/dist/types';
+import { Patient, Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
 import type { Address } from './PrescribeWorkflow';
@@ -89,16 +90,16 @@ export const PatientCard = (props: {
     }
   });
 
-  const updatePatient = (e: any, { trackInteraction = true } = {}) => {
+  const updatePatient = (patient: Patient, { trackInteraction = true } = {}) => {
     props.actions.updateFormValue({
       key: 'patient',
-      value: e.detail.patient
+      value: patient
     });
     if (trackInteraction) {
       dispatchAnalyticsTrackEvent('fieldInteraction', {
         name: 'Field Interaction',
         formName: 'add_prescription_form',
-        patientId: e.detail.patient.id
+        patientId: patient.id
       });
     }
     if (props.enableOrder && !props.address) {
@@ -106,7 +107,7 @@ export const PatientCard = (props: {
       // but the address hasn't been manually overridden
       props.actions.updateFormValue({
         key: 'address',
-        value: e.detail.patient.address
+        value: patient.address
       });
     }
   };
@@ -114,10 +115,7 @@ export const PatientCard = (props: {
   createEffect(() => {
     if (store?.selectedPatient?.data && props?.patientId) {
       // update patient when passed-in patient (patientId) is fetched
-      updatePatient(
-        { detail: { patient: store?.selectedPatient?.data } },
-        { trackInteraction: false }
-      );
+      updatePatient(store?.selectedPatient?.data, { trackInteraction: false });
     }
   });
 
@@ -160,14 +158,18 @@ export const PatientCard = (props: {
           <div class="flex items-center justify-between">
             <Text color="gray">{props?.patientId ? 'Patient' : 'Select Patient'}</Text>
           </div>
-
-          {/* Show Dropdown when no patientId is passed */}
-          <photon-patient-select
-            invalid={props.store.patient?.error ?? false}
-            help-text={props.store.patient?.error}
-            on:photon-patient-selected={updatePatient}
-            selected={props.store.patient?.value?.id ?? props.patientId}
-            sdk={props.client!.getSDK()}
+          <PatientSelect
+            selectedPatient={store.selectedPatient.data}
+            patients={store.patients.data}
+            loading={store.patients.isLoading || store.selectedPatient.isLoading}
+            onInitialFetch={() => actions.getPatients(props.client!.getSDK())}
+            onSearch={(name) =>
+              actions.getPatients(props.client!.getSDK(), name ? { name } : undefined)
+            }
+            onSelect={(patient: Patient) => {
+              actions.getSelectedPatient(props.client!.getSDK(), patient.id);
+              updatePatient(patient);
+            }}
           />
         </Card>
       </Show>
