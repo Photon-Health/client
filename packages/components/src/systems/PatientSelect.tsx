@@ -4,11 +4,14 @@ import { ComboBox } from '../particles/ComboBox';
 import { Patient } from '@photonhealth/sdk/dist/types';
 import { createMemo, For, Show } from 'solid-js';
 import { debounce } from '@solid-primitives/scheduled';
+import { format } from 'date-fns';
+import clsx from 'clsx';
 
 export const PatientSelect = (props: {
   selectedPatient?: Patient;
   patients: Patient[];
   loading: boolean;
+  onInitialFetch: () => void;
   onSearch: (name?: string) => void;
   onSelect: (patient: Patient) => void;
 }) => {
@@ -33,7 +36,7 @@ export const PatientSelect = (props: {
       setSelected={props.onSelect}
       onOpen={() => {
         if (props.patients.length === 0) {
-          props.onSearch();
+          props.onInitialFetch();
         }
       }}
     >
@@ -57,14 +60,20 @@ export const PatientSelect = (props: {
       >
         <ComboBox.Options>
           <For each={data()}>
-            {(p: Patient) => (
-              <ComboBox.Option key={p.id} value={p}>
-                {p.name?.full || ''}
-              </ComboBox.Option>
-            )}
+            {(p: Patient) => <ComboBox.Option key={p.id} value={p} render={PatientOption} />}
           </For>
         </ComboBox.Options>
       </Show>
     </ComboBox>
   );
 };
+
+const PatientOption = (props: { value: Patient; active: boolean }) => (
+  <div class="w-full flex justify-between items-center gap-x-2">
+    {/* Styling accounts for wrapping long names on mobile */}
+    <span class="min-w-0 whitespace-normal">{props.value.name.full}</span>
+    <span class={clsx('shrink-0', props.active ? 'text-white' : 'text-gray-500')}>
+      {format(props.value.dateOfBirth, 'M/d/yyyy')}
+    </span>
+  </div>
+);

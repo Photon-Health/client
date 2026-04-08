@@ -1,9 +1,11 @@
+import { Patient } from '../types';
+
 export const PATIENT = {
   __typename: 'Patient',
   id: 'pat_123',
   externalId: 'ext_pat_123',
   name: {
-    __typename: 'HumanName',
+    __typename: 'Name',
     full: 'Sally Patient',
     first: 'Sally',
     middle: null,
@@ -17,7 +19,7 @@ export const PATIENT = {
   phone: '+17185551234',
   address: null,
   preferredPharmacies: []
-};
+} as Patient;
 
 export const TREATMENT = {
   __typename: 'Treatment',

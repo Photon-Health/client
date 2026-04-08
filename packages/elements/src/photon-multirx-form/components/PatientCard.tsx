@@ -1,5 +1,5 @@
 import { any, record, string } from 'superstruct';
-import { createEffect, createMemo, createSignal, onMount, Show } from 'solid-js';
+import { createMemo, createSignal, onMount, Show } from 'solid-js';
 import {
   AddressForm,
   Card,
@@ -63,13 +63,6 @@ export const PatientCard = (props: {
     }
   });
 
-  createEffect(() => {
-    if (patientStore.selectedPatient.data) {
-      // update patient when passed-in patient (patientId) is fetched
-      updateFormPatient(patientStore.selectedPatient.data, { trackInteraction: false });
-    }
-  });
-
   const updateFormPatient = (patient: Patient, { trackInteraction = true } = {}) => {
     props.actions.updateFormValue({
       key: 'patient',
@@ -110,17 +103,16 @@ export const PatientCard = (props: {
           <div class="flex items-center justify-between">
             <Text color="gray">Select Patient</Text>
           </div>
-
-          {/* Show Dropdown when no patientId is passed */}
           <PatientSelect
             selectedPatient={patientStore.selectedPatient.data}
             patients={patientStore.patients.data}
             loading={patientStore.patients.isLoading || patientStore.selectedPatient.isLoading}
+            onInitialFetch={() => patientActions.getPatients(props.client!.getSDK())}
             onSearch={(name) =>
               patientActions.getPatients(props.client!.getSDK(), name ? { name } : undefined)
             }
             onSelect={(patient: Patient) => {
-              patientActions.setSelectedPatient(patient);
+              patientActions.getSelectedPatient(props.client!.getSDK(), patient.id);
               updateFormPatient(patient);
             }}
           />
