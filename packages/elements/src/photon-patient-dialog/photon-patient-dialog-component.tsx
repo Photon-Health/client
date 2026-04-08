@@ -32,7 +32,6 @@ const Component = (props: PatientDialogProps) => {
   const [loading, setLoading] = createSignal(false);
   const [isCreatePrescription, setIsCreatePrescription] = createSignal<boolean>(false);
   const [formStore, setFormStore] = createSignal<any>(undefined);
-  const [selectedStore, setSelectedStore] = createSignal<any>(undefined);
   const [actions, setActions] = createSignal<any>(undefined);
   const [globalError, setGlobalError] = createSignal<string | undefined>(undefined);
   const [hasAnyAddressField, setHasAnyAddressField] = createSignal<boolean>(false);
@@ -253,7 +252,7 @@ const Component = (props: PatientDialogProps) => {
                   size="lg"
                   disabled={loading()}
                   loading={loading() && isCreatePrescription()}
-                  onClick={() => submitForm(formStore(), actions(), selectedStore(), true)}
+                  onClick={() => submitForm(formStore(), actions(), pStore, true)}
                 >
                   {props?.patientId ? 'Save' : 'Create'} and start prescription
                 </Button>
@@ -265,7 +264,7 @@ const Component = (props: PatientDialogProps) => {
                   variant={props?.hideCreatePrescription ? 'primary' : 'secondary'}
                   disabled={loading()}
                   loading={loading() && !isCreatePrescription()}
-                  onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
+                  onClick={() => submitForm(formStore(), actions(), pStore, false)}
                 >
                   {props?.patientId ? 'Save' : 'Create'}
                 </Button>
@@ -283,10 +282,9 @@ const Component = (props: PatientDialogProps) => {
                 </div>
               </Show>
               <PatientForm
-                onUpdate={({ form, actions, reset, selected }: any) => {
+                onUpdate={({ form, actions, reset }: any) => {
                   setFormStore(form);
                   setActions(Object.assign({}, actions, { resetStores: reset }));
-                  setSelectedStore(selected);
                   // Check if any address field has a value
                   setHasAnyAddressField(
                     !!(
@@ -300,6 +298,7 @@ const Component = (props: PatientDialogProps) => {
                 }}
                 patientId={props.patientId}
                 optionalPatientAddress={props.optionalPatientAddress}
+                initialPatient={pStore.selectedPatient.data}
                 initialPatientLoading={props.patientId ? !pStore.selectedPatient.data : false}
               />
             </>
