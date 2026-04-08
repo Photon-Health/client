@@ -18,7 +18,6 @@ import {
   StateSelect
 } from '@photonhealth/components';
 import { createFormStore } from '../stores/form';
-import { PatientStore } from '../stores/patient';
 import { email, empty, message, notFutureDate, zipString } from '../validators';
 
 import { isZip } from '../utils';
@@ -50,7 +49,6 @@ export const PatientForm = (props: {
 }) => {
   let ref: any;
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
-  const { actions: pActions } = PatientStore;
   const { store, actions } = createFormStore(patientToFormValues(props.initialPatient));
   actions.registerValidator({
     key: 'firstName',
@@ -112,7 +110,6 @@ export const PatientForm = (props: {
       optionalPatientAddress: props.optionalPatientAddress,
       reset: () => {
         actions.reset();
-        pActions.reset();
       }
     };
     const event = new CustomEvent('photon-form-updated', {

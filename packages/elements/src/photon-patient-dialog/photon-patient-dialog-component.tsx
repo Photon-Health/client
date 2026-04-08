@@ -284,7 +284,14 @@ const Component = (props: PatientDialogProps) => {
               <PatientForm
                 onUpdate={({ form, actions, reset }: any) => {
                   setFormStore(form);
-                  setActions(Object.assign({}, actions, { resetStores: reset }));
+                  setActions(
+                    Object.assign({}, actions, {
+                      resetStores: () => {
+                        reset();
+                        pActions.reset();
+                      }
+                    })
+                  );
                   // Check if any address field has a value
                   setHasAnyAddressField(
                     !!(
