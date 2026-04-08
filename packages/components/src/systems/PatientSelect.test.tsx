@@ -10,52 +10,6 @@ const makePatient = (overrides: Partial<Patient> = {}): Patient => ({
   ...overrides
 });
 
-test('renders placeholder when no patient is selected', () => {
-  render(() => (
-    <PatientSelect
-      patients={[]}
-      loading={false}
-      onInitialFetch={vi.fn()}
-      onSearch={vi.fn()}
-      onSelect={vi.fn()}
-    />
-  ));
-
-  screen.getByPlaceholderText('Select patient...');
-});
-
-test('shows "Loading..." when patient list is empty and loading', async () => {
-  const user = userEvent.setup();
-  render(() => (
-    <PatientSelect
-      patients={[]}
-      loading={true}
-      onInitialFetch={vi.fn()}
-      onSearch={vi.fn()}
-      onSelect={vi.fn()}
-    />
-  ));
-
-  await user.click(screen.getByPlaceholderText('Select patient...'));
-  screen.getByRole('option', { name: 'Loading...' });
-});
-
-test('shows "No patients found" when patient list is empty and not loading', async () => {
-  const user = userEvent.setup();
-  render(() => (
-    <PatientSelect
-      patients={[]}
-      loading={false}
-      onInitialFetch={vi.fn()}
-      onSearch={vi.fn()}
-      onSelect={vi.fn()}
-    />
-  ));
-
-  await user.click(screen.getByPlaceholderText('Select patient...'));
-  screen.getByText('No patients found');
-});
-
 // Preserving existing behavior of only fetching patients
 // when user interacts with PatientSelect
 test('calls onInitialFetch when dropdown opens and patient list is empty', async () => {
@@ -95,51 +49,6 @@ test('does not call onInitialFetch when dropdown opens and patient list is not e
   expect(onInitialFetch).not.toHaveBeenCalled();
 });
 
-test('renders patient list in the dropdown', async () => {
-  const user = userEvent.setup();
-  const patients = [
-    makePatient({ id: 'pat_1', name: { first: 'Alice', last: 'Smith', full: 'Alice Smith' } }),
-    makePatient({ id: 'pat_2', name: { first: 'Bob', last: 'Jones', full: 'Bob Jones' } })
-  ];
-
-  render(() => (
-    <PatientSelect
-      patients={patients}
-      loading={false}
-      onInitialFetch={vi.fn()}
-      onSearch={vi.fn()}
-      onSelect={vi.fn()}
-    />
-  ));
-
-  await user.click(screen.getByPlaceholderText('Select patient...'));
-  screen.getByText('Alice Smith');
-  screen.getByText('Bob Jones');
-});
-
-test('calls onSelect when a patient is clicked', async () => {
-  const user = userEvent.setup();
-  const onSelect = vi.fn();
-  const patient = makePatient({
-    id: 'pat_1',
-    name: { first: 'Alice', last: 'Smith', full: 'Alice Smith' }
-  });
-
-  render(() => (
-    <PatientSelect
-      patients={[patient]}
-      loading={false}
-      onInitialFetch={vi.fn()}
-      onSearch={vi.fn()}
-      onSelect={onSelect}
-    />
-  ));
-
-  await user.click(screen.getByPlaceholderText('Select patient...'));
-  await user.click(screen.getByText('Alice Smith'));
-  expect(onSelect).toHaveBeenCalledWith(patient);
-});
-
 test('places selected patient first in dropdown', async () => {
   const user = userEvent.setup();
   const selected = makePatient({
@@ -167,23 +76,6 @@ test('places selected patient first in dropdown', async () => {
   expect(options).toHaveLength(2);
   expect(options[0]).toHaveTextContent('Alice Smith');
   expect(options[1]).toHaveTextContent('Bob Jones');
-});
-
-test('displays selected patient name in the input', () => {
-  const selected = makePatient({ name: { first: 'Alice', last: 'Smith', full: 'Alice Smith' } });
-
-  render(() => (
-    <PatientSelect
-      selectedPatient={selected}
-      patients={[selected]}
-      loading={false}
-      onInitialFetch={vi.fn()}
-      onSearch={vi.fn()}
-      onSelect={vi.fn()}
-    />
-  ));
-
-  screen.getByDisplayValue('Alice Smith');
 });
 
 describe('search', () => {

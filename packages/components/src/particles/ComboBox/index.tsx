@@ -50,7 +50,6 @@ export function useComboBox() {
 export interface ComboBoxProps {
   children?: JSX.Element;
   value?: any;
-  onChange?: (value: any) => void;
   onOpen?: () => void;
   loading?: boolean;
   setSelected: (selected: any) => void;
