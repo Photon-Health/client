@@ -692,7 +692,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   enableOrder={props.enableOrder}
                   // If rx form is hidden, we need a button to toggle it to visible
                   // If rx form is visible, we don't need the button
-                  onAddDraft={!showForm() ? () => setShowForm(true) : undefined}
+                  onAddAnotherClick={!showForm() ? () => setShowForm(true) : undefined}
                 />
                 <Show when={props.enableOrder && needsSupervisor()}>
                   <SupervisorCard actions={props.formActions} store={props.formStore} />

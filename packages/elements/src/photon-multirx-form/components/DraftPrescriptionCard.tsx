@@ -24,7 +24,7 @@ export const DraftPrescriptionCard = (props: {
   screeningAlerts: ScreeningAlertType[];
   routingConstraints: RoutingConstraint[];
   enableOrder: boolean;
-  onAddDraft?: () => void;
+  onAddAnotherClick?: () => void;
 }) => {
   const { dispatchDraftPrescriptionDeleted, dispatchAnalyticsTrackEvent } =
     usePrescribeEventDispatch();
@@ -34,7 +34,8 @@ export const DraftPrescriptionCard = (props: {
   const [editDraft, setEditDraft] = createSignal<PrescriptionFormData | undefined>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
   const { selectOtherCoverageOption } = usePrescribe();
-  const { draftPrescriptions, prescriptionIds, deletePrescription } = useDraftPrescriptions();
+  const { draftPrescriptions, prescriptionIds, deletePrescription, isLoadingPrefills } =
+    useDraftPrescriptions();
 
   const editPrescription = () => {
     const formData = editDraft();
@@ -173,12 +174,12 @@ export const DraftPrescriptionCard = (props: {
             routingConstraints={props.routingConstraints}
             enableOrder={props.enableOrder}
           />
-          <Show when={props.onAddDraft}>
+          <Show when={props.onAddAnotherClick && !isLoadingPrefills()}>
             <Button
               variant="secondary"
               class="w-full xs:w-fit mt-5"
               size="lg"
-              onClick={props.onAddDraft}
+              onClick={props.onAddAnotherClick}
             >
               Add another
             </Button>
