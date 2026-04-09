@@ -77,18 +77,14 @@ export const SSOLogin = () => {
 };
 
 function isCurrentOriginAllowed(): boolean {
-  const allowedDomains = [
-    'http://localhost:3000',
-    'https://app.boson.health',
-    'https://app.neutron.health',
-    'https://app.photon.health'
-  ];
-
   try {
     const currentOrigin = window.location.origin;
-    return allowedDomains.some((domain) => {
-      return currentOrigin === domain;
-    });
+    return (
+      currentOrigin === 'http://localhost:3000' ||
+      /^https:\/\/app(-[a-z0-9-]+)?\.boson\.health$/.test(currentOrigin) ||
+      currentOrigin === 'https://app.neutron.health' ||
+      currentOrigin === 'https://app.photon.health'
+    );
   } catch {
     return false;
   }

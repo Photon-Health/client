@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import { PatientAnalytics } from './configs/analytics';
 
 vi.mock('react-ga4', () => ({
   event: vi.fn()
@@ -10,10 +11,12 @@ vi.mock('@datadog/browser-rum', () => ({
     addAction: vi.fn()
   }
 }));
-const mockPatientAnalytics = {
+const mockPatientAnalytics: PatientAnalytics = {
   page: vi.fn(),
   identify: vi.fn(),
-  track: vi.fn()
+  track: vi.fn(),
+  getFlagValue: vi.fn(),
+  getFlagValueSync: vi.fn()
 };
 vi.mock('./configs/analytics', () => ({
   getPatientAnalytics: () => mockPatientAnalytics
@@ -47,3 +50,19 @@ if (typeof window !== 'undefined' && !('IntersectionObserver' in window)) {
 }
 
 vi.stubGlobal('scrollTo', vi.fn());
+
+// Fixes bug in Chakra UI https://github.com/chakra-ui/chakra-ui/issues/6036
+// useBreakpointValue causes bug during unit tests
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn()
+  }))
+});

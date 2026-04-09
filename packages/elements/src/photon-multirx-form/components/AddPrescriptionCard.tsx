@@ -65,14 +65,13 @@ export const AddPrescriptionCard = (props: {
   enableCombineAndDuplicate?: boolean;
   screenDraftedPrescriptions: () => void;
   draftedPrescriptionChanged: () => void;
-  onDraftPrescriptionCreated: () => void;
   screeningAlerts: ScreeningAlertType[];
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
   disableList?: DisableList;
 }) => {
   const { tryCreatePrescription } = useDraftPrescriptions();
-  const { dispatchOrderError, dispatchAnalytics } = usePrescribeEventDispatch();
+  const { dispatchOrderError, dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
   const [searchText, setSearchText] = createSignal<string>('');
@@ -130,9 +129,6 @@ export const AddPrescriptionCard = (props: {
         showSuccessToast: true
       };
       createdPrescription = await tryCreatePrescription(prescriptionFormData, options);
-      if (createdPrescription) {
-        props.onDraftPrescriptionCreated();
-      }
     } catch (err) {
       dispatchOrderError([err as GraphQLFormattedError]);
     } finally {
@@ -198,9 +194,12 @@ export const AddPrescriptionCard = (props: {
                 value: e.detail.data
               });
             }
-            dispatchAnalytics({
-              trackEventType: 'prescription_field_interaction',
-              properties: { fieldName: 'treatment', hasValue: true }
+            dispatchAnalyticsTrackEvent('fieldInteraction', {
+              name: 'Field Interaction',
+              formName: 'add_prescription_form',
+              fieldName: 'treatment',
+              hasValue: true,
+              isOptional: false
             });
 
             if (e.detail.catalogId) {
@@ -245,9 +244,12 @@ export const AddPrescriptionCard = (props: {
                 key: 'dispenseAsWritten',
                 value: checked
               });
-              dispatchAnalytics({
-                trackEventType: 'prescription_field_interaction',
-                properties: { fieldName: 'dispenseAsWritten', hasValue: checked }
+              dispatchAnalyticsTrackEvent('fieldInteraction', {
+                name: 'Field Interaction',
+                formName: 'add_prescription_form',
+                fieldName: 'dispenseAsWritten',
+                hasValue: checked,
+                isOptional: true
               });
             }}
           />
@@ -268,12 +270,12 @@ export const AddPrescriptionCard = (props: {
                     });
                   }}
                   onBlur={(e) => {
-                    dispatchAnalytics({
-                      trackEventType: 'prescription_field_interaction',
-                      properties: {
-                        fieldName: 'dispenseQuantity',
-                        hasValue: Boolean(e.currentTarget.value)
-                      }
+                    dispatchAnalyticsTrackEvent('fieldInteraction', {
+                      name: 'Field Interaction',
+                      formName: 'add_prescription_form',
+                      fieldName: 'dispenseQuantity',
+                      hasValue: Boolean(e.currentTarget.value),
+                      isOptional: false
                     });
                   }}
                 />
@@ -300,12 +302,12 @@ export const AddPrescriptionCard = (props: {
                 });
               }}
               onBlur={(e) => {
-                dispatchAnalytics({
-                  trackEventType: 'prescription_field_interaction',
-                  properties: {
-                    fieldName: 'dispenseUnit',
-                    hasValue: Boolean(e.currentTarget.value)
-                  }
+                dispatchAnalyticsTrackEvent('fieldInteraction', {
+                  name: 'Field Interaction',
+                  formName: 'add_prescription_form',
+                  fieldName: 'dispenseUnit',
+                  hasValue: Boolean(e.currentTarget.value),
+                  isOptional: false
                 });
               }}
             />
@@ -352,12 +354,12 @@ export const AddPrescriptionCard = (props: {
                 });
               }}
               onBlur={(e) => {
-                dispatchAnalytics({
-                  trackEventType: 'prescription_field_interaction',
-                  properties: {
-                    fieldName: 'daysSupply',
-                    hasValue: Boolean(e.currentTarget.value)
-                  }
+                dispatchAnalyticsTrackEvent('fieldInteraction', {
+                  name: 'Field Interaction',
+                  formName: 'add_prescription_form',
+                  fieldName: 'daysSupply',
+                  hasValue: Boolean(e.currentTarget.value),
+                  isOptional: true
                 });
               }}
             />
@@ -376,12 +378,12 @@ export const AddPrescriptionCard = (props: {
                 });
               }}
               onBlur={(e) => {
-                dispatchAnalytics({
-                  trackEventType: 'prescription_field_interaction',
-                  properties: {
-                    fieldName: 'refills',
-                    hasValue: Boolean(e.currentTarget.value)
-                  }
+                dispatchAnalyticsTrackEvent('fieldInteraction', {
+                  name: 'Field Interaction',
+                  formName: 'add_prescription_form',
+                  fieldName: 'refills',
+                  hasValue: Boolean(e.currentTarget.value),
+                  isOptional: true
                 });
               }}
             />
@@ -402,9 +404,12 @@ export const AddPrescriptionCard = (props: {
               });
             }}
             onBlur={(value: string) => {
-              dispatchAnalytics({
-                trackEventType: 'prescription_field_interaction',
-                properties: { fieldName: 'instructions', hasValue: Boolean(value) }
+              dispatchAnalyticsTrackEvent('fieldInteraction', {
+                name: 'Field Interaction',
+                formName: 'add_prescription_form',
+                fieldName: 'instructions',
+                hasValue: Boolean(value),
+                isOptional: false
               });
             }}
           />
@@ -420,9 +425,12 @@ export const AddPrescriptionCard = (props: {
               });
             }}
             onBlur={(value: string) => {
-              dispatchAnalytics({
-                trackEventType: 'prescription_field_interaction',
-                properties: { fieldName: 'pharmacy_notes', hasValue: Boolean(value) }
+              dispatchAnalyticsTrackEvent('fieldInteraction', {
+                name: 'Field Interaction',
+                formName: 'add_prescription_form',
+                fieldName: 'pharmacy_notes',
+                hasValue: Boolean(value),
+                isOptional: true
               });
             }}
           />
@@ -443,12 +451,12 @@ export const AddPrescriptionCard = (props: {
               });
             }}
             onBlur={(e) => {
-              dispatchAnalytics({
-                trackEventType: 'prescription_field_interaction',
-                properties: {
-                  fieldName: 'doNotFillBeforeDate',
-                  hasValue: Boolean(e.currentTarget.value)
-                }
+              dispatchAnalyticsTrackEvent('fieldInteraction', {
+                name: 'Field Interaction',
+                formName: 'add_prescription_form',
+                fieldName: 'doNotFillBeforeDate',
+                hasValue: Boolean(e.currentTarget.value),
+                isOptional: true
               });
             }}
           />
@@ -464,9 +472,12 @@ export const AddPrescriptionCard = (props: {
                   key: 'addToTemplates',
                   value: checked
                 });
-                dispatchAnalytics({
-                  trackEventType: 'prescription_field_interaction',
-                  properties: { fieldName: 'addToTemplates', hasValue: checked }
+                dispatchAnalyticsTrackEvent('fieldInteraction', {
+                  name: 'Field Interaction',
+                  formName: 'add_prescription_form',
+                  fieldName: 'addToTemplates',
+                  hasValue: checked,
+                  isOptional: true
                 });
               }}
             />

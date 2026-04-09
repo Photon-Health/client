@@ -119,7 +119,8 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   const {
     dispatchSignatureAttestationAgreed,
     dispatchSignatureAttestationCanceled,
-    dispatchAnalytics
+    dispatchAttestationResolved,
+    dispatchAnalyticsTrackEvent
   } = usePrescribeEventDispatch();
   const [status, setStatus] = createSignal<Status>({ status: 'LOADING' });
   const [submitting, setSubmitting] = createSignal(false);
@@ -154,15 +155,16 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   createEffect(() => {
     if (status().status === 'COMPLETE') {
       dispatchSignatureAttestationAgreed();
+      dispatchAttestationResolved();
     }
   });
 
   createEffect(() => {
     const curr = status();
     if (curr.status === 'NEEDS ATTESTATION') {
-      dispatchAnalytics({
-        trackEventType: 'signature_attestation_shown',
-        properties: { attestationVersion: curr.version }
+      dispatchAnalyticsTrackEvent('pageViewed', {
+        name: 'Signature Attestation Page Viewed',
+        attestationVersion: curr.version
       });
     }
   });
@@ -177,15 +179,16 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
     }
     const curr = status();
     if (curr.status === 'NEEDS ATTESTATION') {
+      dispatchAnalyticsTrackEvent('ctaClicked', {
+        name: 'Signature Attestation Agreed',
+        buttonText: 'I Agree',
+        attestationVersion: curr.version
+      });
       setSubmitting(true);
       const res = await agreeToSignatureAttestation(props.client)(curr.version);
       if (res.data?.agreeToSignatureAttestation) {
         setSubmitting(false);
         setStatus({ status: 'COMPLETE' });
-        dispatchAnalytics({
-          trackEventType: 'signature_attestation_agreed',
-          properties: { attestationVersion: curr.version }
-        });
       } else if (res.error || res.errors) {
         setSubmitting(false);
         setStatus({
@@ -218,7 +221,10 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
           <AgreementCard
             onAgree={onAgree}
             onCancel={() => {
-              dispatchAnalytics({ trackEventType: 'signature_attestation_canceled' });
+              dispatchAnalyticsTrackEvent('ctaClicked', {
+                name: 'Signature Attestation Canceled',
+                buttonText: 'Cancel'
+              });
               dispatchSignatureAttestationCanceled();
             }}
             disabled={submitting()}

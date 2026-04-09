@@ -17,15 +17,6 @@ export const getOrder = async (orderId: string) => {
   }
 };
 
-export const getOffers = async (orderId: string) => {
-  const response = await graphQLClient.GetOffersForOrder({ orderId: orderId });
-  if (response.offers) {
-    return response.offers;
-  } else {
-    throw new Error('No offers found');
-  }
-};
-
 export const getOfferBundles = async (orderId: string) => {
   const response = await graphQLClient.GetOfferBundlesForOrder({ orderId: orderId });
   return response.offerBundles;
@@ -145,13 +136,15 @@ export const markOrderAsPickedUp = async (orderId: string) => {
 export const rerouteOrder = async (
   orderId: string,
   pharmacyId: string,
-  patientSelectedPrice: boolean
+  patientSelectedPrice: boolean,
+  reason?: string
 ) => {
   try {
     const response = await graphQLClient.RerouteOrder({
       orderId,
       pharmacyId,
-      patientSelectedPrice
+      patientSelectedPrice,
+      reason: reason || undefined
     });
     if (response?.rerouteOrder) {
       return true;

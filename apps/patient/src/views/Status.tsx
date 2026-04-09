@@ -1,4 +1,4 @@
-import { Box, Button, Container, Heading, VStack } from '@chakra-ui/react';
+import { Box, Button, Container, Heading, useDisclosure, VStack } from '@chakra-ui/react';
 import queryString from 'query-string';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
@@ -18,6 +18,7 @@ import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
+import { ChangePharmacyReasons } from '../components/ChangePharmacyReasons';
 import { computeNumRefillsForPrescription } from '../utils/presenters';
 import { CouponCardList } from '../components/coupons';
 import { Pharmacy } from '../utils/models';
@@ -25,10 +26,11 @@ import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 export const Status = () => {
   const navigate = useNavigate();
-  const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
+  const { order, setOrder, isDemo, setFaqModalIsOpen, setReason } = useOrderContext();
   const patientAnalytics = usePatientAnalytics();
   usePageAnalytics({ pageName: 'Order Status' });
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
+  const { isOpen, onClose, onOpen } = useDisclosure();
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') ?? undefined;
@@ -40,6 +42,8 @@ export const Status = () => {
   const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
 
   const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
+
+  const canOrderReroute = !isDemo && enablePatientRerouting && order.isReroutable;
 
   const handleGetDirections = () => {
     if (!pharmacy?.name) return;
@@ -134,9 +138,7 @@ export const Status = () => {
     return null;
   }
 
-  const canOrderReroute = !isDemo && enablePatientRerouting && order.isReroutable;
-
-  const handleRerouteLink = () => {
+  const navigateToReroute = (reason?: string) => {
     const query = queryString.stringify({
       orderId: order.id,
       token,
@@ -149,8 +151,41 @@ export const Status = () => {
       pharmacyId: pharmacy?.id,
       pharmacyName: pharmacy?.name,
       isPharmacyOpen: displayPharmacy?.isOpen,
-      fulfillmentType: fulfillmentType
+      fulfillmentType: fulfillmentType,
+      rerouteReason: reason
     });
+  };
+
+  const handleReroute = () => {
+    const isEnabled = patientAnalytics.getFlagValueSync('change_pharmacy_reasons', false);
+    const hasUnresolvedOrderError = order.exceptions.some(
+      (e) => e.exceptionType === 'ORDER_ERROR' && !e.resolvedAt
+    );
+
+    if (hasUnresolvedOrderError) {
+      const reason = 'Order Error';
+      setReason(reason); // set reason for reroute on order context
+      navigateToReroute(reason);
+      return;
+    }
+
+    if (isEnabled) {
+      onOpen();
+      return;
+    }
+
+    navigateToReroute();
+  };
+
+  const handleSelectReason = (reason: string, otherReason?: string) => {
+    patientAnalytics.track(
+      'Pharmacy Change Reason Selected',
+      order,
+      { reason, otherReason: otherReason || undefined },
+      { toRudderStack: false, toMixpanel: true }
+    );
+    setReason(otherReason ? `${reason}: ${otherReason}` : reason);
+    navigateToReroute();
   };
 
   const fulfillments = order.fulfillments.map((f) => ({
@@ -207,7 +242,7 @@ export const Status = () => {
       size="md"
       py={6}
       variant="outline"
-      onClick={handleRerouteLink}
+      onClick={handleReroute}
       leftIcon={<FiRefreshCcw />}
       color="blue.500"
       w="full"
@@ -286,7 +321,7 @@ export const Status = () => {
                   Pharmacy
                 </Heading>
                 <Card>
-                  <VStack w="full" spacing={0}>
+                  <VStack w="full" spacing={2}>
                     <PharmacyInfo
                       pharmacy={displayPharmacy}
                       showDetails={!isDeliveryPharmacy}
@@ -336,6 +371,7 @@ export const Status = () => {
       <VStack w="full" pb={6}>
         <PoweredBy />
       </VStack>
+      <ChangePharmacyReasons isOpen={isOpen} onClose={onClose} onSelect={handleSelectReason} />
     </VStack>
   );
 };

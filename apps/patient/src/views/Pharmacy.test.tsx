@@ -12,8 +12,8 @@ import {
 } from '../test-utils/generators';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
-import { getOffers, getOrder, getPharmaciesByLocation, setOrderPharmacy } from '../api';
-import { fetchOfferBundles, fetchOffers, getPharmacy } from './pharmacy.utils';
+import { getOfferBundles, getOrder, getPharmaciesByLocation, setOrderPharmacy } from '../api';
+import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
 import { FulfillmentType } from '../__generated__/graphql';
 
 // Mock the settings and pharmacy utils before any imports
@@ -39,7 +39,7 @@ vi.mock('../api', () => ({
   getOrder: vi.fn(),
   getPharmaciesByLocation: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
   getPharmacies: vi.fn().mockResolvedValue({ pharmacies: [] }),
-  getOffers: vi.fn().mockResolvedValue([]),
+  getOfferBundles: vi.fn().mockResolvedValue([]),
   rerouteOrder: vi.fn(),
   setOrderPharmacy: vi.fn(),
   setPreferredPharmacy: vi.fn(),
@@ -59,7 +59,6 @@ vi.mock('../configs/graphqlClient', () => ({
 }));
 
 vi.mock('./pharmacy.utils', () => ({
-  fetchOffers: vi.fn(),
   fetchOfferBundles: vi.fn(),
   getPharmacy: vi.fn()
 }));
@@ -93,15 +92,15 @@ describe('Pharmacy page', () => {
   });
 
   describe('offers', async () => {
-    let fetchOffersMock: MockedFunction<typeof fetchOffers>;
+    let fetchOfferBundlesMock: MockedFunction<typeof fetchOfferBundles>;
     let getPharmacyMock: MockedFunction<typeof getPharmacy>;
     let getOrderMock: MockedFunction<typeof getOrder>;
     let getPharmaciesByLocationMock: MockedFunction<typeof getPharmaciesByLocation>;
     let setOrderPharmacyMock: MockedFunction<typeof setOrderPharmacy>;
 
     beforeAll(async () => {
-      fetchOffersMock = vi.mocked(fetchOffers);
-      fetchOffersMock.mockResolvedValue([
+      fetchOfferBundlesMock = vi.mocked(fetchOfferBundles);
+      fetchOfferBundlesMock.mockResolvedValue([
         {
           costType: 'INSURANCE_ESTIMATE',
           deliveryEstimate: 'Delivers in 2-3 days',
@@ -114,7 +113,8 @@ describe('Pharmacy page', () => {
             name: 'Amazon Pharmacy',
             fulfillmentTypes: ['MAIL_ORDER']
           },
-          tags: ['In Stock', 'Free Shipping']
+          tags: ['In Stock', 'Free Shipping'],
+          medications: [{ name: 'Metformin 500mg', amount: 25.99, retailAmount: 150.0 }]
         },
         {
           costType: 'PRIME_RX',
@@ -128,7 +128,8 @@ describe('Pharmacy page', () => {
             name: 'Amazon Pharmacy',
             fulfillmentTypes: ['MAIL_ORDER']
           },
-          tags: ['Prime Member', 'Fast Delivery']
+          tags: ['Prime Member', 'Fast Delivery'],
+          medications: [{ name: 'Metformin 500mg', amount: 19.99, retailAmount: 120.0 }]
         }
       ]);
 
@@ -142,7 +143,7 @@ describe('Pharmacy page', () => {
       getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
       setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
     });
-    test('shows offers when they are available and price toggle is enabled', async () => {
+    test('shows offers when they are available and price is enabled', async () => {
       const singlePrescriptionOrder = generateOrder({
         id: 'ord_testId777',
         state: 'ROUTING',
@@ -177,7 +178,7 @@ describe('Pharmacy page', () => {
       renderApp();
       await navigateToPharmacyScreen();
 
-      // Price toggle is already enabled by default, so offers should show
+      // Price is already enabled by default, so offers should show
       // Wait for offers to load and check they are displayed
       expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
       expect(await screen.findByText('Delivers in 1-2 days')).toBeInTheDocument();
@@ -185,7 +186,7 @@ describe('Pharmacy page', () => {
       expect(await screen.findByText('Prime Rx Price')).toBeInTheDocument();
     }, 10_000);
 
-    test('shows offers when they are available and price toggle is enabled - doing the same thing again', async () => {
+    test('shows offers when they are available and price is enabled - doing the same thing again', async () => {
       const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
       const singlePrescriptionOrder = generateOrder({
@@ -222,7 +223,7 @@ describe('Pharmacy page', () => {
       renderApp();
       await navigateToPharmacyScreen();
 
-      // Price toggle is already enabled by default, so offers should show
+      // Price is already enabled by default, so offers should show
       // Wait for offers to load and check they are displayed
       expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
       expect(await screen.findByText('Delivers in 1-2 days')).toBeInTheDocument();
@@ -230,74 +231,10 @@ describe('Pharmacy page', () => {
       expect(await screen.findByText('Prime Rx Price')).toBeInTheDocument();
     }, 10_000);
 
-    test('shows the cheaper offer when both CASH and PRIME_RX offers are available', async () => {
-      const { fetchOffers } = await import('./pharmacy.utils');
-      vi.mocked(fetchOffers).mockResolvedValueOnce([
-        {
-          costType: 'CASH',
-          deliveryEstimate: 'Delivers in 2-3 days',
-          costAmount: 9.99,
-          costAmountTitle: 'Cash Price',
-          retailAmount: 100.0,
-          retailAmountTitle: 'Retail',
-          pharmacy: {
-            id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-            name: 'Amazon Pharmacy',
-            fulfillmentTypes: ['MAIL_ORDER']
-          },
-          tags: []
-        },
-        {
-          costType: 'PRIME_RX',
-          deliveryEstimate: 'Delivers in 1-2 days',
-          costAmount: 19.99,
-          costAmountTitle: 'Prime Rx Price',
-          retailAmount: 100.0,
-          retailAmountTitle: 'Retail',
-          pharmacy: {
-            id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-            name: 'Amazon Pharmacy',
-            fulfillmentTypes: ['MAIL_ORDER']
-          },
-          tags: []
-        }
-      ]);
-
-      const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
-      vi.mocked(getOrder).mockResolvedValue(
-        generateOrder({
-          id: 'ord_testId777',
-          state: 'ROUTING',
-          patient: generatePatient(),
-          fills: [generateFill('test-treatment')],
-          address: {
-            street1: '123 Main St',
-            city: 'New York',
-            state: 'NY',
-            postalCode: '10001',
-            country: 'US'
-          }
-        })
-      );
-      vi.mocked(getPharmaciesByLocation).mockResolvedValue({
-        pharmaciesByLocation: [
-          generatePharmacy({ id: 'phr_testId123', name: 'Test Local Pickup Pharmacy' })
-        ]
-      });
-      vi.mocked(setOrderPharmacy).mockResolvedValue(true);
-
-      renderApp();
-      await navigateToPharmacyScreen();
-
-      expect(await screen.findByText('$9.99')).toBeInTheDocument();
-      expect(await screen.findByText('Cash Price')).toBeInTheDocument();
-      expect(screen.queryByText('Prime Rx Price')).not.toBeInTheDocument();
-    }, 10_000);
-
     test('does not show offers when no offers are available', async () => {
       // Override the mock to return empty array for this test
-      const { fetchOffers } = await import('./pharmacy.utils');
-      vi.mocked(fetchOffers).mockResolvedValueOnce([]);
+      const { fetchOfferBundles } = await import('./pharmacy.utils');
+      vi.mocked(fetchOfferBundles).mockResolvedValueOnce([]);
 
       const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
@@ -342,7 +279,7 @@ describe('Pharmacy page', () => {
 
   describe('address requirements', () => {
     test('does not show offers when order has no address', async () => {
-      const { getPharmaciesByLocation, setOrderPharmacy, getOrder, getOffers } = await import(
+      const { getPharmaciesByLocation, setOrderPharmacy, getOrder, getOfferBundles } = await import(
         '../api'
       );
       const getOrderMock = vi.mocked(getOrder);
@@ -354,8 +291,8 @@ describe('Pharmacy page', () => {
         // No address provided
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
-      const { fetchOffers } = await import('./pharmacy.utils');
-      vi.mocked(fetchOffers).mockResolvedValueOnce([]);
+      const { fetchOfferBundles } = await import('./pharmacy.utils');
+      vi.mocked(fetchOfferBundles).mockResolvedValueOnce([]);
 
       const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
       getPharmaciesByLocationMock.mockResolvedValue({
@@ -374,10 +311,6 @@ describe('Pharmacy page', () => {
 
       renderApp();
       await navigateToPharmacyScreen();
-
-      // Enable price toggle
-      const priceToggle = screen.getByRole('checkbox', { name: 'Show lowest cash prices' });
-      await userEvent.click(priceToggle);
 
       // Wait for component to render
       await screen.findByText('Select a pharmacy');
@@ -427,8 +360,8 @@ describe('Pharmacy page', () => {
 
     test('does not show offers even when order has address (current behavior)', async () => {
       // Override the mock to return empty array for this test
-      const { fetchOffers } = await import('./pharmacy.utils');
-      vi.mocked(fetchOffers).mockResolvedValueOnce([]);
+      const { fetchOfferBundles } = await import('./pharmacy.utils');
+      vi.mocked(fetchOfferBundles).mockResolvedValueOnce([]);
 
       const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
@@ -465,15 +398,11 @@ describe('Pharmacy page', () => {
       renderApp();
       await navigateToPharmacyScreen();
 
-      // Enable price toggle
-      const priceToggle = screen.getByRole('checkbox', { name: 'Show lowest cash prices' });
-      await userEvent.click(priceToggle);
-
       // Should show location information
       expect(await screen.findByText('Showing pharmacies near')).toBeInTheDocument();
       expect(await screen.findByText('123 Main St, New York, NY 10001')).toBeInTheDocument();
 
-      // Current behavior: offers are not shown even with address and price toggle enabled
+      // Current behavior: offers are not shown even with address and price is enabled
       // This documents the current state where offers functionality is not working
       expect(screen.queryByText('Delivery')).not.toBeInTheDocument();
       expect(screen.queryByText('Get delivered')).not.toBeInTheDocument();
@@ -485,50 +414,6 @@ describe('Pharmacy page', () => {
       expect(screen.getByText('Get your medication at a nearby pharmacy')).toBeInTheDocument();
     }, 10_000);
   });
-
-  test('shows enabled price toggle when order has 1 prescription', async () => {
-    const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
-    const getOrderMock = vi.mocked(getOrder);
-    const singlePrescriptionOrder = generateOrder({
-      id: 'ord_testId777',
-      state: 'ROUTING',
-      patient: generatePatient(),
-      fills: [generateFill('test-treatment')]
-    });
-    getOrderMock.mockResolvedValue(singlePrescriptionOrder);
-    const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
-    getPharmaciesByLocationMock.mockResolvedValue({
-      pharmaciesByLocation: [
-        generatePharmacy({
-          id: 'phr_testId123',
-          name: 'Test Local Pickup Pharmacy',
-          price: 444,
-          retailPrice: 1000
-        })
-      ]
-    });
-    const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
-    setOrderPharmacyMock.mockResolvedValue(true);
-
-    renderApp();
-
-    await navigateToPharmacyScreen();
-
-    const priceToggle = screen.getByRole('checkbox', { name: 'Show lowest cash prices' });
-    expect(priceToggle).toBeInTheDocument();
-    expect(priceToggle).toBeEnabled();
-
-    expect(screen.getByText('Coupon Price')).toBeInTheDocument();
-    expect(screen.getByText('$444')).toBeInTheDocument();
-    expect(screen.getAllByText('Retail')).toHaveLength(2);
-    expect(screen.getByText('$1000')).toBeInTheDocument();
-
-    const includePriceOptions = getPharmaciesByLocationMock.mock.calls.map((call) => {
-      const options = call[0];
-      return options.includePrice;
-    });
-    expect(includePriceOptions).not.toContain(false);
-  }, 10_000);
 
   test('puts preferred pharmacy at the top of the pickup list', async () => {
     const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
@@ -637,54 +522,13 @@ describe('Pharmacy page', () => {
   }, 10_000);
 
   describe('multi-rx offers', () => {
-    test('hides price toggle when order has 2+ prescriptions and defaults to cash prices', async () => {
-      const { fetchOfferBundles } = await import('./pharmacy.utils');
-      vi.mocked(fetchOfferBundles).mockResolvedValueOnce([]);
-      const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
-      const getOrderMock = vi.mocked(getOrder);
-      const multiPrescriptionOrder = generateOrder({
-        id: 'ord_testId888',
-        state: 'ROUTING',
-        patient: generatePatient(),
-        fills: [generateFill('test-treatment-1'), generateFill('test-treatment-2')]
-      });
-      getOrderMock.mockResolvedValue(multiPrescriptionOrder);
-      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
-      getPharmaciesByLocationMock.mockResolvedValue({
-        pharmaciesByLocation: [
-          generatePharmacy({
-            id: 'phr_testId123',
-            name: 'Test Local Pickup Pharmacy'
-          })
-        ]
-      });
-      const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
-      setOrderPharmacyMock.mockResolvedValue(true);
-
-      renderApp();
-
-      expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
-      await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
-      expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
-
-      const priceToggle = screen.queryByRole('checkbox', { name: 'Show lowest cash prices' });
-      expect(priceToggle).not.toBeInTheDocument();
-
-      const callArgs = getPharmaciesByLocationMock.mock.calls.map((call) => call[0].includePrice);
-      expect(callArgs).toContain(true);
-
-      // ensure price UI is not showing in the cards
-      expect(screen.queryByText('Coupon Price')).not.toBeInTheDocument();
-      expect(screen.queryByText('Retail')).not.toBeInTheDocument();
-    }, 10_000);
-
-    test('shows the cheaper offer when both CASH and PRIME_RX offers are available', async () => {
+    test('shows Total Price title for mixed CASH and PRIME_RX bundle', async () => {
       const { fetchOfferBundles } = await import('./pharmacy.utils');
       vi.mocked(fetchOfferBundles).mockResolvedValueOnce([
         {
-          costType: 'CASH',
-          costAmount: 29.98,
-          costAmountTitle: 'Cash Price',
+          costType: 'MIXED',
+          costAmount: 21.98,
+          costAmountTitle: 'Total Price',
           retailAmount: 200.0,
           retailAmountTitle: 'Retail',
           deliveryEstimate: 'Delivers in 2-3 days',
@@ -695,26 +539,8 @@ describe('Pharmacy page', () => {
           },
           tags: [],
           medications: [
-            { name: 'Metformin', amount: 9.99, retailAmount: 100.0 },
-            { name: 'Lisinopril', amount: 19.99, retailAmount: 100.0 }
-          ]
-        },
-        {
-          costType: 'PRIME_RX',
-          costAmount: 39.99,
-          costAmountTitle: 'Prime Rx Price',
-          retailAmount: 200.0,
-          retailAmountTitle: 'Retail',
-          deliveryEstimate: 'Delivers in 1-2 days',
-          pharmacy: {
-            id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-            name: 'Amazon Pharmacy',
-            fulfillmentTypes: ['MAIL_ORDER']
-          },
-          tags: [],
-          medications: [
-            { name: 'Metformin', amount: 19.99, retailAmount: 100.0 },
-            { name: 'Lisinopril', amount: 20.0, retailAmount: 100.0 }
+            { name: 'Metformin', pricingType: 'CASH', amount: 9.99, retailAmount: 100.0 },
+            { name: 'Lisinopril', pricingType: 'PRIME_RX', amount: 11.99, retailAmount: 100.0 }
           ]
         }
       ]);
@@ -744,9 +570,8 @@ describe('Pharmacy page', () => {
       renderApp();
       await navigateToPharmacyScreen();
 
-      expect(await screen.findByText('$29.98')).toBeInTheDocument();
-      expect(await screen.findByText('Cash Price')).toBeInTheDocument();
-      expect(screen.queryByText('Prime Rx Price')).not.toBeInTheDocument();
+      expect(await screen.findByText('$21.98')).toBeInTheDocument();
+      expect(await screen.findByText('Total Price')).toBeInTheDocument();
     }, 10_000);
 
     test('shows per-medication prices and promotions for multi-rx bundle offers', async () => {

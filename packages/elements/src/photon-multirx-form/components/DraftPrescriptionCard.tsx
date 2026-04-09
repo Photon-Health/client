@@ -1,5 +1,6 @@
-import { createSignal } from 'solid-js';
+import { createSignal, Show } from 'solid-js';
 import {
+  Button,
   Card,
   CoverageOption,
   DraftPrescriptionList,
@@ -23,15 +24,18 @@ export const DraftPrescriptionCard = (props: {
   screeningAlerts: ScreeningAlertType[];
   routingConstraints: RoutingConstraint[];
   enableOrder: boolean;
+  onAddAnotherClick?: () => void;
 }) => {
-  const { dispatchDraftPrescriptionDeleted, dispatchAnalytics } = usePrescribeEventDispatch();
+  const { dispatchDraftPrescriptionDeleted, dispatchAnalyticsTrackEvent } =
+    usePrescribeEventDispatch();
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
   const [editDialogConfirm, setEditDialogConfirm] = createSignal<(() => void) | undefined>();
   const [editDraft, setEditDraft] = createSignal<PrescriptionFormData | undefined>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
   const { selectOtherCoverageOption } = usePrescribe();
-  const { draftPrescriptions, prescriptionIds, deletePrescription } = useDraftPrescriptions();
+  const { draftPrescriptions, prescriptionIds, deletePrescription, isLoadingPrefills } =
+    useDraftPrescriptions();
 
   const editPrescription = () => {
     const formData = editDraft();
@@ -64,7 +68,7 @@ export const DraftPrescriptionCard = (props: {
       editPrescription();
       onConfirm?.();
       dispatchDraftPrescriptionDeleted();
-      dispatchAnalytics({ trackEventType: 'draft_prescription_edited' });
+      dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Draft Prescription Edited' });
     } else {
       setEditDialogOpen(true);
       setEditDialogConfirm(onConfirm);
@@ -85,7 +89,7 @@ export const DraftPrescriptionCard = (props: {
     editDialogConfirm()?.();
     setEditDialogConfirm(undefined);
     dispatchDraftPrescriptionDeleted();
-    dispatchAnalytics({ trackEventType: 'draft_prescription_edited' });
+    dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Draft Prescription Edited' });
   };
   const handleEditCancel = () => {
     setEditDialogOpen(false);
@@ -98,7 +102,7 @@ export const DraftPrescriptionCard = (props: {
       const deletedRx = draftPrescriptions().find((rx) => rx.id === deletedId);
       deletePrescription(deletedId);
       dispatchDraftPrescriptionDeleted(deletedRx);
-      dispatchAnalytics({ trackEventType: 'draft_prescription_deleted' });
+      dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Draft Prescription Deleted' });
     }
 
     setDeleteDialogOpen(false);
@@ -153,22 +157,34 @@ export const DraftPrescriptionCard = (props: {
           </Text>
           <PhotonTooltip
             maxWidth="300px"
-            tip="Each prescription will include the prescriber’s digital signature and the date it was written when the order is sent to the pharmacy."
+            tip="Each prescription will include the prescriber's digital signature and the date it was written when the order is sent to the pharmacy."
           />
         </div>
-        <DraftPrescriptionList
-          handleDelete={(draftId: string) => {
-            setDeleteDialogOpen(true);
-            setDeleteDraftId(draftId);
-          }}
-          handleEdit={(draft) => {
-            checkEditPrescription(draft);
-          }}
-          handleSwapToOtherPrescription={handleSwapToOtherPrescription}
-          screeningAlerts={props.screeningAlerts}
-          routingConstraints={props.routingConstraints}
-          enableOrder={props.enableOrder}
-        />
+        <div>
+          <DraftPrescriptionList
+            handleDelete={(draftId: string) => {
+              setDeleteDialogOpen(true);
+              setDeleteDraftId(draftId);
+            }}
+            handleEdit={(draft) => {
+              checkEditPrescription(draft);
+            }}
+            handleSwapToOtherPrescription={handleSwapToOtherPrescription}
+            screeningAlerts={props.screeningAlerts}
+            routingConstraints={props.routingConstraints}
+            enableOrder={props.enableOrder}
+          />
+          <Show when={props.onAddAnotherClick && !isLoadingPrefills()}>
+            <Button
+              variant="secondary"
+              class="w-full xs:w-fit mt-5"
+              size="lg"
+              onClick={props.onAddAnotherClick}
+            >
+              Add another
+            </Button>
+          </Show>
+        </div>
       </Card>
     </div>
   );

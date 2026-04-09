@@ -38,7 +38,12 @@ export const PrescriptionsList = () => {
                         onClick={() => {}}
                       >
                         <VStack me="auto" w="full" align="start">
-                          <Text align="start" data-dd-privacy="mask" fontWeight="semibold">
+                          <Text
+                            align="start"
+                            data-dd-privacy="mask"
+                            className="mp-mask"
+                            fontWeight="semibold"
+                          >
                             {treatment.name}
                           </Text>
                           <HStack>
@@ -55,21 +60,27 @@ export const PrescriptionsList = () => {
                         <HStack>
                           <HStack w="50%">
                             <Text color="gray.500">{t.quantity}</Text>
-                            <Text data-dd-privacy="mask">{prescription.dispenseQuantity}</Text>
+                            <Text data-dd-privacy="mask" className="mp-mask">
+                              {prescription.dispenseQuantity}
+                            </Text>
                           </HStack>
                           <HStack w="50%">
                             <Text color="gray.500">{t.daysSupply}</Text>
-                            <Text data-dd-privacy="mask">{prescription.daysSupply}</Text>
+                            <Text data-dd-privacy="mask" className="mp-mask">
+                              {prescription.daysSupply}
+                            </Text>
                           </HStack>
                         </HStack>
                         <HStack>
                           <HStack w="50%">
                             <Text color="gray.500">{t.refills}</Text>
-                            <Text data-dd-privacy="mask">{count - 1}</Text>
+                            <Text data-dd-privacy="mask" className="mp-mask">
+                              {count - 1}
+                            </Text>
                           </HStack>
                           <HStack w="50%">
                             <Text color="gray.500">{t.expires}</Text>
-                            <Text data-dd-privacy="mask">
+                            <Text data-dd-privacy="mask" className="mp-mask">
                               {formatDate(prescription.expirationDate)}
                             </Text>
                           </HStack>

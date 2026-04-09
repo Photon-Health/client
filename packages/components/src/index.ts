@@ -4,8 +4,8 @@ import { Alert } from './particles/Alert';
 import Checkbox from './particles/Checkbox';
 import DispenseUnitSelect from './particles/DispenseUnitSelect';
 import Input from './particles/Input';
-import AddressAutocompleteInput from './particles/AddressAutocompleteInput';
 import type { ParsedAddress } from './particles/AddressAutocompleteInput';
+import AddressAutocompleteInput from './particles/AddressAutocompleteInput';
 import { InputGroup } from './particles/InputGroup';
 import DateInput from './particles/DateInput';
 import Select from './particles/Select';
@@ -78,6 +78,7 @@ import {
   DRAFT_PRESCRIPTION_FORM_FIELDS,
   PATIENT_FORM_FIELDS
 } from './analytics/buildFieldSnapshot';
+import { PatientSelect } from './systems/PatientSelect';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
 
@@ -143,7 +144,8 @@ export {
   dispatchAnalyticsTrackEvent,
   buildFieldSnapshot,
   PATIENT_FORM_FIELDS,
-  DRAFT_PRESCRIPTION_FORM_FIELDS
+  DRAFT_PRESCRIPTION_FORM_FIELDS,
+  PatientSelect
 };
 
 // Export types

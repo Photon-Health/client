@@ -1,6 +1,7 @@
 import { ApiObject, IdentifyTraits, RudderAnalytics } from '@rudderstack/analytics-js';
 import { Order } from '../utils/models';
 import mixpanel from 'mixpanel-browser';
+import { defaults } from 'lodash';
 import { countFillsAndRemoveDuplicates } from '../utils/general';
 
 const RUDDERSTACK_WRITE_KEY = import.meta.env.VITE_RUDDERSTACK_WRITE_KEY;
@@ -230,10 +231,21 @@ function mapOrderToContextData(order: Order): ContextData {
   };
 }
 
+type FlagValues = {
+  change_pharmacy_reasons: boolean;
+};
+
+type FlagNames = keyof FlagValues;
+
 export interface PatientAnalytics {
   page(category: string, name?: string, properties?: ApiObject): void;
 
-  track(eventName: string, order: Order, properties?: ApiObject): void;
+  track(
+    eventName: string,
+    order: Order,
+    properties?: ApiObject,
+    options?: { toRudderStack?: boolean; toMixpanel?: boolean }
+  ): void;
 
   identify(input: {
     userId?: string;
@@ -241,13 +253,22 @@ export interface PatientAnalytics {
     orgId?: string;
     orgName?: string;
   }): void;
+
+  getFlagValue<K extends FlagNames>(flagName: K, fallback: FlagValues[K]): Promise<FlagValues[K]>;
+
+  getFlagValueSync<K extends FlagNames>(flagName: K, fallback: FlagValues[K]): FlagValues[K];
 }
 
 class NoopPatientAnalytics implements PatientAnalytics {
   page(_category: string, _name?: string, _properties?: ApiObject): void {
     return;
   }
-  track(_eventName: string, _order: Order, _properties?: ApiObject): void {
+  track(
+    _eventName: string,
+    _order: Order,
+    _properties: ApiObject,
+    _options: { toRudderStack?: boolean; toMixpanel?: boolean }
+  ): void {
     return;
   }
   identify(_input: {
@@ -258,15 +279,31 @@ class NoopPatientAnalytics implements PatientAnalytics {
   }): void {
     return;
   }
+  async getFlagValue<K extends FlagNames>(
+    _flagName: K,
+    fallback: FlagValues[K]
+  ): Promise<FlagValues[K]> {
+    return fallback;
+  }
+  getFlagValueSync<K extends FlagNames>(_flagName: K, fallback: FlagValues[K]): FlagValues[K] {
+    return fallback;
+  }
 }
 
 class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
   private rudderanalytics?: RudderAnalytics;
   private environment = 'development';
   private mixpanelEnabled: boolean = false;
+  private isNonProduction = true;
 
   constructor() {
     this.environment = ENVIRONMENT;
+    this.isNonProduction =
+      ENVIRONMENT === 'boson' ||
+      ENVIRONMENT === 'neutron' ||
+      ENVIRONMENT === 'tau' ||
+      ENVIRONMENT === 'local' ||
+      ENVIRONMENT === 'development';
 
     if (RUDDERSTACK_WRITE_KEY && RUDDERSTACK_DATA_PLANE_URL) {
       this.rudderanalytics = new RudderAnalytics();
@@ -278,11 +315,13 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
 
     if (MIXPANEL_TOKEN) {
       mixpanel.init(MIXPANEL_TOKEN, {
-        debug: false,
+        debug: false, // floods the console, only turn on when needed
         track_pageview: true,
         persistence: 'localStorage',
         record_sessions_percent: 100, // session replay
-        record_heatmap_data: true
+        record_heatmap_data: true,
+        flags: true,
+        record_mask_all_text: false // reveal all text and mask individually; inputs are unaffected and remain masked
       });
       this.mixpanelEnabled = true;
     }
@@ -305,10 +344,15 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
     }
   }
 
-  track(eventName: string, order: Order, properties: ApiObject = {}) {
-    if (!this.rudderanalytics) {
-      return;
-    }
+  track(
+    eventName: string,
+    order: Order,
+    properties: ApiObject = {},
+    options: { toRudderStack?: boolean; toMixpanel?: boolean } = {}
+  ) {
+    // Rudderstack is our existing metrics tool so default to true
+    // Mixpanel is new and we don't want to send everything there yet, default to false
+    defaults(options, { toRudderStack: true, toMixpanel: false });
 
     const trackProperties = {
       environment: this.environment,
@@ -316,18 +360,21 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
       ...properties
     };
 
-    const isNonProductionEnvironment =
-      this.environment === 'boson' ||
-      this.environment === 'neutron' ||
-      this.environment === 'tau' ||
-      this.environment === 'local' ||
-      this.environment === 'development';
+    if (this.rudderanalytics && options.toRudderStack) {
+      if (this.isNonProduction) {
+        console.log(`📊 [Analytics] ${eventName}`, trackProperties);
+      }
 
-    if (isNonProductionEnvironment) {
-      console.log(`📊 [Analytics] ${eventName}`, trackProperties);
+      this.rudderanalytics.track(eventName, trackProperties);
     }
 
-    this.rudderanalytics.track(eventName, trackProperties);
+    if (this.mixpanelEnabled && options.toMixpanel) {
+      mixpanel.track(eventName, trackProperties);
+
+      if (this.isNonProduction) {
+        console.log(`📊 [Analytics: To Mixpanel] ${eventName}`, trackProperties);
+      }
+    }
   }
 
   identify({
@@ -349,6 +396,41 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
     if (this.mixpanelEnabled && userId) {
       mixpanel.identify(userId);
     }
+  }
+
+  async getFlagValue<K extends FlagNames>(
+    flagName: K,
+    fallback: FlagValues[K]
+  ): Promise<FlagValues[K]> {
+    let flagValue: FlagValues[K];
+
+    if (this.mixpanelEnabled) {
+      flagValue = await mixpanel.flags.get_variant_value(flagName, fallback);
+    } else {
+      flagValue = fallback;
+    }
+
+    if (this.isNonProduction) {
+      console.log(`📊 [Analytics: Feature Flag] ${flagName}`, flagValue);
+    }
+
+    return flagValue;
+  }
+
+  getFlagValueSync<K extends FlagNames>(flagName: K, fallback: FlagValues[K]): FlagValues[K] {
+    let flagValue: FlagValues[K];
+
+    if (this.mixpanelEnabled) {
+      flagValue = mixpanel.flags.get_variant_value_sync(flagName, fallback);
+    } else {
+      flagValue = fallback;
+    }
+
+    if (this.isNonProduction) {
+      console.log(`📊 [Analytics: Feature Flag] ${flagName}`, flagValue);
+    }
+
+    return flagValue;
   }
 }
 

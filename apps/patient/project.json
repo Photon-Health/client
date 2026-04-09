@@ -5,53 +5,60 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
+    "pullenv": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "../../tools/pullenv.sh boson patient_build_vars"
+      }
+    },
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.boson npx graphql-codegen"
+        "command": "VITE_ENV_NAME=boson npx graphql-codegen"
       }
     },
     "codegen:tau": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.tau npx graphql-codegen"
+        "command": "VITE_ENV_NAME=tau npx graphql-codegen"
       }
     },
     "codegen:neutron": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.neutron npx graphql-codegen"
+        "command": "VITE_ENV_NAME=neutron npx graphql-codegen"
       }
     },
     "codegen:photon": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.photon npx graphql-codegen"
+        "command": "VITE_ENV_NAME=photon npx graphql-codegen"
       }
     },
     "codegen:watch": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.boson npx graphql-codegen --watch"
+        "command": "VITE_ENV_NAME=boson npx graphql-codegen --watch"
       }
     },
     "codegen:watch:tau": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.tau npx graphql-codegen --watch"
+        "command": "VITE_ENV_NAME=tau npx graphql-codegen --watch"
       }
     },
     "start": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.boson vite"
+        "command": "vite"
       },
       "dependsOn": ["^build", "codegen"]
     },
@@ -59,7 +66,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.tau vite"
+        "command": "env-cmd -f .env -f .env.tau vite"
       },
       "dependsOn": ["^build", "codegen:tau"]
     },
@@ -68,7 +75,7 @@
       "options": {
         "cwd": "apps/patient",
         "commands": [
-          "env-cmd -f .env.boson vite",
+          "vite",
           "nx watch --projects=patient --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=patient"
         ]
       },
@@ -79,7 +86,7 @@
       "options": {
         "cwd": "apps/patient",
         "commands": [
-          "env-cmd -f .env.tau vite",
+          "env-cmd -f .env -f .env.tau vite",
           "nx watch --projects=patient --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=patient"
         ]
       },
@@ -90,7 +97,7 @@
       "outputs": ["{workspaceRoot}/dist/apps/patient"],
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.boson vite build"
+        "command": "vite build"
       },
       "dependsOn": ["^build", "codegen"]
     },
@@ -99,7 +106,7 @@
       "outputs": ["{workspaceRoot}/dist/apps/patient"],
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.neutron vite build"
+        "command": "vite build"
       },
       "dependsOn": ["^build", "codegen:neutron"]
     },
@@ -108,12 +115,13 @@
       "outputs": ["{workspaceRoot}/dist/apps/patient"],
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.photon vite build"
+        "command": "vite build"
       },
       "dependsOn": ["^build", "codegen:photon"]
     },
     "test": {
       "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
       "options": {
         "cwd": "apps/patient",
         "command": "vitest run"
@@ -175,14 +183,14 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.boson npx playwright test"
+        "command": "npx playwright test"
       }
     },
     "e2e:ui": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "env-cmd -f .env.boson npx playwright test --ui"
+        "command": "npx playwright test --ui"
       }
     }
   }

@@ -8,7 +8,6 @@ import {
   Heading,
   HStack,
   Link,
-  Switch,
   Text,
   useToast,
   VStack
@@ -23,7 +22,7 @@ import { FixedFooter, LocationModal, PoweredBy } from '../components';
 import { CouponModal } from '../components/coupons';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy, wait } from '../utils/general';
-import { OfferDetails, Pharmacy as EnrichedPharmacy, OfferBundleDetails } from '../utils/models';
+import { Pharmacy as EnrichedPharmacy, OfferBundleDetails } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -49,7 +48,7 @@ import {
   Prescription
 } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
-import { fetchOfferBundles, fetchOffers, getPharmacy } from './pharmacy.utils';
+import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
 import _ from 'lodash';
 import {
   BrandedOptionOverrides,
@@ -80,9 +79,9 @@ export const Pharmacy = () => {
     setOrder,
     isDemo,
     fetchOrder,
-    showPriceToggle,
     enablePrice,
-    setEnablePrice
+    setEnablePrice,
+    reason
   } = useOrderContext();
   // We don't want to collect data on demo activity
   const patientAnalytics = usePatientAnalytics();
@@ -162,10 +161,8 @@ export const Pharmacy = () => {
     BrandedOptionOverrides | undefined
   >(undefined);
 
-  const [offers, setOffers] = useState<OfferDetails[] | OfferBundleDetails[] | undefined>(
-    undefined
-  );
-  const [filteredOffers, setFilteredOffers] = useState<OfferDetails[] | undefined>(undefined);
+  const [offers, setOffers] = useState<OfferBundleDetails[] | undefined>(undefined);
+  const [filteredOffers, setFilteredOffers] = useState<OfferBundleDetails[] | undefined>(undefined);
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
@@ -243,11 +240,9 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     const getOffers = async () => {
-      let fetchedOffers: OfferDetails[] | OfferBundleDetails | undefined = [];
-
       // only fetch offers if we don't have any
       if (!offers) {
-        fetchedOffers = orderIsMultiRx ? await fetchOfferBundles(order) : await fetchOffers(order);
+        const fetchedOffers = await fetchOfferBundles(order);
 
         if (JSON.stringify(fetchedOffers) !== JSON.stringify(offers)) {
           setOffers(fetchedOffers);
@@ -264,12 +259,9 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     const insuranceOffer = offers?.find((offer) => offer.costType == 'INSURANCE_ESTIMATE');
-    const cashOrPrimeRxOffers =
-      offers?.filter((o) => o.costType === 'CASH' || o.costType === 'PRIME_RX') ?? [];
-    const bestCashOrPrimeRxOffer = cashOrPrimeRxOffers
-      .filter((o) => o.costAmount != null)
-      // sort by price, then prioritize PRIME_RX over CASH if prices are the same
-      .sort((a, b) => a.costAmount! - b.costAmount! || (b.costType === 'PRIME_RX' ? 1 : -1))[0];
+    const bestPriceOffer = offers?.find(
+      (o) => o.costType === 'MIXED' || o.costType === 'PRIME_RX' || o.costType === 'CASH'
+    );
 
     const novocareOffer = offers?.find((offer) => offer.costType == 'NOVOCARE_OFFER');
 
@@ -278,10 +270,10 @@ export const Pharmacy = () => {
     const filteringOffers = [];
 
     // we'll only want to set the override if we have at least one offer to show
-    if (bestCashOrPrimeRxOffer || insuranceOffer) {
-      if (enablePrice && bestCashOrPrimeRxOffer) {
-        amazonPharmacyOverride = bestCashOrPrimeRxOffer;
-        filteringOffers.push(bestCashOrPrimeRxOffer);
+    if (bestPriceOffer || insuranceOffer) {
+      if (enablePrice && bestPriceOffer) {
+        amazonPharmacyOverride = bestPriceOffer;
+        filteringOffers.push(bestPriceOffer);
       } else if (!enablePrice && insuranceOffer) {
         amazonPharmacyOverride = insuranceOffer;
         filteringOffers.push(insuranceOffer);
@@ -779,7 +771,7 @@ export const Pharmacy = () => {
       try {
         const patientSelectedPrice = enablePrice;
         const result = isReroute
-          ? await rerouteOrder(order.id, selectedPharmacy.id, patientSelectedPrice)
+          ? await rerouteOrder(order.id, selectedPharmacy.id, patientSelectedPrice, reason)
           : await setOrderPharmacy(
               order.id,
               selectedPharmacy.id,
@@ -1075,28 +1067,7 @@ export const Pharmacy = () => {
     );
   }
 
-  const locationPreview = (
-    <VStack w="full" align="start" spacing={1}>
-      <Text size="sm">{t.showingLabel}</Text>
-      <Link
-        onClick={() => setLocationModalOpen(true)}
-        display="inline"
-        size="sm"
-        data-dd-privacy="mask"
-      >
-        <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
-        {cleanAddress}
-      </Link>
-    </VStack>
-  );
-
-  const setLocationButton = (
-    <Button variant="brand" onClick={() => setLocationModalOpen(true)}>
-      {t.setLoc}
-    </Button>
-  );
   const capsuleEnabled = enableCourier && order?.address?.postalCode && capsulePharmacyId;
-
   const brandedOptions = _.uniq([
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
     // the destructuring for novo and amazon can be removed once we remove brandedOptionsOverrides
@@ -1130,32 +1101,6 @@ export const Pharmacy = () => {
   const showPickupHeading =
     (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;
 
-  const pickupPharmacyOptions = (patientLocation: string) => (
-    <PickupPharmacyCardList
-      location={patientLocation}
-      pharmacies={allPharmacies}
-      preferredPharmacy={effectivePreferredPharmacyId}
-      savingPreferred={savingPreferred}
-      selectedId={selectedId}
-      handleSelect={handleSelect}
-      handleShowMore={handleShowMore}
-      handleSetPreferred={handleSetPreferredPharmacy}
-      loadingMore={isLoading}
-      showingAllPharmacies={showingAllPharmacies}
-      showHeading={showPickupHeading}
-      showPrice={isDemo || !orderIsMultiRx}
-      enableOpenNow={enableOpenNow}
-      enable24Hr={enable24Hr}
-      enablePrice={enablePrice}
-      setEnableOpenNow={setEnableOpenNow}
-      setEnable24Hr={setEnable24Hr}
-      currentPharmacyId={order.pharmacy?.id}
-      setCouponModalOpen={setCouponModalOpen}
-      numberOfBrandedOptions={brandedOptions.length}
-      shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
-    />
-  );
-
   return (
     <Box>
       {!isDemo && <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />}
@@ -1174,58 +1119,35 @@ export const Pharmacy = () => {
       />
 
       <Box bgColor="white">
-        <VStack
-          spacing={4}
-          align="span"
-          pt={4}
-          pb={!showPriceToggle ? 4 : 0} // don't remove, this padding is needed when price toggle section is not shown
-        >
+        <VStack spacing={4} align="span" p={4}>
           <Container px={-3}>
             <VStack spacing={2} align="start" px={4}>
               <Heading as="h3" size="lg">
                 {heading}
               </Heading>
               <HStack justify="space-between" w="full">
-                {patientLocation ? locationPreview : setLocationButton}
+                {patientLocation ? (
+                  <VStack w="full" align="start" spacing={1}>
+                    <Text size="sm">{t.showingLabel}</Text>
+                    <Link
+                      onClick={() => setLocationModalOpen(true)}
+                      display="inline"
+                      size="sm"
+                      data-dd-privacy="mask"
+                      className="mp-mask"
+                    >
+                      <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
+                      {cleanAddress}
+                    </Link>
+                  </VStack>
+                ) : (
+                  <Button variant="brand" onClick={() => setLocationModalOpen(true)}>
+                    {t.setLoc}
+                  </Button>
+                )}
               </HStack>
             </VStack>
           </Container>
-
-          {showPriceToggle ? (
-            <Container px={-3}>
-              <VStack
-                spacing={2}
-                align="start"
-                borderY="2px solid"
-                borderColor="gray.300"
-                py={4}
-                px={4}
-              >
-                <HStack justify="space-between" w="full">
-                  {t.showDiscountCardPrices()}
-                  <Switch
-                    size="lg"
-                    aria-label="Show lowest cash prices"
-                    isChecked={enablePrice}
-                    onChange={(e) => {
-                      setEnablePrice(e.target.checked);
-                      patientAnalytics.track('Patient Toggle Show CashPrice Filter', order, {
-                        enabled: e.target.checked
-                      });
-                    }}
-                  />
-                </HStack>
-                {enablePrice && !orderIsMultiRx ? (
-                  <Box p={3} bgColor="blue.100" borderRadius="lg">
-                    <Text fontSize="sm">
-                      Coupon will be generated after you select a pharmacy.{' '}
-                      <Link onClick={() => setCouponModalOpen(true)}>More info</Link>
-                    </Text>
-                  </Box>
-                ) : null}
-              </VStack>
-            </Container>
-          ) : null}
         </VStack>
       </Box>
 
@@ -1289,7 +1211,29 @@ export const Pharmacy = () => {
                   </VStack>
                 </Card>
               )}
-              {pickupPharmacyOptions(patientLocation)}
+              <PickupPharmacyCardList
+                location={patientLocation}
+                pharmacies={allPharmacies}
+                preferredPharmacy={effectivePreferredPharmacyId}
+                savingPreferred={savingPreferred}
+                selectedId={selectedId}
+                handleSelect={handleSelect}
+                handleShowMore={handleShowMore}
+                handleSetPreferred={handleSetPreferredPharmacy}
+                loadingMore={isLoading}
+                showingAllPharmacies={showingAllPharmacies}
+                showHeading={showPickupHeading}
+                showPrice={isDemo || !orderIsMultiRx}
+                enableOpenNow={enableOpenNow}
+                enable24Hr={enable24Hr}
+                enablePrice={enablePrice}
+                setEnableOpenNow={setEnableOpenNow}
+                setEnable24Hr={setEnable24Hr}
+                currentPharmacyId={order.pharmacy?.id}
+                setCouponModalOpen={setCouponModalOpen}
+                numberOfBrandedOptions={brandedOptions.length}
+                shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
+              />
             </VStack>
           </VStack>
         )}

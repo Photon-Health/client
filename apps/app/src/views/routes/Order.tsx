@@ -484,6 +484,10 @@ export const Order = () => {
                 });
                 if (decision) {
                   setUpdating(true);
+                  track('Order Canceled', {
+                    buttonText: 'Cancel Order',
+                    orderId: id
+                  });
                   try {
                     const variables = {
                       id,
@@ -705,8 +709,7 @@ export const Order = () => {
                           onClick={async () => {
                             setUpdating(true);
                             try {
-                              track('clinicalapp_order_details_track_events', {
-                                trackEventType: 'select_pharmacy',
+                              track('Pharmacy Selected by Provider', {
                                 orderId: id,
                                 pharmacyId
                               });

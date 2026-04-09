@@ -53,7 +53,9 @@ export const Profile = () => {
   const user = data?.me;
   const organization = data?.organization;
 
-  const canEdit = usePermissions(['edit:profile']);
+  const hasEditProfile = usePermissions(['edit:profile']);
+  const hasEditProfileSelf = usePermissions(['edit:profile_self']);
+  const canEdit = hasEditProfile || hasEditProfileSelf;
 
   const initialValues: yup.InferType<typeof profileFormSchema> = {
     name: {
@@ -108,7 +110,9 @@ export const Profile = () => {
       ]).map(({ title, value }) => ({
         title,
         value: value ? (
-          <Text fontSize="sm">{value}</Text>
+          <Text fontSize="sm" data-dd-privacy="mask" className="mp-mask">
+            {value}
+          </Text>
         ) : (
           <Text fontSize="sm" color="gray.400" as="i">
             Not available

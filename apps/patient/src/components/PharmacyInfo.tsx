@@ -329,7 +329,7 @@ export const PharmacyInfo = ({
           <VStack spacing={0} align="flex-end" minW="fit-content">
             <Text fontSize="sm">Coupon Price</Text>
             <Text fontWeight="bold">${formatPrice(pharmacy.price)}</Text>
-            {pharmacy.retailPrice ? (
+            {pharmacy.retailPrice && pharmacy.retailPrice > pharmacy.price ? (
               <Text fontSize="sm" color="gray.500">
                 Retail{' '}
                 <Text as="span" textDecoration="line-through">
@@ -441,6 +441,7 @@ export const PharmacyInfo = ({
             fontWeight="medium"
             target="_blank"
             data-dd-privacy="mask"
+            className="mp-mask"
             ms={2}
           >
             {orderFulfillment.carrier} {orderFulfillment.trackingNumber}

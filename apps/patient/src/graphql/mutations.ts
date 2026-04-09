@@ -13,11 +13,17 @@ export const SET_PREFERRED_PHARMACY = gql`
 `;
 
 export const REROUTE_ORDER = gql`
-  mutation RerouteOrder($orderId: ID!, $pharmacyId: ID!, $patientSelectedPrice: Boolean) {
+  mutation RerouteOrder(
+    $orderId: ID!
+    $pharmacyId: ID!
+    $patientSelectedPrice: Boolean
+    $reason: String
+  ) {
     rerouteOrder(
       orderId: $orderId
       pharmacyId: $pharmacyId
       patientSelectedPrice: $patientSelectedPrice
+      reason: $reason
     )
   }
 `;

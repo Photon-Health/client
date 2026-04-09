@@ -5,11 +5,12 @@ import {
   Card,
   PatientInfo,
   PatientMedHistory,
+  PatientSelect,
   PhotonClientStore,
   Text,
   usePrescribeEventDispatch
 } from '@photonhealth/components';
-import { Treatment } from '@photonhealth/sdk/dist/types';
+import { Patient, Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
 import type { Address } from './PrescribeWorkflow';
@@ -63,7 +64,7 @@ export const PatientCard = (props: {
   hidePatientCard?: boolean;
   optionalPatientAddress?: boolean;
 }) => {
-  const { dispatchAnalytics } = usePrescribeEventDispatch();
+  const { dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
   const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
   const [showEditPatientView, setShowEditPatientView] = createSignal(false);
   const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
@@ -89,15 +90,16 @@ export const PatientCard = (props: {
     }
   });
 
-  const updatePatient = (e: any, { trackInteraction = true } = {}) => {
+  const updatePatient = (patient: Patient, { trackInteraction = true } = {}) => {
     props.actions.updateFormValue({
       key: 'patient',
-      value: e.detail.patient
+      value: patient
     });
     if (trackInteraction) {
-      dispatchAnalytics({
-        trackEventType: 'prescription_patient_changed',
-        properties: { patientId: e.detail.patient.id }
+      dispatchAnalyticsTrackEvent('fieldInteraction', {
+        name: 'Field Interaction',
+        formName: 'add_prescription_form',
+        patientId: patient.id
       });
     }
     if (props.enableOrder && !props.address) {
@@ -105,7 +107,7 @@ export const PatientCard = (props: {
       // but the address hasn't been manually overridden
       props.actions.updateFormValue({
         key: 'address',
-        value: e.detail.patient.address
+        value: patient.address
       });
     }
   };
@@ -113,10 +115,7 @@ export const PatientCard = (props: {
   createEffect(() => {
     if (store?.selectedPatient?.data && props?.patientId) {
       // update patient when passed-in patient (patientId) is fetched
-      updatePatient(
-        { detail: { patient: store?.selectedPatient?.data } },
-        { trackInteraction: false }
-      );
+      updatePatient(store?.selectedPatient?.data, { trackInteraction: false });
     }
   });
 
@@ -159,14 +158,18 @@ export const PatientCard = (props: {
           <div class="flex items-center justify-between">
             <Text color="gray">{props?.patientId ? 'Patient' : 'Select Patient'}</Text>
           </div>
-
-          {/* Show Dropdown when no patientId is passed */}
-          <photon-patient-select
-            invalid={props.store.patient?.error ?? false}
-            help-text={props.store.patient?.error}
-            on:photon-patient-selected={updatePatient}
-            selected={props.store.patient?.value?.id ?? props.patientId}
-            sdk={props.client!.getSDK()}
+          <PatientSelect
+            selectedPatient={store.selectedPatient.data}
+            patients={store.patients.data}
+            loading={store.patients.isLoading || store.selectedPatient.isLoading}
+            onInitialFetch={() => actions.getPatients(props.client!.getSDK())}
+            onSearch={(name) =>
+              actions.getPatients(props.client!.getSDK(), name ? { name } : undefined)
+            }
+            onSelect={(patient: Patient) => {
+              actions.getSelectedPatient(props.client!.getSDK(), patient.id);
+              updatePatient(patient);
+            }}
           />
         </Card>
       </Show>
@@ -178,7 +181,12 @@ export const PatientCard = (props: {
             weightUnit={props?.weightUnit}
             editPatient={
               props?.enableOrder && !showAddressForm()
-                ? () => setShowEditPatientView(true)
+                ? () => {
+                    dispatchAnalyticsTrackEvent('ctaClicked', {
+                      name: 'Patient Edited'
+                    });
+                    setShowEditPatientView(true);
+                  }
                 : undefined
             }
             address={props?.address || props.store.patient?.value?.address}
@@ -217,9 +225,7 @@ export const PatientCard = (props: {
             open={showAddMedDialog()}
             on:photon-medication-selected={(e: { detail: { medication: Treatment } }) => {
               setNewMedication(e.detail.medication);
-              dispatchAnalytics({
-                trackEventType: 'add_to_medication_history'
-              });
+              dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Added To Medication History' });
             }}
             on:photon-medication-closed={() => {
               setShowAddMedDialog(false);

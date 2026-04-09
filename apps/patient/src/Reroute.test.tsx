@@ -25,7 +25,7 @@ vi.mock('./api', () => ({
   getOrder: vi.fn(),
   getPharmacies: vi.fn().mockResolvedValue({ pharmacies: [] }),
   getPharmaciesByLocation: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
-  getOffers: vi.fn().mockResolvedValue([]),
+  getOfferBundles: vi.fn().mockResolvedValue([]),
   rerouteOrder: vi.fn().mockReturnValue(Promise.resolve(true)),
   setOrderPharmacy: vi.fn(),
   setPreferredPharmacy: vi.fn(),
@@ -45,7 +45,7 @@ vi.mock('./configs/graphqlClient', () => ({
 }));
 
 vi.mock('@datadog/browser-rum');
-vi.mock('./hooks/usePageAnalytics');
+vi.mock('../hooks/usePageAnalytics');
 vi.mock('react-ga4');
 vi.mock('mixpanel-browser');
 

@@ -21,7 +21,7 @@ export type Pharmacy = NotMaybe<GetPharmaciesByLocationQuery['pharmaciesByLocati
 
 export type OrderFulfillment = NotMaybe<Order['fulfillment']>;
 
-export interface OfferDetails {
+export interface OfferBundleDetails {
   deliveryEstimate?: string;
   costType?: string;
   costAmount?: number;
@@ -35,12 +35,10 @@ export interface OfferDetails {
     logo?: string;
   };
   tags: string[];
-}
-
-export interface OfferBundleDetails extends OfferDetails {
-  medications: Array<{
+  medications?: Array<{
     name?: string;
-    amount: number;
+    pricingType?: string;
+    amount?: number;
     amountTitle?: string;
     retailAmount?: number;
     retailAmountTitle?: string;

@@ -24,7 +24,7 @@ vi.mock('../api', () => ({
   updateOrderAddress: (...args: unknown[]) => mockUpdateOrderAddress(...args),
   getPharmacies: vi.fn().mockResolvedValue({ pharmacies: [] }),
   getPharmaciesByLocation: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
-  getOffers: vi.fn().mockResolvedValue([]),
+  getOfferBundles: vi.fn().mockResolvedValue([]),
   AUTH_HEADER_ERRORS: []
 }));
 

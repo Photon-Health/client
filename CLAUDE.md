@@ -11,12 +11,14 @@ Photon Health client monorepo — a healthcare platform with a clinical provider
 ### Development
 
 ```bash
-npm i                   # Install all dependencies
-npm run app             # Run clinical app (boson env, with codegen watch)
-npm run app:tau          # Run clinical app (local tau env)
-npm run patient          # Run patient app (boson env, with codegen watch)
-npm run patient:tau      # Run patient app (local tau env)
-npx nx run elements:start  # Elements dev server at localhost:3000 (no hot reload)
+npm i                         # Install all dependencies
+npm nx run app:pullenv        # Get env vars for clinical app (boson env)
+npm run app                   # Run clinical app (boson env, with codegen watch)
+npm run app:tau               # Run clinical app (local tau env)
+npm nx run patient:pullenv    # Get env vars for patient app (boson env)
+npm run patient               # Run patient app (boson env, with codegen watch)
+npm run patient:tau           # Run patient app (local tau env)
+npx nx run elements:start     # Elements dev server at localhost:3000 (no hot reload)
 ```
 
 ### Linting
@@ -32,9 +34,9 @@ npx nx run elements:lint # Lint elements only
 ### Testing
 
 ```bash
-# Clinical app (Jest)
+# Clinical app (Vitest)
 npx nx run app:test                      # Run all tests
-npx nx run app:test -- --testPathPattern="MyComponent"  # Run single test file
+npx nx run app:test -- MyComponent       # Run single test file
 
 # Patient app (Vitest)
 npx nx run patient:test                  # Run all tests (single run)
@@ -170,16 +172,16 @@ const mailOrderProviders = getOrgMailOrderPharms(user?.org_id)?.provider;
 
 ### Environments
 
-| Name     | Purpose          | Config files      |
-|----------|------------------|-------------------|
-| boson    | Development      | `.env.boson`      |
-| tau      | Local services   | `.env.tau`        |
-| neutron  | Staging          | `.env.neutron`    |
-| photon   | Production       | `.env.photon`     |
+| Name     | Purpose          |
+|----------|------------------|
+| boson    | Development      |
+| tau      | Local services   |
+| neutron  | Staging          |
+| photon   | Production       |
 
-Environment is selected via `env-cmd -f .env.<name>` in Nx targets.
+Environment variables for boson, neutron and photon are stored in AWS Secrets Manager. You will typically only need to pull env vars for boson for local development. `.env.tau` contains tau-specific (non-sensitive) overrides.
 
-**Nx automatic `.env` loading:** Nx automatically loads `.env.local` (and other `.env` files) from the project root before running any target. Variables loaded first take precedence — Nx won't overwrite a variable already set in the process. This means `.env.local` values are available to all Nx targets without explicit `env-cmd` references. For example, Playwright credentials (`PLAYWRIGHT_E2E_ACCOUNT_USERNAME`, `PLAYWRIGHT_E2E_ACCOUNT_PASSWORD`) and `PLAYWRIGHT_BASE_URL` stored in `apps/app/.env.local` are automatically available when running `nx run app:e2e`, even though that target only explicitly loads `.env.boson` via `env-cmd`.
+**Nx automatic `.env` loading:** Nx automatically loads `.env.local` (and other `.env` files) from the project root before running any target. Variables loaded first take precedence — Nx won't overwrite a variable already set in the process. This means `.env.local` values are available to all Nx targets without explicit `env-cmd` references. For example, Playwright credentials (`PLAYWRIGHT_E2E_ACCOUNT_USERNAME`, `PLAYWRIGHT_E2E_ACCOUNT_PASSWORD`) and `PLAYWRIGHT_BASE_URL` stored in `apps/app/.env.local` are automatically available when running `nx run app:e2e`.
 
 ### Backend APIs
 
@@ -293,6 +295,44 @@ Analytics applies only to the clinical and patient apps — **not** to `packages
 
 **Datadog RUM:** Initialized in `src/instrumentation/index.ts` via `initializeInstrumentation()`. User context (org, email) is set via `setInstrumentationUserContext()` which is called automatically by `ProviderAnalyticsProvider` when the user authenticates.
 
+**Prescribe Workflow Analytics (Embed Events):** The prescribe workflow lives in Solid.js web components (`packages/elements`, `packages/components`), which cannot call RudderStack directly (they're published to npm and must not bundle customer-conflicting singletons). Instead, analytics events bubble up as CustomEvents through Shadow DOM to the React clinical app, which forwards them to RudderStack.
+
+*Event categories and types* — defined in `packages/sdk/src/clinicalAnalyticsTypes.ts`:
+
+| Category | Type | Description |
+|----------|------|-------------|
+| `pageViewed` | `PageViewEvent` | Page/view lifecycle — each variant has a unique `name` (e.g. "New Prescriptions Page Viewed", "Signature Attestation Page Viewed") |
+| `ctaClicked` | `CtaClickEvent` | Call-to-action clicks — each variant has a unique descriptive `name` |
+| `fieldInteraction` | `FieldInteractionEvent` | Form field completeness — all share `name: 'Field Interaction'` with `formName`, `fieldName`, `hasValue`, `isOptional` |
+
+CTA click events have two sub-types:
+CTA event names: "Patient Created", "Patient Updated", "Order Sent", "Prescriptions Activated", "Signature Attestation Agreed", "Signature Attestation Canceled", "Order Canceled", "Draft Prescription Added", "Draft Prescription Edited", "Draft Prescription Deleted", "Added To Medication History", "Combine Orders Confirmed", "Combine Orders Rejected", "Screening Alert Acknowledged", "Screening Alert Canceled", "Pharmacy Selected".
+
+*Type-safe dispatch* — `AnalyticsEventMap` (in the SDK) maps each `AnalyticsCategory` to its event type. The generic function `dispatchAnalyticsTrackEvent<C>(category, event)` enforces that the category and event type are always coupled at compile time.
+
+*Dispatch mechanism* — `PrescribeEventDispatchProvider` (`packages/components/src/systems/PrescribeEventDispatchProvider.tsx`) is a Solid.js context provider that wraps a `<div ref={ref}>`. It exposes `dispatchAnalyticsTrackEvent` (which closes over the ref) via `usePrescribeEventDispatch()`. Consumers call it like:
+```tsx
+const { dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
+dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Order Sent', buttonText: 'Send', ... });
+dispatchAnalyticsTrackEvent('fieldInteraction', { name: 'Field Interaction', formName: '...', ... });
+dispatchAnalyticsTrackEvent('pageViewed', { name: 'New Prescriptions Page Viewed', ... });
+```
+This dispatches a `photon-analytics-track-event` CustomEvent (`composed: true, bubbles: true`) with `detail: { ...event, category, timestamp }`.
+
+*Listener side* — React form components (`PatientForm`, `UpdatePatientForm`, `PrescriptionForm` in `apps/app/src/views/routes/`) listen on the element ref via `addEventListener('photon-analytics-track-event', ...)`. The handler calls `trackAnalyticsEvent()` (`src/instrumentation/analyticsTrackEventListenerUtils.ts`) which extracts the `name` field as the RudderStack event name and flattens any field snapshot properties with a `snap_` prefix (e.g. `{ firstName: { completed: true } }` → `{ snap_first_name: true }`).
+
+*Field snapshots* — `buildFieldSnapshot()` and `buildPrescriptionSnapshot()` (`packages/components/src/analytics/buildFieldSnapshot.ts`) capture form completeness state. `PATIENT_FORM_FIELDS` and `DRAFT_PRESCRIPTION_FORM_FIELDS` define which fields are tracked. These snapshots are included in CTA click events (e.g. "Patient Created", "draft prescription added") as the `fields` property.
+
+*Key files:*
+
+| File | Purpose |
+|------|---------|
+| `packages/sdk/src/clinicalAnalyticsTypes.ts` | Event type definitions (`AnalyticsCategory`, `AnalyticsEventMap`, `PageViewEvent`, `CtaClickEvent`, `FieldInteractionEvent`) |
+| `packages/components/src/analytics/dispatchAnalyticsTrackEvent.ts` | Generic dispatch function — creates and fires the CustomEvent |
+| `packages/components/src/analytics/buildFieldSnapshot.ts` | Field snapshot utilities and form field constants |
+| `packages/components/src/systems/PrescribeEventDispatchProvider.tsx` | Solid.js context provider exposing `dispatchAnalyticsTrackEvent` via `usePrescribeEventDispatch()` |
+| `apps/app/src/instrumentation/analyticsTrackEventListenerUtils.ts` | Listener-side event-to-RudderStack mapping and field snapshot flattening |
+
 #### Patient App (`apps/patient`)
 
 **RudderStack:** Uses a singleton `patientAnalytics` instance exported from `src/configs/analytics.ts`.
@@ -349,7 +389,7 @@ The React clinical app listens for element events with `addEventListener` and ty
 
 | Project | Framework | Runner |
 |---------|-----------|--------|
-| Clinical app (`apps/app`) | Jest + React Testing Library | `npx nx run app:test` |
+| Clinical app (`apps/app`) | Vitest + React Testing Library | `npx nx run app:test` |
 | Patient app (`apps/patient`) | Vitest + React Testing Library | `npx nx run patient:test` |
 | Components (`packages/components`) | Vitest + Solid Testing Library | `npx nx run components:test` |
 | Elements (`packages/elements`) | Vitest | `npx nx run elements:test` |
@@ -361,7 +401,7 @@ The React clinical app listens for element events with `addEventListener` and ty
 
 **Page/integration tests** (`apps/patient/src/views/*.test.tsx`, `Navigation.test.tsx`) — render full page components with `createMemoryRouter` + `RouterProvider` and test user flows across route transitions. These mock the API layer (`vi.mock('../api')`), GraphQL client, analytics, and heavy child components, then assert on screen content and navigation behavior. They use test data generators from `src/test-utils/generators.ts` which provide factory functions like `generateOrder()`, `generatePatient()`, `generateFill()`, etc. with sensible defaults and `Partial<>` overrides.
 
-**Unit tests** (`apps/patient/src/utils/*.test.ts`, `packages/components/src/**/**.test.ts`) — pure function tests with no rendering. Test files sit alongside their source files. Examples: `formatters.test.ts`, `shouldShowPriceToggle.test.tsx`, `conversionFactors.test.ts`.
+**Unit tests** (`apps/patient/src/utils/*.test.ts`, `packages/components/src/**/**.test.ts`) — pure function tests with no rendering. Test files sit alongside their source files. Examples: `formatters.test.ts`, `conversionFactors.test.ts`, `deliveryPromise.test.ts`.
 
 **Component tests** (`packages/components/src/**/*.test.tsx`) — Solid.js component tests using `@solidjs/testing-library`. Test individual UI components like `ComboBox`, `Input`, `PharmacySelect`, `PatientMedHistory`, and `DoseCalculator`.
 
@@ -372,7 +412,7 @@ The React clinical app listens for element events with `addEventListener` and ty
 All new utility functions, views, and components must include tests. Match the test type to the code:
 - New utility/helper functions → unit tests
 - New patient app views → page-level integration tests (with mocked API/analytics/router)
-- New clinical app views → React Testing Library tests (with `jest.mock` for API/analytics) following the same patterns as patient app tests, adapted for Jest. Also expand Playwright E2E coverage for critical user flows.
+- New clinical app views → React Testing Library tests with MSW for API mocking, following the same patterns as patient app tests. Also expand Playwright E2E coverage for critical user flows.
 - New Solid.js components in `packages/components` → component tests with `@solidjs/testing-library`
 - New React hooks → hook tests with `renderHook`
 
@@ -381,7 +421,7 @@ All new utility functions, views, and components must include tests. Match the t
 - Keep tests **brief and focused**. For unit tests of pure functions, prefer single-assertion, bite-sized tests. For page-level and integration tests that interact with rendered UI, longer tests with multiple assertions are fine.
 - Use **fuzzy matching** assertions where possible (e.g. `toHaveTextContent`, `toMatch`, `expect.objectContaining`) to avoid brittle tests that break on insignificant changes.
 - Prefer **`@testing-library`** (`@testing-library/react`, `@solidjs/testing-library`) for unit and component tests — query by role/text, not implementation details.
-- **Mocking**: Avoid mocks when possible. Use mocks only when a third-party library makes it difficult to render a component, or to harness legacy code that was never originally tested just to get a component/page to render without refactoring. MSW is the desired direction for API mocking but no reusable pattern has been established yet — for now, `jest.mock`/`vi.mock` is acceptable.
+- **Mocking**: Prefer **MSW** (`msw`) for API mocking — the clinical app has shared default handlers in `@photonhealth/sdk/test-utils` (see `order-workflow-analytics.test.tsx` for the established pattern). Use `vi.mock` only when MSW can't cover the case (e.g. mocking non-HTTP modules, auth state, or third-party libraries that are difficult to render). Avoid mocks when possible.
 - **Component vs. page-level tests**: When adding tests for a component, ask the engineer whether the component is complex enough to warrant isolated component tests, or if it can be implicitly covered by a page-level test that exercises it in context.
 - Test files use `.test.ts` or `.test.tsx` extension and live alongside source files
 - Test files are excluded from ESLint (configured in `.eslintrc.json` ignorePatterns)

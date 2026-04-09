@@ -1,13 +1,16 @@
-import type { PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
+import type { AnalyticsCategory, AnalyticsEventMap } from '@photonhealth/sdk';
 
-export const dispatchAnalyticsTrackEvent = (
-  detail: PhotonEmbedAnalyticsEventInput,
-  ref: { dispatchEvent(event: CustomEvent): void }
+type AnalyticsRef = { dispatchEvent(event: CustomEvent): void };
+
+export const dispatchAnalyticsTrackEvent = <C extends AnalyticsCategory>(
+  category: C,
+  event: AnalyticsEventMap[C],
+  ref: AnalyticsRef
 ) => {
-  const event = new CustomEvent('photon-analytics-track-event', {
+  const customEvent = new CustomEvent('photon-analytics-track-event', {
     composed: true,
     bubbles: true,
-    detail: { ...detail, timestamp: new Date().toISOString() }
+    detail: { ...event, category, timestamp: new Date().toISOString() }
   });
-  ref?.dispatchEvent(event);
+  ref?.dispatchEvent(customEvent);
 };
