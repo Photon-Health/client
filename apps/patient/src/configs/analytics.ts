@@ -320,7 +320,8 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
         persistence: 'localStorage',
         record_sessions_percent: 100, // session replay
         record_heatmap_data: true,
-        flags: true
+        flags: true,
+        record_mask_all_text: false // reveal all text and mask individually; inputs are unaffected and remain masked
       });
       this.mixpanelEnabled = true;
     }
