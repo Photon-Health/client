@@ -64,11 +64,15 @@ export const UserItem = ({
     <Tr>
       <Td>
         <Skeleton isLoaded={!loading}>
-          <Text>{user?.name?.full ?? 'Unknown'}</Text>
+          <Text data-dd-privacy="mask" className="mp-mask">
+            {user?.name?.full ?? 'Unknown'}
+          </Text>
         </Skeleton>
       </Td>
       <Td>
-        <Skeleton isLoaded={!loading}>{user?.email ?? 'EMAIL'}</Skeleton>
+        <Skeleton isLoaded={!loading} data-dd-privacy="mask" className="mp-mask">
+          {user?.email ?? 'EMAIL'}
+        </Skeleton>
       </Td>
       <Td textOverflow={'ellipsis'}>
         <Skeleton isLoaded={!loading}>{roles ?? 'ROLES'}</Skeleton>

@@ -139,7 +139,7 @@ export const Status = () => {
     return null;
   }
 
-  const navigateToReroute = () => {
+  const navigateToReroute = (reason?: string) => {
     const query = queryString.stringify({
       orderId: order.id,
       token,
@@ -152,12 +152,24 @@ export const Status = () => {
       pharmacyId: pharmacy?.id,
       pharmacyName: pharmacy?.name,
       isPharmacyOpen: displayPharmacy?.isOpen,
-      fulfillmentType: fulfillmentType
+      fulfillmentType: fulfillmentType,
+      rerouteReason: reason
     });
   };
 
   const handleReroute = () => {
     const isEnabled = patientAnalytics.getFlagValueSync(FeatureFlags.ChangePharmacyReasons);
+    const hasUnresolvedOrderError = order.exceptions.some(
+      (e) => e.exceptionType === 'ORDER_ERROR' && !e.resolvedAt
+    );
+
+    if (hasUnresolvedOrderError) {
+      const reason = 'Order Error';
+      setReason(reason); // set reason for reroute on order context
+      navigateToReroute(reason);
+      return;
+    }
+
     if (isEnabled) {
       onOpen();
       return;

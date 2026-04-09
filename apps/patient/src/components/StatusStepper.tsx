@@ -76,7 +76,10 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
                   </StepIndicator>
                   <Box ml={1}>
                     <StepTitle>{title}</StepTitle>
-                    <StepDescription data-dd-privacy={isDelivery ? 'mask' : undefined}>
+                    <StepDescription
+                      data-dd-privacy={isDelivery ? 'mask' : undefined}
+                      className={isDelivery ? 'mp-mask' : undefined}
+                    >
                       {description}
                     </StepDescription>
                   </Box>
