@@ -136,7 +136,9 @@ export const Organization = () => {
       ].map(({ title, value }) => ({
         title,
         value: value ? (
-          <Text fontSize="sm">{value}</Text>
+          <Text fontSize="sm" data-dd-privacy="mask" className="mp-mask">
+            {value}
+          </Text>
         ) : (
           <Text fontSize="sm" color="gray.400" as="i">
             Not available
