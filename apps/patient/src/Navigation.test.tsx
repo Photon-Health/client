@@ -11,7 +11,7 @@ import {
 } from './test-utils/generators';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
-import { FeatureFlags } from './configs/featureFlags';
+import { FEATURE_FLAG_DEFAULTS, FeatureFlags } from './configs/featureFlags';
 
 const mockToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
@@ -20,11 +20,8 @@ const mockPatientAnalytics = {
   page: vi.fn(),
   identify: vi.fn(),
   track: vi.fn(),
-  getFlagValue: vi.fn().mockResolvedValue({
-    skipReviewPage: false,
-    showRxSummaryOnPharmacyPage: false
-  }),
-  getFlagValueSync: vi.fn().mockReturnValue(false)
+  getFlagValue: vi.fn(),
+  getFlagValueSync: vi.fn()
 };
 vi.mock('./configs/analytics', () => ({
   getPatientAnalytics: () => mockPatientAnalytics
@@ -87,8 +84,22 @@ describe('App', () => {
     fulfillments: [generateFulfillment({ state: 'PROCESSING' })]
   });
 
+  const resetFeatureFlagMocks = () => {
+    mockPatientAnalytics.getFlagValue.mockImplementation(async (flagName: string) => {
+      return FEATURE_FLAG_DEFAULTS[flagName as keyof typeof FEATURE_FLAG_DEFAULTS];
+    });
+    mockPatientAnalytics.getFlagValueSync.mockImplementation((flagName: string) => {
+      return FEATURE_FLAG_DEFAULTS[flagName as keyof typeof FEATURE_FLAG_DEFAULTS];
+    });
+  };
+
+  beforeEach(() => {
+    resetFeatureFlagMocks();
+  });
+
   afterEach(() => {
     vi.clearAllMocks();
+    resetFeatureFlagMocks();
   });
 
   test('For Local Pickup Pharmacies: navigate from review > pharmacy > readyBy > status', async () => {
