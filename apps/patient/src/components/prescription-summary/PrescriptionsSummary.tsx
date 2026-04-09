@@ -37,7 +37,9 @@ export function PrescriptionsSummary() {
       </HStack>
       <HStack spacing="1.5">
         <Text>Patient</Text>
-        <Text fontWeight="medium">{order.patient.name.full}</Text>
+        <Text fontWeight="medium" className="mp-mask">
+          {order.patient.name.full}
+        </Text>
       </HStack>
       <Box border="1px" borderColor="gray.200" borderRadius="lg" w="full" overflow="clip">
         {flattenedFills.map((fill, index) => (
