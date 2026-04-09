@@ -156,7 +156,7 @@ export const Patient = () => {
     >
       <Card>
         <CardHeader>
-          <Text fontWeight="medium" data-dd-privacy="mask">
+          <Text fontWeight="medium" data-dd-privacy="mask" className="mp-mask">
             {loading ? (
               <SkeletonText skeletonHeight={5} noOfLines={1} width="200px" />
             ) : (
@@ -179,7 +179,7 @@ export const Patient = () => {
               {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : patient?.dateOfBirth ? (
-                <Text fontSize="md" data-dd-privacy="mask">
+                <Text fontSize="md" data-dd-privacy="mask" className="mp-mask">
                   {formatDateLong(patient.dateOfBirth)}
                 </Text>
               ) : (
@@ -193,7 +193,7 @@ export const Patient = () => {
               {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : patient?.sex ? (
-                <Text fontSize="md" data-dd-privacy="mask">
+                <Text fontSize="md" data-dd-privacy="mask" className="mp-mask">
                   {sexMap[patient.sex as keyof object]}{' '}
                 </Text>
               ) : (
@@ -207,7 +207,7 @@ export const Patient = () => {
               {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : patient?.gender ? (
-                <Text fontSize="md" data-dd-privacy="mask">
+                <Text fontSize="md" data-dd-privacy="mask" className="mp-mask">
                   {patient.gender}
                 </Text>
               ) : (
@@ -227,6 +227,7 @@ export const Patient = () => {
                   isExternal
                   textDecoration="underline"
                   data-dd-privacy="mask"
+                  className="mp-mask"
                 >
                   {formatPhone(patient.phone)}
                 </Link>
@@ -247,6 +248,7 @@ export const Patient = () => {
                   isExternal
                   textDecoration="underline"
                   data-dd-privacy="mask"
+                  className="mp-mask"
                 >
                   {patient.email}
                 </Link>
