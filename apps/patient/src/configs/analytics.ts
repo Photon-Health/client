@@ -397,11 +397,12 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
     fallback?: FlagValues[K]
   ): Promise<FlagValues[K]> {
     let flagValue: FlagValues[K];
+    const fallbackValue = fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
 
     if (this.mixpanelEnabled) {
-      flagValue = await mixpanel.flags.get_variant_value(flagName, fallback);
+      flagValue = await mixpanel.flags.get_variant_value(flagName, fallbackValue);
     } else {
-      flagValue = fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
+      flagValue = fallbackValue;
     }
 
     if (this.isNonProduction) {
@@ -413,11 +414,12 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
 
   getFlagValueSync<K extends FlagKeys>(flagName: K, fallback?: FlagValues[K]): FlagValues[K] {
     let flagValue: FlagValues[K];
+    const fallbackValue = fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
 
     if (this.mixpanelEnabled) {
-      flagValue = mixpanel.flags.get_variant_value_sync(flagName, fallback);
+      flagValue = mixpanel.flags.get_variant_value_sync(flagName, fallbackValue);
     } else {
-      flagValue = fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
+      flagValue = fallbackValue;
     }
 
     if (this.isNonProduction) {
