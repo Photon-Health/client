@@ -35,7 +35,7 @@ export function FillSummary({ fill, expanded = false }: FillSummaryProps) {
             <FillDescriptor label="Days Supply">{fill.prescription?.daysSupply}</FillDescriptor>
           </HStack>
           <HStack w="full" justifyContent="space-between">
-            <FillDescriptor label="Refills">{fill.count}</FillDescriptor>
+            <FillDescriptor label="Refills">{fill.count - 1}</FillDescriptor>
             <FillDescriptor label="Expires">
               {formatDate(fill.prescription?.expirationDate)}
             </FillDescriptor>
