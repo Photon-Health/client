@@ -13,10 +13,22 @@ export const UserProfile = () => {
         boxSize="10"
       />
       <Box>
-        <Text fontWeight="medium" fontSize="sm" wordBreak={'break-word'}>
+        <Text
+          fontWeight="medium"
+          fontSize="sm"
+          wordBreak={'break-word'}
+          data-dd-privacy="mask"
+          className="mp-mask"
+        >
           {user?.name}
         </Text>
-        <Text color="muted" fontSize="sm" wordBreak={'break-all'}>
+        <Text
+          color="muted"
+          fontSize="sm"
+          wordBreak={'break-all'}
+          data-dd-privacy="mask"
+          className="mp-mask"
+        >
           {user?.email}
         </Text>
       </Box>

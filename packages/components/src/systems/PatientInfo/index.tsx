@@ -112,7 +112,7 @@ export default function PatientInfo(props: PatientInfoProps) {
           </Button>
         </Show>
       </div>
-      <div class="pt-2" data-dd-privacy="mask">
+      <div class="pt-2 mp-mask" data-dd-privacy="mask">
         <Text size="lg" bold loading={!patient()} sampleLoadingText="Sally Patient">
           {patient()?.name.full || 'N/A'}
         </Text>

@@ -13,13 +13,13 @@ const NameView = ({ name, sub = '', isPatient = false, patientId = '' }: NameVie
     <HStack spacing="3">
       <Box>
         {isPatient ? (
-          <Text fontWeight="medium" whiteSpace="nowrap" data-dd-privacy="mask">
+          <Text fontWeight="medium" whiteSpace="nowrap" data-dd-privacy="mask" className="mp-mask">
             <ChakraLink as={RouterLink} to={`/patients/${patientId}`} style={{ textWrap: 'wrap' }}>
               {name}
             </ChakraLink>
           </Text>
         ) : (
-          <Text fontWeight="medium" whiteSpace="nowrap" data-dd-privacy="mask">
+          <Text fontWeight="medium" whiteSpace="nowrap" data-dd-privacy="mask" className="mp-mask">
             {name}
           </Text>
         )}
