@@ -11,7 +11,7 @@ import {
 } from './test-utils/generators';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
-import { FEATURE_FLAG_DEFAULTS, FeatureFlags } from './configs/featureFlags';
+import { FEATURE_FLAG_DEFAULTS } from './configs/featureFlags';
 
 const mockToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
@@ -123,9 +123,7 @@ describe('App', () => {
     renderApp({ order: testOrder });
 
     expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
-    expect(mockPatientAnalytics.getFlagValue).toHaveBeenCalledWith(
-      FeatureFlags.RemoveReviewYourRxPage
-    );
+    expect(mockPatientAnalytics.getFlagValue).toHaveBeenCalledWith('remove_review_your_rx_page');
     await expectTotalPageViewAnalyticsCountToBe(1);
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
     expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();

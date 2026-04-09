@@ -22,7 +22,6 @@ import { FAQModal } from '../components/FAQModal';
 import { preloadImage } from '../utils/preloadImage';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
-import { FeatureFlags } from '../configs/featureFlags';
 
 type FetchOrderOptions = {
   triggerNavigationAfterFetch: boolean;
@@ -208,7 +207,7 @@ export const Main = () => {
       }
 
       const removeReviewStepExperiment = await patientAnalytics.getFlagValue(
-        FeatureFlags.RemoveReviewYourRxPage
+        'remove_review_your_rx_page'
       );
 
       const hasPharmacy = newOrder.pharmacy?.id;

@@ -13,7 +13,7 @@ import {
 } from '../test-utils/generators';
 import { Order } from '../utils/models';
 import { getOrder } from '../api';
-import { FEATURE_FLAG_DEFAULTS, FeatureFlags } from '../configs/featureFlags';
+import { FEATURE_FLAG_DEFAULTS } from '../configs/featureFlags';
 
 vi.mock('../api', () => ({
   triggerDemoNotification: vi.fn(),
@@ -40,14 +40,14 @@ vi.mock('../hooks/usePatientAnalytics', () => ({
     page: vi.fn(),
     identify: vi.fn(),
     getFlagValue: vi.fn(async (flagName: string) => {
-      if (flagName === FeatureFlags.ChangePharmacyReasons) {
+      if (flagName === 'change_pharmacy_reasons') {
         return mockChangePharmacyReasonsFlag;
       }
 
       return FEATURE_FLAG_DEFAULTS[flagName as keyof typeof FEATURE_FLAG_DEFAULTS];
     }),
     getFlagValueSync: vi.fn((flagName: string) => {
-      if (flagName === FeatureFlags.ChangePharmacyReasons) {
+      if (flagName === 'change_pharmacy_reasons') {
         return mockChangePharmacyReasonsFlag;
       }
 

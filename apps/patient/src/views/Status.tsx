@@ -23,7 +23,6 @@ import { computeNumRefillsForPrescription } from '../utils/presenters';
 import { CouponCardList } from '../components/coupons';
 import { Pharmacy } from '../utils/models';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
-import { FeatureFlags } from '../configs/featureFlags';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -158,7 +157,7 @@ export const Status = () => {
   };
 
   const handleReroute = () => {
-    const isEnabled = patientAnalytics.getFlagValueSync(FeatureFlags.ChangePharmacyReasons);
+    const isEnabled = patientAnalytics.getFlagValueSync('change_pharmacy_reasons');
     const hasUnresolvedOrderError = order.exceptions.some(
       (e) => e.exceptionType === 'ORDER_ERROR' && !e.resolvedAt
     );

@@ -63,7 +63,6 @@ import { MailOrderSelectModal } from '../components/mail-order-select';
 import { MailOrderPharmacyOption } from '../components/mail-order-select/MailOrderSelectCard';
 import { getOfferType } from '../utils/offers';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
-import { FeatureFlags } from '../configs/featureFlags';
 import { PrescriptionsSummary } from '../components/prescription-summary';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
@@ -1104,7 +1103,7 @@ export const Pharmacy = () => {
     (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;
 
   const removeReviewPageExperiment = patientAnalytics.getFlagValueSync(
-    FeatureFlags.RemoveReviewYourRxPage
+    'remove_review_your_rx_page'
   );
 
   return (
