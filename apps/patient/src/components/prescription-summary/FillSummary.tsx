@@ -10,7 +10,7 @@ interface FillSummaryProps {
 
 export function FillSummary({ fill, expanded = false }: FillSummaryProps) {
   return (
-    <Box key={fill.prescription?.id} border="1px" borderColor="gray.200" borderRadius="lg" w="full">
+    <Box>
       <Box py={2} px={3} borderBottom={expanded ? '1px' : '0'} borderColor="gray.200">
         <Text
           textOverflow="ellipsis"
@@ -29,7 +29,7 @@ export function FillSummary({ fill, expanded = false }: FillSummaryProps) {
         transitionDuration={'150ms'}
         transitionTimingFunction={expanded ? 'linear' : 'ease-out'}
       >
-        <VStack background="gray.50" borderBottomRadius="lg" px={3} py={2}>
+        <VStack background="gray.50" px={3} py={2}>
           <HStack w="full" justifyContent="space-between">
             <FillDescriptor label="Quantity">{fill.prescription?.dispenseQuantity}</FillDescriptor>
             <FillDescriptor label="Days Supply">{fill.prescription?.daysSupply}</FillDescriptor>

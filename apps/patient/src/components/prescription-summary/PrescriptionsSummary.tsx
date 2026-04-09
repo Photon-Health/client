@@ -1,4 +1,4 @@
-import { Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useOrderContext } from '../../views/Main';
 import { FillSummary } from './FillSummary';
@@ -39,9 +39,13 @@ export function PrescriptionsSummary() {
         <Text>Patient</Text>
         <Text fontWeight="medium">{order.patient.name.full}</Text>
       </HStack>
-      {flattenedFills.map((fill) => (
-        <FillSummary key={fill.id} fill={fill} expanded={expanded} />
-      ))}
+      <Box border="1px" borderColor="gray.200" borderRadius="lg" w="full" overflow="clip">
+        {flattenedFills.map((fill, index) => (
+          <Box key={fill.id} borderTop={index > 0 ? '1px' : '0px'} borderColor="gray.200" w="full">
+            <FillSummary fill={fill} expanded={expanded} />
+          </Box>
+        ))}
+      </Box>
     </VStack>
   );
 }
