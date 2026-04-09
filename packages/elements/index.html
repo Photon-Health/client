@@ -7,6 +7,10 @@
     <script src="./src/index.ts" type="module"></script>
 
     <script>
+      window.addEventListener('photon-user-token', (e) => {
+        console.log('photon-user-token:', e.detail.token);
+      });
+
       window.addEventListener('photon-order-created', (e) => {
         console.log(e);
         const parent = document.getElementById('parent');
@@ -35,6 +39,7 @@
       audience="https://api.boson.health"
       uri="https://api.boson.health/graphql"
       auto-login="true"
+      emit-user-token="true"
     >
       <div style="padding: 15px" id="parent">
         <photon-prescribe-workflow
