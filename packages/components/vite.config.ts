@@ -27,6 +27,13 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     css: true,
-    setupFiles: ['./src/test-setup.ts']
+    setupFiles: ['./src/setupTests.ts'],
+    // Silence errors that fire on every test
+    // related to jsdom not supporting valid CSS features.
+    // These errors do not affect vitest functionality.
+    // https://github.com/primefaces/primevue/issues/4512#issuecomment-1749633215
+    onConsoleLog(log) {
+      if (log.includes('Could not parse CSS stylesheet')) return false;
+    }
   }
 });

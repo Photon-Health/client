@@ -113,15 +113,25 @@ export const Nav = () => {
                 </MenuButton>
                 <MenuList py="0">
                   <VStack alignItems={'start'} py={'2.5'} px={'3'} roundedTop={'md'} gap={'1'}>
-                    <Text fontWeight="medium" fontSize="md">
+                    <Text
+                      fontWeight="medium"
+                      fontSize="md"
+                      data-dd-privacy="mask"
+                      className="mp-mask"
+                    >
                       {user?.name}
                     </Text>
-                    <Text color="muted" fontSize="sm">
+                    <Text color="muted" fontSize="sm" data-dd-privacy="mask" className="mp-mask">
                       {user?.email}
                     </Text>
                     {organization?.name &&
                       user?.name.toLowerCase() !== organization?.name.toLowerCase() && (
-                        <Text color="muted" fontSize="sm">
+                        <Text
+                          color="muted"
+                          fontSize="sm"
+                          data-dd-privacy="mask"
+                          className="mp-mask"
+                        >
                           {organization.name}
                         </Text>
                       )}
