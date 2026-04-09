@@ -27,7 +27,7 @@ export const PharmacyFilters = ({
         onClick={() => {
           if (enable24Hr) setEnable24Hr(false);
           setEnableOpenNow(!enableOpenNow);
-          patientAnalytics.track('Toggle Open Now Filter ', order, {
+          patientAnalytics.track('Toggle Open Now Filter', order, {
             enabled: !enable24Hr,
             previousOpenNowState: enableOpenNow
           });
