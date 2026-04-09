@@ -107,7 +107,6 @@ export const PatientForm = (props: {
     const detail = {
       form: form,
       actions: actions,
-      optionalPatientAddress: props.optionalPatientAddress,
       reset: () => {
         actions.reset();
       }
@@ -166,17 +165,16 @@ export const PatientForm = (props: {
     );
   };
 
+  const isAddressRequired = createMemo(() => !props.optionalPatientAddress || hasAnyAddressField());
+
   const AddressFields = () => {
-    const isAddressRequired = createMemo(
-      () => !props.optionalPatientAddress || hasAnyAddressField()
-    );
     return (
       <>
         {/*Using !mt-8 because of tailwind issue in shadowDom elements */}
         {/*when not using the !important modifier*/}
         <p class="font-sans text-lg mt-4 md:!mt-8" role="heading" aria-level="3">
           Address
-          <Show when={props.optionalPatientAddress && !hasAnyAddressField()}>
+          <Show when={!isAddressRequired()}>
             <span class="text-gray-500 text-sm font-normal"> (optional)</span>
           </Show>
         </p>
