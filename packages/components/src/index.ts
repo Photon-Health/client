@@ -78,6 +78,7 @@ import {
   DRAFT_PRESCRIPTION_FORM_FIELDS,
   PATIENT_FORM_FIELDS
 } from './analytics/buildFieldSnapshot';
+import { PatientSelect } from './systems/PatientSelect';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
 
@@ -143,7 +144,8 @@ export {
   dispatchAnalyticsTrackEvent,
   buildFieldSnapshot,
   PATIENT_FORM_FIELDS,
-  DRAFT_PRESCRIPTION_FORM_FIELDS
+  DRAFT_PRESCRIPTION_FORM_FIELDS,
+  PatientSelect
 };
 
 // Export types
