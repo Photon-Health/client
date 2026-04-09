@@ -276,12 +276,12 @@ class NoopPatientAnalytics implements PatientAnalytics {
   }
   async getFlagValue<K extends FlagKeys>(
     flagName: K,
-    _fallback?: FlagValues[K]
+    fallback?: FlagValues[K]
   ): Promise<FlagValues[K]> {
-    return FEATURE_FLAG_DEFAULTS[flagName];
+    return fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
   }
-  getFlagValueSync<K extends FlagKeys>(flagName: K, _fallback?: FlagValues[K]): FlagValues[K] {
-    return FEATURE_FLAG_DEFAULTS[flagName];
+  getFlagValueSync<K extends FlagKeys>(flagName: K, fallback?: FlagValues[K]): FlagValues[K] {
+    return fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
   }
 }
 
