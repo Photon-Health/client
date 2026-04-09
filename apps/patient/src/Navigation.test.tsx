@@ -11,6 +11,7 @@ import {
 } from './test-utils/generators';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
+import { FeatureFlags } from './configs/featureFlags';
 
 const mockToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
@@ -18,7 +19,12 @@ const mockToken =
 const mockPatientAnalytics = {
   page: vi.fn(),
   identify: vi.fn(),
-  track: vi.fn()
+  track: vi.fn(),
+  getFlagValue: vi.fn().mockResolvedValue({
+    skipReviewPage: false,
+    showRxSummaryOnPharmacyPage: false
+  }),
+  getFlagValueSync: vi.fn().mockReturnValue(false)
 };
 vi.mock('./configs/analytics', () => ({
   getPatientAnalytics: () => mockPatientAnalytics
@@ -106,9 +112,13 @@ describe('App', () => {
     renderApp({ order: testOrder });
 
     expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
+    expect(mockPatientAnalytics.getFlagValue).toHaveBeenCalledWith(
+      FeatureFlags.RemoveReviewYourRxPage
+    );
     await expectTotalPageViewAnalyticsCountToBe(1);
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
     expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+    expect(screen.queryByTestId('PrescriptionsSummary')).not.toBeInTheDocument();
     await expectTotalPageViewAnalyticsCountToBe(2);
     await userEvent.click(screen.getByText('Test Local Pickup Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
@@ -169,6 +179,31 @@ describe('App', () => {
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
   }, 10_000);
+
+  test('skips review and lands on pharmacy when the experiment enables it', async () => {
+    mockPatientAnalytics.getFlagValue.mockResolvedValue({
+      skipReviewPage: true,
+      showRxSummaryOnPharmacyPage: true
+    });
+
+    mockPatientAnalytics.getFlagValueSync.mockReturnValue({
+      skipReviewPage: true,
+      showRxSummaryOnPharmacyPage: true
+    });
+
+    const { getOrder } = await import('./api');
+    vi.mocked(getOrder).mockResolvedValue(testOrder);
+
+    const { memoryRouter } = renderApp();
+
+    await waitFor(() => {
+      expect(memoryRouter.state.location.pathname).toBe('/pharmacy');
+    });
+
+    expect(screen.queryByText('Review your prescription')).not.toBeInTheDocument();
+    expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+    expect(screen.getByTestId('PrescriptionsSummary')).toBeInTheDocument();
+  });
 });
 
 const renderApp = (order: Partial<OrderContextType> = {}) => {

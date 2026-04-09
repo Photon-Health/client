@@ -26,7 +26,7 @@ export function PrescriptionsSummary() {
   };
 
   return (
-    <VStack spacing={2} alignItems="start">
+    <VStack data-testid="PrescriptionsSummary" spacing={2} alignItems="start">
       <HStack w="full" justifyContent="space-between">
         <Heading as="h3" size="lg">
           Prescriptions
