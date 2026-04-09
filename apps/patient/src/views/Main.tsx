@@ -22,6 +22,7 @@ import { FAQModal } from '../components/FAQModal';
 import { preloadImage } from '../utils/preloadImage';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
+import { FeatureFlags } from '../configs/featureFlags';
 
 type FetchOrderOptions = {
   triggerNavigationAfterFetch: boolean;
@@ -206,8 +207,16 @@ export const Main = () => {
         return;
       }
 
+      const removeReviewStepExperiment = patientAnalytics.getFlagValueSync(
+        FeatureFlags.RemoveReviewYourRxPage
+      );
+
       const hasPharmacy = newOrder.pharmacy?.id;
-      const redirect = hasPharmacy ? '/status' : '/review';
+      const pageToStartPharmacySelection = removeReviewStepExperiment.skipReviewPage
+        ? '/pharmacy'
+        : '/review';
+
+      const redirect = hasPharmacy ? '/status' : pageToStartPharmacySelection;
 
       const query = queryString.stringify({ orderId: newOrder.id, token });
       navigate(`${redirect}?${query}`, {
