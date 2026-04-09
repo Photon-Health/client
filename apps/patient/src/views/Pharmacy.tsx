@@ -1067,6 +1067,10 @@ export const Pharmacy = () => {
     );
   }
 
+  const patientClicksAddress = () => {
+    patientAnalytics.track('Patient Clicks Address', order, {});
+  };
+
   const capsuleEnabled = enableCourier && order?.address?.postalCode && capsulePharmacyId;
   const brandedOptions = _.uniq([
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
@@ -1130,7 +1134,10 @@ export const Pharmacy = () => {
                   <VStack w="full" align="start" spacing={1}>
                     <Text size="sm">{t.showingLabel}</Text>
                     <Link
-                      onClick={() => setLocationModalOpen(true)}
+                      onClick={() => {
+                        patientClicksAddress();
+                        setLocationModalOpen(true);
+                      }}
                       display="inline"
                       size="sm"
                       data-dd-privacy="mask"
