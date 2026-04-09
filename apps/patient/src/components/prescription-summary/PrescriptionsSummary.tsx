@@ -37,7 +37,7 @@ export function PrescriptionsSummary() {
       </HStack>
       <HStack spacing="1.5">
         <Text>Patient</Text>
-        <Text fontWeight="medium" className="mp-mask">
+        <Text fontWeight="medium" className="mp-mask" data-dd-privacy="mask">
           {order.patient.name.full}
         </Text>
       </HStack>
