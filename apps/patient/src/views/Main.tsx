@@ -201,13 +201,13 @@ export const Main = () => {
     [orderId, order]
   );
   const navigateForOrder = useCallback(
-    (newOrder: Order) => {
+    async (newOrder: Order) => {
       if (newOrder.state === 'CANCELED') {
         navigate('/canceled', { replace: true });
         return;
       }
 
-      const removeReviewStepExperiment = patientAnalytics.getFlagValueSync(
+      const removeReviewStepExperiment = await patientAnalytics.getFlagValue(
         FeatureFlags.RemoveReviewYourRxPage
       );
 
@@ -238,7 +238,7 @@ export const Main = () => {
           setOrderDataLocally(result, currentPharmacy);
 
           if (options.triggerNavigationAfterFetch) {
-            navigateForOrder(result);
+            await navigateForOrder(result);
           }
         }
         return result;
@@ -257,7 +257,7 @@ export const Main = () => {
 
         // If an order was returned, use it for routing
         setOrderDataLocally(error.response.data.order);
-        navigateForOrder(error.response.data.order);
+        await navigateForOrder(error.response.data.order);
       }
     },
     [isDemo, orderId, setOrderDataLocally, navigateForOrder, navigate]
