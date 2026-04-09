@@ -98,11 +98,8 @@ export interface InputGroupProps {
 
 function InputGroupWrapper(props: InputGroupProps) {
   const [state, { setError, setLoading, setDisabled, setRequired }] = useContext(InputGroupContext);
-  const ariaDescribedBy = props.error
-    ? `${state.id}-error`
-    : props.helpText
-    ? `${state.id}-help`
-    : undefined;
+  const ariaDescribedBy = () =>
+    props.error ? `${state.id}-error` : props.helpText ? `${state.id}-help` : undefined;
 
   createEffect(() => {
     setError(props.error || '');
@@ -157,7 +154,7 @@ function InputGroupWrapper(props: InputGroupProps) {
         <Show when={props.error || props.helpText}>
           <p
             class={`text-sm ${props.error ? 'text-red-400' : 'text-gray-500'}`}
-            id={ariaDescribedBy}
+            id={ariaDescribedBy()}
           >
             {props.error || props.helpText}
           </p>

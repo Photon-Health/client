@@ -15,6 +15,7 @@ import Input, { InputProps } from '../Input';
 import { createStore } from 'solid-js/store';
 import clsx from 'clsx';
 import { useInputGroup } from '../InputGroup';
+import { Dynamic } from 'solid-js/web';
 
 interface ComboBoxState {
   open: boolean;
@@ -49,7 +50,7 @@ export function useComboBox() {
 export interface ComboBoxProps {
   children?: JSX.Element;
   value?: any;
-  onChange?: (value: any) => void;
+  onOpen?: () => void;
   loading?: boolean;
   setSelected: (selected: any) => void;
 }
@@ -68,6 +69,9 @@ export function ComboBox(props: ComboBoxProps) {
     {
       setOpen(open: boolean) {
         setState('open', open);
+        if (open && props.onOpen) {
+          props.onOpen();
+        }
       },
       setSelected(selected: any) {
         // set selected will call the prop setSelected to ideally update props.value
@@ -87,10 +91,8 @@ export function ComboBox(props: ComboBoxProps) {
   ];
 
   createEffect(() => {
-    if (props.value?.id !== state.selected?.id) {
-      // update internal selected state when the passed value changes
-      setState('selected', props.value);
-    }
+    // update internal selected state when the passed value changes
+    setState('selected', props.value);
   });
 
   return (
@@ -141,36 +143,61 @@ function ComboOptions(props: { children?: JSX.Element }) {
 export interface ComboOptionProps {
   key: string;
   value: any;
+  disabled?: boolean;
   children?: JSX.Element;
+  render?: any;
 }
 
 function ComboOption(props: ComboOptionProps) {
   const [state, { setSelected, setActive }] = useContext(ComboBoxContext);
+  const active = () => state.active === props.key;
 
-  const optionClass = createMemo(() =>
-    clsx('relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900 cursor-pointer', {
-      'bg-blue-600 text-white': state.active === props.key
-    })
-  );
-
-  const iconClass = createMemo(() => {
-    return clsx(state.active === props.key ? 'text-white' : 'text-blue-600');
-  });
+  if (props.disabled) {
+    return (
+      <li
+        class="relative cursor-default select-none py-2 px-3 text-gray-400"
+        role="option"
+        aria-disabled="true"
+        tabindex="-1"
+      >
+        <span class="block truncate">
+          {props.render ? (
+            <Dynamic component={props.render} value={props.value} active={active()} />
+          ) : (
+            props.children
+          )}
+        </span>
+      </li>
+    );
+  }
 
   return (
     <li
-      class={optionClass()}
+      class={clsx('flex items-center cursor-pointer select-none py-2 px-3 text-gray-900', {
+        'bg-blue-600 text-white': active()
+      })}
       role="option"
       tabindex="-1"
       onClick={() => setSelected(props.value)}
       onMouseEnter={() => setActive(props.key)}
+      onMouseLeave={() => setActive('')}
     >
-      <span class="block truncate">{props.children}</span>
-      <Show when={state.selected?.id === props.key}>
-        <span class="absolute inset-y-0 right-0 flex items-center pr-4">
-          <Icon name="checkCircle" class={iconClass()} />
-        </span>
-      </Show>
+      <span class="w-full truncate">
+        {props.render ? (
+          <Dynamic component={props.render} value={props.value} active={active()} />
+        ) : (
+          props.children
+        )}
+      </span>
+      <Icon
+        name="checkCircle"
+        class={clsx(
+          'ml-2 shrink-0',
+          // Use visibility prop so Icon still occupies space when invisible
+          state.selected?.id === props.key ? 'visible' : 'invisible',
+          active() ? 'text-white' : 'text-blue-600'
+        )}
+      />
     </li>
   );
 }
@@ -183,7 +210,7 @@ interface ComboBoxInputProps {
 function ComboInput(props: ComboBoxInputProps & InputProps) {
   const [state, { setOpen, setSelected }] = useComboBox();
   const [inputGroupState] = useInputGroup();
-  const [local, restInput] = splitProps(props, ['onInput', 'value']);
+  const [local, restInput] = splitProps(props, ['onInput', 'onClick', 'value']);
   const [localValue, setLocalValue] = createSignal('');
   let inputContainer: HTMLElement;
 
@@ -217,11 +244,17 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
           {...restInput}
           aria-label={props.label}
           value={localValue() || ''}
-          onClick={() => setOpen(!state.open)}
+          onClick={(e) => {
+            setOpen(!state.open);
+            if (local?.onClick) {
+              // @ts-ignore
+              local.onClick(e);
+            }
+          }}
           onInput={(e) => {
             if (local?.onInput) {
               // @ts-ignore
-              local?.onInput(e);
+              local.onInput(e);
             }
             setLocalValue(e.currentTarget.value);
             setOpen(true);
@@ -241,15 +274,15 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
           <span class="text-sm text-gray-400">Clear</span>
         </button>
       </Show>
-      <button
-        class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2"
-        onClick={() => setOpen(!state.open)}
-        aria-label="Show options"
-      >
-        <Show when={!inputGroupState.loading && !props.loading}>
+      <Show when={!inputGroupState.loading && !props.loading}>
+        <button
+          class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2"
+          onClick={() => setOpen(!state.open)}
+          aria-label="Show options"
+        >
           <Icon name="chevronUpDown" class="text-gray-400" />
-        </Show>
-      </button>
+        </button>
+      </Show>
     </>
   );
 }
