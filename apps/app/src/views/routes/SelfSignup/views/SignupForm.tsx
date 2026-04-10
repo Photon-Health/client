@@ -73,7 +73,7 @@ export const SignupForm = ({
               <Stack spacing="8">
                 <Stack spacing="4" textAlign="left">
                   <VStack alignItems="start">
-                    <Text fontSize="sm" color="gray.500">
+                    <Text fontSize="sm" color="gray.800">
                       One time setup. This information will be used to contact you about any
                       prescription issues.
                     </Text>
@@ -121,7 +121,7 @@ export const SignupForm = ({
                       />
                       {canPrefillNpi ? (
                         <FormHelperText marginBottom="4">
-                          If your NPI is incorrect, please contact{' '}
+                          If NPI is incorrect contact{' '}
                           <Link
                             href={`mailto:${supportEmail}`}
                             textDecoration="underline"
