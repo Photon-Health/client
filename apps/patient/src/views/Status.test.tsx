@@ -13,6 +13,7 @@ import {
 } from '../test-utils/generators';
 import { Order } from '../utils/models';
 import { getOrder } from '../api';
+import { FEATURE_FLAG_DEFAULTS } from '../configs/featureFlags';
 
 vi.mock('../api', () => ({
   triggerDemoNotification: vi.fn(),
@@ -22,6 +23,7 @@ vi.mock('../api', () => ({
     address: 'mocked address'
   }),
   getOrder: vi.fn(),
+  getPharmaciesByLocation: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
   getPharmacies: vi.fn().mockResolvedValue([]),
   getOfferBundles: vi.fn().mockResolvedValue([]),
   AUTH_HEADER_ERRORS: []
@@ -37,9 +39,19 @@ vi.mock('../hooks/usePatientAnalytics', () => ({
     track: vi.fn(),
     page: vi.fn(),
     identify: vi.fn(),
-    getFlagValueSync: vi.fn((flagName: string, fallback: boolean) => {
-      if (flagName === 'change_pharmacy_reasons') return mockChangePharmacyReasonsFlag;
-      return fallback;
+    getFlagValue: vi.fn(async (flagName: string) => {
+      if (flagName === 'change_pharmacy_reasons') {
+        return mockChangePharmacyReasonsFlag;
+      }
+
+      return FEATURE_FLAG_DEFAULTS[flagName as keyof typeof FEATURE_FLAG_DEFAULTS];
+    }),
+    getFlagValueSync: vi.fn((flagName: string) => {
+      if (flagName === 'change_pharmacy_reasons') {
+        return mockChangePharmacyReasonsFlag;
+      }
+
+      return FEATURE_FLAG_DEFAULTS[flagName as keyof typeof FEATURE_FLAG_DEFAULTS];
     })
   })),
   PatientAnalyticsProvider: ({ children }: { children: ReactNode }) => children
