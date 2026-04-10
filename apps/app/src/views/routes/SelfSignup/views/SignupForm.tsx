@@ -252,8 +252,9 @@ export const SignupForm = ({
                   <Button
                     type="submit"
                     isLoading={isSubmitting}
-                    bg="#001740"
+                    bg="#00538A"
                     color="white"
+                    rounded="md"
                     _hover={{ bg: '#002060' }}
                     _active={{ bg: '#001030' }}
                     width="100%"

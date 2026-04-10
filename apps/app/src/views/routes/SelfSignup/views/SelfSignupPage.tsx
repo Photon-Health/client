@@ -1,4 +1,5 @@
-import { Box, Text } from '@chakra-ui/react';
+import { Box, HStack, Text } from '@chakra-ui/react';
+import { Logo } from '../../../components/Logo';
 import { useSearchParams } from 'react-router-dom';
 import { auth0Config } from '../../../../configs/auth';
 import { trackSelfSignupEvent } from '../../../../configs/analytics';
@@ -97,9 +98,12 @@ export const SelfSignupPage = () => {
           <UnverifiedUserAlert supportEmail={supportEmail} />
         )}
       </Box>
-      <Text fontSize="xs" color="gray.800" textAlign="center" py="4" mb="32px">
-        Powered by Photon
-      </Text>
+      <HStack justify="center" spacing="1" py="4" mb="32px">
+        <Text fontSize="xs" color="gray.800">
+          Powered by
+        </Text>
+        <Logo bgIsWhite width="90px" height="12" />
+      </HStack>
     </Box>
   );
 };

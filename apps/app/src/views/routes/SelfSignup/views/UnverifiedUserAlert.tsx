@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertIcon, Container, Link } from '@chakra-ui/react';
+import { Alert, AlertDescription, AlertIcon, Container, Link, Text } from '@chakra-ui/react';
 
 interface UnverifiedUserAlertProps {
   supportEmail?: string;
@@ -7,10 +7,10 @@ interface UnverifiedUserAlertProps {
 export const UnverifiedUserAlert = ({ supportEmail }: UnverifiedUserAlertProps) => {
   return (
     <Container maxW="md" py="6">
-      <Alert status="warning" borderRadius="md">
+      <Alert status="error" borderRadius="md">
         <AlertIcon />
         <AlertDescription fontSize="sm">
-          Your identity or credentials couldn't be verified.
+          <Text fontWeight="bold">Your identity or credentials couldn't be verified.</Text>
           {supportEmail && (
             <>
               {' '}
