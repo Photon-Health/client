@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import { PatientAnalytics } from './configs/analytics';
+import { FEATURE_FLAG_DEFAULTS, FlagKeys, FlagValues } from './configs/featureFlags';
 
 vi.mock('react-ga4', () => ({
   event: vi.fn()
@@ -11,12 +12,19 @@ vi.mock('@datadog/browser-rum', () => ({
     addAction: vi.fn()
   }
 }));
+
+const getFlagValueImpl = async <K extends FlagKeys>(flagName: K, fallback?: FlagValues[K]) =>
+  fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
+
+const getFlagValueSyncImpl = <K extends FlagKeys>(flagName: K, fallback?: FlagValues[K]) =>
+  fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
+
 const mockPatientAnalytics: PatientAnalytics = {
   page: vi.fn(),
   identify: vi.fn(),
   track: vi.fn(),
-  getFlagValue: vi.fn(),
-  getFlagValueSync: vi.fn()
+  getFlagValue: vi.fn(getFlagValueImpl) as PatientAnalytics['getFlagValue'],
+  getFlagValueSync: vi.fn(getFlagValueSyncImpl) as PatientAnalytics['getFlagValueSync']
 };
 vi.mock('./configs/analytics', () => ({
   getPatientAnalytics: () => mockPatientAnalytics
