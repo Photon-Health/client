@@ -1,4 +1,4 @@
-import { Box, Container, Image } from '@chakra-ui/react';
+import { Box, Text } from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
 import { auth0Config } from '../../../../configs/auth';
 import { trackSelfSignupEvent } from '../../../../configs/analytics';
@@ -83,26 +83,24 @@ export const SelfSignupPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only track once on mount - these values are derived from URL params and won't change
 
-  const cobrandedLogoUrl = 'https://logos.photon.health/photon_prescriber_cobrand.svg';
-
   return (
-    <>
-      <Box as="nav" bg="#001740" py="3">
-        <Container>
-          <Image src={cobrandedLogoUrl} alt="Cobranded logo" height="7" fit="contain" />
-        </Container>
+    <Box bg="white">
+      <Box>
+        {isVerifiedPrescriber ? (
+          <SignupForm
+            initialFormData={initialFormData}
+            canPrefillNpi={canPrefillNpi}
+            supportEmail={supportEmail}
+            onSubmit={submitForm}
+          />
+        ) : (
+          <UnverifiedUserAlert supportEmail={supportEmail} />
+        )}
       </Box>
-      {isVerifiedPrescriber ? (
-        <SignupForm
-          initialFormData={initialFormData}
-          canPrefillNpi={canPrefillNpi}
-          supportEmail={supportEmail}
-          onSubmit={submitForm}
-        />
-      ) : (
-        <UnverifiedUserAlert supportEmail={supportEmail} />
-      )}
-    </>
+      <Text fontSize="xs" color="gray.800" textAlign="center" py="4" mb="32px">
+        Powered by Photon
+      </Text>
+    </Box>
   );
 };
 
