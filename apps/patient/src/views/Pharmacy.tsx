@@ -1125,7 +1125,9 @@ export const Pharmacy = () => {
 
       {removeReviewPageExperiment.showRxSummaryOnPharmacyPage && (
         <Box bgColor="white" p={4} borderBottom="1px" borderColor="gray.200">
-          <PrescriptionsSummary />
+          <Container px={-3}>
+            <PrescriptionsSummary />
+          </Container>
         </Box>
       )}
 
