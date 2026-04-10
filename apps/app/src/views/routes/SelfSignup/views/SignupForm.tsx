@@ -24,6 +24,7 @@ interface SignupFormProps {
   initialFormData: SignupFormData;
   canPrefillNpi: boolean;
   supportEmail?: string;
+  customerAgreementPrefix?: string;
   onSubmit: (values: SignupFormData) => Promise<void>;
 }
 
@@ -31,6 +32,7 @@ export const SignupForm = ({
   initialFormData,
   canPrefillNpi,
   supportEmail,
+  customerAgreementPrefix,
   onSubmit
 }: SignupFormProps) => {
   const setFieldValueRef = useRef<FormikHelpers<SignupFormData>['setFieldValue']>();
@@ -226,8 +228,10 @@ export const SignupForm = ({
                         I agree
                       </Text>{' '}
                       <Text as="span" fontSize="md" display="inline">
-                        that by creating an account and prescribing with Photon Health, Inc., I am
-                        authorized and licensed to prescribe, and I accept Photon Health's{' '}
+                        that by creating an account and prescribing with{' '}
+                        {customerAgreementPrefix ? `${customerAgreementPrefix} ` : ''}
+                        Photon Health, Inc., I am authorized and licensed to prescribe, and I accept
+                        Photon Health's{' '}
                         <Link href="https://www.photon.health/terms" target="_blank">
                           Terms of Service
                         </Link>{' '}

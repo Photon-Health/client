@@ -31,7 +31,8 @@ export const SelfSignupPage = () => {
     verified,
     credentials,
     supportEmail,
-    customerAppName
+    customerAppName,
+    customerAgreementPrefix
   } = useMemo(() => extractTokenData(sessionToken), [sessionToken]);
   const canPrefillNpi = !!(npi && npi?.length === 10);
   const isVerifiedPrescriber = verified && VALID_LICENSES.has(credentials ?? 'none');
@@ -99,6 +100,7 @@ export const SelfSignupPage = () => {
             initialFormData={initialFormData}
             canPrefillNpi={canPrefillNpi}
             supportEmail={supportEmail}
+            customerAgreementPrefix={customerAgreementPrefix}
             onSubmit={submitForm}
           />
         ) : (
@@ -125,6 +127,7 @@ type SelfSignupFormPrefillData = {
   credentials?: string;
   supportEmail?: string;
   customerAppName?: string;
+  customerAgreementPrefix?: string;
 };
 
 function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
@@ -148,6 +151,7 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   const credentials: string | undefined = decodedPayload.credentials;
   const supportEmail: string | undefined = decodedPayload.supportEmail;
   const customerAppName: string | undefined = decodedPayload.customerAppName;
+  const customerAgreementPrefix: string | undefined = decodedPayload.customerAgreementPrefix;
 
   if (!npi || !firstName || !lastName || !email || !phone) {
     const missingFields = [];
@@ -173,7 +177,8 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
     verified,
     credentials,
     supportEmail,
-    customerAppName
+    customerAppName,
+    customerAgreementPrefix
   };
 }
 
