@@ -82,15 +82,7 @@ export const SignupForm = ({
                   <Stack>
                     <FormControl isRequired isInvalid={!!errors.email && touched.email}>
                       <FormLabel htmlFor="email">Email</FormLabel>
-                      <Field
-                        as={Input}
-                        id="email"
-                        name="email"
-                        type="email"
-                        autoComplete="email"
-                        isReadOnly
-                        bg="gray.100"
-                      />
+                      <Field as={Input} id="email" name="email" type="email" autoComplete="email" />
                       <ErrorMessage name="email" component={FormErrorMessage} />
                     </FormControl>
 

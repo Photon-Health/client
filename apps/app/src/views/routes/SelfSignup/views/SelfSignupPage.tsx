@@ -22,10 +22,17 @@ export const SelfSignupPage = () => {
     return <div>Error: no state</div>;
   }
 
-  const { firstName, lastName, email, npi, phone, verified, credentials, supportEmail } = useMemo(
-    () => extractTokenData(sessionToken),
-    [sessionToken]
-  );
+  const {
+    firstName,
+    lastName,
+    email,
+    npi,
+    phone,
+    verified,
+    credentials,
+    supportEmail,
+    customerAppName
+  } = useMemo(() => extractTokenData(sessionToken), [sessionToken]);
   const canPrefillNpi = !!(npi && npi?.length === 10);
   const isVerifiedPrescriber = verified && VALID_LICENSES.has(credentials ?? 'none');
 
@@ -100,7 +107,7 @@ export const SelfSignupPage = () => {
       </Box>
       <HStack justify="center" spacing="1" py="4" mb="32px">
         <Text fontSize="xs" color="gray.800">
-          Powered by
+          {customerAppName ? `${customerAppName} powered by` : 'Powered by'}
         </Text>
         <Logo bgIsWhite width="90px" height="12" />
       </HStack>
@@ -117,6 +124,7 @@ type SelfSignupFormPrefillData = {
   verified?: boolean;
   credentials?: string;
   supportEmail?: string;
+  customerAppName?: string;
 };
 
 function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
@@ -139,6 +147,7 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   const verified: boolean = decodedPayload.verified ?? false;
   const credentials: string | undefined = decodedPayload.credentials;
   const supportEmail: string | undefined = decodedPayload.supportEmail;
+  const customerAppName: string | undefined = decodedPayload.customerAppName;
 
   if (!npi || !firstName || !lastName || !email || !phone) {
     const missingFields = [];
@@ -155,7 +164,17 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
     console.error(`Non verified prescriber attempted to sign up`, decodedPayload);
   }
 
-  return { firstName, lastName, email, npi, phone, verified, credentials, supportEmail };
+  return {
+    firstName,
+    lastName,
+    email,
+    npi,
+    phone,
+    verified,
+    credentials,
+    supportEmail,
+    customerAppName
+  };
 }
 
 function formatPhoneToTenDigits(phone: string | number): string {
