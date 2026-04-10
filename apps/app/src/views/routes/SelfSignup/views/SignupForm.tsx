@@ -79,7 +79,7 @@ export const SignupForm = ({
                     </Text>
                   </VStack>
 
-                  <Stack>
+                  <Stack spacing="4">
                     <FormControl isRequired isInvalid={!!errors.email && touched.email}>
                       <FormLabel htmlFor="email">Email</FormLabel>
                       <Field as={Input} id="email" name="email" type="email" autoComplete="email" />
@@ -112,7 +112,7 @@ export const SignupForm = ({
                         isReadOnly={canPrefillNpi}
                       />
                       {canPrefillNpi ? (
-                        <FormHelperText marginBottom="4">
+                        <FormHelperText>
                           If NPI is incorrect contact{' '}
                           <Link
                             href={`mailto:${supportEmail}`}
