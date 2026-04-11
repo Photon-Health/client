@@ -161,7 +161,7 @@ export const Status = () => {
   };
 
   const handleReroute = () => {
-    const isEnabled = patientAnalytics.getFlagValueSync('change_pharmacy_reasons', false);
+    const isEnabled = patientAnalytics.getFlagValueSync('change_pharmacy_reasons');
     const hasUnresolvedOrderError = order.exceptions.some(
       (e) => e.exceptionType === 'ORDER_ERROR' && !e.resolvedAt
     );
