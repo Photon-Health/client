@@ -31,20 +31,20 @@ export const PatientSelect = (props: {
   }, 250);
 
   return (
-    <ComboBox
-      value={props.selectedPatient || {}}
-      setSelected={props.onSelect}
+    <ComboBox<Patient>
+      value={props.selectedPatient}
+      setSelected={(patient) => patient && props.onSelect(patient)}
       onOpen={() => {
         if (props.patients.length === 0) {
           props.onInitialFetch();
         }
       }}
     >
-      <ComboBox.Input
+      <ComboBox.Input<Patient>
         loading={props.loading}
         placeholder="Select patient..."
         onInput={(e) => handleSearch(e.currentTarget.value)}
-        displayValue={(p: Patient) => {
+        displayValue={(p) => {
           return p.name?.full || '';
         }}
       />

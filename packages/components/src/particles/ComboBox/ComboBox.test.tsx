@@ -30,7 +30,7 @@ function renderComboBox(props: {
     <ComboBox setSelected={setSelected} value={props.value} onOpen={props.onOpen}>
       <ComboBox.Input
         label="Test Label"
-        displayValue={(val) => val?.label ?? ''}
+        displayValue={(val?: Option) => val?.label ?? ''}
         showClear={props.showClear}
       />
       <ComboBox.Options>
@@ -150,7 +150,7 @@ test('option renders render prop component with internal state', async () => {
 
   render(() => (
     <ComboBox setSelected={vi.fn()} value={undefined}>
-      <ComboBox.Input label="Test Label" displayValue={(val) => val?.label ?? ''} />
+      <ComboBox.Input<Option> label="Test Label" displayValue={(val) => val?.label ?? ''} />
       <ComboBox.Options>
         <ComboBox.Option key={OPTIONS[0].id} value={OPTIONS[0]} render={CustomOption}>
           {OPTIONS[0].label}

@@ -1,5 +1,5 @@
 /// <reference types="google.maps" />
-import { createSignal, createEffect, For, Show } from 'solid-js';
+import { createEffect, createSignal, For, Show } from 'solid-js';
 import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
@@ -7,7 +7,7 @@ import InputGroup from '../../particles/InputGroup';
 import Spinner from '../../particles/Spinner';
 import getNavigatorLocation from '../../utils/getNavigatorLocation';
 import getLocations, { Location } from '../../utils/getLocations';
-import autocompleteLocation from '../../utils/autocompleteLocation';
+import autocompleteLocation, { AutocompleteResults } from '../../utils/autocompleteLocation';
 import ComboBox from '../../particles/ComboBox';
 import { useGoogleService } from '../GoogleServiceProvider';
 
@@ -21,10 +21,11 @@ export default function LocationSelect(props: LocationSelectProps) {
   const [address, setAddress] = createSignal('');
   const [loadingNavigator, setLoadingNavigator] = createSignal(false);
   const [navigatorError, setNavigatorError] = createSignal(false);
-  const [options, setOptions] = createSignal<any[]>([]);
+  const [options, setOptions] = createSignal<AutocompleteResults>([]);
   const { googleMapsServices } = useGoogleService();
 
-  const handleAddressSubmit = async (address: string) => {
+  const handleAddressSubmit = async (address?: string) => {
+    if (!address) return;
     const { geocoder } = googleMapsServices();
     if (!geocoder) return;
 
@@ -102,16 +103,16 @@ export default function LocationSelect(props: LocationSelectProps) {
         <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700 w-full" />
       </div>
       <InputGroup label="Enter an address or zip code">
-        <ComboBox setSelected={handleAddressSubmit}>
-          <ComboBox.Input
-            displayValue={(option) => option.label}
+        <ComboBox<string> setSelected={handleAddressSubmit}>
+          <ComboBox.Input<string>
+            displayValue={(option) => option ?? ''}
             onInput={(e) => setAddress(e.currentTarget.value)}
           />
           <Show when={options()?.length > 0}>
             <ComboBox.Options>
               <For each={options()}>
                 {(option) => (
-                  <ComboBox.Option key={option.value} value={option.label}>
+                  <ComboBox.Option<string> key={option.value ?? option.label} value={option.label}>
                     {option.label}
                   </ComboBox.Option>
                 )}

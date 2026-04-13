@@ -47,15 +47,15 @@ export function useComboBox() {
   return useContext(ComboBoxContext);
 }
 
-export interface ComboBoxProps {
+export interface ComboBoxProps<T> {
   children?: JSX.Element;
-  value?: any;
+  value?: T;
   onOpen?: () => void;
   loading?: boolean;
-  setSelected: (selected: any) => void;
+  setSelected: (selected: T | undefined) => void;
 }
 
-export function ComboBox(props: ComboBoxProps) {
+export function ComboBox<T>(props: ComboBoxProps<T>) {
   const [state, setState] = createStore<ComboBoxState>({
     open: false,
     selected: {},
@@ -77,7 +77,9 @@ export function ComboBox(props: ComboBoxProps) {
         // set selected will call the prop setSelected to ideally update props.value
         // we now listen for props.value to change and update internal selected state in an effect right below
         // this allows for outside components to update the internal state of this component rather than isolate it
-        if (props.value?.id !== selected?.id || props.value?.id === undefined) {
+        const currentId = (props.value as { id?: string } | undefined)?.id;
+        const nextId = (selected as { id?: string } | undefined)?.id;
+        if (currentId !== nextId || currentId === undefined) {
           props.setSelected(selected);
         }
       },
@@ -140,15 +142,15 @@ function ComboOptions(props: { children?: JSX.Element }) {
   );
 }
 
-export interface ComboOptionProps {
+export interface ComboOptionProps<T> {
   key: string;
-  value: any;
+  value: T;
   disabled?: boolean;
   children?: JSX.Element;
   render?: any;
 }
 
-function ComboOption(props: ComboOptionProps) {
+function ComboOption<T>(props: ComboOptionProps<T>) {
   const [state, { setSelected, setActive }] = useContext(ComboBoxContext);
   const active = () => state.active === props.key;
 
@@ -202,12 +204,12 @@ function ComboOption(props: ComboOptionProps) {
   );
 }
 
-interface ComboBoxInputProps {
-  displayValue: (item: any) => string;
+interface ComboBoxInputProps<T> {
+  displayValue: (item: T) => string;
   showClear?: boolean;
 }
 
-function ComboInput(props: ComboBoxInputProps & InputProps) {
+function ComboInput<T>(props: ComboBoxInputProps<T> & InputProps) {
   const [state, { setOpen, setSelected }] = useComboBox();
   const [inputGroupState] = useInputGroup();
   const [local, restInput] = splitProps(props, ['onInput', 'onClick', 'value']);
@@ -226,14 +228,14 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
       setLocalValue(props.displayValue(state.selected));
     }
     if (state.selected === undefined) {
-      setLocalValue(props.displayValue(state.selected) || '');
+      setLocalValue('');
     }
   });
 
   createEffect(() => {
     // separately, listen for open state to change and reset the display value
     if (!state.open) {
-      setLocalValue(props.displayValue(state.selected) || '');
+      setLocalValue(state.selected ? props.displayValue(state.selected) : '');
     }
   });
 
