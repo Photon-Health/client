@@ -206,19 +206,20 @@ export const Main = () => {
         return;
       }
 
-      const removeReviewStepExperiment = await patientAnalytics.getFlagValue(
-        'remove_review_your_rx_page'
-      );
-
+      let redirectPath: string;
       const hasPharmacy = newOrder.pharmacy?.id;
-      const pageToStartPharmacySelection = removeReviewStepExperiment.skipReviewPage
-        ? '/pharmacy'
-        : '/review';
 
-      const redirect = hasPharmacy ? '/status' : pageToStartPharmacySelection;
+      if (hasPharmacy) {
+        redirectPath = '/status';
+      } else {
+        const removeReviewStepExperiment = await patientAnalytics.getFlagValue(
+          'remove_review_your_rx_page'
+        );
+        redirectPath = removeReviewStepExperiment.skipReviewPage ? '/pharmacy' : '/review';
+      }
 
       const query = queryString.stringify({ orderId: newOrder.id, token });
-      navigate(`${redirect}?${query}`, {
+      navigate(`${redirectPath}?${query}`, {
         replace: true
       });
     },

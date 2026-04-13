@@ -8,22 +8,14 @@ import {
   FormHelperText,
   FormLabel,
   Heading,
-  HStack,
-  IconButton,
   Input,
   Link,
-  Popover,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
-  Portal,
   Stack,
   Text,
   VStack
 } from '@chakra-ui/react';
 import { ErrorMessage, Field, Formik, FormikHelpers } from 'formik';
 import { useRef } from 'react';
-import { FaInfoCircle } from 'react-icons/fa';
 import { AddressSuggestionList } from '../components/AddressSuggestionList';
 import { StateSelect } from '../components/StateSelect';
 import { useAddressAutocomplete } from '../components/useAddressAutocomplete';
@@ -33,6 +25,7 @@ interface SignupFormProps {
   initialFormData: SignupFormData;
   canPrefillNpi: boolean;
   supportEmail?: string;
+  customerAgreementPrefix?: string;
   onSubmit: (values: SignupFormData) => Promise<void>;
 }
 
@@ -40,6 +33,7 @@ export const SignupForm = ({
   initialFormData,
   canPrefillNpi,
   supportEmail,
+  customerAgreementPrefix,
   onSubmit
 }: SignupFormProps) => {
   const setFieldValueRef = useRef<FormikHelpers<SignupFormData>['setFieldValue']>();
@@ -85,63 +79,36 @@ export const SignupForm = ({
                     <Heading as="h1" size="xs">
                       Confirm your info
                     </Heading>
-                    <Text fontSize="md" color="gray">
-                      This is a one-time setup. We'll securely save your details so prescribing is
-                      faster next time.
-                    </Text>
-                    <Text fontSize="md" marginTop="4">
-                      Please confirm your details:
+                    <Text fontSize="sm" color="gray.800">
+                      One time setup. This information will be used to contact you about any
+                      prescription issues.
                     </Text>
                   </VStack>
 
-                  <Stack>
+                  <Stack spacing="4">
+                    <FormControl isRequired isInvalid={!!errors.email && touched.email}>
+                      <FormLabel htmlFor="email">Email</FormLabel>
+                      <Field as={Input} id="email" name="email" type="email" autoComplete="email" />
+                      <ErrorMessage name="email" component={FormErrorMessage} />
+                    </FormControl>
+
                     <FormControl isRequired isInvalid={!!errors.firstName && touched.firstName}>
-                      <FormLabel htmlFor="firstName">First Name</FormLabel>
+                      <FormLabel htmlFor="firstName">First name</FormLabel>
                       <Field as={Input} id="firstName" name="firstName" autoComplete="given-name" />
                       <ErrorMessage name="firstName" component={FormErrorMessage} />
                     </FormControl>
 
                     <FormControl isRequired isInvalid={!!errors.lastName && touched.lastName}>
-                      <FormLabel htmlFor="lastName">Last Name</FormLabel>
+                      <FormLabel htmlFor="lastName">Last name</FormLabel>
                       <Field as={Input} id="lastName" name="lastName" autoComplete="family-name" />
                       <ErrorMessage name="lastName" component={FormErrorMessage} />
-                    </FormControl>
-
-                    <FormControl isRequired isInvalid={!!errors.email && touched.email}>
-                      <HStack spacing="0" alignItems="center">
-                        <FormLabel htmlFor="email" marginRight="0" marginBottom="0">
-                          Email
-                        </FormLabel>
-                        <Popover placement={'top-start'}>
-                          <PopoverTrigger>
-                            <IconButton
-                              variant="ghost"
-                              color="gray"
-                              size="xs"
-                              aria-label="Why is email required?"
-                              icon={<FaInfoCircle />}
-                            />
-                          </PopoverTrigger>
-                          <Portal>
-                            <PopoverContent>
-                              <PopoverBody>
-                                Photon will use this email to contact you if issues arise with your
-                                prescriptions.
-                              </PopoverBody>
-                            </PopoverContent>
-                          </Portal>
-                        </Popover>
-                      </HStack>
-
-                      <Field as={Input} id="email" name="email" type="email" autoComplete="email" />
-                      <ErrorMessage name="email" component={FormErrorMessage} />
                     </FormControl>
 
                     <FormControl
                       isRequired={!canPrefillNpi}
                       isInvalid={!!errors.npi && touched.npi}
                     >
-                      <FormLabel htmlFor="npi">NPI</FormLabel>
+                      <FormLabel htmlFor="npi">NPI number</FormLabel>
                       <Field
                         as={Input}
                         id="npi"
@@ -151,8 +118,8 @@ export const SignupForm = ({
                         isReadOnly={canPrefillNpi}
                       />
                       {canPrefillNpi ? (
-                        <FormHelperText marginBottom="4">
-                          If your NPI is incorrect, please contact{' '}
+                        <FormHelperText>
+                          If NPI is incorrect contact{' '}
                           <Link
                             href={`mailto:${supportEmail}`}
                             textDecoration="underline"
@@ -167,7 +134,7 @@ export const SignupForm = ({
                     </FormControl>
 
                     <FormControl isRequired isInvalid={!!errors.phone && touched.phone}>
-                      <FormLabel htmlFor="phone">Phone</FormLabel>
+                      <FormLabel htmlFor="phone">Phone number</FormLabel>
                       <Field
                         as={Input}
                         id="phone"
@@ -265,8 +232,10 @@ export const SignupForm = ({
                         I agree
                       </Text>{' '}
                       <Text as="span" fontSize="md" display="inline">
-                        that by creating an account and prescribing with Photon Health, Inc., I am
-                        authorized and licensed to prescribe, and I accept Photon Health's{' '}
+                        that by creating an account and prescribing with{' '}
+                        {customerAgreementPrefix ? `${customerAgreementPrefix} ` : ''}
+                        Photon Health, Inc., I am authorized and licensed to prescribe, and I accept
+                        Photon Health's{' '}
                         <Link href="https://www.photon.health/terms" target="_blank">
                           Terms of Service
                         </Link>{' '}
@@ -280,8 +249,17 @@ export const SignupForm = ({
                     <ErrorMessage name="didAgreeToTerms" component={FormErrorMessage} />
                   </FormControl>
 
-                  <Button type="submit" isLoading={isSubmitting}>
-                    Submit
+                  <Button
+                    type="submit"
+                    isLoading={isSubmitting}
+                    bg="#00538A"
+                    color="white"
+                    rounded="md"
+                    _hover={{ bg: '#002060' }}
+                    _active={{ bg: '#001030' }}
+                    width="100%"
+                  >
+                    Agree and continue
                   </Button>
                 </Stack>
               </Stack>

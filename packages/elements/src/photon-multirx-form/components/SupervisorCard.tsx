@@ -88,7 +88,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
         </Show>
         <Show when={supervisors().length > 0}>
           <InputGroup label="Supervisor" showOptionalSubtext={true}>
-            <ComboBox
+            <ComboBox<SupervisorCardFragment>
               value={currentSupervisor()}
               setSelected={(value?: SupervisorCardFragment) => {
                 props.actions.updateFormValue({
@@ -98,7 +98,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
                 setFilteredSupervisors(supervisors());
               }}
             >
-              <ComboBox.Input
+              <ComboBox.Input<SupervisorCardFragment>
                 onInput={(e) =>
                   setFilteredSupervisors(filterSupervisors(e.currentTarget.value || ''))
                 }
