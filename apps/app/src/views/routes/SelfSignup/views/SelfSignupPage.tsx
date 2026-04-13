@@ -1,4 +1,4 @@
-import { Box, Container, Image } from '@chakra-ui/react';
+import { Box, HStack, Text } from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
 import { auth0Config } from '../../../../configs/auth';
 import { trackSelfSignupEvent } from '../../../../configs/analytics';
@@ -21,10 +21,18 @@ export const SelfSignupPage = () => {
     return <div>Error: no state</div>;
   }
 
-  const { firstName, lastName, email, npi, phone, verified, credentials, supportEmail } = useMemo(
-    () => extractTokenData(sessionToken),
-    [sessionToken]
-  );
+  const {
+    firstName,
+    lastName,
+    email,
+    npi,
+    phone,
+    verified,
+    credentials,
+    supportEmail,
+    customerAppName,
+    customerAgreementPrefix
+  } = useMemo(() => extractTokenData(sessionToken), [sessionToken]);
   const canPrefillNpi = !!(npi && npi?.length === 10);
   const isVerifiedPrescriber = verified && VALID_LICENSES.has(credentials ?? 'none');
 
@@ -83,26 +91,27 @@ export const SelfSignupPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only track once on mount - these values are derived from URL params and won't change
 
-  const cobrandedLogoUrl = 'https://logos.photon.health/photon_prescriber_cobrand.svg';
-
   return (
-    <>
-      <Box as="nav" bg="#001740" py="3">
-        <Container>
-          <Image src={cobrandedLogoUrl} alt="Cobranded logo" height="7" fit="contain" />
-        </Container>
+    <Box bg="white">
+      <Box>
+        {isVerifiedPrescriber ? (
+          <SignupForm
+            initialFormData={initialFormData}
+            canPrefillNpi={canPrefillNpi}
+            supportEmail={supportEmail}
+            customerAgreementPrefix={customerAgreementPrefix}
+            onSubmit={submitForm}
+          />
+        ) : (
+          <UnverifiedUserAlert supportEmail={supportEmail} />
+        )}
       </Box>
-      {isVerifiedPrescriber ? (
-        <SignupForm
-          initialFormData={initialFormData}
-          canPrefillNpi={canPrefillNpi}
-          supportEmail={supportEmail}
-          onSubmit={submitForm}
-        />
-      ) : (
-        <UnverifiedUserAlert supportEmail={supportEmail} />
-      )}
-    </>
+      <HStack justify="center" spacing="1" py="4" mb="32px">
+        <Text fontSize="xs" color="gray.800">
+          {customerAppName ? `${customerAppName} powered by Photon` : 'Powered by Photon'}
+        </Text>
+      </HStack>
+    </Box>
   );
 };
 
@@ -115,6 +124,8 @@ type SelfSignupFormPrefillData = {
   verified?: boolean;
   credentials?: string;
   supportEmail?: string;
+  customerAppName?: string;
+  customerAgreementPrefix?: string;
 };
 
 function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
@@ -137,6 +148,8 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   const verified: boolean = decodedPayload.verified ?? false;
   const credentials: string | undefined = decodedPayload.credentials;
   const supportEmail: string | undefined = decodedPayload.supportEmail;
+  const customerAppName: string | undefined = decodedPayload.customerAppName;
+  const customerAgreementPrefix: string | undefined = decodedPayload.customerAgreementPrefix;
 
   if (!npi || !firstName || !lastName || !email || !phone) {
     const missingFields = [];
@@ -153,7 +166,18 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
     console.error(`Non verified prescriber attempted to sign up`, decodedPayload);
   }
 
-  return { firstName, lastName, email, npi, phone, verified, credentials, supportEmail };
+  return {
+    firstName,
+    lastName,
+    email,
+    npi,
+    phone,
+    verified,
+    credentials,
+    supportEmail,
+    customerAppName,
+    customerAgreementPrefix
+  };
 }
 
 function formatPhoneToTenDigits(phone: string | number): string {
