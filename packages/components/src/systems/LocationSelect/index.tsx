@@ -17,6 +17,8 @@ interface LocationSelectProps {
   setLocation: (location: Location) => void;
 }
 
+type AddressOption = { id: string; label: string };
+
 export default function LocationSelect(props: LocationSelectProps) {
   const [address, setAddress] = createSignal('');
   const [loadingNavigator, setLoadingNavigator] = createSignal(false);
@@ -24,15 +26,15 @@ export default function LocationSelect(props: LocationSelectProps) {
   const [options, setOptions] = createSignal<AutocompleteResults>([]);
   const { googleMapsServices } = useGoogleService();
 
-  const handleAddressSubmit = async (address?: string) => {
-    if (!address) return;
+  const handleAddressSubmit = async (selection?: AddressOption) => {
+    if (!selection) return;
     const { geocoder } = googleMapsServices();
     if (!geocoder) return;
 
     // get location with address
     setNavigatorError(false);
 
-    const locations = await getLocations(address, geocoder);
+    const locations = await getLocations(selection.label, geocoder);
     if (locations.length > 0) {
       props.setLocation(locations[0]);
       props.setOpen(false);
@@ -103,19 +105,22 @@ export default function LocationSelect(props: LocationSelectProps) {
         <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700 w-full" />
       </div>
       <InputGroup label="Enter an address or zip code">
-        <ComboBox<string> setSelected={handleAddressSubmit}>
-          <ComboBox.Input<string>
-            displayValue={(option) => option ?? ''}
+        <ComboBox<AddressOption> setSelected={handleAddressSubmit}>
+          <ComboBox.Input<AddressOption>
+            displayValue={(option) => option?.label ?? ''}
             onInput={(e) => setAddress(e.currentTarget.value)}
           />
           <Show when={options()?.length > 0}>
             <ComboBox.Options>
               <For each={options()}>
-                {(option) => (
-                  <ComboBox.Option<string> key={option.value ?? option.label} value={option.label}>
-                    {option.label}
-                  </ComboBox.Option>
-                )}
+                {(option) => {
+                  const id = option.value ?? option.label;
+                  return (
+                    <ComboBox.Option<AddressOption> key={id} value={{ id, label: option.label }}>
+                      {option.label}
+                    </ComboBox.Option>
+                  );
+                }}
               </For>
             </ComboBox.Options>
           </Show>

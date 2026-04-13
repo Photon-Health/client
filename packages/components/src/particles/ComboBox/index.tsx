@@ -17,6 +17,8 @@ import clsx from 'clsx';
 import { useInputGroup } from '../InputGroup';
 import { Dynamic } from 'solid-js/web';
 
+export type ComboBoxValueBase = { id: string };
+
 interface ComboBoxState {
   open: boolean;
   selected: any; // TODO should update this to a generic T
@@ -47,7 +49,7 @@ export function useComboBox() {
   return useContext(ComboBoxContext);
 }
 
-export interface ComboBoxProps<T> {
+export interface ComboBoxProps<T extends ComboBoxValueBase> {
   children?: JSX.Element;
   value?: T;
   onOpen?: () => void;
@@ -55,7 +57,7 @@ export interface ComboBoxProps<T> {
   setSelected: (selected: T | undefined) => void;
 }
 
-export function ComboBox<T>(props: ComboBoxProps<T>) {
+export function ComboBox<T extends ComboBoxValueBase>(props: ComboBoxProps<T>) {
   const [state, setState] = createStore<ComboBoxState>({
     open: false,
     selected: {},
@@ -73,13 +75,11 @@ export function ComboBox<T>(props: ComboBoxProps<T>) {
           props.onOpen();
         }
       },
-      setSelected(selected: any) {
+      setSelected(selected: T | undefined) {
         // set selected will call the prop setSelected to ideally update props.value
         // we now listen for props.value to change and update internal selected state in an effect right below
         // this allows for outside components to update the internal state of this component rather than isolate it
-        const currentId = (props.value as { id?: string } | undefined)?.id;
-        const nextId = (selected as { id?: string } | undefined)?.id;
-        if (currentId !== nextId || currentId === undefined) {
+        if (props.value?.id !== selected?.id || props.value === undefined) {
           props.setSelected(selected);
         }
       },
@@ -142,7 +142,7 @@ function ComboOptions(props: { children?: JSX.Element }) {
   );
 }
 
-export interface ComboOptionProps<T> {
+export interface ComboOptionProps<T extends ComboBoxValueBase> {
   key: string;
   value: T;
   disabled?: boolean;
@@ -150,7 +150,7 @@ export interface ComboOptionProps<T> {
   render?: any;
 }
 
-function ComboOption<T>(props: ComboOptionProps<T>) {
+function ComboOption<T extends ComboBoxValueBase>(props: ComboOptionProps<T>) {
   const [state, { setSelected, setActive }] = useContext(ComboBoxContext);
   const active = () => state.active === props.key;
 
@@ -204,12 +204,12 @@ function ComboOption<T>(props: ComboOptionProps<T>) {
   );
 }
 
-interface ComboBoxInputProps<T> {
+interface ComboBoxInputProps<T extends ComboBoxValueBase> {
   displayValue: (item: T) => string;
   showClear?: boolean;
 }
 
-function ComboInput<T>(props: ComboBoxInputProps<T> & InputProps) {
+function ComboInput<T extends ComboBoxValueBase>(props: ComboBoxInputProps<T> & InputProps) {
   const [state, { setOpen, setSelected }] = useComboBox();
   const [inputGroupState] = useInputGroup();
   const [local, restInput] = splitProps(props, ['onInput', 'onClick', 'value']);

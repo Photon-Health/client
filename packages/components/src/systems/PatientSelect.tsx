@@ -52,7 +52,7 @@ export const PatientSelect = (props: {
         when={data().length > 0}
         fallback={
           <ComboBox.Options>
-            <ComboBox.Option key={''} value={null} disabled={true}>
+            <ComboBox.Option key="empty" value={{ id: 'empty' } as Patient} disabled={true}>
               {props.loading ? 'Loading...' : 'No patients found'}
             </ComboBox.Option>
           </ComboBox.Options>
