@@ -13,6 +13,12 @@ export type PhotonFormWrapperProps = {
   checkShouldWarn?: () => boolean;
 };
 
+// only need certain styles for WebViews; they style slightly different than Safari
+const isIOSWebView =
+  typeof navigator !== 'undefined' &&
+  /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+  !/Safari\//.test(navigator.userAgent);
+
 export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
   const props = mergeProps(
     {
@@ -32,17 +38,21 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
   const handleCancel = () => onCloseDialogOpen(false);
 
   return (
-    <div ref={ref} class="z-50 fixed inset-0 flex flex-col bg-[#F9FAFB]">
+    <div
+      ref={ref}
+      classList={{
+        'z-50 fixed inset-0 flex flex-col bg-[#F9FAFB]': true,
+        'photon-form-wrapper--webview': isIOSWebView // fix footer spacing on ios webviews that do not have the Safari spacing
+      }}
+    >
       <style>{tailwind}</style>
       {/* fix iOS Home bar's reserved space from clipping the Footer buttons */}
       <style>{`
         .photon-form-wrapper__footer {
           padding-bottom: calc(1rem + env(safe-area-inset-bottom));
         }
-        @supports (-webkit-touch-callout: none) {
-          .photon-form-wrapper__footer {
-            padding-bottom: max(calc(1rem + env(safe-area-inset-bottom)), 2.5rem);
-          }
+        .photon-form-wrapper--webview .photon-form-wrapper__footer {
+          padding-bottom: max(calc(1rem + env(safe-area-inset-bottom)), 2.5rem);
         }
       `}</style>
 
