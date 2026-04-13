@@ -49,8 +49,11 @@ export function PharmacySearchInput(props: PharmacySearchInputProps) {
       }
       loading={props.loading}
     >
-      <ComboBox value={props.value} setSelected={props.setValue}>
-        <ComboBox.Input
+      <ComboBox<PharmacyOption>
+        value={props.value}
+        setSelected={(pharmacy) => pharmacy && props.setValue(pharmacy)}
+      >
+        <ComboBox.Input<PharmacyOption>
           onInput={(e) => props.onSearch?.(e.currentTarget.value)}
           displayValue={(pharmacy) => {
             return pharmacy?.name
