@@ -3,7 +3,8 @@ import { ComponentProps, For, createMemo, createSignal } from 'solid-js';
 import ComboBox, { ComboBoxProps } from '.';
 import { randomNames } from '../../sampleData/randomNames';
 
-type InputGroupStory = StoryObj<ComboBoxProps>;
+type Person = { id: string; name: string };
+type InputGroupStory = StoryObj<ComboBoxProps<Person>>;
 
 const meta: Meta<ComponentProps<typeof ComboBox>> = {
   title: 'ComboBox',
@@ -31,8 +32,8 @@ export const Default: InputGroupStory = {
     >();
 
     return (
-      <ComboBox value={selectedPerson()} setSelected={setSelectedPerson}>
-        <ComboBox.Input
+      <ComboBox<Person> value={selectedPerson()} setSelected={setSelectedPerson}>
+        <ComboBox.Input<Person>
           onInput={(e) => setQuery(e.currentTarget.value)}
           displayValue={(person) => person.name}
         />
