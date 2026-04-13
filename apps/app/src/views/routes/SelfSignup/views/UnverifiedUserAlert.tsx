@@ -6,29 +6,27 @@ interface UnverifiedUserAlertProps {
 
 export const UnverifiedUserAlert = ({ supportEmail }: UnverifiedUserAlertProps) => {
   return (
-    <Container maxW="lg" marginY="8">
-      <Alert status="error">
+    <Container maxW="md" py="6">
+      <Alert status="error" borderRadius="md">
         <AlertIcon />
         <AlertDescription fontSize="sm">
-          Your identity or prescribing credentials haven't been verified, so you can't access this
-          page
+          <Text fontWeight="bold">Your identity or credentials couldn't be verified.</Text>
+          {supportEmail && (
+            <>
+              {' '}
+              Contact{' '}
+              <Link
+                href={`mailto:${supportEmail}`}
+                textDecoration="underline"
+                _before={{ display: 'none' }}
+              >
+                {supportEmail}
+              </Link>{' '}
+              for assistance.
+            </>
+          )}
         </AlertDescription>
       </Alert>
-      {supportEmail && (
-        <Text fontSize="sm" marginY="4" textAlign="center">
-          <span>
-            Please reach out to{' '}
-            <Link
-              href={`mailto:${supportEmail}`}
-              textDecoration="underline"
-              _before={{ display: 'none' }}
-            >
-              {supportEmail}
-            </Link>{' '}
-            if you believe this is an error or need help completing verification
-          </span>
-        </Text>
-      )}
     </Container>
   );
 };
