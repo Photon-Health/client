@@ -1,5 +1,4 @@
 import { Box, HStack, Text } from '@chakra-ui/react';
-import { Logo } from '../../../components/Logo';
 import { useSearchParams } from 'react-router-dom';
 import { auth0Config } from '../../../../configs/auth';
 import { trackSelfSignupEvent } from '../../../../configs/analytics';
@@ -109,9 +108,8 @@ export const SelfSignupPage = () => {
       </Box>
       <HStack justify="center" spacing="1" py="4" mb="32px">
         <Text fontSize="xs" color="gray.800">
-          {customerAppName ? `${customerAppName} powered by` : 'Powered by'}
+          {customerAppName ? `${customerAppName} powered by Photon` : 'Powered by Photon'}
         </Text>
-        <Logo bgIsWhite width="90px" height="12" />
       </HStack>
     </Box>
   );

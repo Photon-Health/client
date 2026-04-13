@@ -7,6 +7,7 @@ import {
   FormErrorMessage,
   FormHelperText,
   FormLabel,
+  Heading,
   Input,
   Link,
   Stack,
@@ -75,6 +76,9 @@ export const SignupForm = ({
               <Stack spacing="8">
                 <Stack spacing="4" textAlign="left">
                   <VStack alignItems="start">
+                    <Heading as="h1" size="xs">
+                      Confirm your info
+                    </Heading>
                     <Text fontSize="sm" color="gray.800">
                       One time setup. This information will be used to contact you about any
                       prescription issues.
