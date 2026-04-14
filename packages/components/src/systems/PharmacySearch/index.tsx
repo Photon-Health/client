@@ -250,18 +250,15 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
           <div class="w-full flex flex-col sm:flex-row sm:items-center mb-2">
             <label class="whitespace-nowrap mr-1">Showing near:</label>
             <Show when={!fetchingPreferred()} fallback={<Spinner size="sm" />}>
-              <a
-                href="#!"
-                role="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setOpenLocationSearch(true);
-                }}
+              <button
+                type="button"
+                aria-label="Set a location"
+                onClick={() => setOpenLocationSearch(true)}
                 class="text-left truncate text-blue-600 font-semibold text-sm flex items-center"
               >
                 <Icon name="mapPin" size="sm" class="inline-block mr-1" />
                 {location()?.address || 'Set a location'}
-              </a>
+              </button>
             </Show>
           </div>
         }

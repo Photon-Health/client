@@ -123,8 +123,11 @@ const App = () => {
           <div>
             <h2>ComboBox</h2>
 
-            <ComboBox value={selectedPerson()} setSelected={setSelectedPerson}>
-              <ComboBox.Input
+            <ComboBox<{ id: string; name: string }>
+              value={selectedPerson()}
+              setSelected={setSelectedPerson}
+            >
+              <ComboBox.Input<{ id: string; name: string }>
                 onInput={(e) => setQuery(e.currentTarget.value)}
                 displayValue={(person) => person.name}
               />
