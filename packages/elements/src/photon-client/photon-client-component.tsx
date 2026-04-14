@@ -119,7 +119,6 @@ const Component = (props: PhotonClientProps) => {
   createEffect(() => {
     const isAuthenticated = store()?.authentication.state.isAuthenticated;
     const isLoading = store()?.authentication.state.isLoading;
-    console.log({ isAuthenticated, isLoading, emit: props.emitUserToken });
     if (props.emitUserToken && isAuthenticated && !isLoading) {
       sdk.authentication.getAccessToken().then((token) => {
         ref?.dispatchEvent(
