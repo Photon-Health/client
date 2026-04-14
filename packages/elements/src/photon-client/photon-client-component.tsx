@@ -2,10 +2,10 @@ import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
 import { Env, PhotonClient } from '@photonhealth/sdk';
 import {
+  GoogleServiceProvider,
   PhotonClientStore,
   PhotonContext,
-  SDKProvider,
-  GoogleServiceProvider
+  SDKProvider
 } from '@photonhealth/components';
 import { makeTimer } from '@solid-primitives/timer';
 import queryString from 'query-string';
@@ -28,6 +28,7 @@ type PhotonClientProps = {
   toastBuffer?: number;
   env?: Env;
   externalUserId?: string;
+  emitUserToken?: boolean;
 };
 
 const version = pkg?.version ?? 'unknown';
@@ -112,6 +113,22 @@ const Component = (props: PhotonClientProps) => {
         }
         store()?.authentication.login(args);
       }
+    }
+  });
+
+  createEffect(() => {
+    const isAuthenticated = store()?.authentication.state.isAuthenticated;
+    const isLoading = store()?.authentication.state.isLoading;
+    if (props.emitUserToken && isAuthenticated && !isLoading) {
+      sdk.authentication.getAccessToken().then((token) => {
+        ref?.dispatchEvent(
+          new CustomEvent('photon-user-token', {
+            composed: true,
+            bubbles: true,
+            detail: { token }
+          })
+        );
+      });
     }
   });
 
@@ -220,6 +237,13 @@ customElement(
       reflect: true,
       notify: true,
       parse: false
+    },
+    emitUserToken: {
+      attribute: 'emit-user-token',
+      value: false,
+      reflect: false,
+      notify: false,
+      parse: true
     }
   },
   Component
