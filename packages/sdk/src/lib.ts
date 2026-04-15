@@ -173,7 +173,13 @@ export class PhotonClient {
   ) {
     const apollo = new ApolloClient({
       link: setContext(async (_, { headers: baseHeaders, ...rest }) => {
-        const token = await this.authentication.getAccessToken();
+        let token: string | undefined;
+        try {
+          token = await this.authentication.getAccessToken();
+        } catch {
+          // Session expired or auth unavailable — proceed without token
+          // so the request gets a proper 401 from the API
+        }
 
         const headers = {
           ...baseHeaders,

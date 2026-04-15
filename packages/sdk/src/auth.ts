@@ -164,7 +164,7 @@ export class AuthManager {
       };
       await this.authentication.loginWithRedirect(redirectOpts);
       if (throwIfFailure) {
-        throw new Error(); // Needed just because this needs to resolve to something
+        throw new Error('Unable to retrieve access token'); // Session likely expired
       } else {
         // Retry once
         return await this._getAccessToken({ audience }, true);
