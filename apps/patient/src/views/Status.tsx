@@ -28,7 +28,6 @@ export const Status = () => {
   const navigate = useNavigate();
   const { order, setOrder, isDemo, setFaqModalIsOpen, setReason } = useOrderContext();
   const patientAnalytics = usePatientAnalytics();
-  usePageAnalytics({ pageName: 'Order Status' });
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
   const { isOpen, onClose, onOpen } = useDisclosure();
 
@@ -137,6 +136,11 @@ export const Status = () => {
     console.error('No order found');
     return null;
   }
+
+  usePageAnalytics({
+    pageName: 'Order Status',
+    properties: { changePharmacyShown: displayPharmacy && canOrderReroute }
+  });
 
   const navigateToReroute = (reason?: string) => {
     const query = queryString.stringify({

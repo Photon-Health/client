@@ -1,5 +1,6 @@
 import { customElement } from 'solid-element';
 import { createEffect, createSignal, onMount, Show } from 'solid-js';
+import { Portal } from 'solid-js/web';
 import {
   buildFieldSnapshot,
   Button,
@@ -220,77 +221,88 @@ const Component = (props: PatientDialogProps) => {
 
   return (
     <div ref={ref}>
-      <style>{photonStyles}</style>
       <Show when={props.open}>
-        <PhotonFormWrapper
-          onClosed={() => {
-            dispatchClosed();
-            actions().resetStores();
-            props.open = false;
-          }}
-          title={props?.patientId ? 'Edit patient' : 'New patient'}
-          titleIconName={props?.patientId ? 'pencil-square' : 'person-plus'}
-          footer={
-            <>
-              <Show when={!props?.hideCreatePrescription}>
-                <Button
-                  class="w-full xs:w-fit"
-                  size="lg"
-                  disabled={loading()}
-                  loading={loading() && isCreatePrescription()}
-                  onClick={() => submitForm(formStore(), actions(), selectedStore(), true)}
-                >
-                  {props?.patientId ? 'Save' : 'Create'} and start prescription
-                </Button>
-              </Show>
-              <Show when={!!hasPatients() || !!props?.hideCreatePrescription}>
-                <Button
-                  class="w-full xs:w-fit"
-                  size="lg"
-                  variant={props?.hideCreatePrescription ? 'primary' : 'secondary'}
-                  disabled={loading()}
-                  loading={loading() && !isCreatePrescription()}
-                  onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
-                >
-                  {props?.patientId ? 'Save' : 'Create'}
-                </Button>
-              </Show>
-            </>
-          }
-          form={
-            <>
-              <Show when={globalError()}>
-                <div
-                  class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-                  role="alert"
-                >
-                  <span class="block sm:inline">{globalError()}</span>
-                </div>
-              </Show>
-              <photon-patient-form
-                slot="form"
-                on:photon-form-updated={(e: any) => {
-                  setFormStore(e.detail.form);
-                  setActions(Object.assign({}, e.detail.actions, { resetStores: e.detail.reset }));
-                  setSelectedStore(e.detail.selected);
-                  // Check if any address field has a value
-                  const form = e.detail.form;
-                  setHasAnyAddressField(
-                    !!(
-                      form['address_street1']?.value ||
-                      form['address_street2']?.value ||
-                      form['address_city']?.value ||
-                      form['address_state']?.value ||
-                      form['address_zip']?.value
-                    )
-                  );
-                }}
-                patient-id={props.patientId}
-                optional-patient-address={props.optionalPatientAddress}
-              />
-            </>
-          }
-        />
+        {/*
+          Portal to document.body so the wrapper escapes the prescribe workflow's
+          <main overflow-y-auto> scroll container. On iOS, a nested position:fixed
+          element inside an overflow:auto ancestor can be clipped to that ancestor,
+          leaving the prescribe footer visible through this dialog. useShadow scopes
+          photonStyles + the wrapper's Tailwind so they don't leak to document.body.
+        */}
+        <Portal mount={document.body} useShadow={true}>
+          <style>{photonStyles}</style>
+          <PhotonFormWrapper
+            onClosed={() => {
+              dispatchClosed();
+              actions().resetStores();
+              props.open = false;
+            }}
+            title={props?.patientId ? 'Edit patient' : 'New patient'}
+            titleIconName={props?.patientId ? 'pencil-square' : 'person-plus'}
+            footer={
+              <>
+                <Show when={!props?.hideCreatePrescription}>
+                  <Button
+                    class="w-full xs:w-fit"
+                    size="lg"
+                    disabled={loading()}
+                    loading={loading() && isCreatePrescription()}
+                    onClick={() => submitForm(formStore(), actions(), selectedStore(), true)}
+                  >
+                    {props?.patientId ? 'Save' : 'Create'} and start prescription
+                  </Button>
+                </Show>
+                <Show when={!!hasPatients() || !!props?.hideCreatePrescription}>
+                  <Button
+                    class="w-full xs:w-fit"
+                    size="lg"
+                    variant={props?.hideCreatePrescription ? 'primary' : 'secondary'}
+                    disabled={loading()}
+                    loading={loading() && !isCreatePrescription()}
+                    onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
+                  >
+                    {props?.patientId ? 'Save' : 'Create'}
+                  </Button>
+                </Show>
+              </>
+            }
+            form={
+              <>
+                <Show when={globalError()}>
+                  <div
+                    class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+                    role="alert"
+                  >
+                    <span class="block sm:inline">{globalError()}</span>
+                  </div>
+                </Show>
+                <photon-patient-form
+                  slot="form"
+                  on:photon-form-updated={(e: any) => {
+                    setFormStore(e.detail.form);
+                    setActions(
+                      Object.assign({}, e.detail.actions, { resetStores: e.detail.reset })
+                    );
+                    setSelectedStore(e.detail.selected);
+                    // Check if any address field has a value
+                    const form = e.detail.form;
+                    setHasAnyAddressField(
+                      !!(
+                        form['address_street1']?.value ||
+                        form['address_street2']?.value ||
+                        form['address_city']?.value ||
+                        form['address_state']?.value ||
+                        form['address_zip']?.value
+                      )
+                    );
+                  }}
+                  patient-id={props.patientId}
+                  optional-patient-address={props.optionalPatientAddress}
+                />
+              </>
+            }
+          />
+        </Portal>
       </Show>
     </div>
   );

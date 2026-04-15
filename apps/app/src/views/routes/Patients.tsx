@@ -7,6 +7,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Portal,
   Skeleton,
   SkeletonText,
   Text
@@ -59,35 +60,37 @@ const EditView = (props: EditViewProps) => {
           icon={<FiMoreVertical fontSize="1.25rem" />}
           variant="ghost"
         />
-        <MenuList>
-          <MenuItem icon={<FiEye fontSize="1.2em" />} as={RouterLink} to={`/patients/${id}`}>
-            View patient
-          </MenuItem>
-          <MenuItem
-            icon={<FiEdit fontSize="1.2em" />}
-            as={RouterLink}
-            to={`/patients/update/${id}`}
-            onClick={() => {
-              setDisableScroll(true);
-            }}
-          >
-            Edit patient
-          </MenuItem>
-          <MenuItem
-            icon={<TbPrescription fontSize="1.2em" />}
-            as={RouterLink}
-            to={`/prescriptions/new?patientId=${id}`}
-          >
-            Create prescription
-          </MenuItem>
-          <MenuItem
-            icon={<FiShoppingCart fontSize="1.2em" />}
-            as={RouterLink}
-            to={`/orders/new?patientId=${id}`}
-          >
-            Create order
-          </MenuItem>
-        </MenuList>
+        <Portal>
+          <MenuList>
+            <MenuItem icon={<FiEye fontSize="1.2em" />} as={RouterLink} to={`/patients/${id}`}>
+              View patient
+            </MenuItem>
+            <MenuItem
+              icon={<FiEdit fontSize="1.2em" />}
+              as={RouterLink}
+              to={`/patients/update/${id}`}
+              onClick={() => {
+                setDisableScroll(true);
+              }}
+            >
+              Edit patient
+            </MenuItem>
+            <MenuItem
+              icon={<TbPrescription fontSize="1.2em" />}
+              as={RouterLink}
+              to={`/prescriptions/new?patientId=${id}`}
+            >
+              Create prescription
+            </MenuItem>
+            <MenuItem
+              icon={<FiShoppingCart fontSize="1.2em" />}
+              as={RouterLink}
+              to={`/orders/new?patientId=${id}`}
+            >
+              Create order
+            </MenuItem>
+          </MenuList>
+        </Portal>
       </Menu>
     </HStack>
   );
