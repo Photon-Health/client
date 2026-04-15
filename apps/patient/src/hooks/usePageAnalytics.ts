@@ -28,7 +28,8 @@ export const usePageAnalytics = ({ pageName, properties }: UsePageAnalyticsProps
       });
 
       patientAnalytics.track('Page Opened', order, {
-        page_name: pageName
+        page_name: pageName,
+        ...properties
       });
     }
   }, [location.pathname, pageName, order?.id, order?.organization.id, order?.organization.name]);
