@@ -13,12 +13,6 @@ export type PhotonFormWrapperProps = {
   checkShouldWarn?: () => boolean;
 };
 
-// only need certain styles for WebViews; they style slightly different than Safari
-const isIOSWebView =
-  typeof navigator !== 'undefined' &&
-  /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-  !/Safari\//.test(navigator.userAgent);
-
 export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
   const props = mergeProps(
     {
@@ -38,23 +32,8 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
   const handleCancel = () => onCloseDialogOpen(false);
 
   return (
-    <div
-      ref={ref}
-      classList={{
-        'z-50 fixed inset-0 flex flex-col bg-[#F9FAFB]': true,
-        'photon-form-wrapper--webview': isIOSWebView // fix footer spacing on ios webviews that do not have the Safari spacing
-      }}
-    >
+    <div ref={ref} class="z-50 fixed inset-0 flex flex-col bg-[#F9FAFB]">
       <style>{tailwind}</style>
-      {/* fix iOS Home bar's reserved space from clipping the Footer buttons */}
-      <style>{`
-        .photon-form-wrapper__footer {
-          padding-bottom: calc(1rem + env(safe-area-inset-bottom));
-        }
-        .photon-form-wrapper--webview .photon-form-wrapper__footer {
-          padding-bottom: max(calc(1rem + env(safe-area-inset-bottom)), 2.5rem);
-        }
-      `}</style>
 
       {/* Close Wrapper Modal */}
       <photon-dialog
@@ -102,7 +81,7 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
         <div class="px-4 pt-4 pb-4 md:px-4 w-full sm:w-[600px] xs:mx-auto">{props.form}</div>
       </main>
       <Show when={props.footer}>
-        <footer class="photon-form-wrapper__footer flex-shrink-0 bg-white shadow-card px-4 pt-4 md:px-8">
+        <footer class="flex-shrink-0 bg-white shadow-card px-4 py-4 md:px-8">
           <div class="flex flex-col xs:flex-row-reverse xs:justify-start gap-2 items-center w-full sm:w-[600px] xs:mx-auto sm:px-4">
             {props.footer}
           </div>
