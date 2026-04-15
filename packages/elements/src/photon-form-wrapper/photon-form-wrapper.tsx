@@ -32,11 +32,7 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
   const handleCancel = () => onCloseDialogOpen(false);
 
   return (
-    <div
-      ref={ref}
-      class="z-50 fixed top-0 left-0 w-full h-screen overflow-y-auto overflow-x-hidden bg-[#F9FAFB]"
-      style={{ height: '100dvh', '-webkit-overflow-scrolling': 'touch', 'touch-action': 'pan-y' }}
-    >
+    <div ref={ref} class="z-50 fixed inset-0 flex flex-col bg-[#F9FAFB]">
       <style>{tailwind}</style>
 
       {/* Close Wrapper Modal */}
@@ -52,8 +48,7 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
         <p class="font-sans text-lg xs:text-base">{props.closeBody}</p>
       </photon-dialog>
 
-      {/* Wrapper */}
-      <header class="z-40 flex items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full shadow-card">
+      <header class="flex-shrink-0 flex items-center px-4 py-2 md:px-8 md:py-3 bg-white shadow-card">
         <div class="flex items-center">
           <Button
             variant="naked"
@@ -79,13 +74,14 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
         </div>
         <div class="flex items-center w-[44px]" />
       </header>
-      <div class="z-30 w-full min-h-screen bg-[#F9FAFB] pt-14">
-        <div class="px-4 pb-40 md:pt-4 md:pb-52 md:px-4 w-full h-full sm:w-[600px] xs:mx-auto">
-          {props.form}
-        </div>
-      </div>
+      <main
+        class="flex-1 overflow-y-auto overscroll-contain"
+        style={{ '-webkit-overflow-scrolling': 'touch' }}
+      >
+        <div class="px-4 pt-4 pb-4 md:px-4 w-full sm:w-[600px] xs:mx-auto">{props.form}</div>
+      </main>
       <Show when={props.footer}>
-        <footer class="z-40 fixed bottom-0 w-full bg-white shadow-card px-4 py-4 md:px-8">
+        <footer class="flex-shrink-0 bg-white shadow-card px-4 py-4 md:px-8">
           <div class="flex flex-col xs:flex-row-reverse xs:justify-start gap-2 items-center w-full sm:w-[600px] xs:mx-auto sm:px-4">
             {props.footer}
           </div>
