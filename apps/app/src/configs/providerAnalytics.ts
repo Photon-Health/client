@@ -72,12 +72,11 @@ export class ProviderAnalytics {
 
     if (this.rudderanalytics && this.isInitialized) {
       if (this.isNonProduction) {
-        console.log(`📊 [Analytics] ${eventName}`, trackProperties);
+        console.log(`📊 [Analytics: To Rudderstack] ${eventName}`, trackProperties);
       }
       this.rudderanalytics.track(eventName, trackProperties);
-    }
-
-    if (this.mixpanelEnabled) {
+    } else if (this.mixpanelEnabled) {
+      // using else to prevent double tracking, since Rudderstack events are forwarded to Mixpanel
       if (this.isNonProduction) {
         console.log(`📊 [Analytics: To Mixpanel] ${eventName}`, trackProperties);
       }
