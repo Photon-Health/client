@@ -70,6 +70,10 @@ export const PatientForm = (props: {
     }
   });
 
+  onCleanup(() => {
+    actions.reset();
+  });
+
   createEffect(() => {
     const values = patientToFormValues(props.initialPatient);
     for (const [key, value] of Object.entries(values)) {
@@ -77,17 +81,17 @@ export const PatientForm = (props: {
     }
   });
 
-  // Leftover from when PatientForm was photon-patient-form-component
-  // We no longer use this event internally but
-  // no way of knowing if customer is listening for this event
-  const dispatchFormUpdated = (form: any) => {
+  createEffect(() => {
     const detail = {
-      form: form,
+      form: store,
       actions: actions,
       reset: () => {
         actions.reset();
       }
     };
+    // Leftover from when PatientForm was photon-patient-form-component
+    // We no longer use this event internally but
+    // no way of knowing if customer is listening for this event
     const event = new CustomEvent('photon-form-updated', {
       composed: true,
       bubbles: true,
@@ -96,25 +100,6 @@ export const PatientForm = (props: {
     ref?.dispatchEvent(event);
 
     props.onUpdate(detail);
-  };
-
-  // Check if any address field has a value
-  const hasAnyAddressField = createMemo(() => {
-    return !!(
-      store['address_street1']?.value ||
-      store['address_street2']?.value ||
-      store['address_city']?.value ||
-      store['address_state']?.value ||
-      store['address_zip']?.value
-    );
-  });
-
-  createEffect(() => {
-    dispatchFormUpdated(store);
-  });
-
-  onCleanup(() => {
-    actions.reset();
   });
 
   const initialPreferredPharmacy = createMemo(() => {
@@ -132,15 +117,25 @@ export const PatientForm = (props: {
     return prefOption;
   });
 
-  const formName = props.patientId ? 'update_patient_form' : 'new_patient_form';
-
   const trackFieldInteraction = (fieldName: string, hasValue: boolean, isOptional = false) => {
+    const formName = props.patientId ? 'update_patient_form' : 'new_patient_form';
     dispatchAnalyticsTrackEvent(
       'fieldInteraction',
       { name: 'Field Interaction', formName, fieldName, hasValue, isOptional },
       ref
     );
   };
+
+  // Check if any address field has a value
+  const hasAnyAddressField = createMemo(() => {
+    return !!(
+      store['address_street1']?.value ||
+      store['address_street2']?.value ||
+      store['address_city']?.value ||
+      store['address_state']?.value ||
+      store['address_zip']?.value
+    );
+  });
 
   const isAddressRequired = createMemo(() => !props.optionalPatientAddress || hasAnyAddressField());
 

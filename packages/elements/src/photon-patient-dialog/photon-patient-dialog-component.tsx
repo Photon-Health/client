@@ -9,6 +9,7 @@ import {
   usePhoton
 } from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
+import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import { PatientStore } from '../stores/patient';
 import gql from 'graphql-tag';
 import { PatientForm } from './PatientForm';
@@ -243,6 +244,7 @@ const Component = (props: PatientDialogProps) => {
           photonStyles + the wrapper's Tailwind so they don't leak to document.body.
         */}
         <Portal mount={document.body} useShadow={true}>
+          <style>{photonStyles}</style>
           <PhotonFormWrapper
             onClosed={() => {
               dispatchClosed();
