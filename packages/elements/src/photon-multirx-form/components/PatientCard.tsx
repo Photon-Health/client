@@ -169,15 +169,13 @@ export const PatientCard = (props: {
           <Card addChildrenDivider={true}>
             <div class="flex items-center justify-between">
               <Text color="gray">{props?.patientId ? 'Patient' : 'Select Patient'}</Text>
-              <Show when={!store.selectedPatient.data}>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setShowAddNewPatientDialog(true)}
-                >
-                  + Add New Patient
-                </Button>
-              </Show>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowAddNewPatientDialog(true)}
+              >
+                + Add Patient
+              </Button>
             </div>
             <PatientSelect
               selectedPatient={store.selectedPatient.data}
