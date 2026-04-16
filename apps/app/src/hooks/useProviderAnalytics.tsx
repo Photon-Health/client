@@ -138,8 +138,9 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
         name: data.me.name?.full ?? '',
         customer_id: data.organization.customer?.id
       });
-      getProviderAnalytics().identify(data.me.id, {
+      getProviderAnalytics().identify(data.me.email, {
         email: data.me.email,
+        user_id: data.me.id,
         name: data.me.name?.full ?? '',
         org_id: data.organization.id,
         customer_id: data.organization.customer?.id
