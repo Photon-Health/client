@@ -81,7 +81,6 @@ export class ProviderAnalytics {
       if (this.isNonProduction) {
         console.log(`📊 [Analytics: To Mixpanel] ${eventName}`, trackProperties);
       }
-      mixpanel.track(eventName, trackProperties);
     }
   }
 }
