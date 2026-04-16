@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, onCleanup, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
 import {
   AddressAutocompleteInput,
@@ -24,13 +24,26 @@ import { isZip } from '../utils';
 import { PhotonAuthorized } from '../photon-authorized';
 import { Patient } from '@photonhealth/sdk/dist/types';
 
+const validators = {
+  firstName: message(size(string(), 1, Infinity), 'Please enter a first name.'),
+  lastName: message(size(string(), 1, Infinity), 'Please enter a last name.'),
+  dateOfBirth: message(notFutureDate, 'Please enter a valid date of birth.'),
+  sex: message(enums(SEX_OPTIONS.map((o) => o.value)), 'Please enter Sex at Birth.'),
+  phone: message(size(string(), 12), 'Please enter a valid mobile number.'),
+  email: message(union([email(), empty()]), 'Please enter a valid email.'),
+  address_street1: message(size(string(), 1, Infinity), 'Please enter a valid Street 1.'),
+  address_city: message(size(string(), 1, Infinity), 'Please enter a valid City.'),
+  address_state: message(size(string(), 2, 2), 'Please enter a valid State.'),
+  address_zip: message(zipString(), 'Please enter a valid zip code.')
+};
+
 const patientToFormValues = (patient: Patient | undefined) => ({
   firstName: patient?.name.first,
   lastName: patient?.name.last,
   dateOfBirth: patient?.dateOfBirth,
-  phone: patient?.phone,
-  gender: patient?.gender,
   sex: patient?.sex,
+  gender: patient?.gender,
+  phone: patient?.phone,
   email: patient?.email,
   address_street1: patient?.address?.street1,
   address_street2: patient?.address?.street2,
@@ -50,47 +63,11 @@ export const PatientForm = (props: {
   let ref: any;
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
   const { store, actions } = createFormStore(patientToFormValues(props.initialPatient));
-  actions.registerValidator({
-    key: 'firstName',
-    validator: message(size(string(), 1, Infinity), 'Please enter a first name.')
-  });
-  actions.registerValidator({
-    key: 'lastName',
-    validator: message(size(string(), 1, Infinity), 'Please enter a last name.')
-  });
-  actions.registerValidator({
-    key: 'dateOfBirth',
-    validator: message(notFutureDate, 'Please enter a valid date of birth.')
-  });
-  actions.registerValidator({
-    key: 'sex',
-    validator: message(enums(SEX_OPTIONS.map((o) => o.value)), 'Please enter Sex at Birth.')
-  });
-  actions.registerValidator({
-    key: 'phone',
-    validator: message(size(string(), 12), 'Please enter a valid mobile number.')
-  });
-  actions.registerValidator({
-    key: 'email',
-    validator: message(union([email(), empty()]), 'Please enter a valid email.')
-  });
 
-  // Address validators - only run when address is required.
-  actions.registerValidator({
-    key: 'address_street1',
-    validator: message(size(string(), 1, Infinity), 'Please enter a valid Street 1.')
-  });
-  actions.registerValidator({
-    key: 'address_city',
-    validator: message(size(string(), 1, Infinity), 'Please enter a valid City.')
-  });
-  actions.registerValidator({
-    key: 'address_state',
-    validator: message(size(string(), 2, 2), 'Please enter a valid State.')
-  });
-  actions.registerValidator({
-    key: 'address_zip',
-    validator: message(zipString(), 'Please enter a valid zip code.')
+  onMount(() => {
+    for (const [k, v] of Object.entries(validators)) {
+      actions.registerValidator({ key: k, validator: v });
+    }
   });
 
   createEffect(() => {
