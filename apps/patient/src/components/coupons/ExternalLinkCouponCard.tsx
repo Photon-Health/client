@@ -42,7 +42,7 @@ export const ExternalLinkCouponCard = (props: ExternalLinkCouponCardProps) => {
         <Text fontSize="4xl" alignSelf="center" fontWeight="700" py={0} lineHeight="1">
           ${formatPrice(price)}
         </Text>
-        {retailPrice ? (
+        {retailPrice && retailPrice > price ? (
           <Text alignSelf="center" color="gray.500">
             Retail price:{' '}
             <span style={{ textDecoration: 'line-through' }}>${formatPrice(retailPrice)}</span>

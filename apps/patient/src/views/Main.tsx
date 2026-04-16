@@ -200,17 +200,26 @@ export const Main = () => {
     [orderId, order]
   );
   const navigateForOrder = useCallback(
-    (newOrder: Order) => {
+    async (newOrder: Order) => {
       if (newOrder.state === 'CANCELED') {
         navigate('/canceled', { replace: true });
         return;
       }
 
+      let redirectPath: string;
       const hasPharmacy = newOrder.pharmacy?.id;
-      const redirect = hasPharmacy ? '/status' : '/review';
+
+      if (hasPharmacy) {
+        redirectPath = '/status';
+      } else {
+        const removeReviewStepExperiment = await patientAnalytics.getFlagValue(
+          'remove_review_your_rx_page'
+        );
+        redirectPath = removeReviewStepExperiment.skipReviewPage ? '/pharmacy' : '/review';
+      }
 
       const query = queryString.stringify({ orderId: newOrder.id, token });
-      navigate(`${redirect}?${query}`, {
+      navigate(`${redirectPath}?${query}`, {
         replace: true
       });
     },
@@ -229,7 +238,7 @@ export const Main = () => {
           setOrderDataLocally(result, currentPharmacy);
 
           if (options.triggerNavigationAfterFetch) {
-            navigateForOrder(result);
+            await navigateForOrder(result);
           }
         }
         return result;
@@ -248,7 +257,7 @@ export const Main = () => {
 
         // If an order was returned, use it for routing
         setOrderDataLocally(error.response.data.order);
-        navigateForOrder(error.response.data.order);
+        await navigateForOrder(error.response.data.order);
       }
     },
     [isDemo, orderId, setOrderDataLocally, navigateForOrder, navigate]

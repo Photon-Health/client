@@ -1,4 +1,4 @@
-import { JSX, Show, mergeProps, createMemo, createEffect } from 'solid-js';
+import { createEffect, createMemo, JSX, mergeProps, Show } from 'solid-js';
 import { Transition } from 'solid-transition-group';
 import Icon from '../Icon';
 import createTransition from '../../utils/createTransition';
@@ -89,10 +89,10 @@ function Dialog(props: DialogProps) {
                   <div class="absolute right-0 top-0 pr-4 pt-4 sm:pr-6 sm:pt-6 sm:block">
                     <button
                       type="button"
+                      aria-label="Dismiss"
                       class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                       onClick={merged.onClose}
                     >
-                      <span class="sr-only">Close</span>
                       <Icon name="xMark" class="h-6 w-6" aria-hidden="true" />
                     </button>
                   </div>

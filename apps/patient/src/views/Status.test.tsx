@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import type { ReactNode } from 'react';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import { routeElements } from '../Routes';
 import { render, screen } from '@testing-library/react';
@@ -12,6 +13,7 @@ import {
 } from '../test-utils/generators';
 import { Order } from '../utils/models';
 import { getOrder } from '../api';
+import { FEATURE_FLAG_DEFAULTS } from '../configs/featureFlags';
 
 vi.mock('../api', () => ({
   triggerDemoNotification: vi.fn(),
@@ -21,13 +23,39 @@ vi.mock('../api', () => ({
     address: 'mocked address'
   }),
   getOrder: vi.fn(),
+  getPharmaciesByLocation: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
+  getPharmacies: vi.fn().mockResolvedValue([]),
+  getOfferBundles: vi.fn().mockResolvedValue([]),
   AUTH_HEADER_ERRORS: []
 }));
 
 vi.mock('@datadog/browser-rum');
-vi.mock('../hooks/usePageAnalytics');
 vi.mock('react-ga4');
 vi.mock('mixpanel-browser');
+
+let mockChangePharmacyReasonsFlag = false;
+vi.mock('../hooks/usePatientAnalytics', () => ({
+  usePatientAnalytics: vi.fn(() => ({
+    track: vi.fn(),
+    page: vi.fn(),
+    identify: vi.fn(),
+    getFlagValue: vi.fn(async (flagName: string) => {
+      if (flagName === 'change_pharmacy_reasons') {
+        return mockChangePharmacyReasonsFlag;
+      }
+
+      return FEATURE_FLAG_DEFAULTS[flagName as keyof typeof FEATURE_FLAG_DEFAULTS];
+    }),
+    getFlagValueSync: vi.fn((flagName: string) => {
+      if (flagName === 'change_pharmacy_reasons') {
+        return mockChangePharmacyReasonsFlag;
+      }
+
+      return FEATURE_FLAG_DEFAULTS[flagName as keyof typeof FEATURE_FLAG_DEFAULTS];
+    })
+  })),
+  PatientAnalyticsProvider: ({ children }: { children: ReactNode }) => children
+}));
 
 describe('Status page Coupon cards', () => {
   test('shows external URL if present', async () => {
@@ -94,6 +122,55 @@ describe('Status page Coupon cards', () => {
     expect(await screen.findByText('Order is likely ready')).toBeInTheDocument();
 
     expect(screen.queryByText('Coupon card')).not.toBeInTheDocument();
+  });
+});
+
+describe('Status page Rerouting', () => {
+  const reroutableOrderBase: Partial<Order> = {
+    state: 'PLACED',
+    isReroutable: true,
+    organization: {
+      id: 'org_test',
+      name: 'Test Org',
+      settings: {
+        brandColor: '',
+        patientUx: { enablePatientRerouting: true }
+      }
+    }
+  };
+  beforeEach(() => {
+    mockChangePharmacyReasonsFlag = true;
+  });
+
+  afterEach(() => {
+    mockChangePharmacyReasonsFlag = false;
+  });
+
+  test('navigates directly to pharmacy page without modal when unresolved ORDER_ERROR exists', async () => {
+    const { memoryRouter } = await renderAppAtStatusView({
+      ...reroutableOrderBase,
+      exceptions: [{ exceptionType: 'ORDER_ERROR', resolvedAt: null }]
+    });
+
+    await userEvent.click(await screen.findByRole('button', { name: /change pharmacy/i }));
+
+    expect(
+      screen.queryByText('Let us know why you want to change pharmacies')
+    ).not.toBeInTheDocument();
+    expect(memoryRouter.state.location.pathname).toBe('/pharmacy');
+  });
+
+  test('shows reasons modal when ORDER_ERROR is resolved', async () => {
+    renderAppAtStatusView({
+      ...reroutableOrderBase,
+      exceptions: [{ exceptionType: 'ORDER_ERROR', resolvedAt: new Date() }]
+    });
+
+    await userEvent.click(await screen.findByRole('button', { name: /change pharmacy/i }));
+
+    expect(
+      await screen.findByText('Let us know why you want to change pharmacies')
+    ).toBeInTheDocument();
   });
 });
 

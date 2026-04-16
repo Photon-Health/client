@@ -3,6 +3,7 @@ import { Order } from '../utils/models';
 import mixpanel from 'mixpanel-browser';
 import { defaults } from 'lodash';
 import { countFillsAndRemoveDuplicates } from '../utils/general';
+import { FEATURE_FLAG_DEFAULTS, FlagKeys, FlagValues } from './featureFlags';
 
 const RUDDERSTACK_WRITE_KEY = import.meta.env.VITE_RUDDERSTACK_WRITE_KEY;
 const RUDDERSTACK_DATA_PLANE_URL = import.meta.env.VITE_RUDDERSTACK_DATA_PLANE_URL;
@@ -231,12 +232,6 @@ function mapOrderToContextData(order: Order): ContextData {
   };
 }
 
-type FlagValues = {
-  change_pharmacy_reasons: boolean;
-};
-
-type FlagNames = keyof FlagValues;
-
 export interface PatientAnalytics {
   page(category: string, name?: string, properties?: ApiObject): void;
 
@@ -254,9 +249,9 @@ export interface PatientAnalytics {
     orgName?: string;
   }): void;
 
-  getFlagValue<K extends FlagNames>(flagName: K, fallback: FlagValues[K]): Promise<FlagValues[K]>;
+  getFlagValue<K extends FlagKeys>(flagName: K, fallback?: FlagValues[K]): Promise<FlagValues[K]>;
 
-  getFlagValueSync<K extends FlagNames>(flagName: K, fallback: FlagValues[K]): FlagValues[K];
+  getFlagValueSync<K extends FlagKeys>(flagName: K, fallback?: FlagValues[K]): FlagValues[K];
 }
 
 class NoopPatientAnalytics implements PatientAnalytics {
@@ -279,14 +274,14 @@ class NoopPatientAnalytics implements PatientAnalytics {
   }): void {
     return;
   }
-  async getFlagValue<K extends FlagNames>(
-    _flagName: K,
-    fallback: FlagValues[K]
+  async getFlagValue<K extends FlagKeys>(
+    flagName: K,
+    fallback?: FlagValues[K]
   ): Promise<FlagValues[K]> {
-    return fallback;
+    return fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
   }
-  getFlagValueSync<K extends FlagNames>(_flagName: K, fallback: FlagValues[K]): FlagValues[K] {
-    return fallback;
+  getFlagValueSync<K extends FlagKeys>(flagName: K, fallback?: FlagValues[K]): FlagValues[K] {
+    return fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
   }
 }
 
@@ -320,7 +315,9 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
         persistence: 'localStorage',
         record_sessions_percent: 100, // session replay
         record_heatmap_data: true,
-        flags: true
+        flags: true,
+        record_mask_all_text: false, // reveal all text and mask individually; inputs are unaffected and remain masked
+        autocapture: false
       });
       this.mixpanelEnabled = true;
     }
@@ -397,16 +394,17 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
     }
   }
 
-  async getFlagValue<K extends FlagNames>(
+  async getFlagValue<K extends FlagKeys>(
     flagName: K,
-    fallback: FlagValues[K]
+    fallback?: FlagValues[K]
   ): Promise<FlagValues[K]> {
     let flagValue: FlagValues[K];
+    const fallbackValue = fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
 
     if (this.mixpanelEnabled) {
-      flagValue = await mixpanel.flags.get_variant_value(flagName, fallback);
+      flagValue = await mixpanel.flags.get_variant_value(flagName, fallbackValue);
     } else {
-      flagValue = fallback;
+      flagValue = fallbackValue;
     }
 
     if (this.isNonProduction) {
@@ -416,13 +414,14 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
     return flagValue;
   }
 
-  getFlagValueSync<K extends FlagNames>(flagName: K, fallback: FlagValues[K]): FlagValues[K] {
+  getFlagValueSync<K extends FlagKeys>(flagName: K, fallback?: FlagValues[K]): FlagValues[K] {
     let flagValue: FlagValues[K];
+    const fallbackValue = fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
 
     if (this.mixpanelEnabled) {
-      flagValue = mixpanel.flags.get_variant_value_sync(flagName, fallback);
+      flagValue = mixpanel.flags.get_variant_value_sync(flagName, fallbackValue);
     } else {
-      flagValue = fallback;
+      flagValue = fallbackValue;
     }
 
     if (this.isNonProduction) {

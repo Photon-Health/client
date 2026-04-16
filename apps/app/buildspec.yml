@@ -12,6 +12,7 @@ env:
     VITE_AUTH0_AUDIENCE: app_build_vars:VITE_AUTH0_AUDIENCE
     VITE_GRAPHQL_URI: app_build_vars:VITE_GRAPHQL_URI
     VITE_CLINICAL_GRAPHQL_URI: app_build_vars:VITE_CLINICAL_GRAPHQL_URI
+    VITE_MIXPANEL_TOKEN: app_build_vars:VITE_MIXPANEL_TOKEN
 
 phases:
   install:

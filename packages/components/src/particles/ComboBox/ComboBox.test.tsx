@@ -1,5 +1,5 @@
 import { render, screen } from '@solidjs/testing-library';
-import { test, expect, vi } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import '@testing-library/jest-dom';
 import ComboBox from './index';
 import userEvent from '@testing-library/user-event';
@@ -10,16 +10,16 @@ const openComboBox = async (user: ReturnType<typeof userEvent.setup>, label: str
   await user.click(screen.getByLabelText(label));
 };
 
-type Option = { id: string; label: string; disabled?: boolean };
+type TestOption = { id: string; label: string; disabled?: boolean };
 
-const OPTIONS: Option[] = [
+const OPTIONS: TestOption[] = [
   { id: 'opt-1', label: 'Option 1' },
   { id: 'opt-2', label: 'Option 2' }
 ];
 
 function renderComboBox(props: {
-  value?: Option;
-  options?: Option[];
+  value?: TestOption;
+  options?: TestOption[];
   setSelected?: ReturnType<typeof vi.fn>;
   onOpen?: ReturnType<typeof vi.fn>;
   showClear?: boolean;
@@ -27,8 +27,8 @@ function renderComboBox(props: {
   const setSelected = props.setSelected ?? vi.fn();
   const options = props.options ?? OPTIONS;
   render(() => (
-    <ComboBox setSelected={setSelected} value={props.value} onOpen={props.onOpen}>
-      <ComboBox.Input
+    <ComboBox<TestOption> setSelected={setSelected} value={props.value} onOpen={props.onOpen}>
+      <ComboBox.Input<TestOption>
         label="Test Label"
         displayValue={(val) => val?.label ?? ''}
         showClear={props.showClear}
@@ -144,13 +144,13 @@ test('disabled option is rendered but cannot be selected', async () => {
 
 test('option renders render prop component with internal state', async () => {
   const user = userEvent.setup();
-  const CustomOption = (props: { value: Option; active: boolean }) => (
+  const CustomOption = (props: { value: TestOption; active: boolean }) => (
     <span>{`${props.value.label} - ${props.active ? 'active' : 'inactive'}`}</span>
   );
 
   render(() => (
     <ComboBox setSelected={vi.fn()} value={undefined}>
-      <ComboBox.Input label="Test Label" displayValue={(val) => val?.label ?? ''} />
+      <ComboBox.Input<TestOption> label="Test Label" displayValue={(val) => val?.label ?? ''} />
       <ComboBox.Options>
         <ComboBox.Option key={OPTIONS[0].id} value={OPTIONS[0]} render={CustomOption}>
           {OPTIONS[0].label}

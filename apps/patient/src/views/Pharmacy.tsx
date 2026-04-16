@@ -63,6 +63,7 @@ import { MailOrderSelectModal } from '../components/mail-order-select';
 import { MailOrderPharmacyOption } from '../components/mail-order-select/MailOrderSelectCard';
 import { getOfferType } from '../utils/offers';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
+import { PrescriptionsSummary } from '../components/prescription-summary';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -1067,6 +1068,10 @@ export const Pharmacy = () => {
     );
   }
 
+  const patientClicksAddress = () => {
+    patientAnalytics.track('Patient Clicks Address', order, {});
+  };
+
   const capsuleEnabled = enableCourier && order?.address?.postalCode && capsulePharmacyId;
   const brandedOptions = _.uniq([
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
@@ -1101,6 +1106,10 @@ export const Pharmacy = () => {
   const showPickupHeading =
     (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;
 
+  const removeReviewPageExperiment = patientAnalytics.getFlagValueSync(
+    'remove_review_your_rx_page'
+  );
+
   return (
     <Box>
       {!isDemo && <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />}
@@ -1118,10 +1127,18 @@ export const Pharmacy = () => {
         options={patientMailOrderOptions}
       />
 
+      {removeReviewPageExperiment.showRxSummaryOnPharmacyPage && (
+        <Box bgColor="white" p={4} borderBottom="1px" borderColor="gray.200">
+          <Container px={-3}>
+            <PrescriptionsSummary />
+          </Container>
+        </Box>
+      )}
+
       <Box bgColor="white">
         <VStack spacing={4} align="span" p={4}>
           <Container px={-3}>
-            <VStack spacing={2} align="start" px={4}>
+            <VStack spacing={2} align="start">
               <Heading as="h3" size="lg">
                 {heading}
               </Heading>
@@ -1130,10 +1147,14 @@ export const Pharmacy = () => {
                   <VStack w="full" align="start" spacing={1}>
                     <Text size="sm">{t.showingLabel}</Text>
                     <Link
-                      onClick={() => setLocationModalOpen(true)}
+                      onClick={() => {
+                        patientClicksAddress();
+                        setLocationModalOpen(true);
+                      }}
                       display="inline"
                       size="sm"
                       data-dd-privacy="mask"
+                      className="mp-mask"
                     >
                       <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
                       {cleanAddress}

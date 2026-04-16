@@ -28,7 +28,6 @@ export const Status = () => {
   const navigate = useNavigate();
   const { order, setOrder, isDemo, setFaqModalIsOpen, setReason } = useOrderContext();
   const patientAnalytics = usePatientAnalytics();
-  usePageAnalytics({ pageName: 'Order Status' });
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
   const { isOpen, onClose, onOpen } = useDisclosure();
 
@@ -138,7 +137,12 @@ export const Status = () => {
     return null;
   }
 
-  const navigateToReroute = () => {
+  usePageAnalytics({
+    pageName: 'Order Status',
+    properties: { changePharmacyShown: displayPharmacy && canOrderReroute }
+  });
+
+  const navigateToReroute = (reason?: string) => {
     const query = queryString.stringify({
       orderId: order.id,
       token,
@@ -151,12 +155,24 @@ export const Status = () => {
       pharmacyId: pharmacy?.id,
       pharmacyName: pharmacy?.name,
       isPharmacyOpen: displayPharmacy?.isOpen,
-      fulfillmentType: fulfillmentType
+      fulfillmentType: fulfillmentType,
+      rerouteReason: reason
     });
   };
 
   const handleReroute = () => {
-    const isEnabled = patientAnalytics.getFlagValueSync('change_pharmacy_reasons', false);
+    const isEnabled = patientAnalytics.getFlagValueSync('change_pharmacy_reasons');
+    const hasUnresolvedOrderError = order.exceptions.some(
+      (e) => e.exceptionType === 'ORDER_ERROR' && !e.resolvedAt
+    );
+
+    if (hasUnresolvedOrderError) {
+      const reason = 'Order Error';
+      setReason(reason); // set reason for reroute on order context
+      navigateToReroute(reason);
+      return;
+    }
+
     if (isEnabled) {
       onOpen();
       return;
