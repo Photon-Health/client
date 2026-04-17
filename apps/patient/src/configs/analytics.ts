@@ -9,6 +9,7 @@ const RUDDERSTACK_WRITE_KEY = import.meta.env.VITE_RUDDERSTACK_WRITE_KEY;
 const RUDDERSTACK_DATA_PLANE_URL = import.meta.env.VITE_RUDDERSTACK_DATA_PLANE_URL;
 const ENVIRONMENT = import.meta.env.VITE_ENV_NAME || 'development';
 const MIXPANEL_TOKEN = import.meta.env.VITE_MIXPANEL_TOKEN;
+const IS_E2E_TEST = import.meta.env.VITE_IS_E2E_TEST === 'true';
 
 interface ContextDataAddress {
   city: string;
@@ -308,7 +309,7 @@ class RudderAndMixPanelPatientAnalytics implements PatientAnalytics {
       return;
     }
 
-    if (MIXPANEL_TOKEN) {
+    if (MIXPANEL_TOKEN && !IS_E2E_TEST) {
       mixpanel.init(MIXPANEL_TOKEN, {
         debug: false, // floods the console, only turn on when needed
         track_pageview: true,

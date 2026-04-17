@@ -40,7 +40,10 @@ function localDevServer(): { webServer: ReturnType<typeof defineConfig>['webServ
       command: 'npx nx run patient:start',
       url: patientBaseUrl,
       reuseExistingServer: !process.env.CI,
-      timeout: 180_000
+      timeout: 180_000,
+      env: {
+        VITE_IS_E2E_TEST: 'true'
+      }
     }
   };
 }
