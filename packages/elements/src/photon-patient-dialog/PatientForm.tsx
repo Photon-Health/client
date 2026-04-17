@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
+import { createMemo, createSignal, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
 import {
   AddressAutocompleteInput,
@@ -17,12 +17,9 @@ import {
   Spinner,
   StateSelect
 } from '@photonhealth/components';
-import { createFormStore } from '../stores/form';
 import { email, empty, message, notFutureDate, zipString } from '../validators';
-
 import { isZip } from '../utils';
 import { PhotonAuthorized } from '../photon-authorized';
-import { Patient } from '@photonhealth/sdk/dist/types';
 
 const validators = {
   firstName: message(size(string(), 1, Infinity), 'Please enter a first name.'),
@@ -37,84 +34,21 @@ const validators = {
   address_zip: message(zipString(), 'Please enter a valid zip code.')
 };
 
-const patientToFormValues = (patient: Patient | undefined) => ({
-  firstName: patient?.name.first,
-  lastName: patient?.name.last,
-  dateOfBirth: patient?.dateOfBirth,
-  sex: patient?.sex,
-  gender: patient?.gender,
-  phone: patient?.phone,
-  email: patient?.email,
-  address_street1: patient?.address?.street1,
-  address_street2: patient?.address?.street2,
-  address_city: patient?.address?.city,
-  address_state: patient?.address?.state,
-  address_zip: patient?.address?.postalCode,
-  preferredPharmacy: patient?.preferredPharmacies?.[0]?.id
-});
-
 export const PatientForm = (props: {
   patientId: string;
   optionalPatientAddress: boolean;
-  initialPatient: Patient | undefined;
   initialPatientLoading: boolean;
-  onUpdate: (detail: any) => void;
+  initialPreferredPharmacy?: PharmacyOption;
+  store: Record<string, any>;
+  actions: Record<string, (...args: any) => any>;
 }) => {
   let ref: any;
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
-  const { store, actions } = createFormStore(patientToFormValues(props.initialPatient));
 
   onMount(() => {
     for (const [k, v] of Object.entries(validators)) {
-      actions.registerValidator({ key: k, validator: v });
+      props.actions.registerValidator({ key: k, validator: v });
     }
-  });
-
-  onCleanup(() => {
-    actions.reset();
-  });
-
-  createEffect(() => {
-    const values = patientToFormValues(props.initialPatient);
-    for (const [key, value] of Object.entries(values)) {
-      actions.updateFormValue({ key, value });
-    }
-  });
-
-  createEffect(() => {
-    const detail = {
-      form: store,
-      actions: actions,
-      reset: () => {
-        actions.reset();
-      }
-    };
-    // Leftover from when PatientForm was photon-patient-form-component
-    // We no longer use this event internally but
-    // no way of knowing if customer is listening for this event
-    const event = new CustomEvent('photon-form-updated', {
-      composed: true,
-      bubbles: true,
-      detail
-    });
-    ref?.dispatchEvent(event);
-
-    props.onUpdate(detail);
-  });
-
-  const initialPreferredPharmacy = createMemo(() => {
-    const pref = props.initialPatient?.preferredPharmacies?.[0];
-    if (!pref) return;
-
-    const address = pref.address as PharmacyOption['address'];
-    const prefOption: PharmacyOption = {
-      ...pref,
-      address,
-      isPrevious: true,
-      isPreferred: true
-    };
-
-    return prefOption;
   });
 
   const trackFieldInteraction = (fieldName: string, hasValue: boolean, isOptional = false) => {
@@ -129,11 +63,11 @@ export const PatientForm = (props: {
   // Check if any address field has a value
   const hasAnyAddressField = createMemo(() => {
     return !!(
-      store['address_street1']?.value ||
-      store['address_street2']?.value ||
-      store['address_city']?.value ||
-      store['address_state']?.value ||
-      store['address_zip']?.value
+      props.store['address_street1']?.value ||
+      props.store['address_street2']?.value ||
+      props.store['address_city']?.value ||
+      props.store['address_state']?.value ||
+      props.store['address_zip']?.value
     );
   });
 
@@ -152,32 +86,38 @@ export const PatientForm = (props: {
         </p>
         <InputGroup
           label="Street 1"
-          error={store['address_street1']?.error}
+          error={props.store['address_street1']?.error}
           required={isAddressRequired()}
         >
           <AddressAutocompleteInput
-            value={store['address_street1']?.value}
+            value={props.store['address_street1']?.value}
             onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-              actions.updateFormValue({ key: 'address_street1', value: e.currentTarget.value });
+              props.actions.updateFormValue({
+                key: 'address_street1',
+                value: e.currentTarget.value
+              });
             }}
             onBlur={(e) =>
               trackFieldInteraction('address_street1', Boolean(e.currentTarget.value), true)
             }
             onAddressSelect={(address) => {
-              actions.updateFormValue({ key: 'address_street1', value: address.street1 });
-              actions.updateFormValue({ key: 'address_street2', value: address.street2 });
-              actions.updateFormValue({ key: 'address_city', value: address.city });
-              actions.updateFormValue({ key: 'address_state', value: address.state });
-              actions.updateFormValue({ key: 'address_zip', value: address.postalCode });
+              props.actions.updateFormValue({ key: 'address_street1', value: address.street1 });
+              props.actions.updateFormValue({ key: 'address_street2', value: address.street2 });
+              props.actions.updateFormValue({ key: 'address_city', value: address.city });
+              props.actions.updateFormValue({ key: 'address_state', value: address.state });
+              props.actions.updateFormValue({ key: 'address_zip', value: address.postalCode });
             }}
           />
         </InputGroup>
 
-        <InputGroup label="Street 2" error={store['address_street2']?.error}>
+        <InputGroup label="Street 2" error={props.store['address_street2']?.error}>
           <Input
-            value={store['address_street2']?.value}
+            value={props.store['address_street2']?.value}
             onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-              actions.updateFormValue({ key: 'address_street2', value: e.currentTarget.value });
+              props.actions.updateFormValue({
+                key: 'address_street2',
+                value: e.currentTarget.value
+              });
             }}
             onBlur={(e) =>
               trackFieldInteraction('address_street2', Boolean(e.currentTarget.value), true)
@@ -187,13 +127,13 @@ export const PatientForm = (props: {
 
         <InputGroup
           label="City"
-          error={store['address_city']?.error}
+          error={props.store['address_city']?.error}
           required={isAddressRequired()}
         >
           <Input
-            value={store['address_city']?.value}
+            value={props.store['address_city']?.value}
             onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-              actions.updateFormValue({ key: 'address_city', value: e.currentTarget.value });
+              props.actions.updateFormValue({ key: 'address_city', value: e.currentTarget.value });
             }}
             onBlur={(e) =>
               trackFieldInteraction('address_city', Boolean(e.currentTarget.value), true)
@@ -205,13 +145,16 @@ export const PatientForm = (props: {
           <div class="flex-grow min-w-[40%]">
             <InputGroup
               label="State"
-              error={store['address_state']?.error}
+              error={props.store['address_state']?.error}
               required={isAddressRequired()}
             >
               <StateSelect
-                value={store['address_state']?.value}
+                value={props.store['address_state']?.value}
                 onChange={(e) => {
-                  actions.updateFormValue({ key: 'address_state', value: e.currentTarget.value });
+                  props.actions.updateFormValue({
+                    key: 'address_state',
+                    value: e.currentTarget.value
+                  });
                 }}
                 onBlur={(e) =>
                   trackFieldInteraction('address_state', Boolean(e.currentTarget.value), true)
@@ -222,13 +165,16 @@ export const PatientForm = (props: {
           <div class="flex-grow min-w-[40%]">
             <InputGroup
               label="Zip code"
-              error={store['address_zip']?.error}
+              error={props.store['address_zip']?.error}
               required={isAddressRequired()}
             >
               <Input
-                value={store['address_zip']?.value}
+                value={props.store['address_zip']?.value}
                 onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-                  actions.updateFormValue({ key: 'address_zip', value: e.currentTarget.value });
+                  props.actions.updateFormValue({
+                    key: 'address_zip',
+                    value: e.currentTarget.value
+                  });
                 }}
                 onBlur={(e) =>
                   trackFieldInteraction('address_zip', Boolean(e.currentTarget.value), true)
@@ -258,11 +204,11 @@ export const PatientForm = (props: {
                   Patient info
                 </p>
                 <div class="flex flex-col">
-                  <InputGroup label="First name" error={store['firstName']?.error} required>
+                  <InputGroup label="First name" error={props.store['firstName']?.error} required>
                     <Input
-                      value={store['firstName']?.value}
+                      value={props.store['firstName']?.value}
                       onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-                        actions.updateFormValue({
+                        props.actions.updateFormValue({
                           key: 'firstName',
                           value: e.currentTarget.value
                         });
@@ -273,11 +219,11 @@ export const PatientForm = (props: {
                     />
                   </InputGroup>
 
-                  <InputGroup label="Last name" error={store['lastName']?.error} required>
+                  <InputGroup label="Last name" error={props.store['lastName']?.error} required>
                     <Input
-                      value={store['lastName']?.value}
+                      value={props.store['lastName']?.value}
                       onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-                        actions.updateFormValue({
+                        props.actions.updateFormValue({
                           key: 'lastName',
                           value: e.currentTarget.value
                         });
@@ -288,11 +234,15 @@ export const PatientForm = (props: {
                     />
                   </InputGroup>
 
-                  <InputGroup label="Date of birth" error={store['dateOfBirth']?.error} required>
+                  <InputGroup
+                    label="Date of birth"
+                    error={props.store['dateOfBirth']?.error}
+                    required
+                  >
                     <DateInput
-                      value={store['dateOfBirth']?.value}
+                      value={props.store['dateOfBirth']?.value}
                       onDateChange={(value) => {
-                        actions.updateFormValue({ key: 'dateOfBirth', value });
+                        props.actions.updateFormValue({ key: 'dateOfBirth', value });
                       }}
                       onBlur={(e) =>
                         trackFieldInteraction('dateOfBirth', Boolean(e.currentTarget.value))
@@ -300,23 +250,25 @@ export const PatientForm = (props: {
                     />
                   </InputGroup>
 
-                  <InputGroup label="Mobile number" error={store['phone']?.error} required>
+                  <InputGroup label="Mobile number" error={props.store['phone']?.error} required>
                     <PhoneInput
-                      value={store['phone']?.value}
+                      value={props.store['phone']?.value}
                       onPhoneChange={(value) => {
-                        actions.updateFormValue({ key: 'phone', value });
+                        props.actions.updateFormValue({ key: 'phone', value });
                       }}
                       onBlur={(e) => trackFieldInteraction('phone', Boolean(e.currentTarget.value))}
                     />
                   </InputGroup>
 
-                  <InputGroup label="Sex at birth" error={store['sex']?.error} required>
+                  <InputGroup label="Sex at birth" error={props.store['sex']?.error} required>
                     <SexSelect
-                      value={store['sex']?.value}
+                      value={props.store['sex']?.value}
                       onChange={(e) =>
-                        actions.updateFormValue({ key: 'sex', value: e.currentTarget.value })
+                        props.actions.updateFormValue({ key: 'sex', value: e.currentTarget.value })
                       }
-                      onBlur={() => trackFieldInteraction('sex', Boolean(store['sex']?.value))}
+                      onBlur={() =>
+                        trackFieldInteraction('sex', Boolean(props.store['sex']?.value))
+                      }
                     />
                   </InputGroup>
                 </div>
@@ -345,24 +297,30 @@ export const PatientForm = (props: {
                   <Show when={props.optionalPatientAddress}>
                     <AddressFields />
                   </Show>
-                  <InputGroup label="Gender" error={store['gender']?.error}>
+                  <InputGroup label="Gender" error={props.store['gender']?.error}>
                     <GenderSelect
-                      value={store['gender']?.value}
+                      value={props.store['gender']?.value}
                       onChange={(e) =>
-                        actions.updateFormValue({ key: 'gender', value: e.currentTarget.value })
+                        props.actions.updateFormValue({
+                          key: 'gender',
+                          value: e.currentTarget.value
+                        })
                       }
                       onBlur={() =>
-                        trackFieldInteraction('gender', Boolean(store['gender']?.value), true)
+                        trackFieldInteraction('gender', Boolean(props.store['gender']?.value), true)
                       }
                     />
                   </InputGroup>
 
-                  <InputGroup label="Email" error={store['email']?.error}>
+                  <InputGroup label="Email" error={props.store['email']?.error}>
                     <Input
                       type="email"
-                      value={store['email']?.value}
+                      value={props.store['email']?.value}
                       onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-                        actions.updateFormValue({ key: 'email', value: e.currentTarget.value });
+                        props.actions.updateFormValue({
+                          key: 'email',
+                          value: e.currentTarget.value
+                        });
                       }}
                       onBlur={(e) =>
                         trackFieldInteraction('email', Boolean(e.currentTarget.value), true)
@@ -373,16 +331,18 @@ export const PatientForm = (props: {
                   <p class="font-sans text-sm m-0 mt-6">Preferred pharmacy</p>
                   <PharmacySearch
                     address={
-                      isZip(store['address_zip']?.value) ? store['address_zip']?.value : undefined
+                      isZip(props.store['address_zip']?.value)
+                        ? props.store['address_zip']?.value
+                        : undefined
                     }
                     setPharmacy={(pharmacy: any) => {
-                      actions.updateFormValue({
+                      props.actions.updateFormValue({
                         key: 'preferredPharmacy',
                         value: pharmacy.id
                       });
                     }}
                     patientId={props.patientId}
-                    initialValue={initialPreferredPharmacy()}
+                    initialValue={props.initialPreferredPharmacy}
                     hidePreferred
                   />
                 </div>

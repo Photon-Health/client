@@ -1,18 +1,21 @@
 import { customElement } from 'solid-element';
-import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { Portal } from 'solid-js/web';
 import {
   buildFieldSnapshot,
   Button,
   dispatchAnalyticsTrackEvent,
   PATIENT_FORM_FIELDS,
+  PharmacyOption,
   usePhoton
 } from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import { PatientStore } from '../stores/patient';
+import { createFormStore } from '../stores/form';
 import gql from 'graphql-tag';
 import { PatientForm } from './PatientForm';
+import { Patient } from '@photonhealth/sdk/dist/types';
 
 type PatientDialogProps = {
   patientId: string;
@@ -27,17 +30,31 @@ const PATIENT_FIELDS = gql`
   }
 `;
 
+const patientToFormValues = (patient: Patient | undefined) => ({
+  firstName: patient?.name.first,
+  lastName: patient?.name.last,
+  dateOfBirth: patient?.dateOfBirth,
+  sex: patient?.sex,
+  gender: patient?.gender,
+  phone: patient?.phone,
+  email: patient?.email,
+  address_street1: patient?.address?.street1,
+  address_street2: patient?.address?.street2,
+  address_city: patient?.address?.city,
+  address_state: patient?.address?.state,
+  address_zip: patient?.address?.postalCode,
+  preferredPharmacy: patient?.preferredPharmacies?.[0]?.id
+});
+
 const Component = (props: PatientDialogProps) => {
   let ref: any;
   const client = usePhoton();
   const [loading, setLoading] = createSignal(false);
   const [isCreatePrescription, setIsCreatePrescription] = createSignal<boolean>(false);
-  const [formStore, setFormStore] = createSignal<any>(undefined);
-  const [actions, setActions] = createSignal<any>(undefined);
   const [globalError, setGlobalError] = createSignal<string | undefined>(undefined);
-  const [hasAnyAddressField, setHasAnyAddressField] = createSignal<boolean>(false);
   const [hasPatients, setHasPatients] = createSignal<boolean>(false);
   const { store: pStore, actions: pActions } = PatientStore;
+  const { store, actions } = createFormStore();
 
   onMount(async () => {
     if (props.patientId) {
@@ -59,9 +76,43 @@ const Component = (props: PatientDialogProps) => {
 
   onCleanup(() => {
     // Component is used as the full page for /patients/update route
-    // so need to clear PatientStore when user navigates away
+    // so need to clear PatientStore singleton when user navigates away
     pActions.clearSelectedPatient();
   });
+
+  createEffect(() => {
+    const values = patientToFormValues(pStore.selectedPatient.data);
+    for (const [key, value] of Object.entries(values)) {
+      actions.updateFormValue({ key, value });
+    }
+  });
+
+  const hasAnyAddressField = createMemo(
+    () =>
+      !!(
+        store['address_street1']?.value ||
+        store['address_street2']?.value ||
+        store['address_city']?.value ||
+        store['address_state']?.value ||
+        store['address_zip']?.value
+      )
+  );
+
+  const initialPreferredPharmacy = createMemo(() => {
+    const pref = pStore.selectedPatient.data?.preferredPharmacies?.[0];
+    if (!pref) return;
+    return {
+      ...pref,
+      address: pref.address as PharmacyOption['address'],
+      isPrevious: true,
+      isPreferred: true
+    };
+  });
+
+  const resetStores = () => {
+    actions.reset();
+    pActions.reset();
+  };
 
   const dispatchUpdate = (patientId: string, didClickCreatePatientAndPrescription = false) => {
     const event = new CustomEvent('photon-patient-updated', {
@@ -108,12 +159,7 @@ const Component = (props: PatientDialogProps) => {
     }
   });
 
-  const submitForm = async (
-    store: any,
-    actions: any,
-    pStore: any,
-    didClickCreatePatientAndPrescription = false
-  ) => {
+  const submitForm = async (didClickCreatePatientAndPrescription = false) => {
     setGlobalError(undefined);
     setIsCreatePrescription(didClickCreatePatientAndPrescription);
     setLoading(true);
@@ -225,7 +271,7 @@ const Component = (props: PatientDialogProps) => {
         );
       }
       setLoading(false);
-      actions.resetStores();
+      resetStores();
       props.open = false;
     } catch (e: any) {
       setLoading(false);
@@ -248,7 +294,7 @@ const Component = (props: PatientDialogProps) => {
           <PhotonFormWrapper
             onClosed={() => {
               dispatchClosed();
-              actions().resetStores();
+              resetStores();
               props.open = false;
             }}
             title={props?.patientId ? 'Edit patient' : 'New patient'}
@@ -261,7 +307,7 @@ const Component = (props: PatientDialogProps) => {
                     size="lg"
                     disabled={loading()}
                     loading={loading() && isCreatePrescription()}
-                    onClick={() => submitForm(formStore(), actions(), pStore, true)}
+                    onClick={() => submitForm(true)}
                   >
                     {props?.patientId ? 'Save' : 'Create'} and start prescription
                   </Button>
@@ -273,7 +319,7 @@ const Component = (props: PatientDialogProps) => {
                     variant={props?.hideCreatePrescription ? 'primary' : 'secondary'}
                     disabled={loading()}
                     loading={loading() && !isCreatePrescription()}
-                    onClick={() => submitForm(formStore(), actions(), pStore, false)}
+                    onClick={() => submitForm(false)}
                   >
                     {props?.patientId ? 'Save' : 'Create'}
                   </Button>
@@ -291,31 +337,12 @@ const Component = (props: PatientDialogProps) => {
                   </div>
                 </Show>
                 <PatientForm
-                  onUpdate={({ form, actions, reset }: any) => {
-                    setFormStore(form);
-                    setActions(
-                      Object.assign({}, actions, {
-                        resetStores: () => {
-                          reset();
-                          pActions.reset();
-                        }
-                      })
-                    );
-                    // Check if any address field has a value
-                    setHasAnyAddressField(
-                      !!(
-                        form['address_street1']?.value ||
-                        form['address_street2']?.value ||
-                        form['address_city']?.value ||
-                        form['address_state']?.value ||
-                        form['address_zip']?.value
-                      )
-                    );
-                  }}
+                  store={store}
+                  actions={actions}
                   patientId={props.patientId}
                   optionalPatientAddress={props.optionalPatientAddress}
-                  initialPatient={pStore.selectedPatient.data}
                   initialPatientLoading={props.patientId ? !pStore.selectedPatient.data : false}
+                  initialPreferredPharmacy={initialPreferredPharmacy()}
                 />
               </>
             }
