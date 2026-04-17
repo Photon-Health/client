@@ -20,6 +20,7 @@ export default defineConfig({
     },
     target: 'esnext',
     sourcemap: true,
+    minify: false,
     rollupOptions: {
       external: ['solid-js']
     }
