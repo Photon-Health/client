@@ -1,13 +1,13 @@
 import {
+  createContext,
+  createEffect,
+  createMemo,
+  createSignal,
+  JSX,
   onMount,
   Show,
-  JSX,
-  useContext,
-  createContext,
-  createMemo,
-  createEffect,
   splitProps,
-  createSignal
+  useContext
 } from 'solid-js';
 import Icon from '../Icon';
 import clickOutside from '../../utils/clickOutside';
@@ -94,7 +94,11 @@ export function ComboBox<T extends ComboBoxValueBase>(props: ComboBoxProps<T>) {
 
   createEffect(() => {
     // update internal selected state when the passed value changes
-    setState('selected', props.value);
+    // we have to deep clone the value via JSON util because it can be a complex object Solidjs Store Proxy
+    // (i.e. PatientSelect passes in a Patient from a Solidjs Store)
+    // and the ComboBox's createStore() store above is now allowed to contain another Solidjs Store object
+    // without throwing "proxy must report the same value for the non-writable, non-configurable property 'Symbol("store-node")'" error
+    setState('selected', props.value ? JSON.parse(JSON.stringify(props.value)) : props.value);
   });
 
   return (
