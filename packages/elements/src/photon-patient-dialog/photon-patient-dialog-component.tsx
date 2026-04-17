@@ -1,5 +1,13 @@
 import { customElement } from 'solid-element';
-import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  onCleanup,
+  onMount,
+  Show,
+  untrack
+} from 'solid-js';
 import { Portal } from 'solid-js/web';
 import {
   buildFieldSnapshot,
@@ -57,12 +65,6 @@ const Component = (props: PatientDialogProps) => {
   const { store, actions } = createFormStore();
 
   onMount(async () => {
-    if (props.patientId) {
-      pActions.getSelectedPatient(client!.getSDK(), props.patientId);
-    } else {
-      pActions.clearSelectedPatient();
-    }
-
     try {
       const { data } = await client.sdk.clinical.patient.getPatients({
         fragment: { PatientFields: PATIENT_FIELDS }
@@ -81,7 +83,25 @@ const Component = (props: PatientDialogProps) => {
   });
 
   createEffect(() => {
-    const values = patientToFormValues(pStore.selectedPatient.data);
+    const patientId = props.patientId;
+    // Need this untrack to prevent endless rerender on /patients/update route
+    // - Effect calls getSelectedPatient
+    // - getSelectedPatient reads store.selectedPatient > adds store.selectedPatient
+    //   to the tracking scope
+    // - getSelectedPatient updates store.selectedPatient > store.selectedPatient is
+    //   tracked by the effect > effect runs again > loop
+    // untrack prevents store.selectedPatient from being added to the tracking scope
+    untrack(() => {
+      if (patientId) {
+        pActions.getSelectedPatient(client!.getSDK(), patientId);
+      } else {
+        pActions.clearSelectedPatient();
+      }
+    });
+  });
+
+  createEffect(() => {
+    const values = patientToFormValues(props.patientId ? pStore.selectedPatient.data : undefined);
     for (const [key, value] of Object.entries(values)) {
       actions.updateFormValue({ key, value });
     }
@@ -108,11 +128,6 @@ const Component = (props: PatientDialogProps) => {
       isPreferred: true
     };
   });
-
-  const resetStores = () => {
-    actions.reset();
-    pActions.reset();
-  };
 
   const dispatchUpdate = (patientId: string, didClickCreatePatientAndPrescription = false) => {
     const event = new CustomEvent('photon-patient-updated', {
@@ -271,7 +286,7 @@ const Component = (props: PatientDialogProps) => {
         );
       }
       setLoading(false);
-      resetStores();
+      actions.reset();
       props.open = false;
     } catch (e: any) {
       setLoading(false);
@@ -294,7 +309,6 @@ const Component = (props: PatientDialogProps) => {
           <PhotonFormWrapper
             onClosed={() => {
               dispatchClosed();
-              resetStores();
               props.open = false;
             }}
             title={props?.patientId ? 'Edit patient' : 'New patient'}
