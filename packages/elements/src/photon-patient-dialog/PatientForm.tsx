@@ -188,7 +188,7 @@ export const PatientForm = (props: {
   };
 
   return (
-    <div class="w-full h-full relative" ref={ref}>
+    <div class="photon-patient-form w-full h-full relative" ref={ref}>
       <Show when={props.initialPatientLoading}>
         <div class="w-full flex justify-center">
           <Spinner color="green" />
