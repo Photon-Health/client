@@ -19,6 +19,7 @@ export default defineConfig({
       fileName: 'index'
     },
     target: 'esnext',
+    sourcemap: true,
     rollupOptions: {
       external: ['solid-js']
     }
