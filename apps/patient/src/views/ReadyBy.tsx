@@ -18,7 +18,6 @@ import {
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
-import { datadogRum } from '@datadog/browser-rum';
 import timezone from 'dayjs/plugin/timezone';
 import queryString from 'query-string';
 import { convertReadyByToUTCTimestamp } from '../utils/general';
@@ -82,17 +81,6 @@ export const ReadyBy = () => {
     }
 
     const readyByTime = convertReadyByToUTCTimestamp(selectedTime, selectedDay);
-
-    // Track selection
-    datadogRum.addAction('ready_by_selection', {
-      readyBy: selectedTime,
-      readyByDay: selectedDay,
-      readyByTime: readyByTime,
-      orderId: order.id,
-      organization: order.organization.name,
-      timestamp: new Date().toISOString(),
-      timezone: dayjs.tz.guess()
-    });
 
     setSubmitting(true);
 

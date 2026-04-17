@@ -7,12 +7,6 @@ vi.mock('react-ga4', () => ({
   event: vi.fn()
 }));
 
-vi.mock('@datadog/browser-rum', () => ({
-  datadogRum: {
-    addAction: vi.fn()
-  }
-}));
-
 const getFlagValueImpl = async <K extends FlagKeys>(flagName: K, fallback?: FlagValues[K]) =>
   fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
 
@@ -53,7 +47,7 @@ if (typeof window !== 'undefined' && !('IntersectionObserver' in window)) {
   // @ts-ignore
   window.IntersectionObserver = IntersectionObserver;
   // @ts-ignore
-  // eslint-disable-next-line no-undef
+
   global.IntersectionObserver = IntersectionObserver;
 }
 

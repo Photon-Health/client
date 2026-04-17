@@ -3,8 +3,6 @@ version: 0.2
 env:
   secrets-manager:
     VITE_ENV_NAME: patient_build_vars:VITE_ENV_NAME
-    VITE_DATADOG_RUM_APPLICATION_ID: patient_build_vars:VITE_DATADOG_RUM_APPLICATION_ID
-    VITE_DATADOG_RUM_CLIENT_TOKEN: patient_build_vars:VITE_DATADOG_RUM_CLIENT_TOKEN
     VITE_RUDDERSTACK_WRITE_KEY: patient_build_vars:VITE_RUDDERSTACK_WRITE_KEY
     VITE_RUDDERSTACK_DATA_PLANE_URL: patient_build_vars:VITE_RUDDERSTACK_DATA_PLANE_URL
     VITE_MIXPANEL_TOKEN: patient_build_vars:VITE_MIXPANEL_TOKEN
@@ -78,19 +76,6 @@ phases:
             https://api.github.com/repos/Photon-Health/client/actions/workflows/pr-e2e-tests.yml/dispatches \
             -d "{\"ref\":\"$CODEBUILD_WEBHOOK_HEAD_REF\",\"inputs\":{\"output_dir\":\"$OUTPUT_DIR\",\"sha\":\"$CODEBUILD_RESOLVED_SOURCE_VERSION\",\"app\":\"patient\"}}"
         fi
-      - echo Installing Datadog CI
-      - npm install -g @datadog/datadog-ci
-      - echo Uploading source maps to Datadog
-      - |
-        export DATADOG_API_KEY=$(aws secretsmanager get-secret-value --secret-id $DATADOG_SOURCE_MAPS_API_KEY --query 'SecretString' --output text)
-        SERVICE_NAME=$(node -p "require('./apps/patient/package.json').name")
-        PACKAGE_VERSION=$(git rev-parse HEAD)
-        ENVIRONMENT=$OUTPUT_DIR
-        npx datadog-ci sourcemaps upload dist/apps/patient \
-          --service=$SERVICE_NAME \
-          --release-version=$PACKAGE_VERSION \
-          --minified-path-prefix=https://orders.${ENVIRONMENT}.health
-
 artifacts:
   files:
     - '**/*'

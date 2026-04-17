@@ -40,7 +40,6 @@ import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { demoMailOrderPharmacies, demoPharmacies } from '../data/demoPharmacies';
 import { demoOffers } from '../data/demoOffers';
 import { isGLP } from '../utils/isGLP';
-import { datadogRum } from '@datadog/browser-rum';
 import {
   FulfillmentType,
   GetPharmaciesByLocationQuery,
@@ -680,18 +679,6 @@ export const Pharmacy = () => {
         value: index + 1
       });
 
-      // Only track price selection if price is enabled and the pharmacy has a price
-      const selectedPrice = pharmacies[index].price;
-      if (enablePrice && selectedPrice) {
-        datadogRum.addAction('price_selection', {
-          orderId: order.id,
-          organization: order.organization.name,
-          pharmacyId: selectedPharmacyId,
-          timestamp: new Date().toISOString(),
-          price: selectedPrice
-        });
-      }
-
       if (shouldTrackOfferImpressionsAndSelections) {
         patientAnalytics.track('Offer Clicked', order, {
           clickedPharmacy: pharmacies[index],
@@ -963,57 +950,6 @@ export const Pharmacy = () => {
       extraOfferMetadata.price = brandedOptionsOverride?.amazonPharmacyOverride?.costAmount;
       extraOfferMetadata.retailPrice = brandedOptionsOverride?.amazonPharmacyOverride?.retailAmount;
       extraOfferMetadata.priceType = priceType;
-
-      const slugifiedOverride = brandedOptionsOverride?.amazonPharmacyOverride.deliveryEstimate
-        ?.toLowerCase()
-        .trim()
-        .replace(/\s+/g, '_')
-        .replace(/[^a-z0-9_]/g, '')
-        .replace(/_+/g, '_')
-        .replace(/^_+|_+$/g, '');
-      if (selectedId === import.meta.env.VITE_AMAZON_PHARMACY_ID) {
-        datadogRum.addAction('amazon_pharmacy_offer_active_and_selected', {
-          orderId: order.id,
-          organizationId: order.organization.id,
-          description: slugifiedOverride,
-          treatmentId: flattenedFills[0]?.treatment?.id,
-          timestamp: new Date().toISOString(),
-          sawPrice,
-          costAmount: brandedOptionsOverride?.amazonPharmacyOverride?.costAmount,
-          retailAmount: brandedOptionsOverride?.amazonPharmacyOverride?.retailAmount,
-          priceType,
-          offers
-        });
-      } else {
-        datadogRum.addAction('amazon_pharmacy_offer_active_and_not_selected', {
-          orderId: order.id,
-          organizationId: order.organization.id,
-          description: slugifiedOverride,
-          treatmentId: flattenedFills[0]?.treatment?.id,
-          timestamp: new Date().toISOString(),
-          sawPrice,
-          costAmount: brandedOptionsOverride?.amazonPharmacyOverride?.costAmount,
-          retailAmount: brandedOptionsOverride?.amazonPharmacyOverride?.retailAmount,
-          priceType,
-          offers
-        });
-      }
-    }
-
-    if (brandedOptionsOverride?.novocareExperimentOverride) {
-      if (selectedId === import.meta.env.VITE_NOVOCARE_PHARMACY_ID) {
-        datadogRum.addAction('novocare_experiment_offer_active_and_selected', {
-          orderId: order.id,
-          organizationId: order.organization.id,
-          timestamp: new Date().toISOString()
-        });
-      } else {
-        datadogRum.addAction('novocare_experiment_offer_active_and_not_selected', {
-          orderId: order.id,
-          organizationId: order.organization.id,
-          timestamp: new Date().toISOString()
-        });
-      }
     }
 
     if (shouldTrackOfferImpressionsAndSelections) {

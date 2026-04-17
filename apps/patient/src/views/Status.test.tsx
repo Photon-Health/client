@@ -29,7 +29,6 @@ vi.mock('../api', () => ({
   AUTH_HEADER_ERRORS: []
 }));
 
-vi.mock('@datadog/browser-rum');
 vi.mock('react-ga4');
 vi.mock('mixpanel-browser');
 
