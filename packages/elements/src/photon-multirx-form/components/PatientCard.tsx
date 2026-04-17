@@ -2,6 +2,7 @@ import { any, record, string } from 'superstruct';
 import { createEffect, createMemo, createSignal, onMount, Show } from 'solid-js';
 import {
   AddressForm,
+  Button,
   Card,
   PatientInfo,
   PatientMedHistory,
@@ -70,6 +71,8 @@ export const PatientCard = (props: {
   const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
   const { actions, store } = PatientStore;
   const [isUpdating, setIsUpdating] = createSignal(false);
+  const [showAddNewPatientDialog, setShowAddNewPatientDialog] = createSignal(false);
+  const [pendingCreatedPatientId, setPendingCreatedPatientId] = createSignal('');
 
   onMount(() => {
     props.actions.registerValidator({
@@ -119,6 +122,14 @@ export const PatientCard = (props: {
     }
   });
 
+  createEffect(() => {
+    const pendingId = pendingCreatedPatientId();
+    if (pendingId && store.selectedPatient.data?.id === pendingId) {
+      updatePatient(store.selectedPatient.data, { trackInteraction: false });
+      setPendingCreatedPatientId('');
+    }
+  });
+
   const currentPatientId = createMemo(
     // prefer the passed-in patientId if it exists
     () => props?.patientId || (props.store.patient?.value?.id as string)
@@ -154,24 +165,45 @@ export const PatientCard = (props: {
   return (
     <div class="flex flex-col gap-8">
       <Show when={!props?.patientId}>
-        <Card addChildrenDivider={true}>
-          <div class="flex items-center justify-between">
-            <Text color="gray">{props?.patientId ? 'Patient' : 'Select Patient'}</Text>
-          </div>
-          <PatientSelect
-            selectedPatient={store.selectedPatient.data}
-            patients={store.patients.data}
-            loading={store.patients.isLoading || store.selectedPatient.isLoading}
-            onInitialFetch={() => actions.getPatients(props.client!.getSDK())}
-            onSearch={(name) =>
-              actions.getPatients(props.client!.getSDK(), name ? { name } : undefined)
-            }
-            onSelect={(patient: Patient) => {
-              actions.getSelectedPatient(props.client!.getSDK(), patient.id);
-              updatePatient(patient);
+        <div>
+          <Card addChildrenDivider={true}>
+            <div class="flex items-center justify-between">
+              <Text color="gray">{props?.patientId ? 'Patient' : 'Select Patient'}</Text>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowAddNewPatientDialog(true)}
+              >
+                + Add Patient
+              </Button>
+            </div>
+            <PatientSelect
+              selectedPatient={store.selectedPatient.data}
+              patients={store.patients.data}
+              loading={store.patients.isLoading || store.selectedPatient.isLoading}
+              onInitialFetch={() => actions.getPatients(props.client!.getSDK())}
+              onSearch={(name) =>
+                actions.getPatients(props.client!.getSDK(), name ? { name } : undefined)
+              }
+              onSelect={(patient: Patient) => {
+                actions.getSelectedPatient(props.client!.getSDK(), patient.id);
+                updatePatient(patient);
+              }}
+            />
+          </Card>
+          <photon-patient-dialog
+            hide-create-prescription={true}
+            open={showAddNewPatientDialog()}
+            on:photon-patient-created={(e: any) => {
+              const newPatientId = e.detail.patientId;
+              setPendingCreatedPatientId(newPatientId);
+              actions.getSelectedPatient(props.client!.getSDK(), newPatientId);
+              setShowAddNewPatientDialog(false);
             }}
+            on:photon-patient-closed={() => setShowAddNewPatientDialog(false)}
+            optional-patient-address={props.optionalPatientAddress}
           />
-        </Card>
+        </div>
       </Show>
       <Show when={patientId() && !props.hidePatientCard}>
         <div>
