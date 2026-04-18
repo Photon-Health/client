@@ -34,10 +34,10 @@ import {
 import { format } from 'date-fns';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createSignal, onMount, Show } from 'solid-js';
-import clearForm from '../util/clearForm';
-import repopulateForm from '../util/repopulateForm';
-import { DisableList } from './PrescribeWorkflow';
-import { afterDate, message } from '../../validators';
+import clearForm from './util/clearForm';
+import repopulateForm from './util/repopulateForm';
+import { DisableList } from '../PrescribeWorkflow';
+import { afterDate, message } from '../../../validators';
 
 const validators = {
   treatment: message(record(string(), any()), 'Please select a treatment'),
@@ -63,7 +63,6 @@ export const AddPrescriptionCard = (props: {
   weightUnit?: string;
   prefillNotes?: string;
   screenDraftedPrescriptions: () => void;
-  draftedPrescriptionChanged: () => void;
   screeningAlerts: ScreeningAlertType[];
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
@@ -211,12 +210,12 @@ export const AddPrescriptionCard = (props: {
               });
             }
 
-            props.draftedPrescriptionChanged();
+            props.screenDraftedPrescriptions();
           }}
           on:photon-treatment-unselected={() => {
             clearForm(props.actions, { notes: props.prefillNotes });
 
-            props.draftedPrescriptionChanged();
+            props.screenDraftedPrescriptions();
           }}
           on:photon-search-text-changed={(e: any) => setSearchText(e.detail.text)}
         />

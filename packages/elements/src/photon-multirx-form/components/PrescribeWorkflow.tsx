@@ -2,13 +2,11 @@ import { gql } from 'graphql-tag';
 import { PhotonAuthorized } from '../../photon-authorized';
 import type { FormError } from '../../stores/form';
 import { checkHasPermission } from '../../utils';
-import { AddPrescriptionCard } from './AddPrescriptionCard';
-import { DraftPrescriptionCard } from './DraftPrescriptionCard';
 import { OrderCard } from './OrderCard';
 import { PatientCard } from './PatientCard';
 import { PharmacyCard } from './PharmacyCard';
-import clearForm from '../util/clearForm';
-import { formatPatientWeight } from '../util/formatPatientWeight';
+import clearForm from './PrescriptionCard/util/clearForm';
+import { formatPatientWeight } from './PrescriptionCard/util/formatPatientWeight';
 import {
   AddressForm,
   Alert,
@@ -31,6 +29,7 @@ import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
 import { SupervisorCard } from './SupervisorCard';
+import { PrescriptionCard } from './PrescriptionCard/PrescriptionCard';
 
 const hasUsableAddress = (address?: {
   street1?: string;
@@ -100,10 +99,6 @@ export type PrescribeProps = {
   allowOffCatalogSearch?: boolean;
   disableList?: DisableList;
   groupId?: string;
-  /**
-   * This logic keeps the rx form closed when refilling a particular template/prescription
-   */
-  initialShowForm: boolean;
 };
 
 export const ScreenDraftedPrescriptionsQuery = gql`
@@ -134,7 +129,6 @@ const calculateNeedsSupervisor = ({ title, state }: { title?: string; state?: st
 
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
-  let prescriptionFormRef: HTMLDivElement | undefined;
 
   const { draftPrescriptions, prescriptionIds, tryUpdatePrescriptionStates, isLoadingPrefills } =
     useDraftPrescriptions();
@@ -152,7 +146,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const [needsSupervisor, setNeedsSupervisor] = createSignal<boolean>(false);
 
   const client = usePhoton();
-  const [showForm, setShowForm] = createSignal<boolean>(props.initialShowForm);
   const [errors, setErrors] = createSignal<FormError[]>([]);
   const [isLoading, setIsLoading] = createSignal<boolean>(true);
   const [authenticated, setAuthenticated] = createSignal<boolean>(
@@ -654,45 +647,20 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 <Show when={props.enableCombineAndDuplicate}>
                   <RecentOrders.Card />
                 </Show>
-                <DraftPrescriptionCard
-                  prescriptionFormRef={prescriptionFormRef}
+                <PrescriptionCard
+                  hideAddToTemplates={props.hideTemplates}
                   actions={props.formActions}
                   store={props.formStore}
-                  setShowForm={() => setShowForm(true)}
-                  handleDraftPrescriptionsChange={screenDraftedPrescriptions}
+                  weight={props.weight}
+                  weightUnit={props.weightUnit}
+                  prefillNotes={prefillNotes}
+                  screenDraftedPrescriptions={screenDraftedPrescriptions}
                   screeningAlerts={screeningAlerts()}
-                  routingConstraints={pharmacySelectionContext.routingConstraints()}
                   enableOrder={props.enableOrder}
+                  catalogId={props.catalogId}
+                  allowOffCatalogSearch={props.allowOffCatalogSearch}
+                  disableList={props.disableList}
                 />
-                <Show when={!showForm()}>
-                  <Button
-                    variant="secondary"
-                    class="w-full xs:w-fit mt-5"
-                    size="lg"
-                    onClick={() => setShowForm(true)}
-                  >
-                    + Add another
-                  </Button>
-                </Show>
-                <Show when={showForm()}>
-                  <div ref={prescriptionFormRef}>
-                    <AddPrescriptionCard
-                      hideAddToTemplates={props.hideTemplates}
-                      actions={props.formActions}
-                      store={props.formStore}
-                      weight={props.weight}
-                      weightUnit={props.weightUnit}
-                      prefillNotes={prefillNotes}
-                      screenDraftedPrescriptions={screenDraftedPrescriptions}
-                      draftedPrescriptionChanged={screenDraftedPrescriptions}
-                      screeningAlerts={screeningAlerts()}
-                      catalogId={props.catalogId}
-                      allowOffCatalogSearch={props.allowOffCatalogSearch}
-                      disableList={props.disableList}
-                      hideForm={() => setShowForm(false)}
-                    />
-                  </div>
-                </Show>
                 <Show when={props.enableOrder && needsSupervisor()}>
                   <SupervisorCard actions={props.formActions} store={props.formStore} />
                 </Show>

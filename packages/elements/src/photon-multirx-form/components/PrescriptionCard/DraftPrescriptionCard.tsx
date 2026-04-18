@@ -11,8 +11,8 @@ import {
   usePrescribe,
   usePrescribeEventDispatch
 } from '@photonhealth/components';
-import repopulateForm from '../util/repopulateForm';
-import { PhotonTooltip } from '../../photon-tooltip';
+import repopulateForm from './util/repopulateForm';
+import { PhotonTooltip } from '../../../photon-tooltip';
 
 export const DraftPrescriptionCard = (props: {
   prescriptionFormRef: HTMLDivElement | undefined;
