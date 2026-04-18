@@ -1,18 +1,15 @@
 import { createSignal } from 'solid-js';
 import {
-  Card,
   CoverageOption,
   DraftPrescriptionList,
   PrescriptionFormData,
   RoutingConstraint,
   ScreeningAlertType,
-  Text,
   useDraftPrescriptions,
   usePrescribe,
   usePrescribeEventDispatch
 } from '@photonhealth/components';
 import repopulateForm from './util/repopulateForm';
-import { PhotonTooltip } from '../../../photon-tooltip';
 
 export const DraftPrescriptionCard = (props: {
   prescriptionFormRef: HTMLDivElement | undefined;
@@ -118,33 +115,20 @@ export const DraftPrescriptionCard = (props: {
   };
 
   return (
-    <div>
-      <Card addChildrenDivider={true}>
-        <div class="flex items-center space-x-2 text-slate-500">
-          <Text color="gray" class="pr-2">
-            Draft Prescriptions
-          </Text>
-          <PhotonTooltip
-            maxWidth="300px"
-            tip="Each prescription will include the prescriber's digital signature and the date it was written when the order is sent to the pharmacy."
-          />
-        </div>
-        <div>
-          <DraftPrescriptionList
-            handleDelete={(draftId: string) => {
-              setDeleteDialogOpen(true);
-              setDeleteDraftId(draftId);
-            }}
-            handleEdit={(draft) => {
-              checkEditPrescription(draft);
-            }}
-            handleSwapToOtherPrescription={handleSwapToOtherPrescription}
-            screeningAlerts={props.screeningAlerts}
-            routingConstraints={props.routingConstraints}
-            enableOrder={props.enableOrder}
-          />
-        </div>
-      </Card>
+    <>
+      <DraftPrescriptionList
+        handleDelete={(draftId: string) => {
+          setDeleteDialogOpen(true);
+          setDeleteDraftId(draftId);
+        }}
+        handleEdit={(draft) => {
+          checkEditPrescription(draft);
+        }}
+        handleSwapToOtherPrescription={handleSwapToOtherPrescription}
+        screeningAlerts={props.screeningAlerts}
+        routingConstraints={props.routingConstraints}
+        enableOrder={props.enableOrder}
+      />
       <photon-dialog
         open={editDialogOpen()}
         label="Overwrite in progress prescription?"
@@ -173,7 +157,7 @@ export const DraftPrescriptionCard = (props: {
           cannot be undone.
         </p>
       </photon-dialog>
-    </div>
+    </>
   );
 };
 

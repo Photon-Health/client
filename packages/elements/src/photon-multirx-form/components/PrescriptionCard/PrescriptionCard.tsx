@@ -2,12 +2,14 @@ import {
   Button,
   Card,
   ScreeningAlertType,
+  Text,
   usePharmacySelectionContext
 } from '@photonhealth/components';
 import { DraftPrescriptionCard } from './DraftPrescriptionCard';
 import { createSignal, Show } from 'solid-js';
 import { AddPrescriptionCard } from './AddPrescriptionCard';
 import { DisableList } from '../PrescribeWorkflow';
+import { PhotonTooltip } from '../../../photon-tooltip';
 
 export const PrescriptionCard = (props: {
   actions: Record<string, (...args: any) => any>;
@@ -28,45 +30,56 @@ export const PrescriptionCard = (props: {
   const [showForm, setShowForm] = createSignal<boolean>(false);
 
   return (
-    <Card>
-      <DraftPrescriptionCard
-        prescriptionFormRef={prescriptionFormRef}
-        actions={props.actions}
-        store={props.store}
-        setShowForm={() => setShowForm(true)}
-        handleDraftPrescriptionsChange={props.screenDraftedPrescriptions}
-        screeningAlerts={props.screeningAlerts}
-        routingConstraints={pharmacySelectionContext.routingConstraints()}
-        enableOrder={props.enableOrder}
-      />
-      <Show when={!showForm()}>
-        <Button
-          variant="secondary"
-          class="w-full xs:w-fit mt-5"
-          size="lg"
-          onClick={() => setShowForm(true)}
-        >
-          + Add another
-        </Button>
-      </Show>
-      <Show when={showForm()}>
-        <div ref={prescriptionFormRef}>
-          <AddPrescriptionCard
-            hideAddToTemplates={props.hideAddToTemplates}
-            actions={props.actions}
-            store={props.store}
-            weight={props.weight}
-            weightUnit={props.weightUnit}
-            prefillNotes={props.prefillNotes}
-            screenDraftedPrescriptions={props.screenDraftedPrescriptions}
-            screeningAlerts={props.screeningAlerts}
-            catalogId={props.catalogId}
-            allowOffCatalogSearch={props.allowOffCatalogSearch}
-            disableList={props.disableList}
-            hideForm={() => setShowForm(false)}
-          />
-        </div>
-      </Show>
+    <Card addChildrenDivider={true}>
+      <div class="flex items-center space-x-2 text-slate-500">
+        <Text color="gray" class="pr-2">
+          Prescriptions
+        </Text>
+        <PhotonTooltip
+          maxWidth="300px"
+          tip="Each prescription will include the prescriber's digital signature and the date it was written when the order is sent to the pharmacy."
+        />
+      </div>
+      <div>
+        <DraftPrescriptionCard
+          prescriptionFormRef={prescriptionFormRef}
+          actions={props.actions}
+          store={props.store}
+          setShowForm={() => setShowForm(true)}
+          handleDraftPrescriptionsChange={props.screenDraftedPrescriptions}
+          screeningAlerts={props.screeningAlerts}
+          routingConstraints={pharmacySelectionContext.routingConstraints()}
+          enableOrder={props.enableOrder}
+        />
+        <Show when={!showForm()}>
+          <Button
+            variant="secondary"
+            class="w-full xs:w-fit mt-4"
+            size="lg"
+            onClick={() => setShowForm(true)}
+          >
+            + Add another
+          </Button>
+        </Show>
+        <Show when={showForm()}>
+          <div ref={prescriptionFormRef} class="mt-8">
+            <AddPrescriptionCard
+              hideAddToTemplates={props.hideAddToTemplates}
+              actions={props.actions}
+              store={props.store}
+              weight={props.weight}
+              weightUnit={props.weightUnit}
+              prefillNotes={props.prefillNotes}
+              screenDraftedPrescriptions={props.screenDraftedPrescriptions}
+              screeningAlerts={props.screeningAlerts}
+              catalogId={props.catalogId}
+              allowOffCatalogSearch={props.allowOffCatalogSearch}
+              disableList={props.disableList}
+              hideForm={() => setShowForm(false)}
+            />
+          </div>
+        </Show>
+      </div>
     </Card>
   );
 };
