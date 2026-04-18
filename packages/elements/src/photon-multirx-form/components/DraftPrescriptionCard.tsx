@@ -1,6 +1,5 @@
-import { createSignal, Show } from 'solid-js';
+import { createSignal } from 'solid-js';
 import {
-  Button,
   Card,
   CoverageOption,
   DraftPrescriptionList,
@@ -19,12 +18,11 @@ export const DraftPrescriptionCard = (props: {
   prescriptionFormRef: HTMLDivElement | undefined;
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
-  setIsEditing: () => void;
+  setShowForm: () => void;
   handleDraftPrescriptionsChange: () => void;
   screeningAlerts: ScreeningAlertType[];
   routingConstraints: RoutingConstraint[];
   enableOrder: boolean;
-  onAddAnotherClick?: () => void;
 }) => {
   const { dispatchDraftPrescriptionDeleted, dispatchAnalyticsTrackEvent } =
     usePrescribeEventDispatch();
@@ -34,8 +32,7 @@ export const DraftPrescriptionCard = (props: {
   const [editDraft, setEditDraft] = createSignal<PrescriptionFormData | undefined>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
   const { selectOtherCoverageOption } = usePrescribe();
-  const { draftPrescriptions, prescriptionIds, deletePrescription, isLoadingPrefills } =
-    useDraftPrescriptions();
+  const { draftPrescriptions, prescriptionIds, deletePrescription } = useDraftPrescriptions();
 
   const editPrescription = () => {
     const formData = editDraft();
@@ -64,7 +61,7 @@ export const DraftPrescriptionCard = (props: {
     setEditDraft(draft);
 
     if (!props.store['treatment'].value) {
-      props.setIsEditing();
+      props.setShowForm();
       editPrescription();
       onConfirm?.();
       dispatchDraftPrescriptionDeleted();
@@ -110,7 +107,7 @@ export const DraftPrescriptionCard = (props: {
 
     if (prescriptionIds().length === 0) {
       // reopen form if all drafts are deleted
-      props.setIsEditing();
+      props.setShowForm();
     }
 
     props.handleDraftPrescriptionsChange();
@@ -146,16 +143,6 @@ export const DraftPrescriptionCard = (props: {
             routingConstraints={props.routingConstraints}
             enableOrder={props.enableOrder}
           />
-          <Show when={props.onAddAnotherClick && !isLoadingPrefills()}>
-            <Button
-              variant="secondary"
-              class="w-full xs:w-fit mt-5"
-              size="lg"
-              onClick={props.onAddAnotherClick}
-            >
-              Add another
-            </Button>
-          </Show>
         </div>
       </Card>
       <photon-dialog

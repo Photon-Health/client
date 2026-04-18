@@ -68,6 +68,7 @@ export const AddPrescriptionCard = (props: {
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
   disableList?: DisableList;
+  hideForm: () => void;
 }) => {
   const { tryCreatePrescription } = useDraftPrescriptions();
   const { dispatchOrderError, dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
@@ -137,6 +138,8 @@ export const AddPrescriptionCard = (props: {
     if (!createdPrescription) {
       return;
     }
+
+    props.hideForm();
 
     // todo: move screening up to prescribeContext (for med history Refill button clicks)
     props.screenDraftedPrescriptions();

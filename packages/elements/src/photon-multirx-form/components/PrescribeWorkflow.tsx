@@ -654,6 +654,26 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 <Show when={props.enableCombineAndDuplicate}>
                   <RecentOrders.Card />
                 </Show>
+                <DraftPrescriptionCard
+                  prescriptionFormRef={prescriptionFormRef}
+                  actions={props.formActions}
+                  store={props.formStore}
+                  setShowForm={() => setShowForm(true)}
+                  handleDraftPrescriptionsChange={screenDraftedPrescriptions}
+                  screeningAlerts={screeningAlerts()}
+                  routingConstraints={pharmacySelectionContext.routingConstraints()}
+                  enableOrder={props.enableOrder}
+                />
+                <Show when={!showForm()}>
+                  <Button
+                    variant="secondary"
+                    class="w-full xs:w-fit mt-5"
+                    size="lg"
+                    onClick={() => setShowForm(true)}
+                  >
+                    + Add another
+                  </Button>
+                </Show>
                 <Show when={showForm()}>
                   <div ref={prescriptionFormRef}>
                     <AddPrescriptionCard
@@ -669,22 +689,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
                       disableList={props.disableList}
+                      hideForm={() => setShowForm(false)}
                     />
                   </div>
                 </Show>
-                <DraftPrescriptionCard
-                  prescriptionFormRef={prescriptionFormRef}
-                  actions={props.formActions}
-                  store={props.formStore}
-                  setIsEditing={() => setShowForm(true)}
-                  handleDraftPrescriptionsChange={screenDraftedPrescriptions}
-                  screeningAlerts={screeningAlerts()}
-                  routingConstraints={pharmacySelectionContext.routingConstraints()}
-                  enableOrder={props.enableOrder}
-                  // If rx form is hidden, we need a button to toggle it to visible
-                  // If rx form is visible, we don't need the button
-                  onAddAnotherClick={!showForm() ? () => setShowForm(true) : undefined}
-                />
                 <Show when={props.enableOrder && needsSupervisor()}>
                   <SupervisorCard actions={props.formActions} store={props.formStore} />
                 </Show>
