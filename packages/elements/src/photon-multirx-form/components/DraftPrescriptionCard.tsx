@@ -16,10 +16,10 @@ import repopulateForm from '../util/repopulateForm';
 import { PhotonTooltip } from '../../photon-tooltip';
 
 export const DraftPrescriptionCard = (props: {
-  prescriptionRef: HTMLDivElement | undefined;
+  prescriptionFormRef: HTMLDivElement | undefined;
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
-  setIsEditing: (isEditing: boolean) => void;
+  setIsEditing: () => void;
   handleDraftPrescriptionsChange: () => void;
   screeningAlerts: ScreeningAlertType[];
   routingConstraints: RoutingConstraint[];
@@ -51,7 +51,7 @@ export const DraftPrescriptionCard = (props: {
         deletePrescription(formData.id);
       }
 
-      props.prescriptionRef?.scrollIntoView({
+      props.prescriptionFormRef?.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
@@ -64,7 +64,7 @@ export const DraftPrescriptionCard = (props: {
     setEditDraft(draft);
 
     if (!props.store['treatment'].value) {
-      props.setIsEditing(true);
+      props.setIsEditing();
       editPrescription();
       onConfirm?.();
       dispatchDraftPrescriptionDeleted();
@@ -110,7 +110,7 @@ export const DraftPrescriptionCard = (props: {
 
     if (prescriptionIds().length === 0) {
       // reopen form if all drafts are deleted
-      props.setIsEditing(true);
+      props.setIsEditing();
     }
 
     props.handleDraftPrescriptionsChange();
@@ -122,34 +122,6 @@ export const DraftPrescriptionCard = (props: {
 
   return (
     <div>
-      <photon-dialog
-        open={editDialogOpen()}
-        label="Overwrite in progress prescription?"
-        confirm-text="Yes, Overwrite"
-        cancel-text="No, Cancel"
-        on:photon-dialog-confirmed={handleEditConfirm}
-        on:photon-dialog-canceled={handleEditCancel}
-        on:photon-dialog-alt={handleEditCancel}
-      >
-        <p class="font-sans text-lg xs:text-base">
-          You are editing a prescription that has not been added. This will be overwritten if you
-          edit another prescription.
-        </p>
-      </photon-dialog>
-      <photon-dialog
-        open={deleteDialogOpen()}
-        label="Delete pending prescription?"
-        confirm-text="Yes, Delete"
-        cancel-text="No, Cancel"
-        on:photon-dialog-confirmed={handleDeleteConfirm}
-        on:photon-dialog-canceled={handleDeleteCancel}
-        on:photon-dialog-alt={handleDeleteCancel}
-      >
-        <p class="font-sans text-lg xs:text-base">
-          Deleting this prescription will remove it from your pending prescriptions. This action
-          cannot be undone.
-        </p>
-      </photon-dialog>
       <Card addChildrenDivider={true}>
         <div class="flex items-center space-x-2 text-slate-500">
           <Text color="gray" class="pr-2">
@@ -186,6 +158,34 @@ export const DraftPrescriptionCard = (props: {
           </Show>
         </div>
       </Card>
+      <photon-dialog
+        open={editDialogOpen()}
+        label="Overwrite in progress prescription?"
+        confirm-text="Yes, Overwrite"
+        cancel-text="No, Cancel"
+        on:photon-dialog-confirmed={handleEditConfirm}
+        on:photon-dialog-canceled={handleEditCancel}
+        on:photon-dialog-alt={handleEditCancel}
+      >
+        <p class="font-sans text-lg xs:text-base">
+          You are editing a prescription that has not been added. This will be overwritten if you
+          edit another prescription.
+        </p>
+      </photon-dialog>
+      <photon-dialog
+        open={deleteDialogOpen()}
+        label="Delete pending prescription?"
+        confirm-text="Yes, Delete"
+        cancel-text="No, Cancel"
+        on:photon-dialog-confirmed={handleDeleteConfirm}
+        on:photon-dialog-canceled={handleDeleteCancel}
+        on:photon-dialog-alt={handleDeleteCancel}
+      >
+        <p class="font-sans text-lg xs:text-base">
+          Deleting this prescription will remove it from your pending prescriptions. This action
+          cannot be undone.
+        </p>
+      </photon-dialog>
     </div>
   );
 };

@@ -10,8 +10,9 @@ import { CoverageOptionSummary } from './CoverageOptions/CoverageOptionSummary';
 import { OtherCoverageOptionsList } from './CoverageOptions/OtherCoverageOptionsList';
 import { toPrescriptionFormData } from './utils/mappers';
 import { PrescriptionFormData } from './DraftPrescriptionsProvider';
+import Card from '../../particles/Card';
 
-interface DraftPrescriptionListItemProps {
+export function DraftPrescriptionListItem(props: {
   draft: Prescription;
   coverageOptions: CoverageOption[];
   handleEdit?: (prescription: PrescriptionFormData) => void;
@@ -19,9 +20,7 @@ interface DraftPrescriptionListItemProps {
   handleSwapToOtherPrescription: (coverageOption: CoverageOption) => void;
   screeningAlerts: ScreeningAlertType[];
   routingConstraint?: RoutingConstraint;
-}
-
-export function DraftPrescriptionListItem(props: DraftPrescriptionListItemProps) {
+}) {
   // we'll want to ensure that we're only rendering
   // alerts for the prescription being rendered
   const screeningAlertsForDraft = createMemo(() =>
@@ -121,13 +120,15 @@ export const DraftPrescriptionLayout = (props: {
   RightChildren?: JSXElement;
   BottomChildren?: JSXElement;
 }) => (
-  <div class="flex flex-col gap-4">
-    <div class="flex justify-between items-center gap-4">
-      <div class="flex flex-col items-start">{props.LeftChildren}</div>
-      <Show when={props?.RightChildren}>
-        {(rightChildren) => <div class="flex items-start gap-3"> {rightChildren()}</div>}
-      </Show>
+  <Card autoPadding={false}>
+    <div class="flex flex-col gap-4 p-4">
+      <div class="flex justify-between items-center gap-4">
+        <div class="flex flex-col items-start">{props.LeftChildren}</div>
+        <Show when={props?.RightChildren}>
+          {(rightChildren) => <div class="flex items-start gap-3"> {rightChildren()}</div>}
+        </Show>
+      </div>
+      <Show when={props?.BottomChildren}>{(bottomChildren) => bottomChildren()}</Show>
     </div>
-    <Show when={props?.BottomChildren}>{(bottomChildren) => bottomChildren()}</Show>
-  </div>
+  </Card>
 );

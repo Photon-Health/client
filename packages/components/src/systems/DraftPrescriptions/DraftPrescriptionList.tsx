@@ -6,7 +6,6 @@ import { RoutingConstraint, getPrescriptionRoutingConstraints } from '../Routing
 import { PrescriptionFormData, useDraftPrescriptions } from './DraftPrescriptionsProvider';
 import { CoverageOption, usePrescribe } from '../PrescribeProvider';
 import { DraftPrescriptionLayout, DraftPrescriptionListItem } from './DraftPrescriptionListItem';
-import Divider from '../../particles/Divider';
 
 interface DraftPrescriptionsProps {
   handleEdit?: (prescription: PrescriptionFormData) => void;
@@ -54,23 +53,18 @@ export function DraftPrescriptionList(props: DraftPrescriptionsProps) {
       <Show when={!isLoadingPrefills() && draftPrescriptions().length > 0}>
         <div class="flex flex-col gap-4">
           <For each={draftPrescriptions()}>
-            {(draftPrescription, index) => (
-              <>
-                <Show when={index() > 0}>
-                  <Divider />
-                </Show>
-                <DraftPrescriptionListItem
-                  screeningAlerts={props.screeningAlerts}
-                  routingConstraint={prescriptionRoutingConstraints().get(draftPrescription.id)}
-                  draft={draftPrescription}
-                  coverageOptions={coverageOptions().filter(
-                    (c) => c.prescriptionId === draftPrescription.id
-                  )}
-                  handleEdit={props.handleEdit}
-                  handleDelete={props.handleDelete}
-                  handleSwapToOtherPrescription={props.handleSwapToOtherPrescription}
-                />
-              </>
+            {(draftPrescription) => (
+              <DraftPrescriptionListItem
+                screeningAlerts={props.screeningAlerts}
+                routingConstraint={prescriptionRoutingConstraints().get(draftPrescription.id)}
+                draft={draftPrescription}
+                coverageOptions={coverageOptions().filter(
+                  (c) => c.prescriptionId === draftPrescription.id
+                )}
+                handleEdit={props.handleEdit}
+                handleDelete={props.handleDelete}
+                handleSwapToOtherPrescription={props.handleSwapToOtherPrescription}
+              />
             )}
           </For>
         </div>

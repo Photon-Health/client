@@ -134,7 +134,7 @@ const calculateNeedsSupervisor = ({ title, state }: { title?: string; state?: st
 
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
-  let prescriptionRef: HTMLDivElement | undefined;
+  let prescriptionFormRef: HTMLDivElement | undefined;
 
   const { draftPrescriptions, prescriptionIds, tryUpdatePrescriptionStates, isLoadingPrefills } =
     useDraftPrescriptions();
@@ -184,12 +184,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
   let prefillNotes = '';
   if (props.additionalNotes) {
-    prefillNotes = `${props.additionalNotes}
-
-`;
+    prefillNotes = `${props.additionalNotes}\n\n`;
   }
   if (props.weight) {
-    prefillNotes = `${prefillNotes}${formatPatientWeight(props.weight, props?.weightUnit)}`;
+    prefillNotes = `${prefillNotes}${formatPatientWeight(props.weight, props.weightUnit)}`;
   }
 
   onMount(async () => {
@@ -203,7 +201,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
     ref.addEventListener('photon-ticket-created-duplicate', () => {
       // need to reset all the form data
-      clearForm(props.formActions, prefillNotes ? { notes: prefillNotes } : undefined);
+      clearForm(props.formActions, { notes: prefillNotes });
       pharmacySelectionContext.setFulfillmentType(undefined);
       pharmacySelectionContext.setPharmacyId(undefined);
       pharmacySelectionContext.setUpdatePreferredPharmacy(false);
@@ -607,7 +605,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       </Show>
 
       <div>
-        <Toaster buffer={props?.toastBuffer || 0} />
+        <Toaster buffer={props.toastBuffer || 0} />
         <div class="flex flex-col gap-8">
           <Show when={(!client || isLoading()) && !authenticated()}>
             <div class="w-full flex justify-center">
@@ -657,7 +655,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   <RecentOrders.Card />
                 </Show>
                 <Show when={showForm()}>
-                  <div ref={prescriptionRef}>
+                  <div ref={prescriptionFormRef}>
                     <AddPrescriptionCard
                       hideAddToTemplates={props.hideTemplates}
                       actions={props.formActions}
@@ -665,13 +663,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       weight={props.weight}
                       weightUnit={props.weightUnit}
                       prefillNotes={prefillNotes}
-                      enableCombineAndDuplicate={props.enableCombineAndDuplicate}
-                      screenDraftedPrescriptions={function () {
-                        screenDraftedPrescriptions();
-                      }}
-                      draftedPrescriptionChanged={function () {
-                        screenDraftedPrescriptions();
-                      }}
+                      screenDraftedPrescriptions={screenDraftedPrescriptions}
+                      draftedPrescriptionChanged={screenDraftedPrescriptions}
                       screeningAlerts={screeningAlerts()}
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
@@ -680,13 +673,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   </div>
                 </Show>
                 <DraftPrescriptionCard
-                  prescriptionRef={prescriptionRef}
+                  prescriptionFormRef={prescriptionFormRef}
                   actions={props.formActions}
                   store={props.formStore}
                   setIsEditing={() => setShowForm(true)}
-                  handleDraftPrescriptionsChange={function () {
-                    screenDraftedPrescriptions();
-                  }}
+                  handleDraftPrescriptionsChange={screenDraftedPrescriptions}
                   screeningAlerts={screeningAlerts()}
                   routingConstraints={pharmacySelectionContext.routingConstraints()}
                   enableOrder={props.enableOrder}
