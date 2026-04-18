@@ -62,7 +62,6 @@ export const AddPrescriptionCard = (props: {
   weight?: number;
   weightUnit?: string;
   prefillNotes?: string;
-  enableCombineAndDuplicate?: boolean;
   screenDraftedPrescriptions: () => void;
   draftedPrescriptionChanged: () => void;
   screeningAlerts: ScreeningAlertType[];
@@ -86,7 +85,7 @@ export const AddPrescriptionCard = (props: {
     }
 
     // initialize values in the prescribe form
-    clearForm(props.actions, props?.prefillNotes ? { notes: props.prefillNotes } : undefined);
+    clearForm(props.actions, { notes: props.prefillNotes });
   });
 
   const handleAddPrescription = async () => {
@@ -157,7 +156,7 @@ export const AddPrescriptionCard = (props: {
       'doNotFillBeforeDate'
     ]);
     setOffCatalog(undefined);
-    clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);
+    clearForm(props.actions, { notes: props.prefillNotes });
 
     setSearchText('');
   };
@@ -212,10 +211,7 @@ export const AddPrescriptionCard = (props: {
             props.draftedPrescriptionChanged();
           }}
           on:photon-treatment-unselected={() => {
-            clearForm(
-              props.actions,
-              props?.prefillNotes ? { notes: props.prefillNotes } : undefined
-            );
+            clearForm(props.actions, { notes: props.prefillNotes });
 
             props.draftedPrescriptionChanged();
           }}
