@@ -7,9 +7,9 @@ import {
   useDraftPrescriptions,
   usePharmacySelectionContext
 } from '@photonhealth/components';
-import { DraftPrescriptionCard } from './DraftPrescriptionCard';
+import { DraftPrescriptions } from './DraftPrescriptions';
 import { createEffect, createSignal, Show } from 'solid-js';
-import { AddPrescriptionCard } from './AddPrescriptionCard';
+import { DraftPrescriptionForm } from './DraftPrescriptionForm';
 import { DisableList } from '../PrescribeWorkflow';
 import { PhotonTooltip } from '../../../photon-tooltip';
 
@@ -55,7 +55,7 @@ export const PrescriptionCard = (props: {
           <Spinner color="green" />
         </Show>
         <Show when={!isLoadingPrefills()}>
-          <DraftPrescriptionCard
+          <DraftPrescriptions
             prescriptionFormRef={prescriptionFormRef}
             actions={props.actions}
             store={props.store}
@@ -77,7 +77,7 @@ export const PrescriptionCard = (props: {
           </Show>
           <Show when={showForm()}>
             <div ref={prescriptionFormRef} class="mt-8">
-              <AddPrescriptionCard
+              <DraftPrescriptionForm
                 hideAddToTemplates={props.hideAddToTemplates}
                 actions={props.actions}
                 store={props.store}

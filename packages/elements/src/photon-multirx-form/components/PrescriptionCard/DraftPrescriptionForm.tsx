@@ -53,7 +53,7 @@ const validators = {
   )
 };
 
-export const AddPrescriptionCard = (props: {
+export const DraftPrescriptionForm = (props: {
   hideAddToTemplates: boolean;
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;

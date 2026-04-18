@@ -11,7 +11,7 @@ import {
 } from '@photonhealth/components';
 import repopulateForm from './util/repopulateForm';
 
-export const DraftPrescriptionCard = (props: {
+export const DraftPrescriptions = (props: {
   prescriptionFormRef: HTMLDivElement | undefined;
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
