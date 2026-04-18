@@ -29,7 +29,7 @@ export const DraftPrescriptionCard = (props: {
   const [editDraft, setEditDraft] = createSignal<PrescriptionFormData | undefined>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
   const { selectOtherCoverageOption } = usePrescribe();
-  const { draftPrescriptions, prescriptionIds, deletePrescription } = useDraftPrescriptions();
+  const { draftPrescriptions, deletePrescription } = useDraftPrescriptions();
 
   const editPrescription = () => {
     const formData = editDraft();
@@ -101,11 +101,6 @@ export const DraftPrescriptionCard = (props: {
 
     setDeleteDialogOpen(false);
     setDeleteDraftId(undefined);
-
-    if (prescriptionIds().length === 0) {
-      // reopen form if all drafts are deleted
-      props.setShowForm();
-    }
 
     props.handleDraftPrescriptionsChange();
   };

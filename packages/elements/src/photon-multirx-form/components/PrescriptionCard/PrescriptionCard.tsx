@@ -2,11 +2,13 @@ import {
   Button,
   Card,
   ScreeningAlertType,
+  Spinner,
   Text,
+  useDraftPrescriptions,
   usePharmacySelectionContext
 } from '@photonhealth/components';
 import { DraftPrescriptionCard } from './DraftPrescriptionCard';
-import { createSignal, Show } from 'solid-js';
+import { createEffect, createSignal, Show } from 'solid-js';
 import { AddPrescriptionCard } from './AddPrescriptionCard';
 import { DisableList } from '../PrescribeWorkflow';
 import { PhotonTooltip } from '../../../photon-tooltip';
@@ -25,9 +27,17 @@ export const PrescriptionCard = (props: {
   allowOffCatalogSearch?: boolean;
   disableList?: DisableList;
 }) => {
-  const pharmacySelectionContext = usePharmacySelectionContext();
   let prescriptionFormRef: HTMLDivElement | undefined;
+  const pharmacySelectionContext = usePharmacySelectionContext();
+  const { prescriptionIds, isLoadingPrefills } = useDraftPrescriptions();
   const [showForm, setShowForm] = createSignal<boolean>(false);
+
+  createEffect(() => {
+    if (prescriptionIds().length === 0) {
+      // reopen form if all drafts are deleted
+      setShowForm(true);
+    }
+  });
 
   return (
     <Card addChildrenDivider={true}>
@@ -41,43 +51,48 @@ export const PrescriptionCard = (props: {
         />
       </div>
       <div>
-        <DraftPrescriptionCard
-          prescriptionFormRef={prescriptionFormRef}
-          actions={props.actions}
-          store={props.store}
-          setShowForm={() => setShowForm(true)}
-          handleDraftPrescriptionsChange={props.screenDraftedPrescriptions}
-          screeningAlerts={props.screeningAlerts}
-          routingConstraints={pharmacySelectionContext.routingConstraints()}
-          enableOrder={props.enableOrder}
-        />
-        <Show when={!showForm()}>
-          <Button
-            variant="secondary"
-            class="w-full xs:w-fit mt-4"
-            size="lg"
-            onClick={() => setShowForm(true)}
-          >
-            + Add another
-          </Button>
+        <Show when={isLoadingPrefills()}>
+          <Spinner color="green" />
         </Show>
-        <Show when={showForm()}>
-          <div ref={prescriptionFormRef} class="mt-8">
-            <AddPrescriptionCard
-              hideAddToTemplates={props.hideAddToTemplates}
-              actions={props.actions}
-              store={props.store}
-              weight={props.weight}
-              weightUnit={props.weightUnit}
-              prefillNotes={props.prefillNotes}
-              screenDraftedPrescriptions={props.screenDraftedPrescriptions}
-              screeningAlerts={props.screeningAlerts}
-              catalogId={props.catalogId}
-              allowOffCatalogSearch={props.allowOffCatalogSearch}
-              disableList={props.disableList}
-              hideForm={() => setShowForm(false)}
-            />
-          </div>
+        <Show when={!isLoadingPrefills()}>
+          <DraftPrescriptionCard
+            prescriptionFormRef={prescriptionFormRef}
+            actions={props.actions}
+            store={props.store}
+            setShowForm={() => setShowForm(true)}
+            handleDraftPrescriptionsChange={props.screenDraftedPrescriptions}
+            screeningAlerts={props.screeningAlerts}
+            routingConstraints={pharmacySelectionContext.routingConstraints()}
+            enableOrder={props.enableOrder}
+          />
+          <Show when={!showForm()}>
+            <Button
+              variant="secondary"
+              class="w-full xs:w-fit mt-4"
+              size="lg"
+              onClick={() => setShowForm(true)}
+            >
+              + Add another
+            </Button>
+          </Show>
+          <Show when={showForm()}>
+            <div ref={prescriptionFormRef} class="mt-8">
+              <AddPrescriptionCard
+                hideAddToTemplates={props.hideAddToTemplates}
+                actions={props.actions}
+                store={props.store}
+                weight={props.weight}
+                weightUnit={props.weightUnit}
+                prefillNotes={props.prefillNotes}
+                screenDraftedPrescriptions={props.screenDraftedPrescriptions}
+                screeningAlerts={props.screeningAlerts}
+                catalogId={props.catalogId}
+                allowOffCatalogSearch={props.allowOffCatalogSearch}
+                disableList={props.disableList}
+                hideForm={() => setShowForm(false)}
+              />
+            </div>
+          </Show>
         </Show>
       </div>
     </Card>
