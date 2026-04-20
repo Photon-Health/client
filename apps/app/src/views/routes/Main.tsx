@@ -19,7 +19,7 @@ declare global {
   }
 }
 
-const canDoSomethingQuery = gql(/* GraphQL */ `
+const allowedOnWebAppQuery = gql(/* GraphQL */ `
   query OrgSettingsQuery {
     organization {
       settings {
@@ -41,18 +41,18 @@ export const Main = () => {
   const navigate = useNavigate();
 
   const {
-    data: canDoSomethingData,
-    error: canDoSomethingError,
-    loading: canDoSomethingLoading
-  } = useQuery(canDoSomethingQuery, { client: clinicalClient });
+    data: allowedOnWebAppData,
+    error: allowedOnWebAppError,
+    loading: allowedOnWebAppLoading
+  } = useQuery(allowedOnWebAppQuery, { client: clinicalClient });
 
   useWelcomeToast();
 
   useEffect(() => {
-    if ((!isLoading && error) || (!canDoSomethingLoading && canDoSomethingError)) {
+    if ((!isLoading && error) || (!allowedOnWebAppLoading && allowedOnWebAppError)) {
       navigate('/', { replace: true });
     }
-  }, [isLoading, error, canDoSomethingLoading, canDoSomethingError, navigate]);
+  }, [isLoading, error, allowedOnWebAppLoading, allowedOnWebAppError, navigate]);
 
   if (isLoading || query.get('code')) {
     return (
@@ -77,7 +77,7 @@ export const Main = () => {
     );
   }
 
-  if (canDoSomethingLoading) {
+  if (allowedOnWebAppLoading) {
     return (
       <Center h="100vh">
         <CircularProgress isIndeterminate color="green.300" />
@@ -87,7 +87,7 @@ export const Main = () => {
 
   const hasOverridePermission = usePermissions(['access:web_app_override']);
 
-  const orgSettings = canDoSomethingData?.organization?.settings;
+  const orgSettings = allowedOnWebAppData?.organization?.settings;
   const enableWebAppPrescribe = orgSettings?.providerUx?.enableWebAppPrescribe ?? true;
 
   if (isAuthenticated && !user?.org_id) return <SelectOrg />;

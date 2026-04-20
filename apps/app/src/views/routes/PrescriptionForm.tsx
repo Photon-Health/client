@@ -29,7 +29,6 @@ const orgSettingsQuery = graphql(/* GraphQL */ `
           enablePatientRouting
           enablePickupPharmacies
           enableDeliveryPharmacies
-          enableWebAppPrescribe
           optionalPatientAddress
         }
       }
@@ -59,7 +58,6 @@ export const PrescriptionForm = () => {
   const enableDeliveryPharmacies = orgSettings?.providerUx?.enableDeliveryPharmacies ?? false;
   const enablePatientRouting = orgSettings?.providerUx?.enablePatientRouting ?? true;
   const enableDuplicateRxWarnings = orgSettings?.providerUx?.enableDuplicateRxWarnings ?? true;
-  const enableWebAppPrescribe = orgSettings?.providerUx?.enableWebAppPrescribe ?? true;
   const enableRxTemplates = orgSettings?.providerUx?.enableRxTemplates ?? true;
   const mailOrderProviders = getOrgMailOrderPharms(user?.org_id)?.provider;
 
@@ -76,10 +74,6 @@ export const PrescriptionForm = () => {
 
   useEffect(() => {
     if (!ref.current) return;
-
-    if (!enableWebAppPrescribe) {
-      navigate('/disallowed/prescriptions');
-    }
     const abortController = new AbortController();
     const { signal: abortControllerSignal } = abortController;
     const listenerOptions = { signal: abortControllerSignal };
