@@ -240,7 +240,7 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
                         <FormLabel htmlFor="street1" fontSize="sm">
                           Street address
                         </FormLabel>
-                        <Input {...field} id="street1" data-dd-privacy="mask" className="mp-mask" />
+                        <Input {...field} id="street1" className="mp-mask" />
                         <FormErrorMessage>{meta.error}</FormErrorMessage>
                       </FormControl>
                     )}
@@ -252,7 +252,7 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
                         <FormLabel htmlFor="street2" fontSize="sm">
                           Apartment, suite, etc. (optional)
                         </FormLabel>
-                        <Input {...field} id="street2" data-dd-privacy="mask" className="mp-mask" />
+                        <Input {...field} id="street2" className="mp-mask" />
                       </FormControl>
                     )}
                   </Field>
@@ -263,7 +263,7 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
                         <FormLabel htmlFor="city" fontSize="sm">
                           City
                         </FormLabel>
-                        <Input {...field} id="city" data-dd-privacy="mask" className="mp-mask" />
+                        <Input {...field} id="city" className="mp-mask" />
                         <FormErrorMessage>{meta.error}</FormErrorMessage>
                       </FormControl>
                     )}
@@ -301,13 +301,7 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
                           <FormLabel htmlFor="postalCode" fontSize="sm">
                             ZIP code
                           </FormLabel>
-                          <Input
-                            {...field}
-                            id="postalCode"
-                            maxLength={10}
-                            data-dd-privacy="mask"
-                            className="mp-mask"
-                          />
+                          <Input {...field} id="postalCode" maxLength={10} className="mp-mask" />
                           <FormErrorMessage>{meta.error}</FormErrorMessage>
                         </FormControl>
                       )}

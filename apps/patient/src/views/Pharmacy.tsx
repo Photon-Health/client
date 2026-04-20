@@ -1089,7 +1089,6 @@ export const Pharmacy = () => {
                       }}
                       display="inline"
                       size="sm"
-                      data-dd-privacy="mask"
                       className="mp-mask"
                     >
                       <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
