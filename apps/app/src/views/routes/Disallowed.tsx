@@ -1,4 +1,4 @@
-import { Container, Heading, Stack, useBreakpointValue } from '@chakra-ui/react';
+import { Container, Link, Heading, Stack, useBreakpointValue } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
 
 export const Disallowed = () => {
@@ -15,6 +15,9 @@ export const Disallowed = () => {
           interface with Photon
         </span>
         <span>If you can't find this, please contact your administrator.</span>
+        <Link color="teal.500" href="/">
+          Go Home
+        </Link>
       </Stack>
     </Container>
   );
