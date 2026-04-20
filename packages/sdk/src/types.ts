@@ -967,4 +967,5 @@ export type Permission =
   | 'write:order'
   | 'write:patient'
   | 'write:prescription'
-  | 'write:webhook_config';
+  | 'write:webhook_config'
+  | 'access:web_app';

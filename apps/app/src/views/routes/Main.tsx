@@ -8,6 +8,8 @@ import { auth0Config } from '../../configs/auth';
 import useQueryParams from '../../hooks/useQueryParams';
 import { Env } from '@photonhealth/sdk';
 import { useWelcomeToast } from '../../hooks/useWelcomeToast';
+import { gql, useQuery } from '@apollo/client';
+import usePermissions from '../../hooks/usePermissions';
 
 declare global {
   namespace JSX {
@@ -17,22 +19,41 @@ declare global {
   }
 }
 
+const canDoSomethingQuery = gql(/* GraphQL */ `
+  query OrgSettingsQuery {
+    organization {
+      settings {
+        providerUx {
+          enableWebAppPrescribe
+        }
+      }
+    }
+  }
+`);
+
 export const Main = () => {
   const query = useQueryParams();
 
   // Detect is browser is Safari
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  const { user, isAuthenticated, isLoading, error } = usePhoton();
+  const { user, isAuthenticated, isLoading, error, clinicalClient } = usePhoton();
   const location = useLocation();
   const navigate = useNavigate();
+  const hasOverridePermission = usePermissions(['access:web_app']);
+
+  const {
+    data: canDoSomethingData,
+    error: canDoSomethingError,
+    loading: canDoSomethingLoading
+  } = useQuery(canDoSomethingQuery, { client: clinicalClient });
 
   useWelcomeToast();
 
   useEffect(() => {
-    if (!isLoading && error) {
+    if ((!isLoading && error) || (!canDoSomethingLoading && canDoSomethingError)) {
       navigate('/', { replace: true });
     }
-  }, [isLoading, error]);
+  }, [isLoading, error, canDoSomethingLoading, canDoSomethingError, navigate]);
 
   if (isLoading || query.get('code')) {
     return (
@@ -57,11 +78,26 @@ export const Main = () => {
     );
   }
 
+  if (canDoSomethingLoading) {
+    return (
+      <Center h="100vh">
+        <CircularProgress isIndeterminate color="green.300" />
+      </Center>
+    );
+  }
+
+  const orgSettings = canDoSomethingData?.organization?.settings;
+  const enableWebAppPrescribe = orgSettings?.providerUx?.enableWebAppPrescribe ?? true;
+
+  if (isAuthenticated && !user?.org_id) return <SelectOrg />;
+
+  if (isAuthenticated && !enableWebAppPrescribe && !hasOverridePermission) {
+    return <Navigate to="/disallowed" />;
+  }
+
   if (location.pathname === '/' && isAuthenticated) {
     if (user?.org_id) return <Navigate to="/prescriptions" replace />;
   }
-
-  if (isAuthenticated && !user?.org_id) return <SelectOrg />;
 
   return (
     // For infinite scrolling, Safari expects body to be 100vh, while chrome/firefox expects heihgt auto
