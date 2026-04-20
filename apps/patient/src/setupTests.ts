@@ -7,12 +7,6 @@ vi.mock('react-ga4', () => ({
   event: vi.fn()
 }));
 
-vi.mock('@datadog/browser-rum', () => ({
-  datadogRum: {
-    addAction: vi.fn()
-  }
-}));
-
 const getFlagValueImpl = async <K extends FlagKeys>(flagName: K, fallback?: FlagValues[K]) =>
   fallback ?? FEATURE_FLAG_DEFAULTS[flagName];
 

@@ -21,7 +21,6 @@ vi.mock('./utils/preloadImage', () => ({
   preloadImage: vi.fn().mockResolvedValue(undefined)
 }));
 
-vi.mock('@datadog/browser-rum');
 vi.mock('./hooks/usePageAnalytics');
 vi.mock('react-ga4');
 vi.mock('mixpanel-browser');

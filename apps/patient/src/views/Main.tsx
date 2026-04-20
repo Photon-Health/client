@@ -1,5 +1,4 @@
 import { Center, ChakraProvider, CircularProgress } from '@chakra-ui/react';
-import { datadogRum } from '@datadog/browser-rum';
 import { Context, createContext, useCallback, useContext, useEffect, useState } from 'react';
 import {
   Outlet,
@@ -127,28 +126,6 @@ export const Main = () => {
     }
   }, [order?.patient.id, order?.organization.id, order?.organization.name, order?.address]);
 
-  useEffect(
-    function triggerDatadogShortlinkOpenEvent() {
-      // If the user opens a shortlink, send an event to Datadog
-      // Only trigger on / because thats the first page they see when clicking a shortlink
-      if (location.pathname === '/' && token) {
-        try {
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          datadogRum.addAction('shortlink-opened', {
-            orderId: payload.orderId,
-            patientId: payload.sub,
-            organizationId: payload.organizationId,
-            context: payload.context,
-            metadata: payload.metadata
-          });
-        } catch (e) {
-          console.error('Failed to parse JWT token', e);
-        }
-      }
-    },
-    [location.pathname, token]
-  );
-
   useEffect(() => {
     // need to parse the token and see if this is a controlled substance link
     let tokenData: TokenPayload | undefined;
@@ -190,10 +167,6 @@ export const Main = () => {
 
       const newFlattenedFills = countFillsAndRemoveDuplicates(newOrder.fills);
       setFlattenedFills(newFlattenedFills);
-
-      datadogRum.setGlobalContextProperty('organizationId', newOrder.organization.id);
-      datadogRum.setGlobalContextProperty('orderId', orderId);
-      datadogRum.setUser({ patientId: newOrder.patient.id });
 
       patientAnalytics.track('Patient App Opened', newOrder, {});
     },
