@@ -32,24 +32,15 @@ vi.mock('../api', () => ({
 vi.mock('react-ga4');
 vi.mock('mixpanel-browser');
 
-let mockChangePharmacyReasonsFlag = false;
 vi.mock('../hooks/usePatientAnalytics', () => ({
   usePatientAnalytics: vi.fn(() => ({
     track: vi.fn(),
     page: vi.fn(),
     identify: vi.fn(),
     getFlagValue: vi.fn(async (flagName: string) => {
-      if (flagName === 'change_pharmacy_reasons') {
-        return mockChangePharmacyReasonsFlag;
-      }
-
       return FEATURE_FLAG_DEFAULTS[flagName as keyof typeof FEATURE_FLAG_DEFAULTS];
     }),
     getFlagValueSync: vi.fn((flagName: string) => {
-      if (flagName === 'change_pharmacy_reasons') {
-        return mockChangePharmacyReasonsFlag;
-      }
-
       return FEATURE_FLAG_DEFAULTS[flagName as keyof typeof FEATURE_FLAG_DEFAULTS];
     })
   })),
@@ -137,13 +128,6 @@ describe('Status page Rerouting', () => {
       }
     }
   };
-  beforeEach(() => {
-    mockChangePharmacyReasonsFlag = true;
-  });
-
-  afterEach(() => {
-    mockChangePharmacyReasonsFlag = false;
-  });
 
   test('navigates directly to pharmacy page without modal when unresolved ORDER_ERROR exists', async () => {
     const { memoryRouter } = await renderAppAtStatusView({
