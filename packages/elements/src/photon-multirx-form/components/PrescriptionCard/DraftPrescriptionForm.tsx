@@ -67,7 +67,7 @@ export const DraftPrescriptionForm = (props: {
   disableList?: DisableList;
   hideForm: () => void;
 }) => {
-  const { tryCreatePrescription } = useDraftPrescriptions();
+  const { tryCreatePrescription, draftPrescriptions } = useDraftPrescriptions();
   const { dispatchOrderError, dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
@@ -85,6 +85,36 @@ export const DraftPrescriptionForm = (props: {
     // initialize values in the prescribe form
     clearForm(props.actions, { notes: props.prefillNotes });
   });
+
+  const handleTreatmentSelected = (e: any) => {
+    if (e.detail.data.__typename === 'PrescriptionTemplate') {
+      repopulateForm(props.actions, {
+        ...e.detail.data,
+        notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
+      });
+    } else {
+      props.actions.updateFormValue({
+        key: 'treatment',
+        value: e.detail.data
+      });
+    }
+    dispatchAnalyticsTrackEvent('fieldInteraction', {
+      name: 'Field Interaction',
+      formName: 'add_prescription_form',
+      fieldName: 'treatment',
+      hasValue: true,
+      isOptional: false
+    });
+
+    if (e.detail.catalogId) {
+      props.actions.updateFormValue({
+        key: 'catalogId',
+        value: e.detail.catalogId
+      });
+    }
+
+    props.screenDraftedPrescriptions();
+  };
 
   const handleAddPrescription = async () => {
     setIsLoading(true);
@@ -165,35 +195,7 @@ export const DraftPrescriptionForm = (props: {
         off-catalog-option={offCatalog()}
         search-text={searchText()}
         disable-list={props.disableList}
-        on:photon-treatment-selected={(e: any) => {
-          if (e.detail.data.__typename === 'PrescriptionTemplate') {
-            repopulateForm(props.actions, {
-              ...e.detail.data,
-              notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
-            });
-          } else {
-            props.actions.updateFormValue({
-              key: 'treatment',
-              value: e.detail.data
-            });
-          }
-          dispatchAnalyticsTrackEvent('fieldInteraction', {
-            name: 'Field Interaction',
-            formName: 'add_prescription_form',
-            fieldName: 'treatment',
-            hasValue: true,
-            isOptional: false
-          });
-
-          if (e.detail.catalogId) {
-            props.actions.updateFormValue({
-              key: 'catalogId',
-              value: e.detail.catalogId
-            });
-          }
-
-          props.screenDraftedPrescriptions();
-        }}
+        on:photon-treatment-selected={handleTreatmentSelected}
         on:photon-treatment-unselected={() => {
           clearForm(props.actions, { notes: props.prefillNotes });
 
@@ -441,8 +443,8 @@ export const DraftPrescriptionForm = (props: {
           }}
         />
       </InputGroup>
-      <div class="flex flex-col xs:flex-row mt-4">
-        <Show when={!props.hideAddToTemplates}>
+      <Show when={!props.hideAddToTemplates}>
+        <div class="flex flex-col mt-4 gap-y-2">
           <Checkbox
             mainText="Add To Personal Templates"
             showOptionalSubtext
@@ -461,9 +463,7 @@ export const DraftPrescriptionForm = (props: {
               });
             }}
           />
-        </Show>
-        <Show when={props.store.addToTemplates?.value ?? false}>
-          <div class="flex-1 mt-2">
+          <Show when={props.store.addToTemplates?.value ?? false}>
             <InputGroup label="Template Name" error={props.store.templateName?.error}>
               <Input
                 value={props.store.templateName?.value ?? ''}
@@ -475,24 +475,29 @@ export const DraftPrescriptionForm = (props: {
                 }
               />
             </InputGroup>
-          </div>
-        </Show>
-        <div class="flex flex-grow justify-end">
-          <Button
-            class="w-full xs:!w-auto h-fit mt-6"
-            size="lg"
-            onClick={() => {
-              if (!isLoading()) {
-                handleAddPrescription();
-              }
-            }}
-            loading={isLoading()}
-            variant="primary"
-            color="blue"
-          >
-            Add to drafts
-          </Button>
+          </Show>
         </div>
+      </Show>
+      <div class="w-full flex flex-col justify-end mt-6 gap-2 xs:!flex-row-reverse xs:!justify-start">
+        <Button
+          class="w-full xs:!w-auto"
+          size="lg"
+          onClick={() => {
+            if (!isLoading()) {
+              handleAddPrescription();
+            }
+          }}
+          loading={isLoading()}
+          variant="primary"
+          color="blue"
+        >
+          Add to drafts
+        </Button>
+        <Show when={draftPrescriptions().length > 0}>
+          <Button class="w-full xs:!w-auto" size="lg" onClick={() => {}} variant="secondary">
+            Cancel
+          </Button>
+        </Show>
       </div>
     </div>
   );
