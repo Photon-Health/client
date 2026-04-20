@@ -23,10 +23,10 @@ export const DraftPrescriptions = (props: {
 }) => {
   const { dispatchDraftPrescriptionDeleted, dispatchAnalyticsTrackEvent } =
     usePrescribeEventDispatch();
-  const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
   const [editDialogConfirm, setEditDialogConfirm] = createSignal<(() => void) | undefined>();
   const [editDraft, setEditDraft] = createSignal<PrescriptionFormData | undefined>(undefined);
+  const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
   const { selectOtherCoverageOption } = usePrescribe();
   const { draftPrescriptions, deletePrescription } = useDraftPrescriptions();
@@ -54,7 +54,7 @@ export const DraftPrescriptions = (props: {
     }
   };
 
-  const checkEditPrescription = (draft: PrescriptionFormData, onConfirm?: () => undefined) => {
+  const checkCanEditPrescription = (draft: PrescriptionFormData, onConfirm?: () => undefined) => {
     setEditDraft(draft);
 
     if (!props.store['treatment'].value) {
@@ -67,12 +67,6 @@ export const DraftPrescriptions = (props: {
       setEditDialogOpen(true);
       setEditDialogConfirm(onConfirm);
     }
-  };
-
-  const handleSwapToOtherPrescription = (coverage: CoverageOption) => {
-    checkEditPrescription(toFormData(coverage), () => {
-      selectOtherCoverageOption(coverage);
-    });
   };
 
   const handleEditConfirm = () => {
@@ -90,6 +84,7 @@ export const DraftPrescriptions = (props: {
     setEditDraft(undefined);
     setEditDialogConfirm(undefined);
   };
+
   const handleDeleteConfirm = () => {
     const deletedId = deleteDraftId();
     if (deletedId) {
@@ -117,9 +112,13 @@ export const DraftPrescriptions = (props: {
           setDeleteDraftId(draftId);
         }}
         handleEdit={(draft) => {
-          checkEditPrescription(draft);
+          checkCanEditPrescription(draft);
         }}
-        handleSwapToOtherPrescription={handleSwapToOtherPrescription}
+        handleSwapToOtherPrescription={(coverage: CoverageOption) => {
+          checkCanEditPrescription(toFormData(coverage), () => {
+            selectOtherCoverageOption(coverage);
+          });
+        }}
         screeningAlerts={props.screeningAlerts}
         routingConstraints={props.routingConstraints}
         enableOrder={props.enableOrder}

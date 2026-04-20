@@ -89,7 +89,6 @@ export const DraftPrescriptionForm = (props: {
   const handleAddPrescription = async () => {
     setIsLoading(true);
 
-    // TODO TODO TODO move validation to the prescribe provider
     const keys = Object.keys(validators);
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
