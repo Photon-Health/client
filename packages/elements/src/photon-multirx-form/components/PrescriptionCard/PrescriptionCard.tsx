@@ -29,11 +29,11 @@ export const PrescriptionCard = (props: {
 }) => {
   let prescriptionFormRef: HTMLDivElement | undefined;
   const pharmacySelectionContext = usePharmacySelectionContext();
-  const { prescriptionIds, isLoadingPrefills } = useDraftPrescriptions();
+  const { draftPrescriptions, isLoadingPrefills } = useDraftPrescriptions();
   const [showForm, setShowForm] = createSignal<boolean>(false);
 
   createEffect(() => {
-    if (prescriptionIds().length === 0) {
+    if (draftPrescriptions().length === 0) {
       // reopen form if all drafts are deleted
       setShowForm(true);
     }
