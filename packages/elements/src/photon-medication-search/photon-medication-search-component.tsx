@@ -17,6 +17,8 @@ import { DisableList } from '../photon-multirx-form/components/PrescribeWorkflow
 
 import { ApolloClient } from '@apollo/client';
 
+import tailwind from '../tailwind.css?inline';
+
 // Utility Functions
 
 function createBlockedMedsMap(disableList: DisableList | undefined) {
@@ -374,6 +376,7 @@ const Component = (props: ComponentProps) => {
         dispatchSearchTextChanged(ref, '');
       }}
     >
+      <style>{tailwind}</style>
       {/* Mobile */}
 
       {/* Full size search */}

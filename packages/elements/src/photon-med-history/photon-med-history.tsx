@@ -1,6 +1,6 @@
 import { customElement } from 'solid-element';
 import { PatientMedHistory } from '@photonhealth/components';
-import photonStyles from '@photonhealth/components/dist/index.css?inline';
+import tailwind from '../tailwind.css?inline';
 
 interface PatientMedProps {
   patientId: string;
@@ -9,7 +9,7 @@ interface PatientMedProps {
 const PatientMedHistoryWrapper = (props: PatientMedProps) => {
   return (
     <div>
-      <style>{photonStyles}</style>
+      <style>{tailwind}</style>
       <PatientMedHistory
         patientId={props.patientId}
         enableLinks={false}
