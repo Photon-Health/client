@@ -29,7 +29,7 @@ export const Status = () => {
   const { order, setOrder, isDemo, setFaqModalIsOpen, setReason } = useOrderContext();
   const patientAnalytics = usePatientAnalytics();
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const rerouteReasonDialog = useDisclosure();
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') ?? undefined;
@@ -161,7 +161,6 @@ export const Status = () => {
   };
 
   const handleReroute = () => {
-    const isEnabled = patientAnalytics.getFlagValueSync('change_pharmacy_reasons');
     const hasUnresolvedOrderError = order.exceptions.some(
       (e) => e.exceptionType === 'ORDER_ERROR' && !e.resolvedAt
     );
@@ -173,12 +172,8 @@ export const Status = () => {
       return;
     }
 
-    if (isEnabled) {
-      onOpen();
-      return;
-    }
-
-    navigateToReroute();
+    rerouteReasonDialog.onOpen();
+    return;
   };
 
   const handleSelectReason = (reason: string, otherReason?: string) => {
@@ -375,7 +370,11 @@ export const Status = () => {
       <VStack w="full" pb={6}>
         <PoweredBy />
       </VStack>
-      <ChangePharmacyReasons isOpen={isOpen} onClose={onClose} onSelect={handleSelectReason} />
+      <ChangePharmacyReasons
+        isOpen={rerouteReasonDialog.isOpen}
+        onClose={rerouteReasonDialog.onClose}
+        onSelect={handleSelectReason}
+      />
     </VStack>
   );
 };
