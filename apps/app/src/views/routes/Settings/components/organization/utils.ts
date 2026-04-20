@@ -106,6 +106,7 @@ export const organizationSettingsFormSchema = yup.object({
     ),
   priorAuthorizationExceptionMessage: yup.string(),
   providerUx: yup.object({
+    enableWebAppPrescribe: yup.boolean().required('Please select true or false'),
     enablePrescriberOrdering: yup.boolean().required('Please select true or false'),
     enablePrescribeToOrder: yup.boolean().required('Please select true or false'),
     enableRxTemplates: yup.boolean().required('Please select true or false'),
@@ -145,6 +146,7 @@ export function createInitialOrgSettingsFormValues(
     priorAuthorizationEmail: args.priorAuthorizationEmail ?? undefined,
     priorAuthorizationExceptionMessage: args.priorAuthorizationExceptionMessage ?? undefined,
     providerUx: {
+      enableWebAppPrescribe: args.providerUx?.enableWebAppPrescribe ?? true,
       enablePrescriberOrdering: args.providerUx?.enablePrescriberOrdering ?? false,
       enablePrescribeToOrder: args.providerUx?.enablePrescribeToOrder ?? false,
       enableRxTemplates: args.providerUx?.enableRxTemplates ?? false,
