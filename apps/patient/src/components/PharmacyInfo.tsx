@@ -440,7 +440,6 @@ export const PharmacyInfo = ({
             color="link"
             fontWeight="medium"
             target="_blank"
-            data-dd-privacy="mask"
             className="mp-mask"
             ms={2}
           >
