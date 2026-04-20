@@ -141,19 +141,6 @@ export const DraftPrescriptionForm = (props: {
     props.screenDraftedPrescriptions();
 
     // RESET THE FORM
-    props.actions.clearKeys([
-      'treatment',
-      'dispenseAsWritten',
-      'dispenseQuantity',
-      'dispenseUnit',
-      'daysSupply',
-      'refills',
-      'instructions',
-      'notes',
-      'templateName',
-      'addToTemplates',
-      'doNotFillBeforeDate'
-    ]);
     setOffCatalog(undefined);
     clearForm(props.actions, { notes: props.prefillNotes });
 
