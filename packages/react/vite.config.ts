@@ -15,6 +15,7 @@ export default defineConfig({
   ],
   build: {
     sourcemap: true,
+    minify: false,
     lib: {
       // eslint-disable-next-line
       entry: path.resolve(__dirname, 'src/index.ts'),

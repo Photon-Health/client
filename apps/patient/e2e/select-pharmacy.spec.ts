@@ -13,11 +13,10 @@ test('displays order status for a freshly created order', async ({ page }) => {
     // as "open order" combining. So most tests after the first run of the day will hit the "placed" page
     // todo: figure out how to avoid this for e2e tests - organization setting "enableOpenOrderMerges" probably?
     return;
+  } else if (landingPage === 'review-your-prescription') {
+    await expect(page.getByText(/Amoxicillin Oral Capsule 250 MG/i)).toBeVisible();
+    await page.getByRole('button', { name: /search for a pharmacy/i }).click();
   }
-
-  await expect(page.getByText(/Amoxicillin Oral Capsule 250 MG/i)).toBeVisible();
-
-  await page.getByRole('button', { name: /search for a pharmacy/i }).click();
 
   await expect(page.getByRole('heading', { name: /select a pharmacy/i })).toBeVisible({
     timeout: 15_000
@@ -36,7 +35,7 @@ test('displays order status for a freshly created order', async ({ page }) => {
   await expect(page.getByText(/Amoxicillin/i)).toBeVisible();
 });
 
-type LandingPageNames = 'review-your-prescription' | 'order-placed';
+type LandingPageNames = 'review-your-prescription' | 'pharmacy-select' | 'order-placed';
 async function getLandingPage(page: Page): Promise<LandingPageNames> {
   await expect(page.locator('body')).not.toContainText('Loading', { timeout: 15_000 });
 
@@ -45,6 +44,10 @@ async function getLandingPage(page: Page): Promise<LandingPageNames> {
       .getByText(/review your prescription/i)
       .waitFor({ timeout: 15_000 })
       .then(() => 'review-your-prescription' as const),
+    page
+      .getByText(/select a pharmacy/i)
+      .waitFor({ timeout: 15_000 })
+      .then(() => 'pharmacy-select' as const),
     page
       .getByText(/Order placed/i)
       .waitFor({ timeout: 15_000 })
