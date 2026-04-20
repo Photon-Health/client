@@ -86,8 +86,9 @@ test('New Prescriptions Page Viewed fires after Signature attestation status is 
   );
 
   await waitFor(() => {
-    expect(rudderIdentifySpy).toHaveBeenCalledWith(PROVIDER.id, {
+    expect(rudderIdentifySpy).toHaveBeenCalledWith(PROVIDER.email, {
       email: PROVIDER.email,
+      user_id: PROVIDER.id,
       name: PROVIDER.name.full,
       org_id: ORGANIZATION.id,
       customer_id: ORGANIZATION.customer.id
