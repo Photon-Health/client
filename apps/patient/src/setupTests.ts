@@ -47,7 +47,7 @@ if (typeof window !== 'undefined' && !('IntersectionObserver' in window)) {
   // @ts-ignore
   window.IntersectionObserver = IntersectionObserver;
   // @ts-ignore
-
+  // eslint-disable-next-line no-undef
   global.IntersectionObserver = IntersectionObserver;
 }
 
