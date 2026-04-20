@@ -177,6 +177,11 @@ export const DraftPrescriptionForm = (props: {
     setSearchText('');
   };
 
+  const handleCancel = () => {
+    props.hideForm();
+    clearForm(props.actions, { notes: props.prefillNotes });
+  };
+
   createEffect(() => {
     if (props.store.treatment?.value) {
       setSearchText(props.store.treatment.value.name);
@@ -494,7 +499,7 @@ export const DraftPrescriptionForm = (props: {
           Add to drafts
         </Button>
         <Show when={draftPrescriptions().length > 0}>
-          <Button class="w-full xs:!w-auto" size="lg" onClick={() => {}} variant="secondary">
+          <Button class="w-full xs:!w-auto" size="lg" onClick={handleCancel} variant="secondary">
             Cancel
           </Button>
         </Show>
