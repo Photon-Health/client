@@ -483,9 +483,9 @@ export const DraftPrescriptionForm = (props: {
           </Show>
         </div>
       </Show>
-      <div class="w-full flex flex-col justify-end mt-6 gap-2 xs:!flex-row-reverse xs:!justify-start">
+      <div class="w-full flex flex-col justify-end mt-6 gap-2 xs:flex-row-reverse xs:justify-start">
         <Button
-          class="w-full xs:!w-auto"
+          class="w-full xs:w-auto"
           size="lg"
           onClick={() => {
             if (!isLoading()) {
@@ -499,7 +499,7 @@ export const DraftPrescriptionForm = (props: {
           Add to drafts
         </Button>
         <Show when={draftPrescriptions().length > 0}>
-          <Button class="w-full xs:!w-auto" size="lg" onClick={handleCancel} variant="secondary">
+          <Button class="w-full xs:w-auto" size="lg" onClick={handleCancel} variant="secondary">
             Cancel
           </Button>
         </Show>

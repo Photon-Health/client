@@ -86,7 +86,7 @@ export const PrescriptionCard = (props: {
           <Show when={!showForm()}>
             <Button
               variant="secondary"
-              class="w-full xs:w-fit mt-4"
+              class="w-full mt-4"
               size="lg"
               onClick={() => setShowForm(true)}
             >
