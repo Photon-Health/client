@@ -461,8 +461,8 @@ export const AddPrescriptionCard = (props: {
             }}
           />
         </InputGroup>
-        <div class="flex flex-col xs:flex-row mt-4">
-          <Show when={!props.hideAddToTemplates}>
+        <Show when={!props.hideAddToTemplates}>
+          <div class="flex flex-col mt-4 gap-y-2">
             <Checkbox
               mainText="Add To Personal Templates"
               showOptionalSubtext
@@ -481,9 +481,7 @@ export const AddPrescriptionCard = (props: {
                 });
               }}
             />
-          </Show>
-          <Show when={props.store.addToTemplates?.value ?? false}>
-            <div class="flex-1 mt-2">
+            <Show when={props.store.addToTemplates?.value ?? false}>
               <InputGroup label="Template Name" error={props.store.templateName?.error}>
                 <Input
                   value={props.store.templateName?.value ?? ''}
@@ -495,24 +493,24 @@ export const AddPrescriptionCard = (props: {
                   }
                 />
               </InputGroup>
-            </div>
-          </Show>
-          <div class="flex flex-grow justify-end">
-            <Button
-              class="w-full xs:!w-auto h-fit mt-6"
-              size="lg"
-              onClick={() => {
-                if (!isLoading()) {
-                  handleAddPrescription();
-                }
-              }}
-              loading={isLoading()}
-              variant="primary"
-              color="blue"
-            >
-              Add to drafts
-            </Button>
+            </Show>
           </div>
+        </Show>
+        <div class="flex flex-grow justify-end mt-6">
+          <Button
+            class="w-full xs:w-auto"
+            size="lg"
+            onClick={() => {
+              if (!isLoading()) {
+                handleAddPrescription();
+              }
+            }}
+            loading={isLoading()}
+            variant="primary"
+            color="blue"
+          >
+            Add to drafts
+          </Button>
         </div>
       </div>
     </Card>

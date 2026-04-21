@@ -11,7 +11,6 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
 import { Show } from 'solid-js';
-import photonStyles from '@photonhealth/components/dist/index.css?inline';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -45,7 +44,6 @@ const Component = (props: DialogProps) => {
 
   return (
     <>
-      <style>{photonStyles}</style>
       <style>{tailwind}</style>
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>

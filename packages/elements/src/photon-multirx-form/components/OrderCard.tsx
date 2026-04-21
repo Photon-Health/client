@@ -1,6 +1,5 @@
 import { createMemo } from 'solid-js';
 import { Card, PharmacySelect, Text } from '@photonhealth/components';
-import photonStyles from '@photonhealth/components/dist/index.css?inline';
 
 const hasUsableAddress = (address?: {
   street1?: string;
@@ -36,7 +35,6 @@ export const OrderCard = (props: { store: Record<string, any> }) => {
 
   return (
     <div>
-      <style>{photonStyles}</style>
       <Card addChildrenDivider={true}>
         <div class="flex items-center justify-between">
           <Text color="gray">Select Pharmacy</Text>
