@@ -55,7 +55,6 @@ vi.mock('./configs/graphqlClient', () => ({
   }
 }));
 
-vi.mock('@datadog/browser-rum');
 vi.mock('react-ga4');
 vi.mock('mixpanel-browser');
 
