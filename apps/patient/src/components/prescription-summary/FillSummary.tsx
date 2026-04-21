@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { Box, HStack, Text, VStack } from '@chakra-ui/react';
 import { formatDate } from '../../utils/formatters';
 import { FillWithCount } from '../../utils/general';
+import { Tooltip } from '../Tooltip';
 
 interface FillSummaryProps {
   fill: FillWithCount;
@@ -12,20 +13,17 @@ export function FillSummary({ fill, expanded = false }: FillSummaryProps) {
   return (
     <Box>
       <Box py={2} px={3} borderBottom={expanded ? '1px' : '0'} borderColor="gray.200">
-        <Text
-          textOverflow="ellipsis"
-          whiteSpace="nowrap"
-          overflowX="hidden"
-          title={fill.treatment.name}
-          className="mp-mask"
-        >
-          {fill.treatment.name}
-        </Text>
+        <Tooltip label={fill.treatment.name} placement="top-start">
+          <Text textOverflow="ellipsis" whiteSpace="nowrap" overflowX="hidden" className="mp-mask">
+            {fill.treatment.name}
+          </Text>
+        </Tooltip>
       </Box>
       <Box
         as="div"
         maxHeight={expanded ? '80px' : '0px'}
         opacity={expanded ? '100%' : '0'}
+        overflow="hidden"
         transitionProperty={'all'}
         transitionDuration={'150ms'}
         transitionTimingFunction={expanded ? 'linear' : 'ease-out'}

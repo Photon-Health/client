@@ -1,6 +1,6 @@
 import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@chakra-ui/react';
 import { FiInfo, FiStar, FiTag } from 'react-icons/fi';
-import { Tooltip } from './Tooltip';
+import { Tooltip } from '../Tooltip';
 import { text as t } from '../../utils/text';
 import { OfferBundleDetails, OfferPromotionTypes, Promotion } from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';
@@ -170,15 +170,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
           {offer.medications?.map((med) => (
             <HStack key={med.name} w="full" justify="space-between" align="start">
               <VStack align="flex-start">
-                <Tooltip
-                  label={med.name}
-                  placement="top-start"
-                  wrapperProps={{
-                    onClick: (e) => {
-                      e.stopPropagation();
-                    }
-                  }}
-                >
+                <Tooltip label={med.name} placement="top-start">
                   <Text fontSize="sm" color="gray.700" noOfLines={1}>
                     {med.name}
                   </Text>
