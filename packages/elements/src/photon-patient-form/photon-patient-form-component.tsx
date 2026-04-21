@@ -22,7 +22,6 @@ import {
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
-import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import { email, empty, message, notFutureDate, zipString } from '../validators';
 
 import { isZip } from '../utils';
@@ -243,9 +242,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
     );
     return (
       <>
-        {/*Using !mt-8 because of tailwind issue in shadowDom elements */}
-        {/*when not using the !important modifier*/}
-        <p class="font-sans text-lg mt-4 md:!mt-8" role="heading" aria-level="3">
+        <p class="font-sans text-lg mt-4 md:mt-8" role="heading" aria-level="3">
           Address
           <Show when={props.optionalPatientAddress && !hasAnyAddressField()}>
             <span class="text-gray-500 text-sm font-normal"> (optional)</span>
@@ -347,7 +344,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   return (
     <div class="w-full h-full relative" ref={ref}>
       <style>{tailwind}</style>
-      <style>{photonStyles}</style>
       <Show when={pStore.selectedPatient.isLoading}>
         <div class="w-full flex justify-center">
           <Spinner color="green" />

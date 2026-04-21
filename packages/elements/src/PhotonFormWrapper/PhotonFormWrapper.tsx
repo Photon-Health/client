@@ -1,8 +1,7 @@
 import { createSignal, JSX, mergeProps, Show } from 'solid-js';
 import { Button, Icon } from '@photonhealth/components';
-import tailwind from '../tailwind.css?inline';
 
-export type PhotonFormWrapperProps = {
+type PhotonFormWrapperProps = {
   closeTitle?: string;
   closeBody?: string;
   footer?: JSX.Element;
@@ -33,8 +32,6 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
 
   return (
     <div ref={ref} class="z-50 fixed inset-0 flex flex-col bg-[#F9FAFB]">
-      <style>{tailwind}</style>
-
       {/* Close Wrapper Modal */}
       <photon-dialog
         label={props.closeTitle}

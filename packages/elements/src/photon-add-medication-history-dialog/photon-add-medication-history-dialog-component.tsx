@@ -12,7 +12,6 @@ import '@shoelace-style/shoelace/dist/components/menu-item/menu-item';
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 //Styles
-import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import tailwind from '../tailwind.css?inline';
@@ -103,7 +102,6 @@ const Component = (props: AddMedicationHistoryDialogProps) => {
 
   return (
     <div ref={ref}>
-      <style>{photonStyles}</style>
       <style>{tailwind}</style>
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>
