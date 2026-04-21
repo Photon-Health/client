@@ -334,11 +334,12 @@ export function OrganizationSettingsForm({
               <Flex gap={2}>
                 <Field component={SwitchField} name="providerUx.enableWebAppPrescribe" />
                 <FormLabel htmlFor="providerUx.enableWebAppPrescribe" mb={0}>
-                  Enable Prescribing on Web App
+                  Enable Prescribers on the Web App
                 </FormLabel>
               </Flex>
               <FormHelperText>
-                Allow prescribers to create prescriptions on the Photon Web App.
+                Allow prescribers to use the Photon Web App to write prescriptions and manage
+                patients.
               </FormHelperText>
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enablePrescribeToOrder}>
