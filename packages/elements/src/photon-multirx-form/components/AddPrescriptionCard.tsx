@@ -258,27 +258,29 @@ export const AddPrescriptionCard = (props: {
           <div class="flex items-start gap-1">
             <div class="flex-1" style={{ width: '100px' }}>
               <InputGroup label="Quantity" required error={props.store.dispenseQuantity?.error}>
-                <Input
-                  type="number"
-                  inputMode="decimal"
-                  value={props.store.dispenseQuantity?.value ?? undefined}
-                  min={0}
-                  onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-                    props.actions.updateFormValue({
-                      key: 'dispenseQuantity',
-                      value: Number(e.currentTarget.value)
-                    });
-                  }}
-                  onBlur={(e) => {
-                    dispatchAnalyticsTrackEvent('fieldInteraction', {
-                      name: 'Field Interaction',
-                      formName: 'add_prescription_form',
-                      fieldName: 'dispenseQuantity',
-                      hasValue: Boolean(e.currentTarget.value),
-                      isOptional: false
-                    });
-                  }}
-                />
+                <div data-mp-unmask>
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    value={props.store.dispenseQuantity?.value ?? undefined}
+                    min={0}
+                    onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+                      props.actions.updateFormValue({
+                        key: 'dispenseQuantity',
+                        value: Number(e.currentTarget.value)
+                      });
+                    }}
+                    onBlur={(e) => {
+                      dispatchAnalyticsTrackEvent('fieldInteraction', {
+                        name: 'Field Interaction',
+                        formName: 'add_prescription_form',
+                        fieldName: 'dispenseQuantity',
+                        hasValue: Boolean(e.currentTarget.value),
+                        isOptional: false
+                      });
+                    }}
+                  />
+                </div>
               </InputGroup>
             </div>
             {/* Wrap in InputGroup with invisible label to match Quantity's vertical layout */}
@@ -293,24 +295,26 @@ export const AddPrescriptionCard = (props: {
             </InputGroup>
           </div>
           <InputGroup label="Dispense Unit" required error={props.store.dispenseUnit?.error}>
-            <DispenseUnitSelect
-              value={props.store.dispenseUnit?.value ?? undefined}
-              onChange={(e: Event & { currentTarget: HTMLSelectElement }) => {
-                props.actions.updateFormValue({
-                  key: 'dispenseUnit',
-                  value: e.currentTarget.value
-                });
-              }}
-              onBlur={(e) => {
-                dispatchAnalyticsTrackEvent('fieldInteraction', {
-                  name: 'Field Interaction',
-                  formName: 'add_prescription_form',
-                  fieldName: 'dispenseUnit',
-                  hasValue: Boolean(e.currentTarget.value),
-                  isOptional: false
-                });
-              }}
-            />
+            <div data-mp-unmask>
+              <DispenseUnitSelect
+                value={props.store.dispenseUnit?.value ?? undefined}
+                onChange={(e: Event & { currentTarget: HTMLSelectElement }) => {
+                  props.actions.updateFormValue({
+                    key: 'dispenseUnit',
+                    value: e.currentTarget.value
+                  });
+                }}
+                onBlur={(e) => {
+                  dispatchAnalyticsTrackEvent('fieldInteraction', {
+                    name: 'Field Interaction',
+                    formName: 'add_prescription_form',
+                    fieldName: 'dispenseUnit',
+                    hasValue: Boolean(e.currentTarget.value),
+                    isOptional: false
+                  });
+                }}
+              />
+            </div>
           </InputGroup>
         </div>
         <DoseCalculator
@@ -342,51 +346,55 @@ export const AddPrescriptionCard = (props: {
         />
         <div class="sm:grid sm:grid-cols-2 sm:gap-4">
           <InputGroup label="Days Supply" required error={props.store.daysSupply?.error}>
-            <Input
-              type="number"
-              inputMode="numeric"
-              value={props.store.daysSupply?.value ?? undefined}
-              min={0}
-              onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-                props.actions.updateFormValue({
-                  key: 'daysSupply',
-                  value: Number(e.currentTarget.value)
-                });
-              }}
-              onBlur={(e) => {
-                dispatchAnalyticsTrackEvent('fieldInteraction', {
-                  name: 'Field Interaction',
-                  formName: 'add_prescription_form',
-                  fieldName: 'daysSupply',
-                  hasValue: Boolean(e.currentTarget.value),
-                  isOptional: true
-                });
-              }}
-            />
+            <div data-mp-unmask>
+              <Input
+                type="number"
+                inputMode="numeric"
+                value={props.store.daysSupply?.value ?? undefined}
+                min={0}
+                onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+                  props.actions.updateFormValue({
+                    key: 'daysSupply',
+                    value: Number(e.currentTarget.value)
+                  });
+                }}
+                onBlur={(e) => {
+                  dispatchAnalyticsTrackEvent('fieldInteraction', {
+                    name: 'Field Interaction',
+                    formName: 'add_prescription_form',
+                    fieldName: 'daysSupply',
+                    hasValue: Boolean(e.currentTarget.value),
+                    isOptional: true
+                  });
+                }}
+              />
+            </div>
           </InputGroup>
           <InputGroup label="Refills" required error={props.store.refills?.error}>
-            <Input
-              type="number"
-              inputMode="numeric"
-              value={props.store.refills?.value ?? undefined}
-              min={0}
-              max={11}
-              onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
-                props.actions.updateFormValue({
-                  key: 'refills',
-                  value: Number(e.currentTarget.value)
-                });
-              }}
-              onBlur={(e) => {
-                dispatchAnalyticsTrackEvent('fieldInteraction', {
-                  name: 'Field Interaction',
-                  formName: 'add_prescription_form',
-                  fieldName: 'refills',
-                  hasValue: Boolean(e.currentTarget.value),
-                  isOptional: true
-                });
-              }}
-            />
+            <div data-mp-unmask>
+              <Input
+                type="number"
+                inputMode="numeric"
+                value={props.store.refills?.value ?? undefined}
+                min={0}
+                max={11}
+                onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+                  props.actions.updateFormValue({
+                    key: 'refills',
+                    value: Number(e.currentTarget.value)
+                  });
+                }}
+                onBlur={(e) => {
+                  dispatchAnalyticsTrackEvent('fieldInteraction', {
+                    name: 'Field Interaction',
+                    formName: 'add_prescription_form',
+                    fieldName: 'refills',
+                    hasValue: Boolean(e.currentTarget.value),
+                    isOptional: true
+                  });
+                }}
+              />
+            </div>
           </InputGroup>
         </div>
         <InputGroup

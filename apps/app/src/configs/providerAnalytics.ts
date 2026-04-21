@@ -31,7 +31,7 @@ export class ProviderAnalytics {
       this.rudderanalytics.load(RUDDERSTACK_WRITE_KEY, RUDDERSTACK_DATA_PLANE_URL);
       this.isInitialized = true;
     }
-
+    console.log('MIXPANEL_TOKEN: ', MIXPANEL_TOKEN);
     if (MIXPANEL_TOKEN) {
       mixpanel.init(MIXPANEL_TOKEN, {
         debug: false, // floods the console, only turn on when needed
@@ -41,6 +41,7 @@ export class ProviderAnalytics {
         record_heatmap_data: true,
         flags: true,
         record_mask_all_text: false, // reveal all text and mask individually; inputs are unaffected and remain masked
+        record_unmask_input_selector: '[data-mp-unmask] input, [data-mp-unmask] select',
         autocapture: false
       });
       this.mixpanelEnabled = true;
