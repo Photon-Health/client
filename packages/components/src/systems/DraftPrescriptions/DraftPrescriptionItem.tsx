@@ -12,7 +12,7 @@ import { toPrescriptionFormData } from './utils/mappers';
 import { PrescriptionFormData } from './DraftPrescriptionsProvider';
 import Card from '../../particles/Card';
 
-export function DraftPrescriptionListItem(props: {
+export function DraftPrescriptionItem(props: {
   draft: Prescription;
   coverageOptions: CoverageOption[];
   handleEdit?: (prescription: PrescriptionFormData) => void;

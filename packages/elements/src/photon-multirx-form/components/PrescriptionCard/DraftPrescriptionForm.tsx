@@ -152,7 +152,7 @@ export const DraftPrescriptionForm = (props: {
         addToTemplates: props.store.addToTemplates?.value ?? false,
         templateName: props.store.templateName?.value,
         catalogId: props.store.catalogId?.value,
-        showSuccessToast: true
+        showSuccessToast: false
       };
       createdPrescription = await tryCreatePrescription(prescriptionFormData, options);
     } catch (err) {

@@ -28,6 +28,7 @@ export const PrescriptionCard = (props: {
   disableList?: DisableList;
 }) => {
   let prescriptionFormRef: HTMLDivElement | undefined;
+  let lastDraftRef: HTMLDivElement | undefined;
   const pharmacySelectionContext = usePharmacySelectionContext();
   const { draftPrescriptions, isLoadingPrefills } = useDraftPrescriptions();
   const [showForm, setShowForm] = createSignal<boolean>(false);
@@ -36,6 +37,14 @@ export const PrescriptionCard = (props: {
     if (draftPrescriptions().length === 0) {
       // reopen form if all drafts are deleted
       setShowForm(true);
+    }
+  });
+
+  createEffect(() => {
+    // When form is hidden after Add to drafts or Cancel,
+    // scroll last draft prescription into view
+    if (!showForm()) {
+      lastDraftRef?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   });
 
@@ -57,9 +66,10 @@ export const PrescriptionCard = (props: {
         <Show when={!isLoadingPrefills()}>
           <DraftPrescriptions
             prescriptionFormRef={prescriptionFormRef}
+            ref={lastDraftRef}
             actions={props.actions}
             store={props.store}
-            setShowForm={() => setShowForm(true)}
+            expandForm={() => setShowForm(true)}
             handleDraftPrescriptionsChange={props.screenDraftedPrescriptions}
             screeningAlerts={props.screeningAlerts}
             routingConstraints={pharmacySelectionContext.routingConstraints()}
