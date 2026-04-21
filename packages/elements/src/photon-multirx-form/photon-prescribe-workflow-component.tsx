@@ -13,7 +13,6 @@ import { onCleanup } from 'solid-js';
 import { PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
-import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -84,7 +83,6 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
               <style>{shoelaceDarkStyles}</style>
               <style>{shoelaceLightStyles}</style>
               <style>{styles}</style>
-              <style>{photonStyles}</style>
               <PrescribeWorkflow
                 patientId={props.patientId}
                 hideSubmit={props.hideSubmit}
