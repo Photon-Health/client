@@ -1,10 +1,10 @@
 import { Button, triggerToast, usePhoton } from '@photonhealth/components';
-import photonStyles from '@photonhealth/components/dist/index.css?inline';
+import tailwind from '../tailwind.css?inline';
 import { types } from '@photonhealth/sdk';
 import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
 import { createMemo, createSignal, onMount } from 'solid-js';
-import { PhotonFormWrapper } from '../photon-form-wrapper';
+import { PhotonFormWrapper } from '../PhotonFormWrapper';
 import { PatientStore } from '../stores/patient';
 
 const shouldWarn = (form: any) => {
@@ -187,7 +187,7 @@ const Component = (props: {
 
   return (
     <div ref={ref}>
-      <style>{photonStyles}</style>
+      <style>{tailwind}</style>
       <photon-dialog
         label="Lose Unsaved Prescription?"
         open={continueSubmitOpen()}
