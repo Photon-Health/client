@@ -39,6 +39,7 @@ export const Main = () => {
   const { user, isAuthenticated, isLoading, error, clinicalClient } = usePhoton();
   const location = useLocation();
   const navigate = useNavigate();
+
   const hasOverridePermission = usePermissions(['access:web_app_override']);
 
   const {
