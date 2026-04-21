@@ -88,7 +88,7 @@ export const Review = () => {
               <Text display="inline" color="gray.500">
                 {t.patient}
               </Text>
-              <Text display="inline" data-dd-privacy="mask" className="mp-mask">
+              <Text display="inline" className="mp-mask">
                 {patient.name.full}
               </Text>
             </HStack>
