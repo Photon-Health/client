@@ -65,7 +65,7 @@ export const DraftPrescriptionForm = (props: {
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
   disableList?: DisableList;
-  hideForm: () => void;
+  onHideForm: () => void;
 }) => {
   const { tryCreatePrescription, draftPrescriptions } = useDraftPrescriptions();
   const { dispatchOrderError, dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
@@ -165,7 +165,7 @@ export const DraftPrescriptionForm = (props: {
       return;
     }
 
-    props.hideForm();
+    props.onHideForm();
 
     // todo: move screening up to prescribeContext (for med history Refill button clicks)
     props.screenDraftedPrescriptions();
@@ -178,7 +178,7 @@ export const DraftPrescriptionForm = (props: {
   };
 
   const handleCancel = () => {
-    props.hideForm();
+    props.onHideForm();
     clearForm(props.actions, { notes: props.prefillNotes });
   };
 

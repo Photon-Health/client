@@ -8,7 +8,7 @@ import {
   usePharmacySelectionContext
 } from '@photonhealth/components';
 import { DraftPrescriptions } from './DraftPrescriptions';
-import { createEffect, createSignal, Show } from 'solid-js';
+import { createEffect, createSignal, Show, untrack } from 'solid-js';
 import { DraftPrescriptionForm } from './DraftPrescriptionForm';
 import { DisableList } from '../PrescribeWorkflow';
 import { PhotonTooltip } from '../../../photon-tooltip';
@@ -34,17 +34,24 @@ export const PrescriptionCard = (props: {
   const [showForm, setShowForm] = createSignal<boolean>(false);
 
   createEffect(() => {
-    if (draftPrescriptions().length === 0) {
-      // reopen form if all drafts are deleted
-      setShowForm(true);
+    // When prefills are done loading, decide if form should be hidden
+    if (!isLoadingPrefills()) {
+      // Don't need to track draftPrescriptions after isLoadingPrefills
+      // switches to false
+      untrack(() => {
+        // If prefills were successfully created,
+        // most providers won't add another draft so hide form
+        if (draftPrescriptions().length !== 0) {
+          setShowForm(false);
+        }
+      });
     }
   });
 
   createEffect(() => {
-    // When form is hidden after Add to drafts or Cancel,
-    // scroll last draft prescription into view
-    if (!showForm()) {
-      lastDraftRef?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (draftPrescriptions().length === 0) {
+      // reopen form if all drafts are deleted
+      setShowForm(true);
     }
   });
 
@@ -61,7 +68,9 @@ export const PrescriptionCard = (props: {
       </div>
       <div>
         <Show when={isLoadingPrefills()}>
-          <Spinner color="green" />
+          <div class="w-full flex justify-center">
+            <Spinner color="green" />
+          </div>
         </Show>
         <Show when={!isLoadingPrefills()}>
           <DraftPrescriptions
@@ -99,7 +108,10 @@ export const PrescriptionCard = (props: {
                 catalogId={props.catalogId}
                 allowOffCatalogSearch={props.allowOffCatalogSearch}
                 disableList={props.disableList}
-                hideForm={() => setShowForm(false)}
+                onHideForm={() => {
+                  setShowForm(false);
+                  lastDraftRef?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
               />
             </div>
           </Show>
