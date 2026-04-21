@@ -28,7 +28,7 @@ export const PrescriptionCard = (props: {
   disableList?: DisableList;
 }) => {
   let prescriptionFormRef: HTMLDivElement | undefined;
-  let lastDraftRef: HTMLDivElement | undefined;
+  let prescriptionsCardRef: HTMLDivElement | undefined;
   const pharmacySelectionContext = usePharmacySelectionContext();
   const { draftPrescriptions, isLoadingPrefills } = useDraftPrescriptions();
   const [showForm, setShowForm] = createSignal<boolean>(false);
@@ -56,7 +56,7 @@ export const PrescriptionCard = (props: {
   });
 
   return (
-    <Card addChildrenDivider={true}>
+    <Card ref={prescriptionsCardRef} addChildrenDivider={true}>
       <div class="flex items-center space-x-2 text-slate-500">
         <Text color="gray" class="pr-2">
           Prescriptions
@@ -75,7 +75,6 @@ export const PrescriptionCard = (props: {
         <Show when={!isLoadingPrefills()}>
           <DraftPrescriptions
             prescriptionFormRef={prescriptionFormRef}
-            ref={lastDraftRef}
             actions={props.actions}
             store={props.store}
             expandForm={() => setShowForm(true)}
@@ -110,7 +109,9 @@ export const PrescriptionCard = (props: {
                 disableList={props.disableList}
                 onHideForm={() => {
                   setShowForm(false);
-                  lastDraftRef?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  if (prescriptionsCardRef) {
+                    prescriptionsCardRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
                 }}
               />
             </div>

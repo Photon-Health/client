@@ -29,7 +29,6 @@ export function getPrescriptionRoutingConstraints(
 
 export const DraftPrescriptions = (props: {
   prescriptionFormRef: HTMLDivElement | undefined;
-  ref: HTMLDivElement | undefined;
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
   expandForm: () => void;
@@ -173,24 +172,18 @@ export const DraftPrescriptions = (props: {
         <Show when={!isLoadingPrefills() && draftPrescriptions().length > 0}>
           <div class="flex flex-col gap-4">
             <For each={draftPrescriptions()}>
-              {(draftPrescription, index) => (
-                <div class="relative">
-                  {/* Add ref to allow scrolling to a little bit above the last draft item */}
-                  {index() === draftPrescriptions().length - 1 && (
-                    <div ref={props.ref} class="absolute left-0 top-[-1rem]" />
+              {(draftPrescription) => (
+                <DraftPrescriptionItem
+                  screeningAlerts={props.screeningAlerts}
+                  routingConstraint={prescriptionRoutingConstraints().get(draftPrescription.id)}
+                  draft={draftPrescription}
+                  coverageOptions={coverageOptions().filter(
+                    (c) => c.prescriptionId === draftPrescription.id
                   )}
-                  <DraftPrescriptionItem
-                    screeningAlerts={props.screeningAlerts}
-                    routingConstraint={prescriptionRoutingConstraints().get(draftPrescription.id)}
-                    draft={draftPrescription}
-                    coverageOptions={coverageOptions().filter(
-                      (c) => c.prescriptionId === draftPrescription.id
-                    )}
-                    handleEdit={handleEdit}
-                    handleDelete={handleDelete}
-                    handleSwapToOtherPrescription={handleSwapToOtherPrescription}
-                  />
-                </div>
+                  handleEdit={handleEdit}
+                  handleDelete={handleDelete}
+                  handleSwapToOtherPrescription={handleSwapToOtherPrescription}
+                />
               )}
             </For>
           </div>
