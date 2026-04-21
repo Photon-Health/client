@@ -95,7 +95,7 @@ export const App = () => {
             <Route path="/sso" element={<SSOLogin />} />
             <Route path="/signup" element={<SelfSignupPage />} />
             <Route path="/logout" element={<Logout />} />
-            <Route path="/disallowed" element={<Disallowed />}></Route>
+            <Route path="/disallowed" element={<Disallowed />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </ProviderAnalyticsProvider>
