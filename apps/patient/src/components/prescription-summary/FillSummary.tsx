@@ -18,7 +18,6 @@ export function FillSummary({ fill, expanded = false }: FillSummaryProps) {
           overflowX="hidden"
           title={fill.treatment.name}
           className="mp-mask"
-          data-dd-privacy="mask"
         >
           {fill.treatment.name}
         </Text>
@@ -52,7 +51,7 @@ function FillDescriptor({ label, children }: { label: string; children: ReactNod
   return (
     <HStack>
       <Text as="span">{label}</Text>
-      <Text as="span" fontWeight="medium" className="mp-mask" data-dd-privacy="mask">
+      <Text as="span" fontWeight="medium" className="mp-mask">
         {children}
       </Text>
     </HStack>
