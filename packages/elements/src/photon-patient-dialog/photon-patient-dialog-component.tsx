@@ -1,13 +1,5 @@
 import { customElement } from 'solid-element';
-import {
-  createEffect,
-  createMemo,
-  createSignal,
-  onCleanup,
-  onMount,
-  Show,
-  untrack
-} from 'solid-js';
+import { createEffect, createMemo, createSignal, onMount, Show } from 'solid-js';
 import { Portal } from 'solid-js/web';
 import {
   buildFieldSnapshot,
@@ -19,22 +11,51 @@ import {
 } from '@photonhealth/components';
 import tailwind from '../tailwind.css?inline';
 import { PhotonFormWrapper } from '../PhotonFormWrapper';
-import { PatientStore } from '../stores/patient';
 import { createFormStore } from '../stores/form';
 import gql from 'graphql-tag';
 import { PatientForm } from './PatientForm';
 import { Patient } from '@photonhealth/sdk/dist/types';
 
-type PatientDialogProps = {
-  patientId: string;
-  open: boolean;
-  hideCreatePrescription: boolean;
-  optionalPatientAddress: boolean;
-};
-
-const PATIENT_FIELDS = gql`
+const HAS_PATIENTS_FIELDS = gql`
   fragment PatientFields on Patient {
     id
+  }
+`;
+
+const PATIENT_DIALOG_FIELDS = gql`
+  fragment PatientDialogFields on Patient {
+    id
+    name {
+      first
+      last
+    }
+    dateOfBirth
+    sex
+    gender
+    email
+    phone
+    address {
+      id
+      street1
+      street2
+      city
+      state
+      postalCode
+      country
+    }
+    preferredPharmacies {
+      id
+      name
+      address {
+        city
+        country
+        postalCode
+        state
+        street1
+        street2
+      }
+      phone
+    }
   }
 `;
 
@@ -54,20 +75,28 @@ const patientToFormValues = (patient: Patient | undefined) => ({
   preferredPharmacy: patient?.preferredPharmacies?.[0]?.id
 });
 
-const Component = (props: PatientDialogProps) => {
+const Component = (props: {
+  patientId: string;
+  open: boolean;
+  hideCreatePrescription: boolean;
+  optionalPatientAddress: boolean;
+}) => {
   let ref: any;
   const client = usePhoton();
   const [loading, setLoading] = createSignal(false);
+  const [loadingPatient, setLoadingPatient] = createSignal(!!props.patientId);
   const [isCreatePrescription, setIsCreatePrescription] = createSignal<boolean>(false);
   const [globalError, setGlobalError] = createSignal<string | undefined>(undefined);
   const [hasPatients, setHasPatients] = createSignal<boolean>(false);
-  const { store: pStore, actions: pActions } = PatientStore;
+  const [initialPreferredPharmacy, setInitialPreferredPharmacy] = createSignal<
+    PharmacyOption | undefined
+  >(undefined);
   const { store, actions } = createFormStore();
 
   onMount(async () => {
     try {
       const { data } = await client.sdk.clinical.patient.getPatients({
-        fragment: { PatientFields: PATIENT_FIELDS }
+        fragment: { PatientFields: HAS_PATIENTS_FIELDS }
       });
       setHasPatients(data && data.patients.length > 0);
     } catch (err) {
@@ -76,34 +105,46 @@ const Component = (props: PatientDialogProps) => {
     }
   });
 
-  onCleanup(() => {
-    // Component is used as the full page for /patients/update route
-    // so need to clear PatientStore singleton when user navigates away
-    pActions.clearSelectedPatient();
-  });
-
-  createEffect(() => {
+  createEffect(async () => {
     const patientId = props.patientId;
-    // Need this untrack to prevent endless rerender on /patients/update route
-    // - Effect calls getSelectedPatient
-    // - getSelectedPatient reads store.selectedPatient > adds store.selectedPatient
-    //   to the tracking scope
-    // - getSelectedPatient updates store.selectedPatient > store.selectedPatient is
-    //   tracked by the effect > effect runs again > loop
-    // untrack prevents store.selectedPatient from being added to the tracking scope
-    untrack(() => {
-      if (patientId) {
-        pActions.getSelectedPatient(client!.getSDK(), patientId);
-      } else {
-        pActions.clearSelectedPatient();
-      }
-    });
-  });
 
-  createEffect(() => {
-    const values = patientToFormValues(props.patientId ? pStore.selectedPatient.data : undefined);
-    for (const [key, value] of Object.entries(values)) {
-      actions.updateFormValue({ key, value });
+    if (!patientId) {
+      // Clear form if no patient
+      const values = patientToFormValues(undefined);
+      for (const [key, value] of Object.entries(values)) {
+        actions.updateFormValue({ key, value });
+      }
+      return;
+    }
+
+    setLoadingPatient(true);
+    // TODO: See what error flow should be
+    try {
+      const { data } = await client.sdk.clinical.patient.getPatient({
+        id: patientId,
+        fragment: {
+          PatientOrderFields: PATIENT_DIALOG_FIELDS
+        }
+      });
+
+      if (data.patient) {
+        const values = patientToFormValues(data.patient);
+        for (const [key, value] of Object.entries(values)) {
+          actions.updateFormValue({ key, value });
+        }
+
+        const pref = data.patient.preferredPharmacies?.[0];
+        if (pref) {
+          setInitialPreferredPharmacy({
+            ...pref,
+            address: pref.address as PharmacyOption['address'],
+            isPrevious: true,
+            isPreferred: true
+          });
+        }
+      }
+    } finally {
+      setLoadingPatient(false);
     }
   });
 
@@ -117,17 +158,6 @@ const Component = (props: PatientDialogProps) => {
         store['address_zip']?.value
       )
   );
-
-  const initialPreferredPharmacy = createMemo(() => {
-    const pref = pStore.selectedPatient.data?.preferredPharmacies?.[0];
-    if (!pref) return;
-    return {
-      ...pref,
-      address: pref.address as PharmacyOption['address'],
-      isPrevious: true,
-      isPreferred: true
-    };
-  });
 
   const dispatchUpdate = (patientId: string, didClickCreatePatientAndPrescription = false) => {
     const event = new CustomEvent('photon-patient-updated', {
@@ -195,14 +225,11 @@ const Component = (props: PatientDialogProps) => {
       return true;
     }
 
+    const initialPharmacy = initialPreferredPharmacy();
     if (
       store['preferredPharmacy']!.value &&
-      pStore.selectedPatient.data?.preferredPharmacies &&
-      pStore.selectedPatient.data?.preferredPharmacies.length !== 0 &&
-      !pStore.selectedPatient.data?.preferredPharmacies
-        ?.map((x: any) => x?.id)
-        .filter((x: any) => x !== null)
-        .includes(store['preferredPharmacy']!.value)
+      initialPharmacy &&
+      initialPharmacy.id !== store['preferredPharmacy']!.value
     ) {
       // remove existing preferred pharmacy in order to add the new one
       const removePreferredPharmacyMutation = client!
@@ -211,7 +238,7 @@ const Component = (props: PatientDialogProps) => {
       await removePreferredPharmacyMutation({
         variables: {
           patientId: props.patientId,
-          pharmacyId: pStore.selectedPatient.data?.preferredPharmacies![0]!.id
+          pharmacyId: initialPharmacy.id
         },
         awaitRefetchQueries: false
       });
@@ -287,6 +314,7 @@ const Component = (props: PatientDialogProps) => {
       }
       setLoading(false);
       actions.reset();
+      // TODO: see if we can avoid this
       props.open = false;
     } catch (e: any) {
       setLoading(false);
@@ -355,7 +383,7 @@ const Component = (props: PatientDialogProps) => {
                   actions={actions}
                   patientId={props.patientId}
                   optionalPatientAddress={props.optionalPatientAddress}
-                  initialPatientLoading={props.patientId ? !pStore.selectedPatient.data : false}
+                  initialPatientLoading={loadingPatient()}
                   initialPreferredPharmacy={initialPreferredPharmacy()}
                 />
               </>
