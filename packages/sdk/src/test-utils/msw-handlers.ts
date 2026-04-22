@@ -40,7 +40,7 @@ const servicesHandlers = [
 
   clinicalGql.query('MeUserQuery', () =>
     HttpResponse.json({
-      data: { me: { name: { title: 'MD' }, address: { state: 'NY' } } }
+      data: { me: { credentials: 'MD', address: { state: 'NY' } } }
     })
   ),
 
