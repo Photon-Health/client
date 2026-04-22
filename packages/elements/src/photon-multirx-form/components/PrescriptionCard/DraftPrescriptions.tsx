@@ -191,16 +191,16 @@ export const DraftPrescriptions = (props: {
       </div>
       <photon-dialog
         open={editDialogOpen()}
-        label="Overwrite in progress prescription?"
-        confirm-text="Yes, Overwrite"
-        cancel-text="No, Cancel"
+        label="Discard in-progress prescription?"
+        confirm-text="Yes, discard"
+        cancel-text="Go back"
         on:photon-dialog-confirmed={handleEditConfirm}
         on:photon-dialog-canceled={handleEditCancel}
         on:photon-dialog-alt={handleEditCancel}
       >
         <p class="font-sans text-lg xs:text-base">
-          You are editing a prescription that has not been added. This will be overwritten if you
-          edit another prescription.
+          You are editing a prescription that has not been added to your drafts. Your in-progress
+          prescription will be discarded if you edit another prescription.
         </p>
       </photon-dialog>
       <photon-dialog
@@ -213,7 +213,7 @@ export const DraftPrescriptions = (props: {
         on:photon-dialog-alt={handleDeleteCancel}
       >
         <p class="font-sans text-lg xs:text-base">
-          Deleting this prescription will remove it from your pending prescriptions. This action
+          Deleting this prescription will remove it from your draft prescriptions. This action
           cannot be undone.
         </p>
       </photon-dialog>
