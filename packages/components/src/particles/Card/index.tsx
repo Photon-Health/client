@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { createMemo, For, JSX, mergeProps } from 'solid-js';
 
 export interface CardProps extends JSX.HTMLAttributes<HTMLDivElement> {
+  ref?: HTMLDivElement | undefined;
   children: JSX.Element | JSX.Element[];
   selected?: boolean;
   disabled?: boolean;
@@ -29,7 +30,7 @@ function Card(preProps: CardProps) {
   );
 
   return (
-    <div class={cardClasses()}>
+    <div ref={props.ref} class={cardClasses()}>
       {/* addChildrenDivider adds a horizontal line between each child element */}
       <For each={Array.isArray(props.children) ? props.children : [props.children]}>
         {(child) => (

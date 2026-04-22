@@ -148,18 +148,6 @@ export function isValidPrescriptionRoutingConstraint(
   }
 }
 
-export function getPrescriptionRoutingConstraints(
-  routingConstraints: RoutingConstraint[]
-): Map<string, RoutingConstraint> {
-  const map = new Map<string, RoutingConstraint>();
-  for (const constraint of routingConstraints) {
-    if (isValidPrescriptionRoutingConstraint(constraint)) {
-      map.set(constraint.prescriptions[0].id, constraint);
-    }
-  }
-  return map;
-}
-
 export const noAdviceConstraint: RoutingConstraint = {
   prescriptions: [],
   routing_constraint_type: 'exclude',
