@@ -968,4 +968,4 @@ export type Permission =
   | 'write:patient'
   | 'write:prescription'
   | 'write:webhook_config'
-  | 'access:web_app_override';
+  | 'access_override:web_app';
