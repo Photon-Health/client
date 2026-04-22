@@ -38,6 +38,14 @@ const clearForm = (
     key: 'addToTemplates',
     value: false
   });
+  actions.updateFormValue({
+    key: 'templateName',
+    value: ''
+  });
+  actions.updateFormValue({
+    key: 'doNotFillBeforeDate',
+    value: undefined
+  });
 };
 
 export default clearForm;

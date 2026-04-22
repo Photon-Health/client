@@ -10,7 +10,7 @@ export const PATIENT = {
     first: 'Sally',
     middle: null,
     last: 'Patient',
-    title: 'MD'
+    title: 'Ms.'
   },
   dateOfBirth: '1990-01-01',
   sex: 'FEMALE',
@@ -36,12 +36,13 @@ export const DISPENSE_UNIT = {
 export const PROVIDER = {
   id: 'prov_1',
   email: 'doc@test.com',
+  credentials: 'MD',
   name: {
     first: 'Test',
     full: 'Test Doc',
     last: 'Doc',
     middle: null,
-    title: 'MD'
+    title: 'Dr. '
   }
 };
 

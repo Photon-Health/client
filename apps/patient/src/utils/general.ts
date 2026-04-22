@@ -124,7 +124,7 @@ export const preparePharmacy = (
   let isClosingSoon = false;
   let opens = '';
   let closes = '';
-  let showReadyIn30Min = false;
+  const showReadyIn30Min = false; // not being utilized currently but will revisit so not removing completely
   let logo: string | undefined = undefined;
 
   // for mail-order pharmacies, use the info mapped by this branding constant
@@ -139,7 +139,6 @@ export const preparePharmacy = (
   const pharmacyNameLowerCase = pharmacy.name.toLowerCase();
   if (pharmacyNameLowerCase.includes('walgreens')) {
     logo = walgreensLogo;
-    showReadyIn30Min = true;
   } else if (pharmacyNameLowerCase.includes('costco')) {
     logo = costcoLogo;
   }
