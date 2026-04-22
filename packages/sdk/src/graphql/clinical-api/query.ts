@@ -22,9 +22,7 @@ export const SearchTreatmentOptionsQuery = graphql(`
 export const MeUserQuery = graphql(`
   query MeUserQuery {
     me {
-      name {
-        title
-      }
+      credentials
       address {
         state
       }

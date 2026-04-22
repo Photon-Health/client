@@ -121,10 +121,16 @@ export const ScreenDraftedPrescriptionsQuery = gql`
   }
 `;
 
-const calculateNeedsSupervisor = ({ title, state }: { title?: string; state?: string }) =>
-  !!title &&
+const calculateNeedsSupervisor = ({
+  credentials,
+  state
+}: {
+  credentials?: string;
+  state?: string;
+}) =>
+  !!credentials &&
   !!state &&
-  ['NP', 'PA'].includes(title) &&
+  ['NP', 'PA'].includes(credentials) &&
   ['CA', 'FL', 'GA', 'MI', 'MO', 'NC', 'OK', 'SC', 'TN', 'TX', 'VA'].includes(state.toUpperCase());
 
 export function PrescribeWorkflow(props: PrescribeProps) {
@@ -206,7 +212,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       query: MeUserQuery
     });
     const needsSupervisorResult = calculateNeedsSupervisor({
-      title: me.name?.title || undefined,
+      credentials: me.credentials || undefined,
       state: me.address?.state || undefined
     });
     setNeedsSupervisor(needsSupervisorResult);
