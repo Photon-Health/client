@@ -40,7 +40,7 @@ export const Main = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const hasOverridePermission = usePermissions(['access:web_app_override']);
+  const hasOverridePermission = usePermissions(['access_override:web_app']);
 
   const {
     data: allowedOnWebAppData,
