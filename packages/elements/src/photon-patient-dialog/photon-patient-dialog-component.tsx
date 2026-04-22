@@ -124,7 +124,7 @@ const Component = (props: {
       const { data, errors } = await client.sdk.clinical.patient.getPatient({
         id: patientId,
         fragment: {
-          PatientOrderFields: PATIENT_DIALOG_FIELDS
+          PatientDialogFields: PATIENT_DIALOG_FIELDS
         }
       });
 
