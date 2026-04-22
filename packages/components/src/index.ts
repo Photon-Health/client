@@ -19,7 +19,8 @@ import Card from './particles/Card';
 import Collapsible from './particles/Collapsible';
 import ComboBox from './particles/ComboBox';
 import {
-  DraftPrescriptionList,
+  DraftPrescriptionLayout,
+  DraftPrescriptionItem,
   DraftPrescriptionsProvider,
   type PrescriptionFormData,
   type TemplateOverrides,
@@ -52,7 +53,10 @@ import {
   ScreeningAlerts,
   ScreeningAlertType
 } from './systems/ScreeningAlerts';
-import { RoutingConstraint } from './systems/RoutingConstraints';
+import {
+  RoutingConstraint,
+  isValidPrescriptionRoutingConstraint
+} from './systems/RoutingConstraints';
 
 import triggerToast from './utils/toastTriggers';
 import generateString from './utils/generateString';
@@ -105,7 +109,8 @@ export {
   ComboBox,
   Dialog,
   DoseCalculator,
-  DraftPrescriptionList,
+  DraftPrescriptionLayout,
+  DraftPrescriptionItem,
   DraftPrescriptionsProvider,
   useDraftPrescriptions,
   Icon,
@@ -145,7 +150,8 @@ export {
   buildFieldSnapshot,
   PATIENT_FORM_FIELDS,
   DRAFT_PRESCRIPTION_FORM_FIELDS,
-  PatientSelect
+  PatientSelect,
+  isValidPrescriptionRoutingConstraint
 };
 
 // Export types

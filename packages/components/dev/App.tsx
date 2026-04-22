@@ -1,7 +1,6 @@
 import { createEffect, createMemo, createSignal, For } from 'solid-js';
 import Client from '../src/systems/Client';
 import {
-  DraftPrescriptionList,
   DraftPrescriptionsProvider,
   PharmacySelect,
   PharmacySelectionProvider,
@@ -25,7 +24,7 @@ import { Prescription } from '@photonhealth/sdk/dist/types';
 
 // todo: fix this. it broke since we change how draft prescriptions work, and refactored logic into useContexts
 const App = () => {
-  const [prescriptionIds, setPrescriptionIds] = createSignal<string[]>([
+  const [prescriptionIds] = createSignal<string[]>([
     'rx_01JQF5SG4G6WSMWFR3769PFR8E',
     'rx_01JQF5G1HKVB0XAZYNSTK4V97J'
   ]);
@@ -98,21 +97,6 @@ const App = () => {
                     <h2>Patient Info</h2>
                     <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
                   </div>
-
-                  <div class="mb-10">
-                    <h2>Draft Prescriptions</h2>
-                  </div>
-                  <DraftPrescriptionList
-                    handleDelete={(id) =>
-                      setPrescriptionIds(prescriptionIds().filter((p) => p !== id))
-                    }
-                    handleEdit={(rx) =>
-                      setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))
-                    }
-                    handleSwapToOtherPrescription={(_) => _}
-                    screeningAlerts={[]}
-                    routingConstraints={[]}
-                  />
                 </PrescribeProvider>
               </PharmacySelectionProvider>
             </DraftPrescriptionsProvider>
