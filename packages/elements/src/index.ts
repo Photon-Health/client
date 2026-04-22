@@ -5,7 +5,6 @@ import './photon-authenticated';
 import './photon-multirx-form';
 import './photon-card';
 import './photon-dialog';
-import './photon-patient-form';
 import './photon-patient-dialog';
 import './photon-update-patient-dialog';
 import './photon-medication-search';
