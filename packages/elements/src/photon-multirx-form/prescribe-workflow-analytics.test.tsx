@@ -27,6 +27,9 @@ const server = setupServer(...defaultHandlers);
 beforeAll(() => {
   server.listen({ onUnhandledRequest: 'warn' });
 
+  // Needed when elements code invokes scrollIntoView
+  window.HTMLElement.prototype.scrollIntoView = vi.fn();
+
   if (!customElements.get('photon-medication-search')) {
     customElements.define('photon-medication-search', MockMedicationSearchElement);
   }
@@ -202,7 +205,7 @@ test('Send Order CTAs', async () => {
   );
 
   // Verify draft was added
-  await screen.findByText('Draft Prescriptions', {}, { timeout: 3000 });
+  await screen.findByText(TREATMENT.name, {}, { timeout: 3000 });
 
   // 2. Send the order
   await user.click(screen.getByRole('button', { name: /^send$/i }));
@@ -382,8 +385,7 @@ async function waitForSignatureAttestationModal() {
 }
 
 async function waitForPrescribeForm() {
-  await screen.findByText('Add Prescription', {}, { timeout: 3000 });
-  await screen.findByRole('button', { name: /add to drafts/i });
+  await screen.findByRole('button', { name: /add to drafts/i }), { timeout: 3000 };
 }
 
 async function addDraftPrescription(user: ReturnType<typeof userEvent.setup>) {

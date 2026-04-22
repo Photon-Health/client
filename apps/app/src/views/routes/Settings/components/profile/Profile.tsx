@@ -97,7 +97,7 @@ export const Profile = () => {
   const rows = useMemo(
     () =>
       compact([
-        { title: 'Full Name', value: formatName(user?.name) },
+        { title: 'Full Name', value: formatName(user?.name, user?.credentials) },
         orgNameMatchesUserName && {
           title: 'Organization',
           value: organization?.name
@@ -121,6 +121,7 @@ export const Profile = () => {
       })),
     [
       user?.name,
+      user?.credentials,
       user?.email,
       user?.phone,
       user?.fax,
@@ -301,7 +302,8 @@ function formatName(
         title?: string | null;
       }
     | null
-    | undefined
+    | undefined,
+  credentials?: string | null
 ): string {
   if (!name) return '';
   const { first, middle, last, title } = name;
@@ -311,16 +313,22 @@ function formatName(
   if (last) parts.push(last.trim());
   let fullName = parts.join(' ');
 
-  if (title && title.trim().length <= 4) {
-    const normalized = title.trim().toLowerCase();
-    if (normalized === 'dr' || normalized === 'dr.') {
-      fullName = `Dr. ${fullName}`;
-    } else {
-      fullName += `, ${title.trim().toUpperCase()}`;
-    }
+  if (title && ALLOWED_TITLES.has(title.trim().toLowerCase())) {
+    fullName = `${formatDoctorTitle(title)} ${fullName}`;
+  }
+
+  if (credentials && credentials.trim()) {
+    fullName += `, ${credentials.trim().toUpperCase()}`;
   }
 
   return fullName;
+}
+
+const ALLOWED_TITLES = new Set(['dr', 'dr.']);
+function formatDoctorTitle(title: string): string {
+  const normalized = title.trim().toLowerCase().replace(/\.$/, '');
+  const capitalized = normalized.charAt(0).toUpperCase() + normalized.slice(1);
+  return `${capitalized}.`;
 }
 
 const profileQuery = graphql(/* GraphQL */ `
@@ -331,6 +339,7 @@ const profileQuery = graphql(/* GraphQL */ `
       phone
       fax
       email
+      credentials
       address {
         street1
         street2

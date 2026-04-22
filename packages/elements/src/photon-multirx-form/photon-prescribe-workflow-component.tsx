@@ -13,7 +13,6 @@ import { onCleanup } from 'solid-js';
 import { PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
-import photonStyles from '@photonhealth/components/dist/index.css?inline';
 import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -24,7 +23,7 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
-export interface PrescribeWorkflowComponentProps extends Omit<PrescribeProps, 'initialShowForm'> {
+export interface PrescribeWorkflowComponentProps extends PrescribeProps {
   templateIds?: string;
   templateOverrides?: TemplateOverrides;
   prescriptionIds?: string;
@@ -84,7 +83,6 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
               <style>{shoelaceDarkStyles}</style>
               <style>{shoelaceLightStyles}</style>
               <style>{styles}</style>
-              <style>{photonStyles}</style>
               <PrescribeWorkflow
                 patientId={props.patientId}
                 hideSubmit={props.hideSubmit}
@@ -109,7 +107,6 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
                 allowOffCatalogSearch={props.allowOffCatalogSearch}
                 disableList={props.disableList}
                 groupId={props.groupId}
-                initialShowForm={!props.templateIds && !props.prescriptionIds}
               />
             </PrescribeProvider>
           </PharmacySelectionProvider>
