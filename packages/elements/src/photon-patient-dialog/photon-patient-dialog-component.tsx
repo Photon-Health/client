@@ -237,9 +237,9 @@ const Component = (props: {
 
     const initialPharmacy = initialPreferredPharmacy();
     if (
-      store['preferredPharmacy']!.value &&
+      store['preferredPharmacyId']!.value &&
       initialPharmacy &&
-      initialPharmacy.id !== store['preferredPharmacy']!.value
+      initialPharmacy.id !== store['preferredPharmacyId']!.value
     ) {
       // remove existing preferred pharmacy in order to add the new one
       const removePreferredPharmacyMutation = client!
@@ -276,8 +276,8 @@ const Component = (props: {
             country: 'US'
           }
         : undefined,
-      preferredPharmacies: store['preferredPharmacy']!.value
-        ? [store['preferredPharmacy']!.value]
+      preferredPharmacies: store['preferredPharmacyId']!.value
+        ? [store['preferredPharmacyId']!.value]
         : []
     };
     try {

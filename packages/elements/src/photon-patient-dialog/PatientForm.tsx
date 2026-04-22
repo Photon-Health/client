@@ -335,7 +335,7 @@ export const PatientForm = (props: {
                     }
                     setPharmacy={(pharmacy: any) => {
                       props.actions.updateFormValue({
-                        key: 'preferredPharmacy',
+                        key: 'preferredPharmacyId',
                         value: pharmacy.id
                       });
                     }}
