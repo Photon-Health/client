@@ -96,8 +96,10 @@ test('user can create patient then add, edit, and delete a draft prescription', 
       snap_add_to_templates: false
     })
   );
-  await expect(page.getByText('Draft Prescriptions')).toBeVisible({ timeout: 10_000 });
   await expect(page.getByText(/Amoxicillin/i)).toBeVisible();
+  await expect(page.getByRole('button', { name: /\+ Add another/i })).toBeVisible({
+    timeout: 10_000
+  });
   await expect(page.getByText(/30 Capsule, 0 Refills - test-instructions-text/i)).toBeVisible();
 
   // edit draft
@@ -108,7 +110,9 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   await page.getByRole('button', { name: 'Add to drafts' }).click();
   await expectFieldInteraction(page, 'dispenseQuantity', 2);
   await expect(page.getByText(/60 Capsule, 0 Refills - test-instructions-text/i)).toBeVisible();
-  await expect(page.getByText('Draft Prescriptions')).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('button', { name: /\+ Add another/i })).toBeVisible({
+    timeout: 10_000
+  });
   await expect(page.getByText(/Amoxicillin/i)).toBeVisible();
 
   await expectCtaCount(page, 'Draft Prescription Added', 2);

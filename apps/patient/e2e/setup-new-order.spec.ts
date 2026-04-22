@@ -72,7 +72,9 @@ async function createDraftPrescription(page: Page, medicationName: string) {
   await page.getByLabel('Patient Instructions (SIG)').fill('e2e test notes sig');
 
   await page.getByRole('button', { name: 'Add to drafts' }).click();
-  await expect(page.getByText('Draft Prescriptions')).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('button', { name: /\+ Add another/i })).toBeVisible({
+    timeout: 10_000
+  });
 }
 
 async function clickSendOrder(page: Page) {
