@@ -313,8 +313,8 @@ function formatName(
   if (last) parts.push(last.trim());
   let fullName = parts.join(' ');
 
-  if (title && ALLOWED_HONORIFICS.has(title.trim().toLowerCase())) {
-    fullName = `${formatTitleHonorific(title)} ${fullName}`;
+  if (title && ALLOWED_TITLES.has(title.trim().toLowerCase())) {
+    fullName = `${formatDoctorTitle(title)} ${fullName}`;
   }
 
   if (credentials && credentials.trim()) {
@@ -324,19 +324,8 @@ function formatName(
   return fullName;
 }
 
-const ALLOWED_HONORIFICS = new Set([
-  'dr',
-  'dr.',
-  'mr',
-  'mr.',
-  'mrs',
-  'mrs.',
-  'ms',
-  'ms.',
-  'mx',
-  'mx.'
-]);
-function formatTitleHonorific(title: string): string {
+const ALLOWED_TITLES = new Set(['dr', 'dr.']);
+function formatDoctorTitle(title: string): string {
   const normalized = title.trim().toLowerCase().replace(/\.$/, '');
   const capitalized = normalized.charAt(0).toUpperCase() + normalized.slice(1);
   return `${capitalized}.`;
