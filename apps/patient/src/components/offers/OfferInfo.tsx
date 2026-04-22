@@ -170,7 +170,15 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
           {offer.medications?.map((med) => (
             <HStack key={med.name} w="full" justify="space-between" align="start">
               <VStack align="flex-start">
-                <Tooltip label={med.name} placement="top-start">
+                <Tooltip
+                  label={med.name}
+                  placement="top-start"
+                  wrapperProps={{
+                    onClick: (e) => {
+                      e.stopPropagation();
+                    }
+                  }}
+                >
                   <Text fontSize="sm" color="gray.700" noOfLines={1}>
                     {med.name}
                   </Text>
