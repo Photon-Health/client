@@ -7,6 +7,7 @@ import {
   dispatchAnalyticsTrackEvent,
   PATIENT_FORM_FIELDS,
   PharmacyOption,
+  triggerToast,
   usePhoton
 } from '@photonhealth/components';
 import tailwind from '../tailwind.css?inline';
@@ -107,6 +108,7 @@ const Component = (props: {
 
   createEffect(async () => {
     const patientId = props.patientId;
+    console.log('step 1', patientId);
 
     if (!patientId) {
       // Clear form if no patient
@@ -118,30 +120,38 @@ const Component = (props: {
     }
 
     setLoadingPatient(true);
-    // TODO: See what error flow should be
     try {
-      const { data } = await client.sdk.clinical.patient.getPatient({
+      const { data, errors } = await client.sdk.clinical.patient.getPatient({
         id: patientId,
         fragment: {
           PatientOrderFields: PATIENT_DIALOG_FIELDS
         }
       });
 
-      if (data.patient) {
-        const values = patientToFormValues(data.patient);
-        for (const [key, value] of Object.entries(values)) {
-          actions.updateFormValue({ key, value });
-        }
+      console.log('step 2', data);
+      console.log('step 3', errors);
 
-        const pref = data.patient.preferredPharmacies?.[0];
-        if (pref) {
-          setInitialPreferredPharmacy({
-            ...pref,
-            address: pref.address as PharmacyOption['address'],
-            isPrevious: true,
-            isPreferred: true
-          });
-        }
+      if (errors || !data?.patient) {
+        triggerToast({
+          status: 'error',
+          body: 'Error loading patient, please close the form and try again'
+        });
+        return;
+      }
+
+      const values = patientToFormValues(data.patient);
+      for (const [key, value] of Object.entries(values)) {
+        actions.updateFormValue({ key, value });
+      }
+
+      const pref = data.patient.preferredPharmacies?.[0];
+      if (pref) {
+        setInitialPreferredPharmacy({
+          ...pref,
+          address: pref.address as PharmacyOption['address'],
+          isPrevious: true,
+          isPreferred: true
+        });
       }
     } finally {
       setLoadingPatient(false);
