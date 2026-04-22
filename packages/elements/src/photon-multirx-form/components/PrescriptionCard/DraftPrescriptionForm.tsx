@@ -498,7 +498,18 @@ export const DraftPrescriptionForm = (props: {
         >
           Add to drafts
         </Button>
-        <Show when={draftPrescriptions().length > 0}>
+        {/* Can only hide form if provider has added at least 1 draft */}
+        {/*
+          Can only hide and clear form if there is no in-progress prescription.
+          This is a quick patch to address this flow:
+          - Provider clicks edit button on a draft - form populated with draft, draft is discarded entirely
+          - Provider clicks Cancel button - the current UI implies that Cancel button "cancels" the
+            editing of the draft
+          - Code hides and clears form > draft info is totally lost, which is unexpected behavior
+          This patch means the provider cannot hide and clear form once they start filling it out,
+          so if we get complaints we should implement a more robust solution.
+        */}
+        <Show when={draftPrescriptions().length > 0 && !props.store.treatment?.value}>
           <Button class="w-full xs:w-auto" size="lg" onClick={handleCancel} variant="secondary">
             Cancel
           </Button>
