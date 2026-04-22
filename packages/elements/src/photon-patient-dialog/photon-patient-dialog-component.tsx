@@ -7,7 +7,6 @@ import {
   dispatchAnalyticsTrackEvent,
   PATIENT_FORM_FIELDS,
   PharmacyOption,
-  triggerToast,
   usePhoton
 } from '@photonhealth/components';
 import tailwind from '../tailwind.css?inline';
@@ -132,11 +131,9 @@ const Component = (props: {
       console.log('step 3', errors);
 
       if (errors || !data?.patient) {
-        triggerToast({
-          status: 'error',
-          body: 'Error loading patient, please close the form and try again'
-        });
-        return;
+        setGlobalError(
+          'An error occurred while loading the patient, please close the form and try again'
+        );
       }
 
       const values = patientToFormValues(data.patient);
@@ -256,7 +253,7 @@ const Component = (props: {
 
     const includeAddress = shouldValidateAddress;
     const patientData = {
-      ...(props?.patientId ? { id: props.patientId } : {}),
+      ...(props.patientId ? { id: props.patientId } : {}),
       name: {
         first: store['firstName']!.value,
         last: store['lastName']!.value
@@ -281,7 +278,7 @@ const Component = (props: {
         : []
     };
     try {
-      if (props?.patientId) {
+      if (props.patientId) {
         // if patientId is provided, update the patient.
         const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
         await updatePatientMutation({ variables: patientData, awaitRefetchQueries: false });
@@ -349,11 +346,11 @@ const Component = (props: {
               dispatchClosed();
               props.open = false;
             }}
-            title={props?.patientId ? 'Edit patient' : 'New patient'}
-            titleIconName={props?.patientId ? 'pencil-square' : 'person-plus'}
+            title={props.patientId ? 'Edit patient' : 'New patient'}
+            titleIconName={props.patientId ? 'pencil-square' : 'person-plus'}
             footer={
               <>
-                <Show when={!props?.hideCreatePrescription}>
+                <Show when={!props.hideCreatePrescription}>
                   <Button
                     class="w-full xs:w-fit"
                     size="lg"
@@ -361,19 +358,19 @@ const Component = (props: {
                     loading={loading() && isCreatePrescription()}
                     onClick={() => submitForm(true)}
                   >
-                    {props?.patientId ? 'Save' : 'Create'} and start prescription
+                    {props.patientId ? 'Save' : 'Create'} and start prescription
                   </Button>
                 </Show>
-                <Show when={!!hasPatients() || !!props?.hideCreatePrescription}>
+                <Show when={!!hasPatients() || !!props.hideCreatePrescription}>
                   <Button
                     class="w-full xs:w-fit"
                     size="lg"
-                    variant={props?.hideCreatePrescription ? 'primary' : 'secondary'}
+                    variant={props.hideCreatePrescription ? 'primary' : 'secondary'}
                     disabled={loading()}
                     loading={loading() && !isCreatePrescription()}
                     onClick={() => submitForm(false)}
                   >
-                    {props?.patientId ? 'Save' : 'Create'}
+                    {props.patientId ? 'Save' : 'Create'}
                   </Button>
                 </Show>
               </>
