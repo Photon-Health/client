@@ -385,7 +385,7 @@ async function waitForSignatureAttestationModal() {
 }
 
 async function waitForPrescribeForm() {
-  await screen.findByRole('button', { name: /add to drafts/i }), { timeout: 3000 };
+  await screen.findByRole('button', { name: /add prescription/i }), { timeout: 3000 };
 }
 
 async function addDraftPrescription(user: ReturnType<typeof userEvent.setup>) {
@@ -398,7 +398,7 @@ async function addDraftPrescription(user: ReturnType<typeof userEvent.setup>) {
     screen.getByLabelText(/patient instructions/i),
     'Take one capsule by mouth daily'
   );
-  await user.click(screen.getByRole('button', { name: /add to drafts/i }));
+  await user.click(screen.getByRole('button', { name: /add prescription/i }));
 }
 
 const isFieldInteraction = (filter: Record<string, unknown> = {}) => {

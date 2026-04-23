@@ -696,7 +696,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 <Show when={props.enableOrder && pharmacySelectionContext.isAutoRouted()}>
                   <PharmacyCard pharmacyId={pharmacySelectionContext.autoRoutedPharmacyId()} />
                 </Show>
-                <Show when={!props.hideSubmit}>
+                <Show when={!props.hideSubmit && draftPrescriptions().length > 0}>
                   {/* We're hiding this alert message if enable-order is set, a rough way to let us know this is not in the App.
             The issue we're having is when props are passed and cards are hidden, the form is not showing validation errors. */}
                   <Show when={errors().length > 0 && props.enableOrder}>
