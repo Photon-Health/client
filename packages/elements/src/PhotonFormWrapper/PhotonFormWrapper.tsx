@@ -1,26 +1,6 @@
 import { createSignal, JSX, mergeProps, Show } from 'solid-js';
 import { Button, Icon } from '@photonhealth/components';
 
-// Hide the wrapper header when the clinical webapp is embedded in a known
-// native host's WebView that renders its own top chrome. Detection is a
-// positive UA match for a marker the host injects (e.g. the fakecustomer-ios
-// app appends `PhotonApp/1.0` via `WKWebViewConfiguration.applicationNameForUserAgent`).
-// This avoids false positives from iOS in-app browsers (Gmail, Outlook, etc.)
-// where the user needs our close button because the host has no close affordance.
-const IS_KNOWN_NATIVE_WEBVIEW =
-  typeof navigator !== 'undefined' && /PhotonApp\//.test(navigator.userAgent);
-
-// another option
-// const IS_KNOWN_NATIVE_WEBVIEW_option2 = typeof window.__photonHideHeader !== 'undefined';
-// they use this switft code:
-// configuration.userContentController.addUserScript(
-//   WKUserScript(
-//     source: "window.__photonHideHeader = true;",
-//   injectionTime: .atDocumentStart,
-//   forMainFrameOnly: false
-// )
-// )
-
 type PhotonFormWrapperProps = {
   closeTitle?: string;
   closeBody?: string;
@@ -110,3 +90,15 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
     </div>
   );
 };
+
+// Hide the wrapper header when the clinical webapp is embedded in a known
+// native host's WebView that renders its own top chrome. The host opts in
+// by injecting a WKUserScript at documentStart that sets
+// `window.__photonHideHeader = true`. This avoids false positives from iOS
+// in-app browsers (Gmail, Outlook, etc.) where the user needs our close
+// button because the host has no close affordance, and leaves the UA
+// fully owned by the customer app.
+// Remove this in KLU-
+const IS_KNOWN_NATIVE_WEBVIEW =
+  typeof window !== 'undefined' &&
+  (window as unknown as { __photonHideHeader?: boolean }).__photonHideHeader === true;
