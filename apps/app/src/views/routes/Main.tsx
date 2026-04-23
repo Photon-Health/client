@@ -51,7 +51,7 @@ export const Main = () => {
   useWelcomeToast();
 
   useEffect(() => {
-    if (!isLoading && error) {
+    if ((!isLoading && error) || (!allowedOnWebAppLoading && allowedOnWebAppError)) {
       navigate('/', { replace: true });
     }
   }, [isLoading, error, allowedOnWebAppLoading, allowedOnWebAppError, navigate]);
