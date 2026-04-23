@@ -330,18 +330,6 @@ export function OrganizationSettingsForm({
                 Allow prescribers to create prescription orders to pharmacies.
               </FormHelperText>
             </FormControl>
-            <FormControl isInvalid={!!errors.providerUx?.enableWebAppPrescribe}>
-              <Flex gap={2}>
-                <Field component={SwitchField} name="providerUx.enableWebAppPrescribe" />
-                <FormLabel htmlFor="providerUx.enableWebAppPrescribe" mb={0}>
-                  Enable Prescribers on the Web App
-                </FormLabel>
-              </Flex>
-              <FormHelperText>
-                Allow prescribers to use the Photon Web App to write prescriptions and manage
-                patients.
-              </FormHelperText>
-            </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enablePrescribeToOrder}>
               <Flex gap={2}>
                 <Field component={SwitchField} name="providerUx.enablePrescribeToOrder" />
