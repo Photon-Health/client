@@ -64,6 +64,7 @@ const Component = (props: {
   toastBuffer?: number;
   externalOrderId?: string;
   optionalPatientAddress?: boolean;
+  hideHeaderOnIosWebview?: boolean;
 }) => {
   let ref: any;
   const client = usePhoton();
@@ -238,6 +239,7 @@ const Component = (props: {
         checkShouldWarn={() => shouldWarn(form)}
         title="New prescriptions"
         titleIconName="prescription"
+        hideHeaderOnIOSWebView={props.hideHeaderOnIosWebview}
         footer={
           hideOrderButton() ? null : props.enableOrder ? (
             <Button
@@ -367,7 +369,8 @@ customElement(
     enableOrder: false,
     toastBuffer: 0,
     externalOrderId: undefined,
-    optionalPatientAddress: false
+    optionalPatientAddress: false,
+    hideHeaderOnIosWebview: false
   },
   Component
 );

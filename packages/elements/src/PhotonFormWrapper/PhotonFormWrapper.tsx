@@ -10,6 +10,7 @@ type PhotonFormWrapperProps = {
   form?: JSX.Element;
   onClosed: () => void;
   checkShouldWarn?: () => boolean;
+  hideHeaderOnIOSWebView?: boolean;
 };
 
 export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
@@ -45,32 +46,34 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
         <p class="font-sans text-lg xs:text-base">{props.closeBody}</p>
       </photon-dialog>
 
-      <header class="flex-shrink-0 flex items-center px-4 py-2 md:px-8 md:py-3 bg-white shadow-card">
-        <div class="flex items-center">
-          <Button
-            variant="naked"
-            size="sm"
-            onClick={() => {
-              if (props.checkShouldWarn()) {
-                onCloseDialogOpen(true);
-              } else {
-                props.onClosed();
-              }
-            }}
-          >
-            <div class="text-black text-xl md:text-3xl">
-              <Icon name="xMark" />
-            </div>
-          </Button>
-        </div>
-        <div class="flex-1 flex justify-center items-center min-w-0 px-2">
-          <Show when={props.titleIconName}>
-            <sl-icon name={props.titleIconName} class="flex-shrink-0" />
-          </Show>
-          <p class="ml-1 font-sans text-lg md:text-xl font-medium truncate">{props.title}</p>
-        </div>
-        <div class="flex items-center w-[44px]" />
-      </header>
+      <Show when={!(props.hideHeaderOnIOSWebView && IS_KNOWN_NATIVE_WEBVIEW)}>
+        <header class="flex-shrink-0 flex items-center px-4 py-2 md:px-8 md:py-3 bg-white shadow-card">
+          <div class="flex items-center">
+            <Button
+              variant="naked"
+              size="sm"
+              onClick={() => {
+                if (props.checkShouldWarn()) {
+                  onCloseDialogOpen(true);
+                } else {
+                  props.onClosed();
+                }
+              }}
+            >
+              <div class="text-black text-xl md:text-3xl">
+                <Icon name="xMark" />
+              </div>
+            </Button>
+          </div>
+          <div class="flex-1 flex justify-center items-center min-w-0 px-2">
+            <Show when={props.titleIconName}>
+              <sl-icon name={props.titleIconName} class="flex-shrink-0" />
+            </Show>
+            <p class="ml-1 font-sans text-lg md:text-xl font-medium truncate">{props.title}</p>
+          </div>
+          <div class="flex items-center w-[44px]" />
+        </header>
+      </Show>
       <main
         class="flex-1 overflow-y-auto overscroll-contain"
         style={{ '-webkit-overflow-scrolling': 'touch' }}
@@ -87,3 +90,15 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
     </div>
   );
 };
+
+// Hide the wrapper header when the clinical webapp is embedded in a known
+// native host's WebView that renders its own top chrome. The host opts in
+// by injecting a WKUserScript at documentStart that sets
+// `window.__photonHideHeader = true`. This avoids false positives from iOS
+// in-app browsers (Gmail, Outlook, etc.) where the user needs our close
+// button because the host has no close affordance, and leaves the UA
+// fully owned by the customer app.
+// Remove this in KLU-237
+const IS_KNOWN_NATIVE_WEBVIEW =
+  typeof window !== 'undefined' &&
+  (window as unknown as { __photonHideHeader?: boolean }).__photonHideHeader === true;
