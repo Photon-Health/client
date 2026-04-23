@@ -42,19 +42,18 @@ export const Main = () => {
 
   const hasOverridePermission = usePermissions(['access_override:web_app']);
 
-  const {
-    data: allowedOnWebAppData,
-    error: allowedOnWebAppError,
-    loading: allowedOnWebAppLoading
-  } = useQuery(allowedOnWebAppQuery, { client: clinicalClient });
+  const { data: allowedOnWebAppData, loading: allowedOnWebAppLoading } = useQuery(
+    allowedOnWebAppQuery,
+    { client: clinicalClient }
+  );
 
   useWelcomeToast();
 
   useEffect(() => {
-    if ((!isLoading && error) || (!allowedOnWebAppLoading && allowedOnWebAppError)) {
+    if (!isLoading && error) {
       navigate('/', { replace: true });
     }
-  }, [isLoading, error, allowedOnWebAppLoading, allowedOnWebAppError, navigate]);
+  }, [isLoading, error, navigate]);
 
   if (isLoading || query.get('code')) {
     return (
