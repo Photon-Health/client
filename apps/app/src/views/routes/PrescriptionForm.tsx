@@ -218,6 +218,7 @@ export const PrescriptionForm = () => {
           toast-buffer={70}
           hide-templates={!enableRxTemplates}
           external-order-id={externalId}
+          hide-header-on-ios-webview={true}
         />
       ) : null}
     </div>

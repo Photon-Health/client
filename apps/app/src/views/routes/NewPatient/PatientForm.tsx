@@ -84,6 +84,7 @@ export const PatientForm = () => {
         ref={ref}
         data-testid="patient-dialog"
         optional-patient-address={optionalPatientAddress}
+        hide-header-on-ios-webview={true}
       />
     </div>
   );
