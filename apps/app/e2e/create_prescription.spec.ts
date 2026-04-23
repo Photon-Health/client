@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { setupAnalyticsCapture } from './utils/analytics_intercept';
 import {
+  expectCtaCount,
   expectEventCount,
   expectEventProperties,
   expectFieldInteraction,
-  expectCtaCount,
   findByEventName
 } from './utils/analytics_expect';
 
@@ -78,7 +78,7 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   await expectFieldInteraction(page, 'daysSupply', 1);
   await expectFieldInteraction(page, 'refills', 1);
   await expectFieldInteraction(page, 'instructions', 1);
-  await page.getByRole('button', { name: 'Add to drafts' }).click();
+  await page.getByRole('button', { name: 'Add prescription' }).click();
   await expectCtaCount(page, 'Draft Prescription Added', 1);
   const draftAddedEvents = await findByEventName(page, 'Draft Prescription Added');
   const firstDraftAdded = draftAddedEvents[0];
@@ -107,7 +107,7 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   await expectCtaCount(page, 'Draft Prescription Edited', 1);
   await expect(medSearchInput).toHaveValue(/Amoxicillin/i);
   await page.getByLabel('Quantity').fill('60');
-  await page.getByRole('button', { name: 'Add to drafts' }).click();
+  await page.getByRole('button', { name: 'Add prescription' }).click();
   await expectFieldInteraction(page, 'dispenseQuantity', 2);
   await expect(page.getByText(/60 Capsule, 0 Refills - test-instructions-text/i)).toBeVisible();
   await expect(page.getByRole('button', { name: /\+ Add another/i })).toBeVisible({
