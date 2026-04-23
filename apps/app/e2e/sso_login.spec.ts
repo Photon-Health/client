@@ -8,7 +8,7 @@ test('SSO login flow and logout loop regression', async ({ page }) => {
   // Phase 1: Fresh SSO login — verify connection param and no duplicate redirects
   const authorizeRequests = setupAuthorizeRequestCapture(page);
 
-  await page.goto(`/sso?connection=${CONNECTION_NAME}`);
+  await page.goto(`/sso?connection=${CONNECTION_NAME}&returnTo=/patients/new`);
   await page.waitForURL(/fakecustomer.*auth0/, { timeout: 30_000 });
 
   expectSingleLoginRedirect(authorizeRequests, CONNECTION_NAME);
@@ -66,7 +66,7 @@ function expectSingleLogoutRedirect(navigationUrls: string[], connection: string
 }
 
 async function expectPhotonHomePageVisible(page: Page) {
-  await expect(page.getByRole('heading', { name: 'Prescriptions' })).toBeVisible({
+  await expect(page.getByRole('heading', { name: 'New patients' })).toBeVisible({
     timeout: 60_000
   });
 }
