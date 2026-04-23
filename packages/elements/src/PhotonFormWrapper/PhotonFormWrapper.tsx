@@ -98,7 +98,7 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
 // in-app browsers (Gmail, Outlook, etc.) where the user needs our close
 // button because the host has no close affordance, and leaves the UA
 // fully owned by the customer app.
-// Remove this in KLU-
+// Remove this in KLU-237
 const IS_KNOWN_NATIVE_WEBVIEW =
   typeof window !== 'undefined' &&
   (window as unknown as { __photonHideHeader?: boolean }).__photonHideHeader === true;
