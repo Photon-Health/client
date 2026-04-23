@@ -1,6 +1,26 @@
 import { createSignal, JSX, mergeProps, Show } from 'solid-js';
 import { Button, Icon } from '@photonhealth/components';
 
+// Hide the wrapper header when the clinical webapp is embedded in a known
+// native host's WebView that renders its own top chrome. Detection is a
+// positive UA match for a marker the host injects (e.g. the fakecustomer-ios
+// app appends `PhotonApp/1.0` via `WKWebViewConfiguration.applicationNameForUserAgent`).
+// This avoids false positives from iOS in-app browsers (Gmail, Outlook, etc.)
+// where the user needs our close button because the host has no close affordance.
+const IS_KNOWN_NATIVE_WEBVIEW =
+  typeof navigator !== 'undefined' && /PhotonApp\//.test(navigator.userAgent);
+
+// another option
+// const IS_KNOWN_NATIVE_WEBVIEW_option2 = typeof window.__photonHideHeader !== 'undefined';
+// they use this switft code:
+// configuration.userContentController.addUserScript(
+//   WKUserScript(
+//     source: "window.__photonHideHeader = true;",
+//   injectionTime: .atDocumentStart,
+//   forMainFrameOnly: false
+// )
+// )
+
 type PhotonFormWrapperProps = {
   closeTitle?: string;
   closeBody?: string;
@@ -46,7 +66,7 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
         <p class="font-sans text-lg xs:text-base">{props.closeBody}</p>
       </photon-dialog>
 
-      <Show when={!(props.hideHeaderOnIOSWebView && isIOSWebView())}>
+      <Show when={!(props.hideHeaderOnIOSWebView && IS_KNOWN_NATIVE_WEBVIEW)}>
         <header class="flex-shrink-0 flex items-center px-4 py-2 md:px-8 md:py-3 bg-white shadow-card">
           <div class="flex items-center">
             <Button
@@ -89,19 +109,4 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
       </Show>
     </div>
   );
-};
-
-// Hide the wrapper header when the clinical webapp is embedded in an iOS
-// WebView (e.g. a customer's native app) so we don't double up with the
-// native app's own top chrome. Real iOS browsers (Safari, Chrome, Firefox,
-// Edge) all include `Safari/` in the UA; plain WKWebViews do not. The native
-// host must not add `Safari/` to its WKWebView UA for this to work.
-const isIOSWebView = (): boolean => {
-  if (typeof navigator === 'undefined') return false;
-  const ua = navigator.userAgent;
-  const isIOS =
-    /iPad|iPhone|iPod/.test(ua) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  if (!isIOS) return false;
-  return !/Safari\//.test(ua);
 };
