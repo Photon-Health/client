@@ -30,6 +30,7 @@ type PatientDialogProps = {
   open: boolean;
   hideCreatePrescription: boolean;
   optionalPatientAddress: boolean;
+  hideHeaderOnIosWebview: boolean;
 };
 
 const PATIENT_FIELDS = gql`
@@ -313,6 +314,7 @@ const Component = (props: PatientDialogProps) => {
             }}
             title={props?.patientId ? 'Edit patient' : 'New patient'}
             titleIconName={props?.patientId ? 'pencil-square' : 'person-plus'}
+            hideHeaderOnIOSWebView={props.hideHeaderOnIosWebview}
             footer={
               <>
                 <Show when={!props?.hideCreatePrescription}>
@@ -372,7 +374,8 @@ customElement(
     patientId: '',
     hideCreatePrescription: false,
     open: false,
-    optionalPatientAddress: false
+    optionalPatientAddress: false,
+    hideHeaderOnIosWebview: false
   },
   Component
 );
