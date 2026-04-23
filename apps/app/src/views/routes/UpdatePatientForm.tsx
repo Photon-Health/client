@@ -86,6 +86,7 @@ export const UpdatePatientForm = () => {
         ref={ref}
         patient-id={id}
         optional-patient-address={optionalPatientAddress}
+        hide-header-on-ios-webview={true}
       />
     </div>
   );
