@@ -56,7 +56,6 @@ const organizationSettingsQuery = graphql(/* GraphQL */ `
           enablePatientRouting
           enablePickupPharmacies
           enableDeliveryPharmacies
-          enableWebAppPrescribe
         }
         patientUx {
           enablePatientRerouting

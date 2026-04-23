@@ -28,7 +28,6 @@ import { Support } from './views/routes/Support';
 import { UpdatePatientForm } from './views/routes/UpdatePatientForm';
 import { Env } from '@photonhealth/sdk';
 import { SelfSignupPage } from './views/routes/SelfSignup';
-import { Disallowed } from './views/routes/Disallowed';
 
 const env = import.meta.env.VITE_ENV_NAME as Env;
 
@@ -95,7 +94,6 @@ export const App = () => {
             <Route path="/sso" element={<SSOLogin />} />
             <Route path="/signup" element={<SelfSignupPage />} />
             <Route path="/logout" element={<Logout />} />
-            <Route path="/disallowed" element={<Disallowed />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </ProviderAnalyticsProvider>
