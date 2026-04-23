@@ -23,7 +23,7 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
-export interface PrescribeWorkflowComponentProps extends Omit<PrescribeProps, 'initialShowForm'> {
+export interface PrescribeWorkflowComponentProps extends PrescribeProps {
   templateIds?: string;
   templateOverrides?: TemplateOverrides;
   prescriptionIds?: string;
@@ -107,7 +107,6 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
                 allowOffCatalogSearch={props.allowOffCatalogSearch}
                 disableList={props.disableList}
                 groupId={props.groupId}
-                initialShowForm={!props.templateIds && !props.prescriptionIds}
               />
             </PrescribeProvider>
           </PharmacySelectionProvider>

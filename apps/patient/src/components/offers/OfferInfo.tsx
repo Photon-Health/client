@@ -1,6 +1,6 @@
 import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@chakra-ui/react';
 import { FiInfo, FiStar, FiTag } from 'react-icons/fi';
-import { Tooltip } from './Tooltip';
+import { Tooltip } from '../Tooltip';
 import { text as t } from '../../utils/text';
 import { OfferBundleDetails, OfferPromotionTypes, Promotion } from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';

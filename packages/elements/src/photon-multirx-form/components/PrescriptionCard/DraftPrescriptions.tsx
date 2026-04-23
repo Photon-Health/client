@@ -1,9 +1,10 @@
-import { createSignal, Show } from 'solid-js';
+import { createMemo, createSignal, For, Show } from 'solid-js';
 import {
-  Button,
-  Card,
+  Banner,
   CoverageOption,
-  DraftPrescriptionList,
+  DraftPrescriptionItem,
+  DraftPrescriptionLayout,
+  isValidPrescriptionRoutingConstraint,
   PrescriptionFormData,
   RoutingConstraint,
   ScreeningAlertType,
@@ -12,30 +13,43 @@ import {
   usePrescribe,
   usePrescribeEventDispatch
 } from '@photonhealth/components';
-import repopulateForm from '../util/repopulateForm';
-import { PhotonTooltip } from '../../photon-tooltip';
+import repopulateForm from './util/repopulateForm';
 
-export const DraftPrescriptionCard = (props: {
-  prescriptionRef: HTMLDivElement | undefined;
+export function getPrescriptionRoutingConstraints(
+  routingConstraints: RoutingConstraint[]
+): Map<string, RoutingConstraint> {
+  const map = new Map<string, RoutingConstraint>();
+  for (const constraint of routingConstraints) {
+    if (isValidPrescriptionRoutingConstraint(constraint)) {
+      map.set(constraint.prescriptions[0].id, constraint);
+    }
+  }
+  return map;
+}
+
+export const DraftPrescriptions = (props: {
+  prescriptionFormRef: HTMLDivElement | undefined;
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
-  setIsEditing: (isEditing: boolean) => void;
+  expandForm: () => void;
   handleDraftPrescriptionsChange: () => void;
   screeningAlerts: ScreeningAlertType[];
   routingConstraints: RoutingConstraint[];
   enableOrder: boolean;
-  onAddAnotherClick?: () => void;
 }) => {
   const { dispatchDraftPrescriptionDeleted, dispatchAnalyticsTrackEvent } =
     usePrescribeEventDispatch();
-  const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
   const [editDialogConfirm, setEditDialogConfirm] = createSignal<(() => void) | undefined>();
   const [editDraft, setEditDraft] = createSignal<PrescriptionFormData | undefined>(undefined);
+  const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
-  const { selectOtherCoverageOption } = usePrescribe();
-  const { draftPrescriptions, prescriptionIds, deletePrescription, isLoadingPrefills } =
+  const { selectOtherCoverageOption, coverageOptions } = usePrescribe();
+  const { draftPrescriptions, deletePrescription, isLoadingPrefills, prescriptionIds } =
     useDraftPrescriptions();
+  const prescriptionRoutingConstraints = createMemo((): Map<string, RoutingConstraint> => {
+    return getPrescriptionRoutingConstraints(props.routingConstraints);
+  });
 
   const editPrescription = () => {
     const formData = editDraft();
@@ -51,7 +65,7 @@ export const DraftPrescriptionCard = (props: {
         deletePrescription(formData.id);
       }
 
-      props.prescriptionRef?.scrollIntoView({
+      props.prescriptionFormRef?.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
@@ -60,11 +74,11 @@ export const DraftPrescriptionCard = (props: {
     }
   };
 
-  const checkEditPrescription = (draft: PrescriptionFormData, onConfirm?: () => undefined) => {
+  const checkCanEditPrescription = (draft: PrescriptionFormData, onConfirm?: () => undefined) => {
     setEditDraft(draft);
 
     if (!props.store['treatment'].value) {
-      props.setIsEditing(true);
+      props.expandForm();
       editPrescription();
       onConfirm?.();
       dispatchDraftPrescriptionDeleted();
@@ -75,12 +89,9 @@ export const DraftPrescriptionCard = (props: {
     }
   };
 
-  const handleSwapToOtherPrescription = (coverage: CoverageOption) => {
-    checkEditPrescription(toFormData(coverage), () => {
-      selectOtherCoverageOption(coverage);
-    });
+  const handleEdit = (draft: PrescriptionFormData) => {
+    checkCanEditPrescription(draft);
   };
-
   const handleEditConfirm = () => {
     editPrescription();
     setEditDialogOpen(false);
@@ -96,6 +107,11 @@ export const DraftPrescriptionCard = (props: {
     setEditDraft(undefined);
     setEditDialogConfirm(undefined);
   };
+
+  const handleDelete = (draftId: string) => {
+    setDeleteDialogOpen(true);
+    setDeleteDraftId(draftId);
+  };
   const handleDeleteConfirm = () => {
     const deletedId = deleteDraftId();
     if (deletedId) {
@@ -108,11 +124,6 @@ export const DraftPrescriptionCard = (props: {
     setDeleteDialogOpen(false);
     setDeleteDraftId(undefined);
 
-    if (prescriptionIds().length === 0) {
-      // reopen form if all drafts are deleted
-      props.setIsEditing(true);
-    }
-
     props.handleDraftPrescriptionsChange();
   };
   const handleDeleteCancel = () => {
@@ -120,20 +131,76 @@ export const DraftPrescriptionCard = (props: {
     setDeleteDraftId(undefined);
   };
 
+  const handleSwapToOtherPrescription = (coverage: CoverageOption) => {
+    checkCanEditPrescription(toFormData(coverage), () => {
+      selectOtherCoverageOption(coverage);
+    });
+  };
+
   return (
-    <div>
+    <>
+      <div class="space-y-3">
+        <Show when={isLoadingPrefills()}>
+          <For each={prescriptionIds()}>
+            {() => (
+              <DraftPrescriptionLayout
+                LeftChildren={
+                  <>
+                    <Text size="lg" sampleLoadingText="Medication 100mg" loading />
+                    <Text
+                      size="sm"
+                      sampleLoadingText="Loading notes about the medication"
+                      loading
+                    />
+                  </>
+                }
+              />
+            )}
+          </For>
+        </Show>
+
+        {/* Show when No Drafts */}
+        <Show when={!isLoadingPrefills() && draftPrescriptions().length === 0}>
+          <Banner status="info">
+            {props.enableOrder
+              ? 'Add prescription(s) before sending'
+              : 'Add prescription(s) before saving'}
+          </Banner>
+        </Show>
+
+        {/* Show when Drafts */}
+        <Show when={!isLoadingPrefills() && draftPrescriptions().length > 0}>
+          <div class="flex flex-col gap-4">
+            <For each={draftPrescriptions()}>
+              {(draftPrescription) => (
+                <DraftPrescriptionItem
+                  screeningAlerts={props.screeningAlerts}
+                  routingConstraint={prescriptionRoutingConstraints().get(draftPrescription.id)}
+                  draft={draftPrescription}
+                  coverageOptions={coverageOptions().filter(
+                    (c) => c.prescriptionId === draftPrescription.id
+                  )}
+                  handleEdit={handleEdit}
+                  handleDelete={handleDelete}
+                  handleSwapToOtherPrescription={handleSwapToOtherPrescription}
+                />
+              )}
+            </For>
+          </div>
+        </Show>
+      </div>
       <photon-dialog
         open={editDialogOpen()}
-        label="Overwrite in progress prescription?"
-        confirm-text="Yes, Overwrite"
-        cancel-text="No, Cancel"
+        label="Discard in-progress prescription?"
+        confirm-text="Yes, discard"
+        cancel-text="Go back"
         on:photon-dialog-confirmed={handleEditConfirm}
         on:photon-dialog-canceled={handleEditCancel}
         on:photon-dialog-alt={handleEditCancel}
       >
         <p class="font-sans text-lg xs:text-base">
-          You are editing a prescription that has not been added. This will be overwritten if you
-          edit another prescription.
+          You are editing a prescription that has not been added to your drafts. Your in-progress
+          prescription will be discarded if you edit another prescription.
         </p>
       </photon-dialog>
       <photon-dialog
@@ -146,47 +213,11 @@ export const DraftPrescriptionCard = (props: {
         on:photon-dialog-alt={handleDeleteCancel}
       >
         <p class="font-sans text-lg xs:text-base">
-          Deleting this prescription will remove it from your pending prescriptions. This action
+          Deleting this prescription will remove it from your draft prescriptions. This action
           cannot be undone.
         </p>
       </photon-dialog>
-      <Card addChildrenDivider={true}>
-        <div class="flex items-center space-x-2 text-slate-500">
-          <Text color="gray" class="pr-2">
-            Draft Prescriptions
-          </Text>
-          <PhotonTooltip
-            maxWidth="300px"
-            tip="Each prescription will include the prescriber's digital signature and the date it was written when the order is sent to the pharmacy."
-          />
-        </div>
-        <div>
-          <DraftPrescriptionList
-            handleDelete={(draftId: string) => {
-              setDeleteDialogOpen(true);
-              setDeleteDraftId(draftId);
-            }}
-            handleEdit={(draft) => {
-              checkEditPrescription(draft);
-            }}
-            handleSwapToOtherPrescription={handleSwapToOtherPrescription}
-            screeningAlerts={props.screeningAlerts}
-            routingConstraints={props.routingConstraints}
-            enableOrder={props.enableOrder}
-          />
-          <Show when={props.onAddAnotherClick && !isLoadingPrefills()}>
-            <Button
-              variant="secondary"
-              class="w-full xs:w-fit mt-5"
-              size="lg"
-              onClick={props.onAddAnotherClick}
-            >
-              Add another
-            </Button>
-          </Show>
-        </div>
-      </Card>
-    </div>
+    </>
   );
 };
 
