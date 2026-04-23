@@ -496,7 +496,7 @@ export const DraftPrescriptionForm = (props: {
           variant="primary"
           color="blue"
         >
-          Add to drafts
+          Add prescription
         </Button>
         {/* Can only hide form if provider has added at least 1 draft */}
         {/*
