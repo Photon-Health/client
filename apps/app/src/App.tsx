@@ -64,7 +64,7 @@ export const App = () => {
         <ProviderAnalyticsProvider>
           <Routes>
             <Route path="/" element={<Main />}>
-              <Route path="*" element={<AppOverride />}>
+              <Route element={<AppOverride />}>
                 <Route path="/patients">
                   <Route path="/patients" element={<Patients />} />
                   <Route path="new" element={<PatientForm />} />
