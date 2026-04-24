@@ -17,18 +17,6 @@ declare global {
   }
 }
 
-// const allowedOnWebAppQuery = gql(/* GraphQL */ `
-//   query OrgSettingsQuery {
-//     organization {
-//       settings {
-//         providerUx {
-//           enableWebAppPrescribe
-//         }
-//       }
-//     }
-//   }
-// `);
-
 export const Main = () => {
   const query = useQueryParams();
 
@@ -37,13 +25,6 @@ export const Main = () => {
   const { user, isAuthenticated, isLoading, error } = usePhoton();
   const location = useLocation();
   const navigate = useNavigate();
-
-  // const hasOverridePermission = usePermissions(['access_override:web_app']);
-
-  // const { data: allowedOnWebAppData, loading: allowedOnWebAppLoading } = useQuery(
-  //   allowedOnWebAppQuery,
-  //   { client: clinicalClient }
-  // );
 
   useWelcomeToast();
 
