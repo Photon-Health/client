@@ -26,12 +26,14 @@ import {
   UpdatePrescriptionStates
 } from '../../fetch';
 import triggerToast from '../../utils/toastTriggers';
+import { formatPatientWeight } from './utils/formatters';
 
 export type DraftPrescriptionsContextType = {
   // values
   draftPrescriptions: Accessor<Prescription[]>;
   prescriptionIds: Accessor<string[]>;
   isLoadingPrefills: Accessor<boolean>;
+  rxNotesPrefill: Accessor<string | undefined>;
 
   // actions
   setDraftPrescriptions: Setter<Prescription[]>;
@@ -53,6 +55,9 @@ interface DraftPrescriptionProviderProps {
   templateOverrides: TemplateOverrides;
   prescriptionIdsPrefill: string[];
   enableCombineAndDuplicate: boolean;
+  additionalNotes?: string;
+  weight?: number;
+  weightUnit?: string;
 }
 
 export type TemplateOverrides = {
@@ -118,21 +123,30 @@ function isTreatmentInDraftPrescriptions(
 
 const createPrefillPrescriptionsOnApi = async ({
   client,
-  props
+  props,
+  rxNotesPrefill
 }: {
   client: PhotonClient;
   props: DraftPrescriptionProviderProps;
+  rxNotesPrefill?: string;
 }) => {
   let rxToCreate: MutationCreatePrescriptionsArgs['prescriptions'] = [];
 
   // Create prescriptions from template ids with a few optional override values
   if (props.templateIdsPrefill.length > 0) {
     const dedupedTemplateIds = Array.from(new Set(props.templateIdsPrefill));
-    const templatedCreateRxList = dedupedTemplateIds.map((templateId) => ({
-      ...props.templateOverrides?.[templateId],
-      patientId: props.patientId,
-      templateId
-    }));
+    const templatedCreateRxList = dedupedTemplateIds.map((templateId) => {
+      const templateOverrideNotes = props.templateOverrides?.[templateId]?.notes;
+      const notes = templateOverrideNotes
+        ? `${templateOverrideNotes}\n\n${rxNotesPrefill}`
+        : rxNotesPrefill;
+      return {
+        ...props.templateOverrides?.[templateId],
+        patientId: props.patientId,
+        templateId,
+        notes
+      };
+    });
     rxToCreate = rxToCreate.concat(templatedCreateRxList);
   }
 
@@ -175,6 +189,14 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
     draftPrescriptions().map((prescription) => prescription.id)
   );
 
+  const rxNotesPrefill = createMemo(() => {
+    const patientWeightText = props.weight
+      ? formatPatientWeight(props.weight, props.weightUnit)
+      : '';
+
+    return `${props.additionalNotes}\n\n${patientWeightText}`;
+  });
+
   // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId
   createEffect(async () => {
     if (
@@ -189,7 +211,11 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       setIsLoadingPrefills(true);
 
       try {
-        const newRxs = await createPrefillPrescriptionsOnApi({ client, props });
+        const newRxs = await createPrefillPrescriptionsOnApi({
+          client,
+          props,
+          rxNotesPrefill: rxNotesPrefill()
+        });
         if (newRxs) {
           setDraftPrescriptions((prev) => [...prev, ...newRxs]);
           newRxs.forEach((rx) => {
@@ -365,6 +391,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
     draftPrescriptions,
     prescriptionIds,
     isLoadingPrefills,
+    rxNotesPrefill,
 
     // actions
     setDraftPrescriptions,
