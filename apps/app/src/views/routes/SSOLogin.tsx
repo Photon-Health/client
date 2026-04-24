@@ -79,11 +79,17 @@ export const SSOLogin = () => {
 };
 
 function isCurrentOriginAllowed(): boolean {
+  console.log('CURRENT ORIGIN ALLOWED');
   try {
     const currentOrigin = window.location.origin;
+    console.log('CURRENT ORIGIN: ', currentOrigin);
+    const teste = /^https:\/\/app(-[a-z0-9-]+)?\.boson\.health$/.test(currentOrigin);
+    const newTest = /^https:\/\/*\.boson\.health$/.test(currentOrigin);
+    console.log('CURRENT TEST: ', teste);
+    console.log('newTest: ', newTest);
     return (
       currentOrigin === 'http://localhost:3000' ||
-      /^https:\/\/app(-[a-z0-9-]+)?\.boson\.health$/.test(currentOrigin) ||
+      teste ||
       currentOrigin === 'https://app.neutron.health' ||
       currentOrigin === 'https://app.photon.health'
     );
