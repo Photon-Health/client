@@ -66,7 +66,7 @@ function expectSingleLogoutRedirect(navigationUrls: string[], connection: string
 }
 
 async function expectLandingPageVisible(page: Page) {
-  await expect(page.getByRole('heading', { name: 'New patient' })).toBeVisible({
+  await expect(page.getByRole('paragraph', { name: 'New patient' })).toBeVisible({
     timeout: 60_000
   });
 }
