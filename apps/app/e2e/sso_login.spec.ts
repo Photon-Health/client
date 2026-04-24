@@ -27,7 +27,7 @@ test('SSO login flow and logout loop regression', async ({ page }) => {
   await page.goto('/sso?connection=fakecustomer');
   await page.waitForURL(/loggedOut=1/, { timeout: 30_000 });
   expect(page.url()).toContain(`connection=${CONNECTION_NAME}`);
-  await expectLandingPageVisible(page);
+  await expectPhotonHomePageVisible(page);
 
   expectSingleLogoutRedirect(navigationUrls, CONNECTION_NAME);
 });
@@ -63,6 +63,12 @@ function expectSingleLogoutRedirect(navigationUrls: string[], connection: string
     (url) => url.includes('loggedOut=1') && url.includes(`connection=${connection}`)
   );
   expect(matching).toHaveLength(1);
+}
+
+async function expectPhotonHomePageVisible(page: Page) {
+  await expect(page.getByRole('heading', { name: 'Prescriptions' })).toBeVisible({
+    timeout: 60_000
+  });
 }
 
 async function expectLandingPageVisible(page: Page) {
