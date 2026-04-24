@@ -40,11 +40,14 @@ const client = new PhotonClient({
 });
 
 const onRedirectCallback = (appState?: AppState) => {
+  console.log('ZAC ON REDIRECT CALLBACK');
   let returnTo = localStorage.getItem('authReturnTo');
+  console.log('ZAC ON REDIRECT CALLBACK RETURN: ', returnTo);
   localStorage.removeItem('authReturnTo');
   if (!returnTo) {
     returnTo = appState?.returnTo || window.location.pathname;
   }
+  console.log('ZAC ON REDIRECT CALLBACK RETURN FINAL: ', returnTo);
   window.location.replace(returnTo);
 };
 

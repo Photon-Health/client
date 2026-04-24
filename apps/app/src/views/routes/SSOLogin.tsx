@@ -45,8 +45,10 @@ export const SSOLogin = () => {
       return;
     }
 
+    console.log('ZAC RETURN TO', returnTo);
     if (isCurrentOriginAllowed()) {
       if (returnTo) {
+        console.log('ZAC RETURN TO INSIDE');
         localStorage.setItem('authReturnTo', returnTo);
       }
     }
