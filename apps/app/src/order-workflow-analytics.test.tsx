@@ -18,7 +18,6 @@ const testProviderUxSettings = {
   enablePatientRouting: true,
   enablePickupPharmacies: true,
   enableDeliveryPharmacies: false,
-  enableWebAppPrescribe: true,
   optionalPatientAddress: false
 };
 

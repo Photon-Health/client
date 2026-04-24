@@ -8,8 +8,6 @@ import { auth0Config } from '../../configs/auth';
 import useQueryParams from '../../hooks/useQueryParams';
 import { Env } from '@photonhealth/sdk';
 import { useWelcomeToast } from '../../hooks/useWelcomeToast';
-import { gql, useQuery } from '@apollo/client';
-import usePermissions from '../../hooks/usePermissions';
 
 declare global {
   namespace JSX {
@@ -19,33 +17,33 @@ declare global {
   }
 }
 
-const allowedOnWebAppQuery = gql(/* GraphQL */ `
-  query OrgSettingsQuery {
-    organization {
-      settings {
-        providerUx {
-          enableWebAppPrescribe
-        }
-      }
-    }
-  }
-`);
+// const allowedOnWebAppQuery = gql(/* GraphQL */ `
+//   query OrgSettingsQuery {
+//     organization {
+//       settings {
+//         providerUx {
+//           enableWebAppPrescribe
+//         }
+//       }
+//     }
+//   }
+// `);
 
 export const Main = () => {
   const query = useQueryParams();
 
   // Detect is browser is Safari
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  const { user, isAuthenticated, isLoading, error, clinicalClient } = usePhoton();
+  const { user, isAuthenticated, isLoading, error } = usePhoton();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const hasOverridePermission = usePermissions(['access_override:web_app']);
+  // const hasOverridePermission = usePermissions(['access_override:web_app']);
 
-  const { data: allowedOnWebAppData, loading: allowedOnWebAppLoading } = useQuery(
-    allowedOnWebAppQuery,
-    { client: clinicalClient }
-  );
+  // const { data: allowedOnWebAppData, loading: allowedOnWebAppLoading } = useQuery(
+  //   allowedOnWebAppQuery,
+  //   { client: clinicalClient }
+  // );
 
   useWelcomeToast();
 
@@ -78,26 +76,11 @@ export const Main = () => {
     );
   }
 
-  if (allowedOnWebAppLoading) {
-    return (
-      <Center h="100vh">
-        <CircularProgress isIndeterminate color="green.300" />
-      </Center>
-    );
-  }
-
-  const orgSettings = allowedOnWebAppData?.organization?.settings;
-  const enableWebAppPrescribe = orgSettings?.providerUx?.enableWebAppPrescribe ?? true;
-
-  if (isAuthenticated && !user?.org_id) return <SelectOrg />;
-
-  if (isAuthenticated && !enableWebAppPrescribe && !hasOverridePermission) {
-    return <Navigate to="/disallowed" />;
-  }
-
   if (location.pathname === '/' && isAuthenticated) {
     if (user?.org_id) return <Navigate to="/prescriptions" replace />;
   }
+
+  if (isAuthenticated && !user?.org_id) return <SelectOrg />;
 
   return (
     // For infinite scrolling, Safari expects body to be 100vh, while chrome/firefox expects heihgt auto
