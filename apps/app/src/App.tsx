@@ -81,16 +81,16 @@ export const App = () => {
                   <Route path="new" element={<NewOrder />} />
                   <Route path=":orderId" element={<Order />} />
                 </Route>
-                <Route path="/support" element={<Support />} />
-                <Route path="/playground" element={<Playground />} />={' '}
-                <Route path="/settings" element={<Settings />}>
-                  <Route path="user" />
-                  <Route path="team" />
-                  <Route path="organization" />
-                  <Route path="developers" />
-                  <Route path="templates" />
-                  <Route path="catalog" />
-                </Route>
+              </Route>
+              <Route path="/support" element={<Support />} />
+              <Route path="/playground" element={<Playground />} />={' '}
+              <Route path="/settings" element={<Settings />}>
+                <Route path="user" />
+                <Route path="team" />
+                <Route path="organization" />
+                <Route path="developers" />
+                <Route path="templates" />
+                <Route path="catalog" />
               </Route>
             </Route>
             <Route path="/login" element={<Login />} />
