@@ -66,7 +66,7 @@ function expectSingleLogoutRedirect(navigationUrls: string[], connection: string
 }
 
 async function expectLandingPageVisible(page: Page) {
-  await expect(page.getByRole('textbox', { name: 'First name' })).toBeVisible({
+  await expect(page.getByLabel('First name')).toBeVisible({
     timeout: 60_000
   });
 }
