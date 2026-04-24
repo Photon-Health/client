@@ -342,6 +342,18 @@ export function OrganizationSettingsForm({
                 single view.
               </FormHelperText>
             </FormControl>
+            <FormControl isInvalid={!!errors.providerUx?.enableWebAppPrescribe}>
+              <Flex gap={2}>
+                <Field component={SwitchField} name="providerUx.enableWebAppPrescribe" />
+                <FormLabel htmlFor="providerUx.enableWebAppPrescribe" mb={0}>
+                  Enable Prescribers on the Web App
+                </FormLabel>
+              </Flex>
+              <FormHelperText>
+                Allow prescribers to use the Photon Web App to write prescriptions and manage
+                patients.
+              </FormHelperText>
+            </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enableRxTemplates}>
               <Flex gap={2}>
                 <Field component={SwitchField} name="providerUx.enableRxTemplates" />
