@@ -190,11 +190,12 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
   );
 
   const rxNotesPrefill = createMemo(() => {
-    const patientWeightText = props.weight
-      ? formatPatientWeight(props.weight, props.weightUnit)
-      : '';
+    let notesPrefill = '';
+    if (props.additionalNotes) notesPrefill = `${props.additionalNotes}\n\n`;
+    if (props.weight)
+      notesPrefill = `${notesPrefill}${formatPatientWeight(props.weight, props.weightUnit)}`;
 
-    return `${props.additionalNotes}\n\n${patientWeightText}`;
+    return notesPrefill || undefined;
   });
 
   // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId
