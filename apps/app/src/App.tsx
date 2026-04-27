@@ -28,6 +28,7 @@ import { Support } from './views/routes/Support';
 import { UpdatePatientForm } from './views/routes/UpdatePatientForm';
 import { Env } from '@photonhealth/sdk';
 import { SelfSignupPage } from './views/routes/SelfSignup';
+import { AppOverride } from './views/routes/AppOverride';
 
 const env = import.meta.env.VITE_ENV_NAME as Env;
 
@@ -63,21 +64,23 @@ export const App = () => {
         <ProviderAnalyticsProvider>
           <Routes>
             <Route path="/" element={<Main />}>
-              <Route path="/patients">
-                <Route path="/patients" element={<Patients />} />
-                <Route path="new" element={<PatientForm />} />
-                <Route path="update/:patientId" element={<UpdatePatientForm />} />
-              </Route>
-              <Route path="/patients/:patientId" element={<Patient />} />
-              <Route path="/prescriptions">
-                <Route path="/prescriptions" element={<Prescriptions />} />
-                <Route path="new" element={<PrescriptionForm />} />
-                <Route path=":prescriptionId" element={<Prescription />} />
-              </Route>
-              <Route path="/orders">
-                <Route path="/orders" element={<Orders />} />
-                <Route path="new" element={<NewOrder />} />
-                <Route path=":orderId" element={<Order />} />
+              <Route element={<AppOverride />}>
+                <Route path="/patients">
+                  <Route path="/patients" element={<Patients />} />
+                  <Route path="new" element={<PatientForm />} />
+                  <Route path="update/:patientId" element={<UpdatePatientForm />} />
+                </Route>
+                <Route path="/patients/:patientId" element={<Patient />} />
+                <Route path="/prescriptions">
+                  <Route path="/prescriptions" element={<Prescriptions />} />
+                  <Route path="new" element={<PrescriptionForm />} />
+                  <Route path=":prescriptionId" element={<Prescription />} />
+                </Route>
+                <Route path="/orders">
+                  <Route path="/orders" element={<Orders />} />
+                  <Route path="new" element={<NewOrder />} />
+                  <Route path=":orderId" element={<Order />} />
+                </Route>
               </Route>
               <Route path="/support" element={<Support />} />
               <Route path="/playground" element={<Playground />} />={' '}

@@ -8,7 +8,7 @@ test('SSO login flow and logout loop regression', async ({ page }) => {
   // Phase 1: Fresh SSO login — verify connection param and no duplicate redirects
   const authorizeRequests = setupAuthorizeRequestCapture(page);
 
-  await page.goto(`/sso?connection=${CONNECTION_NAME}`);
+  await page.goto(`/sso?connection=${CONNECTION_NAME}&returnTo=/patients/new`);
   await page.waitForURL(/fakecustomer.*auth0/, { timeout: 30_000 });
 
   expectSingleLoginRedirect(authorizeRequests, CONNECTION_NAME);
@@ -19,7 +19,7 @@ test('SSO login flow and logout loop regression', async ({ page }) => {
     .getByRole('textbox', { name: 'Password' })
     .fill(process.env.PLAYWRIGHT_E2E_SSO_ACCOUNT_PASSWORD);
   await page.getByRole('button', { name: 'Continue' }).click();
-  await expectPhotonHomePageVisible(page);
+  await expectLandingPageVisible(page);
 
   // Phase 2: Re-visit /sso while authenticated — verify loggedOut=1 breaks any login/logout loop
   const navigationUrls = setupNavigationCapture(page);
@@ -67,6 +67,12 @@ function expectSingleLogoutRedirect(navigationUrls: string[], connection: string
 
 async function expectPhotonHomePageVisible(page: Page) {
   await expect(page.getByRole('heading', { name: 'Prescriptions' })).toBeVisible({
+    timeout: 60_000
+  });
+}
+
+async function expectLandingPageVisible(page: Page) {
+  await expect(page.getByLabel('First name')).toBeVisible({
     timeout: 60_000
   });
 }
