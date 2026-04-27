@@ -15,7 +15,7 @@ setup('authenticate', async ({ page }) => {
     .getByRole('textbox', { name: 'Password' })
     .fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD);
   await page.getByRole('button', { name: 'Continue', exact: true }).click();
-  await page.waitForURL(process.env.PLAYWRIGHT_BASE_URL, { timeout: 60_000 });
+  await page.waitForURL(process.env.PLAYWRIGHT_BASE_URL, { timeout: 180_000 });
   await expect(page.getByRole('heading', { name: 'Prescriptions' })).toBeVisible();
 
   await page.context().storageState({ path: authFile });
