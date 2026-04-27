@@ -6,40 +6,46 @@ type TestCase = {
 };
 const testCases = [
   {
-    origin: 'app.boson.health',
+    origin: 'https://app.boson.health',
     expectedAllowed: true
   },
   {
-    origin: 'app.neutron.health',
+    origin: 'https://app.neutron.health',
     expectedAllowed: true
   },
   {
-    origin: 'app.photon.health',
+    origin: 'https://app.photon.health',
     expectedAllowed: true
   },
   {
-    origin: 'app-test-branch-name.boson.health',
+    origin: 'https://app-test-branch-name.boson.health',
     expectedAllowed: true
   },
   {
-    origin: 'app-1234.boson.health',
+    origin: 'https://app-1234.boson.health',
     expectedAllowed: true
   },
   // Bad ones
   {
-    origin: 'app.boson.me',
+    origin: 'https://app.boson.me',
     expectedAllowed: false
   },
   {
-    origin: 'photon.health',
+    origin: 'https://photon.health',
     expectedAllowed: false
   },
   {
-    origin: 'app.failing.health',
+    origin: 'https://app.failing.health',
+    expectedAllowed: false
+  },
+  {
+    origin: 'app.boson.health',
     expectedAllowed: false
   }
 ] as TestCase[];
 
-test.each(testCases)('isCurrentOriginAllowed', (testCase) => {
-  expect(isCurrentOriginAllowed(testCase.origin)).toBe(testCase.expectedAllowed);
+describe.each(testCases)('isCurrentOriginAllowed', (testCase) => {
+  test(`When origin is ${testCase.origin} allowed should be ${testCase.expectedAllowed}`, () => {
+    expect(isCurrentOriginAllowed(testCase.origin)).toBe(testCase.expectedAllowed);
+  });
 });
