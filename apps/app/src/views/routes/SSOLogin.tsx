@@ -81,7 +81,7 @@ function isCurrentOriginAllowed(): boolean {
     const currentOrigin = window.location.origin;
     return (
       currentOrigin === 'http://localhost:3000' ||
-      /^https:\/\/app(-[a-z0-9-]+)?\.boson\.health$/.test(currentOrigin) ||
+      /^https:\/\/app(-.*)\.boson\.health$/.test(currentOrigin) ||
       currentOrigin === 'https://app.neutron.health' ||
       currentOrigin === 'https://app.photon.health'
     );

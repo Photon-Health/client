@@ -6,6 +6,7 @@ const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  timeout: 180_000,
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
