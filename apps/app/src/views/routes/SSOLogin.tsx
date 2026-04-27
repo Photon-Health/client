@@ -83,8 +83,7 @@ function isCurrentOriginAllowed(): boolean {
       currentOrigin === 'http://localhost:3000' ||
       // Test for generated builds from PRs in the form of
       // app-[something here].boson.health
-      /^https:\/\/app(-.*)\.boson\.health$/.test(currentOrigin) ||
-      currentOrigin === 'https://app.boson.health' ||
+      /^https:\/\/app(-.*)?\.boson\.health$/.test(currentOrigin) ||
       currentOrigin === 'https://app.neutron.health' ||
       currentOrigin === 'https://app.photon.health'
     );
