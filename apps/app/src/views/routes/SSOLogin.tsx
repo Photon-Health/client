@@ -44,8 +44,9 @@ export const SSOLogin = () => {
       logout({ federated: false, returnTo: url.toString() });
       return;
     }
+    const currentOrigin = window.location.origin;
 
-    if (isCurrentOriginAllowed()) {
+    if (isCurrentOriginAllowed(currentOrigin)) {
       if (returnTo) {
         localStorage.setItem('authReturnTo', returnTo);
       }
@@ -76,9 +77,9 @@ export const SSOLogin = () => {
   );
 };
 
-function isCurrentOriginAllowed(): boolean {
+// This is only exported for a test.
+export function isCurrentOriginAllowed(currentOrigin: string): boolean {
   try {
-    const currentOrigin = window.location.origin;
     return (
       currentOrigin === 'http://localhost:3000' ||
       // Test for generated builds from PRs in the form of
