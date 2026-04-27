@@ -32,7 +32,7 @@ export const Main = () => {
     if (!isLoading && error) {
       navigate('/', { replace: true });
     }
-  }, [isLoading, error]);
+  }, [isLoading, error, navigate]);
 
   if (isLoading || query.get('code')) {
     return (

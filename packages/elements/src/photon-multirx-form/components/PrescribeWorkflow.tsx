@@ -6,7 +6,6 @@ import { OrderCard } from './OrderCard';
 import { PatientCard } from './PatientCard';
 import { PharmacyCard } from './PharmacyCard';
 import clearForm from './PrescriptionCard/util/clearForm';
-import { formatPatientWeight } from './PrescriptionCard/util/formatPatientWeight';
 import {
   AddressForm,
   Alert,
@@ -136,8 +135,13 @@ const calculateNeedsSupervisor = ({
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
 
-  const { draftPrescriptions, prescriptionIds, tryUpdatePrescriptionStates, isLoadingPrefills } =
-    useDraftPrescriptions();
+  const {
+    draftPrescriptions,
+    prescriptionIds,
+    tryUpdatePrescriptionStates,
+    isLoadingPrefills,
+    rxNotesPrefill
+  } = useDraftPrescriptions();
   const pharmacySelectionContext = usePharmacySelectionContext();
   const {
     dispatchFormValidate,
@@ -180,15 +184,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   });
   const [isScreeningAlertWarningOpen, setIsScreeningAlertWarningOpen] = createSignal(false);
 
-  // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
-  let prefillNotes = '';
-  if (props.additionalNotes) {
-    prefillNotes = `${props.additionalNotes}\n\n`;
-  }
-  if (props.weight) {
-    prefillNotes = `${prefillNotes}${formatPatientWeight(props.weight, props.weightUnit)}`;
-  }
-
   onMount(async () => {
     if (props.address) {
       // if manually overriding address, update the store on mount
@@ -200,7 +195,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
     ref.addEventListener('photon-ticket-created-duplicate', () => {
       // need to reset all the form data
-      clearForm(props.formActions, { notes: prefillNotes });
+      clearForm(props.formActions, { notes: rxNotesPrefill() });
       pharmacySelectionContext.setFulfillmentType(undefined);
       pharmacySelectionContext.setPharmacyId(undefined);
       pharmacySelectionContext.setUpdatePreferredPharmacy(false);
@@ -659,7 +654,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   store={props.formStore}
                   weight={props.weight}
                   weightUnit={props.weightUnit}
-                  prefillNotes={prefillNotes}
+                  prefillNotes={rxNotesPrefill()}
                   screenDraftedPrescriptions={screenDraftedPrescriptions}
                   screeningAlerts={screeningAlerts()}
                   enableOrder={props.enableOrder}
