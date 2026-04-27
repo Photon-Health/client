@@ -9,6 +9,7 @@ export const mockDraftPrescriptionsContextValues = () => {
     draftPrescriptions: () => [],
     prescriptionIds: () => [],
     isLoadingPrefills: () => false,
+    rxNotesPrefill: () => undefined,
     deletePrescription: vi.fn(),
     tryCreatePrescription: vi.fn(),
     tryUpdatePrescriptionStates: vi.fn(),
