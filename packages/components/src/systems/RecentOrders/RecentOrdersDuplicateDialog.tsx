@@ -6,6 +6,7 @@ import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
 import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import formatRxString from '../../utils/formatRxString';
+import formatDate from '../../utils/formatDate';
 
 export default function RecentOrdersDuplicateDialog() {
   let ref: Ref<any> | undefined;
@@ -57,7 +58,7 @@ export default function RecentOrdersDuplicateDialog() {
           </Text>
           <Text size="sm" color="gray">
             Written by {state?.duplicateFill?.prescription?.prescriber?.name?.full} on{' '}
-            {new Date(state?.duplicateFill?.prescription?.writtenAt).toLocaleDateString()}
+            {formatDate(state?.duplicateFill?.prescription?.writtenAt)}
           </Text>
         </div>
 

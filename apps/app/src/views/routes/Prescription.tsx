@@ -28,7 +28,6 @@ import {
 } from '@chakra-ui/react';
 import { FiChevronRight, FiPlus, FiRepeat } from 'react-icons/fi';
 import { GraphQLClient } from 'graphql-request';
-import dayjs from 'dayjs';
 
 import { formatAddress, FormatAddressProps, formatDate } from '../../utils';
 
@@ -485,7 +484,7 @@ export const Prescription = () => {
                             <Text fontSize="sm" color="gray.500">
                               {addressString}
                               {addressString ? <br /> : null}
-                              Created: {dayjs(fill?.order?.createdAt).format('MMM D, YYYY, h:mm A')}
+                              Created: {formatDate(fill?.order?.createdAt)}
                             </Text>
                           </VStack>
                           <Box alignItems="end">
