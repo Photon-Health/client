@@ -20,8 +20,9 @@ import { graphql } from 'apps/app/src/gql';
 import { InvitesQueryDocument } from 'apps/app/src/gql/graphql';
 import { ErrorMessage, Field, Formik, validateYupSchema, yupToFormErrors } from 'formik';
 import * as yup from 'yup';
+import parsePhoneNumberFromString from 'libphonenumber-js';
 import { usePhoton } from '@photonhealth/react';
-import { RolesSelect, hasPrescriberRole, rolesSchema } from '../utils/Roles';
+import { hasPrescriberRole, rolesSchema, RolesSelect } from '../utils/Roles';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 import { npiRegex, phoneRegex, zipCodeRegex } from '../utils/Validation';
 import { AddressInput } from 'packages/sdk/dist/types';
@@ -53,6 +54,12 @@ const requiredForPrescribers =
     return hasPrescriberRole(roles) ? schema.required(message) : schema.notRequired();
   };
 
+const isValidUSPhone = (value?: string) => {
+  if (!value) return true;
+  const parsed = parsePhoneNumberFromString(value, 'US');
+  return !!parsed?.isValid();
+};
+
 const inviteSchema = yup
   .object({
     email: yup.string().email('Enter a valid email').required('Email is required'),
@@ -66,6 +73,7 @@ const inviteSchema = yup
       .matches(phoneRegex, {
         message: 'Enter a valid phone number'
       })
+      .test('is-valid-phone', 'Enter a valid phone number', isValidUSPhone)
       .when('roles', requiredForPrescribers('Phone number is required for prescribers')),
     fax: yup
       .string()
