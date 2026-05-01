@@ -6,6 +6,7 @@ import { InvitesQueryDocument } from 'apps/app/src/gql/graphql';
 import { FiSend, FiTrash } from 'react-icons/fi';
 import { confirmWrapper } from '../../../../components/GuardDialog';
 import { StyledToast } from 'apps/app/src/views/components/StyledToast';
+import { formatDate } from 'apps/app/src/utils';
 
 export const inviteFragment = graphql(/* GraphQL */ `
   fragment InviteFragment on Invite {
@@ -55,7 +56,7 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
       </Td>
       <Td>
         <Badge size="sm" colorScheme={invite.expired ? 'red' : 'green'}>
-          {invite.expired ? 'Expired' : `${new Date(invite.expires_at).toLocaleDateString()}`}
+          {invite.expired ? 'Expired' : `${formatDate(invite.expires_at)}`}
         </Badge>
       </Td>
       <Td>
