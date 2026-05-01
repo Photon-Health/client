@@ -33,13 +33,6 @@ export const isZip = (zip: string) => {
   return /^\d{5}(-\d{4})?$/.test(zip);
 };
 
-// Takes a date string in the format 'YYYY-MM-DD'
-// and returns it in the format 'MM-DD-YYYY'.
-export const formatDate = (dateString: string) => {
-  const [year, month, day] = dateString.split('-');
-  return `${month}-${day}-${year}`;
-};
-
 export function checkHasPermission(subset: Permission[], superset: Permission[]) {
   return subset.every((permission) => superset.includes(permission));
 }

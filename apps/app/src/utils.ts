@@ -15,8 +15,8 @@ function titleCase(str: string) {
 /**
  * Format date to client's local date string (MM/DD/YYYY)
  */
-function formatDate(date: string) {
-  return new Date(date)?.toLocaleDateString('en-US');
+function formatDate(date?: string) {
+  return date ? new Date(date)?.toLocaleDateString('en-US') : '';
 }
 
 /**
@@ -24,20 +24,20 @@ function formatDate(date: string) {
  * Use for any dates that should NOT be shifted to the
  * client's local timezone
  */
-function formatDateUTC(date: string) {
-  return new Date(date)?.toLocaleDateString('en-US', { timeZone: 'UTC' });
+function formatDateUTC(date?: string) {
+  return date ? new Date(date)?.toLocaleDateString('en-US', { timeZone: 'UTC' }) : '';
 }
 
 /**
  * Format date to Month D, Yr
  */
-function formatDateLong(date: string | Date) {
+function formatDateLong(date?: string | Date) {
   const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   };
-  return new Date(date)?.toLocaleDateString([], options);
+  return date ? new Date(date)?.toLocaleDateString([], options) : '';
 }
 
 /**
@@ -45,14 +45,14 @@ function formatDateLong(date: string | Date) {
  * Use for any dates that should NOT be shifted to the
  * client's local timezone
  */
-function formatDateLongUTC(date: string | Date) {
+function formatDateLongUTC(date?: string | Date) {
   const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     timeZone: 'UTC'
   };
-  return new Date(date)?.toLocaleDateString([], options);
+  return date ? new Date(date)?.toLocaleDateString([], options) : '';
 }
 
 // Format phone number to (###) ###-####
