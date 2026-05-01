@@ -6,7 +6,7 @@ import { usePhotonClient } from '../SDKProvider';
 import Button from '../../particles/Button';
 import Text from '../../particles/Text';
 import Card from '../../particles/Card';
-import formatDate from '../../utils/formatDate';
+import { formatDateUTC } from '../../utils/formatDate';
 import Collapsible from '../../particles/Collapsible';
 
 const GET_PATIENT = gql`
@@ -166,7 +166,7 @@ export default function PatientInfo(props: PatientInfoProps) {
               <tbody>
                 <InfoRow label="DOB">
                   <Text size="sm" loading={!patient()} sampleLoadingText="female">
-                    {formatDate(patient()?.dateOfBirth || 'N/A')}
+                    {patient()?.dateOfBirth ? formatDateUTC(patient()?.dateOfBirth) : 'N/A'}
                   </Text>
                 </InfoRow>
                 <InfoRow label="Weight">
