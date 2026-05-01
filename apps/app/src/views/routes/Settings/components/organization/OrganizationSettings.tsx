@@ -113,7 +113,10 @@ export function OrganizationSettings() {
             try {
               await updateOrganizationSettings({
                 variables: {
-                  input: vals
+                  input: {
+                    ...vals,
+                    brandLogo: vals.brandLogo ?? null
+                  }
                 }
               });
             } catch (error) {
