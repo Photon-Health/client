@@ -6,7 +6,7 @@ import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
 import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import formatRxString from '../../utils/formatRxString';
-import formatDate from '../../utils/formatDate';
+import { formatDate } from '../../utils/formatDate';
 
 export default function RecentOrdersDuplicateDialog() {
   let ref: Ref<any> | undefined;

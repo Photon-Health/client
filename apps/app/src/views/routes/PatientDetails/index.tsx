@@ -22,7 +22,7 @@ import {
 import { FiChevronRight, FiEdit, FiPlus } from 'react-icons/fi';
 import { usePhoton } from '@photonhealth/react';
 import { useEffect, useMemo, useState } from 'react';
-import { formatDate, formatDateLong, formatPhone, getMedicationNames } from '../../../utils';
+import { formatDate, formatDateLongUTC, formatPhone, getMedicationNames } from '../../../utils';
 import { Page } from '../../components/Page';
 import { PatientPrescriptions } from './components/PatientPrescriptions';
 import OrderStatusBadge, { OrderFulfillmentState } from '../../components/OrderStatusBadge';
@@ -180,7 +180,7 @@ export const Patient = () => {
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : patient?.dateOfBirth ? (
                 <Text fontSize="md" data-dd-privacy="mask" className="mp-mask">
-                  {formatDateLong(patient.dateOfBirth)}
+                  {formatDateLongUTC(patient.dateOfBirth)}
                 </Text>
               ) : (
                 <Text fontSize="md" as="i" color="gray.500">
