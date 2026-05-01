@@ -1,6 +1,6 @@
 import { For, Show } from 'solid-js';
 import { useRecentOrders } from '.';
-import formatDate from '../../utils/formatDate';
+import { formatDate } from '../../utils/formatDate';
 import Banner from '../../particles/Banner';
 import Button from '../../particles/Button';
 import Card from '../../particles/Card';

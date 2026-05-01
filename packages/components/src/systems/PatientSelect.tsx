@@ -5,7 +5,7 @@ import { Patient } from '@photonhealth/sdk/dist/types';
 import { createMemo, For, Show } from 'solid-js';
 import { debounce } from '@solid-primitives/scheduled';
 import clsx from 'clsx';
-import formatDate from '../utils/formatDate';
+import { formatDateUTC } from '../utils/formatDate';
 
 export const PatientSelect = (props: {
   selectedPatient?: Patient;
@@ -73,7 +73,7 @@ const PatientOption = (props: { value: Patient; active: boolean }) => (
     {/* Styling accounts for wrapping long names on mobile */}
     <span class="min-w-0 whitespace-normal">{props.value.name.full}</span>
     <span class={clsx('shrink-0', props.active ? 'text-white' : 'text-gray-500')}>
-      {formatDate(props.value.dateOfBirth)}
+      {formatDateUTC(props.value.dateOfBirth)}
     </span>
   </div>
 );
