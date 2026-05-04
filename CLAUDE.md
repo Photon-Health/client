@@ -437,3 +437,20 @@ All new utility functions, views, and components must include tests. Match the t
 - **Test files** are excluded from linting (configured in `.eslintrc.json` ignorePatterns)
 - **TypeScript strict mode** enabled; type check with `npx nx run <project>:tsc:boson`
 - **Shared types** belong in `packages/sdk/src/types.ts` since all packages already depend on `@photonhealth/sdk`. For GraphQL response shapes, always use generated types from codegen (`gql/` or `graphql/` directories) rather than defining them manually.
+
+## Date Formatting
+
+Always use standardaized `formatDate*` utils — never format dates inline with `toLocaleDateString`, `toISOString`, `date-fns`, `dayjs`, or `Intl.DateTimeFormat`.
+
+NOTE: The code in `apps/app/patient` does not currently use formatting utils, and should not be taken as an example of standardized patterns.
+
+| Function | Use when |
+|----------|----------|
+| `formatDate(date?)` | Timestamps — fields that record *when an event occurred* (e.g. `createdAt`, `writtenAt`) |
+| `formatDateUTC(date?)` | Dates that should display literally as stored, not shifted to the user's timezone (e.g. `dateOfBirth`) |
+| `formatDateLong(date?)` | Same as `formatDate` but long-form month name |
+| `formatDateLongUTC(date?)` | Same as `formatDateUTC` but long-form month name |
+
+**Why UTC for certain dates?** Some dates should be shown exactly as stored regardless of the user's timezone — e.g. a date of birth of January 15 should always display as January 15. Without `timeZone: 'UTC'`, the API value `2024-01-15T00:00:00Z` renders as January 14 for users in timezones behind UTC.
+
+**Why local timezone for order and prescription related dates?** Fields like `createdAt` represent a moment in time and should appear in the user's local time so they match the user's clock.
