@@ -91,14 +91,14 @@ export const Profile = () => {
   const orgNameMatchesUserName =
     user &&
     organization &&
-    organization?.name.toLowerCase() !==
+    organization?.name.toLowerCase() ===
       `${user.name?.first.toLowerCase()} ${user.name?.last.toLowerCase()}`;
 
   const rows = useMemo(
     () =>
       compact([
-        { title: 'Full Name', value: formatName(user?.name, user?.credentials) },
-        orgNameMatchesUserName && {
+        { title: 'Full Name', value: user?.name?.full },
+        !orgNameMatchesUserName && {
           title: 'Organization',
           value: organization?.name
         },
@@ -289,46 +289,6 @@ function mapAndSortRoles(roles: Role[]): { value: string; label: string; descrip
   }));
   const sortedRoles = mappedRoles.sort();
   return sortedRoles;
-}
-
-function formatName(
-  name:
-    | {
-        __typename?: 'Name';
-        first: string;
-        full: string;
-        last: string;
-        middle?: string | null;
-        title?: string | null;
-      }
-    | null
-    | undefined,
-  credentials?: string | null
-): string {
-  if (!name) return '';
-  const { first, middle, last, title } = name;
-  const parts: string[] = [];
-  if (first) parts.push(first.trim());
-  if (middle) parts.push(middle.trim());
-  if (last) parts.push(last.trim());
-  let fullName = parts.join(' ');
-
-  if (title && ALLOWED_TITLES.has(title.trim().toLowerCase())) {
-    fullName = `${formatDoctorTitle(title)} ${fullName}`;
-  }
-
-  if (credentials && credentials.trim()) {
-    fullName += `, ${credentials.trim().toUpperCase()}`;
-  }
-
-  return fullName;
-}
-
-const ALLOWED_TITLES = new Set(['dr', 'dr.']);
-function formatDoctorTitle(title: string): string {
-  const normalized = title.trim().toLowerCase().replace(/\.$/, '');
-  const capitalized = normalized.charAt(0).toUpperCase() + normalized.slice(1);
-  return `${capitalized}.`;
 }
 
 const profileQuery = graphql(/* GraphQL */ `
