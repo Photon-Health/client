@@ -751,9 +751,13 @@ export const Pharmacy = () => {
       buttonText
     });
 
+    const isSkipReadyBySelectionPageEnabled = patientAnalytics.getFlagValueSync(
+      'remove_ready_by_selection_page'
+    ).skipReadyBySelectionPage;
+
     // If it's a mail order pharmacy, submit the pharmacy to the order
     // Otherwise, just navigate to ready by selection
-    if (isMailOrder || isReroute) {
+    if (isMailOrder || isReroute || isSkipReadyBySelectionPageEnabled) {
       trackSelectedPharmacyRank(selectedPharmacy.id, allPharmaciesIncludingOffers);
 
       try {
