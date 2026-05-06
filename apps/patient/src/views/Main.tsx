@@ -188,7 +188,10 @@ export const Main = () => {
         const removeReviewStepExperiment = await patientAnalytics.getFlagValue(
           'remove_review_your_rx_page'
         );
-        redirectPath = removeReviewStepExperiment.skipReviewPage ? '/pharmacy' : '/review';
+        redirectPath =
+          removeReviewStepExperiment.skipReviewPage && newOrder.patient.address
+            ? '/pharmacy'
+            : '/review';
       }
 
       const query = queryString.stringify({ orderId: newOrder.id, token });
