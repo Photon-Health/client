@@ -1046,9 +1046,10 @@ export const Pharmacy = () => {
   const showPickupHeading =
     (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;
 
-  const removeReviewPageExperiment = patientAnalytics.getFlagValueSync(
-    'remove_review_your_rx_page'
-  );
+  let removeReviewPageExperiment;
+  if (order.patient.address) {
+    removeReviewPageExperiment = patientAnalytics.getFlagValueSync('remove_review_your_rx_page');
+  }
 
   return (
     <Box>
@@ -1067,7 +1068,7 @@ export const Pharmacy = () => {
         options={patientMailOrderOptions}
       />
 
-      {removeReviewPageExperiment.showRxSummaryOnPharmacyPage && (
+      {removeReviewPageExperiment?.showRxSummaryOnPharmacyPage && (
         <Box bgColor="white" p={4} borderBottom="1px" borderColor="gray.200">
           <Container px={-3}>
             <PrescriptionsSummary />
