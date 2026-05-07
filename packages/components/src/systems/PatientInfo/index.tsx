@@ -96,7 +96,7 @@ export default function PatientInfo(props: PatientInfoProps) {
 
   const phoneNumber = createMemo(() => {
     if (patient()?.phone) {
-      const pn = parsePhoneNumber(patient()?.phone);
+      const pn = parsePhoneNumber(patient()?.phone || '');
       return pn.valid ? pn.number.national : patient()?.phone;
     }
     return '';
