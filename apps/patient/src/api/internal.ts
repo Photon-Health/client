@@ -22,9 +22,9 @@ export const getOfferBundles = async (orderId: string) => {
   return response.offerBundles;
 };
 
-export const getFaqsForOrder = async (orderId: string) => {
-  const response = await graphQLClient.GetFaqsForOrder({ orderId });
-  return response.faqsForOrder;
+export const getFaqs = async (orderId: string) => {
+  const response = await graphQLClient.GetFaqs({ orderId });
+  return response.faqs;
 };
 
 export const getPharmaciesByLocation = async ({

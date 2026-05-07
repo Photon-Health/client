@@ -20,7 +20,7 @@ import { Card } from './Card';
 import { FAQContents, FAQEntry } from './FAQ';
 import { useOrderContext } from '../views/Main';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
-import { getFaqsForOrder } from '../api';
+import { getFaqs } from '../api';
 
 export const FAQModal = ({
   isOpen,
@@ -44,7 +44,7 @@ export const FAQModal = ({
     }
     setLoading(true);
     (async () => {
-      const result = await getFaqsForOrder(order.id);
+      const result = await getFaqs(order.id);
       setFaqs(result);
       setLoading(false);
     })();
