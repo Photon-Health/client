@@ -9,13 +9,18 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Skeleton,
+  SkeletonText,
+  Stack,
   useToast,
   VStack
 } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
 import { Card } from './Card';
-import { FAQContents } from './FAQ';
+import { FAQContents, FAQEntry } from './FAQ';
 import { useOrderContext } from '../views/Main';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
+import { getFaqs } from '../api';
 
 export const FAQModal = ({
   isOpen,
@@ -30,9 +35,20 @@ export const FAQModal = ({
   const toast = useToast();
   const patientAnalytics = usePatientAnalytics();
 
-  const handleClose = () => {
-    onClose();
-  };
+  const [faqs, setFaqs] = useState<FAQEntry[] | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen || !order?.id) {
+      return;
+    }
+    setLoading(true);
+    (async () => {
+      const result = await getFaqs(order.id);
+      setFaqs(result);
+      setLoading(false);
+    })();
+  }, [isOpen, order?.id]);
 
   const handleMessageSupport = () => {
     if (isDemo) {
@@ -50,7 +66,7 @@ export const FAQModal = ({
   };
 
   return (
-    <Modal onClose={handleClose} isOpen={isOpen} size="full">
+    <Modal onClose={onClose} isOpen={isOpen} size="full">
       <ModalOverlay />
       <ModalContent backgroundColor="gray.100" alignItems="center" w="full">
         <ModalHeader>Frequently Asked Questions</ModalHeader>
@@ -59,7 +75,14 @@ export const FAQModal = ({
           <Container>
             <VStack alignItems="stretch" spacing={6} w="full">
               <VStack bgColor="white" borderRadius="xl" px={4} py={1} alignItems={'start'} w="full">
-                <FAQContents />
+                {loading ? (
+                  <Stack w="full" py={2} spacing={3}>
+                    <Skeleton height="20px" />
+                    <SkeletonText noOfLines={2} spacing="2" />
+                  </Stack>
+                ) : (
+                  <FAQContents faqs={faqs || []} />
+                )}
               </VStack>
 
               {allowMessageSupport && (
