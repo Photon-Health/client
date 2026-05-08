@@ -22,6 +22,11 @@ export const getOfferBundles = async (orderId: string) => {
   return response.offerBundles;
 };
 
+export const getFaqs = async (orderId: string) => {
+  const response = await graphQLClient.GetFaqs({ orderId });
+  return response.faqs;
+};
+
 export const getPharmaciesByLocation = async ({
   searchParams,
   limit,
