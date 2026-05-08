@@ -500,3 +500,12 @@ export const GET_OFFER_BUNDLES = gql`
     }
   }
 `;
+
+export const GET_FAQS = gql`
+  query GetFaqs($orderId: ID!) {
+    faqs(orderId: $orderId) {
+      question
+      answer
+    }
+  }
+`;
