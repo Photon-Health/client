@@ -176,7 +176,13 @@ export const PrescriptionForm = () => {
       const bosonPhotonOrg = 'org_KzSVZBQixLRkqj5d'; // Test Organization 11
       const neutronPhotonOrg = 'org_kVS7AP4iuItESdMA'; // Photon Test Org
       const neutronDemoOrg = 'org_TY5GFYPIRo3xQGYM'; // Demo Health
-      return [bosonPhotonOrg, neutronPhotonOrg, neutronDemoOrg].includes(user.org_id);
+      const photonInternalTelehealthTestOrg = 'org_xqL46CdX49O1K5Ye'; // Test Telehealth
+      return [
+        bosonPhotonOrg,
+        neutronPhotonOrg,
+        neutronDemoOrg,
+        photonInternalTelehealthTestOrg
+      ].includes(user.org_id);
     }
 
     return false;
