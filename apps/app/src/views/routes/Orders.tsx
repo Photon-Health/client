@@ -113,7 +113,7 @@ const renderRow = (order: Order) => {
         <PopoverBody whiteSpace="pre-wrap">
           <PharmacyNameView
             name={pharmacy.name}
-            phone={pharmacy.phone || ''}
+            phone={pharmacy.phone}
             address={pharmacy?.address}
           />
         </PopoverBody>

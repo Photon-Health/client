@@ -45,7 +45,7 @@ export function createTestPrescriber() {
       last: 'test-provider-last-name'
     },
     organizations: [],
-    phone: ''
+    phone: undefined
   };
 }
 

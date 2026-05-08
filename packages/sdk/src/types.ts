@@ -22,6 +22,8 @@ export type Scalars = {
   AWSDateTime: any;
   /** An email address in the format local-part@domain-part as defined by RFC 822. */
   AWSEmail: any;
+  /** A phone number. This value is stored as a string. Phone numbers can contain either spaces or hyphens to separate digit groups. Phone numbers without a country code are assumed to be US/North American numbers adhering to the North American Numbering Plan (NANP). */
+  AWSPhone: any;
 };
 
 export type Address = {
@@ -278,7 +280,7 @@ export type MutationCreatePatientArgs = {
   gender?: InputMaybe<Scalars['String']>;
   medicationHistory?: InputMaybe<Array<InputMaybe<MedHistoryInput>>>;
   name: NameInput;
-  phone: Scalars['String'];
+  phone: Scalars['AWSPhone'];
   preferredPharmacies?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
   sex: SexType;
 };
@@ -377,7 +379,7 @@ export type MutationUpdatePatientArgs = {
   id: Scalars['ID'];
   medicationHistory?: InputMaybe<Array<InputMaybe<MedHistoryInput>>>;
   name?: InputMaybe<NameInput>;
-  phone?: InputMaybe<Scalars['String']>;
+  phone?: InputMaybe<Scalars['AWSPhone']>;
   preferredPharmacies?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
 };
 
@@ -459,10 +461,10 @@ export type Organization = {
   NPI?: Maybe<Scalars['String']>;
   address?: Maybe<Address>;
   email?: Maybe<Scalars['AWSEmail']>;
-  fax?: Maybe<Scalars['String']>;
+  fax?: Maybe<Scalars['AWSPhone']>;
   id: Scalars['ID'];
   name: Scalars['String'];
-  phone?: Maybe<Scalars['String']>;
+  phone?: Maybe<Scalars['AWSPhone']>;
   type?: Maybe<OrgType>;
 };
 
@@ -485,7 +487,7 @@ export type Patient = {
   medicationHistory?: Maybe<Array<Maybe<PatientMedication>>>;
   name: Name;
   orders?: Maybe<Array<Maybe<Order>>>;
-  phone?: Maybe<Scalars['String']>;
+  phone?: Maybe<Scalars['AWSPhone']>;
   preferredPharmacies?: Maybe<Array<Maybe<Pharmacy>>>;
   prescriptions?: Maybe<Array<Maybe<Prescription>>>;
   sex: SexType;
@@ -573,11 +575,11 @@ export type Pharmacy = {
   __typename?: 'Pharmacy';
   NPI?: Maybe<Scalars['String']>;
   address?: Maybe<Address>;
-  fax?: Maybe<Scalars['String']>;
+  fax?: Maybe<Scalars['AWSPhone']>;
   fulfillmentTypes?: Maybe<Array<Maybe<FulfillmentType>>>;
   id: Scalars['ID'];
   name: Scalars['String'];
-  phone?: Maybe<Scalars['String']>;
+  phone?: Maybe<Scalars['AWSPhone']>;
   is24Hr?: boolean;
   nextEvents?: PharmacyEvents;
   hours?: Maybe<Array<PharmacyHours>>;
@@ -665,10 +667,10 @@ export type ProductFilter = {
 
 export type ProviderProfileInput = {
   address?: InputMaybe<AddressInput>;
-  fax?: InputMaybe<Scalars['String']>;
+  fax?: InputMaybe<Scalars['AWSPhone']>;
   name?: InputMaybe<NameInput>;
   npi?: InputMaybe<Scalars['String']>;
-  phone?: InputMaybe<Scalars['String']>;
+  phone?: InputMaybe<Scalars['AWSPhone']>;
   /** This should be a base64 encoded string of the signature image */
   signature?: InputMaybe<Scalars['String']>;
 };
@@ -679,11 +681,11 @@ export type Provider = {
   address?: Maybe<Address>;
   email: Scalars['AWSEmail'];
   externalId?: Maybe<Scalars['ID']>;
-  fax?: Maybe<Scalars['String']>;
+  fax?: Maybe<Scalars['AWSPhone']>;
   id: Scalars['ID'];
   name: Name;
   organizations: Array<Organization>;
-  phone: Scalars['String'];
+  phone: Scalars['AWSPhone'];
 };
 
 export type Query = {
@@ -911,11 +913,11 @@ export type User = {
   address?: Maybe<Address>;
   email?: Maybe<Scalars['AWSEmail']>;
   externalId?: Maybe<Scalars['ID']>;
-  fax?: Maybe<Scalars['String']>;
+  fax?: Maybe<Scalars['AWSPhone']>;
   id: Scalars['ID'];
   name?: Maybe<Name>;
   npi?: Maybe<Scalars['String']>;
-  phone?: Maybe<Scalars['String']>;
+  phone?: Maybe<Scalars['AWSPhone']>;
   roles?: Maybe<Array<Maybe<Role>>>;
   /** A base64 encoded string of the signature picture that can be rendered */
   signature?: Maybe<Scalars['String']>;

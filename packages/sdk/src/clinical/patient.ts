@@ -150,7 +150,7 @@ export class PatientQueryManager {
         $sex: SexType!
         $gender: String
         $email: AWSEmail
-        $phone: String!
+        $phone: AWSPhone!
         $address: AddressInput
         $allergies: [AllergenInput]
         $medicationHistory: [MedHistoryInput]
@@ -195,7 +195,7 @@ export class PatientQueryManager {
         $sex: SexType
         $gender: String
         $email: AWSEmail
-        $phone: String
+        $phone: AWSPhone
         $allergies: [AllergenInput]
         $medicationHistory: [MedHistoryInput]
         $address: AddressInput
