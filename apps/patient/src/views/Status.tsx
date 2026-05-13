@@ -273,6 +273,7 @@ export const Status = () => {
         isOpen={orderDetailsIsOpen}
         onClose={() => setOrderDetailsIsOpen(false)}
         pharmacyName={order.pharmacy?.name ?? 'My Pharmacy'}
+        pharmacyId={order.pharmacy?.id}
         prescriptions={prescriptions}
       />
       <Helmet>
