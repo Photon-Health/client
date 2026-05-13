@@ -14,6 +14,7 @@ const config: CodegenConfig = {
   schema: schemaByEnv[env],
   documents: [
     'src/**/Settings/**/*.tsx',
+    'src/mutations/clinical-api/*.ts',
     'src/views/routes/PrescriptionForm.tsx',
     'src/views/routes/UpdatePatientForm.tsx',
     'src/views/routes/NewPatient/PatientForm.tsx',
