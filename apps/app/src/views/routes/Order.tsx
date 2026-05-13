@@ -48,7 +48,7 @@ import { LocalPickup } from './NewOrder/components/SelectPharmacyCard/components
 import { LocationResults, LocationSearch } from '../components/LocationSearch';
 import SectionTitleRow from '../components/SectionTitleRow';
 import { gql, useApolloClient, useMutation, useQuery } from '@apollo/client';
-import { CANCEL_ORDER, REROUTE_ORDER } from '../../mutations';
+import { CANCEL_ORDER, ROUTE_ORDER } from '../../mutations';
 import { TicketModal } from '../components/TicketModal';
 import { Fill, Order as OrderType } from '@photonhealth/sdk/dist/types';
 import { datadogRum } from '@datadog/browser-rum';
@@ -256,7 +256,7 @@ export const Order = () => {
       }
     }
   });
-  const [rerouteOrder] = useMutation(REROUTE_ORDER, {
+  const [routeOrder] = useMutation(ROUTE_ORDER, {
     update: async (cache) => {
       // after routing an order, we need to update the cache with the new pharmacy data optimistically
       const existingOrder: { order: types.Order } | null = cache.readQuery({
@@ -713,7 +713,7 @@ export const Order = () => {
                                 orderId: id,
                                 pharmacyId
                               });
-                              await rerouteOrder({ variables: { id, pharmacyId } });
+                              await routeOrder({ variables: { id, pharmacyId } });
                               setPharmacyId('');
                               onClose();
                             } catch (error) {
