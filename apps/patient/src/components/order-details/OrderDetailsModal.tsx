@@ -40,7 +40,7 @@ export interface OrderDetailsModalProps {
 
 const NEXT_STEPS_BY_PHARMACY: Record<string, string> = {
   [import.meta.env.VITE_AMAZON_PHARMACY_ID as string]:
-    'Amazon Pharmacy will text you shortly — no action needed.\n\nNo text? Log in at [amazon.com/pharmacy](https://amazon.com/pharmacy) to view your prescription or create an account.\n\nStill having trouble? Contact support. You can also switch pharmacies if needed.'
+    'Amazon Pharmacy will text you shortly — no action needed.\n\nNo text? Log in at [amazon.com/pharmacy](https://amazon.com/pharmacy) to view your prescription or create an account. Your prescription should show up soon.\n\nStill have trouble? Contact support. You can also switch pharmacies if needed.'
 };
 
 const Row = ({ k, value }: { k: string; value: ReactNode }) => {
