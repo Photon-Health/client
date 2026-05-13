@@ -272,8 +272,9 @@ export const Status = () => {
       <OrderDetailsModal
         isOpen={orderDetailsIsOpen}
         onClose={() => setOrderDetailsIsOpen(false)}
-        pharmacyName={order.pharmacy?.name ?? 'My Pharmacy'}
-        pharmacyId={order.pharmacy?.id}
+        pharmacyName={displayPharmacy?.name ?? 'My Pharmacy'}
+        pharmacyId={displayPharmacy?.id}
+        pharmacyLogo={displayPharmacy?.logo}
         prescriptions={prescriptions}
       />
       <Helmet>

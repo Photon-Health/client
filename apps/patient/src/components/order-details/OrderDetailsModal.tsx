@@ -3,6 +3,7 @@ import {
   Container,
   HStack,
   Icon,
+  Image,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -28,7 +29,7 @@ export interface PrescriptionData {
 export interface OrderDetailsProps {
   pharmacyName: string;
   pharmacyId?: string;
-  pharmacyLogo?: ReactNode;
+  pharmacyLogo?: string;
   prescriptions: PrescriptionData[];
 }
 
@@ -99,7 +100,19 @@ export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalPr
                 spacing={5}
                 w="full"
               >
-                {props.pharmacyLogo ?? defaultIcon}
+                {props.pharmacyLogo ? (
+                  <Box boxSize="32px" overflow="hidden">
+                    <Image
+                      src={props.pharmacyLogo}
+                      width="auto"
+                      height="32px"
+                      boxSize="100%"
+                      objectFit="contain"
+                    />
+                  </Box>
+                ) : (
+                  defaultIcon
+                )}
                 <Box>
                   <Text fontSize="xl" as="h4">
                     This is your order summary for <b>{props.pharmacyName}</b>
