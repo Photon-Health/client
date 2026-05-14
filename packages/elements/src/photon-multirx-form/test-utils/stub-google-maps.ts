@@ -1,12 +1,11 @@
 /// <reference types="google.maps" />
 import { vi } from 'vitest';
-import LatLngBounds = google.maps.LatLngBounds;
 
 /**
  * Stubs `window.google.maps` so code paths that touch the Google Maps SDK
  * (Geocoder, places.AutocompleteService) don't blow up in jsdom. Pass
- * `geocodeResults` when the test exercises the local-pharmacy search feature and
- * needs the Geocoder to return real coordinates.
+ * `geocodeResults` when the test exercises the local-pharmacy search feature
+ * and needs the Geocoder to return real coordinates.
  */
 export function stubGoogleMaps(geocodeResults: google.maps.GeocoderResult[] = []) {
   Object.defineProperty(window, 'google', {
@@ -23,6 +22,14 @@ export function stubGoogleMaps(geocodeResults: google.maps.GeocoderResult[] = []
   });
 }
 
+/**
+ * Builds a minimal Geocoder result. The production code that consumes this
+ * only reads `result.geometry.location.lat() / .lng()` and
+ * `result.formatted_address`; the other fields exist to satisfy the type but
+ * are stubbed with empty / cast values so we don't depend on Google Maps
+ * runtime classes (LatLngBounds, GeocoderLocationType) that aren't installed
+ * on the stubbed `window.google`.
+ */
 export function makeGeocodeResult(
   lat: number,
   lng: number,
@@ -40,8 +47,8 @@ export function makeGeocodeResult(
         toJSON: vi.fn(),
         toUrlValue: vi.fn()
       },
-      location_type: google.maps.GeocoderLocationType.APPROXIMATE,
-      viewport: new LatLngBounds()
+      location_type: 'APPROXIMATE' as google.maps.GeocoderLocationType,
+      viewport: {} as google.maps.LatLngBounds
     },
     formatted_address: formattedAddress
   };
