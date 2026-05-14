@@ -1,20 +1,22 @@
 import {
-  Container,
-  VStack,
-  Text,
-  HStack,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalCloseButton,
-  ModalHeader,
-  ModalBody,
   Box,
-  Icon
+  Container,
+  HStack,
+  Icon,
+  Image,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  VStack
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import { ReactNode } from 'react';
 import { MdOutlineLocalPharmacy } from 'react-icons/md';
+import { renderWithLinks } from '../../utils/text';
 
 export interface PrescriptionData {
   rxName: string;
@@ -26,14 +28,20 @@ export interface PrescriptionData {
 
 export interface OrderDetailsProps {
   pharmacyName: string;
-  pharmacyLogo?: ReactNode;
-
+  pharmacyId?: string;
+  pharmacyLogo?: string;
   prescriptions: PrescriptionData[];
 }
+
 export interface OrderDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const NEXT_STEPS_BY_PHARMACY: Record<string, string> = {
+  [import.meta.env.VITE_AMAZON_PHARMACY_ID as string]:
+    'Amazon Pharmacy will text you shortly — no action needed.\n\nNo text? Log in at [amazon.com/pharmacy](https://amazon.com/pharmacy) to view your prescription or create an account. Your prescription should show up soon.\n\nStill have trouble? Contact support. You can also switch pharmacies if needed.'
+};
 
 const Row = ({ k, value }: { k: string; value: ReactNode }) => {
   return (
@@ -70,6 +78,7 @@ const defaultIcon = (
 );
 
 export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalProps) => {
+  const nextSteps = props.pharmacyId ? NEXT_STEPS_BY_PHARMACY[props.pharmacyId] : undefined;
   const handleClose = () => {
     props.onClose();
   };
@@ -91,7 +100,19 @@ export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalPr
                 spacing={5}
                 w="full"
               >
-                {props.pharmacyLogo ?? defaultIcon}
+                {props.pharmacyLogo ? (
+                  <Box boxSize="32px" overflow="hidden">
+                    <Image
+                      src={props.pharmacyLogo}
+                      width="auto"
+                      height="32px"
+                      boxSize="100%"
+                      objectFit="contain"
+                    />
+                  </Box>
+                ) : (
+                  defaultIcon
+                )}
                 <Box>
                   <Text fontSize="xl" as="h4">
                     This is your order summary for <b>{props.pharmacyName}</b>
@@ -110,6 +131,16 @@ export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalPr
                   <PrescriptionBlock key={`${p.rxName}-${i}`} rx={p} />
                 ))}
               </VStack>
+              {nextSteps && (
+                <VStack alignItems="stretch" spacing={2} w="full">
+                  <Text fontWeight="bold" fontSize="lg">
+                    Next Steps
+                  </Text>
+                  <Box bgColor="blue.50" borderRadius="xl" p={4}>
+                    <Text whiteSpace="pre-wrap">{renderWithLinks(nextSteps)}</Text>
+                  </Box>
+                </VStack>
+              )}
             </VStack>
           </Container>
         </ModalBody>
