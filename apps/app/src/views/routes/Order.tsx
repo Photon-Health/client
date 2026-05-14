@@ -54,7 +54,7 @@ import { Fill, Order as OrderType } from '@photonhealth/sdk/dist/types';
 import { datadogRum } from '@datadog/browser-rum';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 import { StyledToast } from '../components/StyledToast';
-
+import { RerouteOrderButton } from '../components/RerouteOrderButton';
 import { GET_ORDER, GET_ORDER_QUERY_NAME, PHARMACY_QUERY } from '../../queries';
 
 export const ORDER_FULFILLMENT_TYPE_MAP = {
@@ -138,14 +138,16 @@ Description:
 export const OrderDetailPage = () => {
   const params = useParams();
   const id = params.orderId;
-  const { getToken } = usePhoton();
+  const { user, getToken } = usePhoton();
   const { track } = useProviderAnalytics();
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [accessToken, setAccessToken] = useState('');
   const [updating, setUpdating] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [pharmacyId, setPharmacyId] = useState('');
-  const { data, loading, error } = useQuery(GET_ORDER, { variables: { id: id! } });
+  const { data, loading, error } = useQuery(GET_ORDER, {
+    variables: { id: id! }
+  });
   const [cancelReason, setCancelReason] = useState('');
   const cancelReasonRef = useRef(cancelReason);
   const client = useApolloClient();
@@ -362,8 +364,8 @@ export const OrderDetailPage = () => {
               loadingText="Canceling..."
               isDisabled={
                 loading ||
-                order.state === types.OrderState.Canceled ||
-                order.state === types.OrderState.Completed ||
+                order?.state === types.OrderState.Canceled ||
+                order?.state === types.OrderState.Completed ||
                 order?.fulfillment?.state === 'SHIPPED'
               }
               onClick={async () => {
@@ -463,8 +465,8 @@ export const OrderDetailPage = () => {
                 <Skeleton width="70px" height="24px" borderRadius="xl" />
               ) : (
                 <OrderStatusBadge
-                  fulfillmentState={order.fulfillment?.state}
-                  orderState={order.state}
+                  fulfillmentState={order?.fulfillment?.state}
+                  orderState={order?.state}
                 />
               )}
             </Stack>
@@ -481,7 +483,7 @@ export const OrderDetailPage = () => {
                     <SkeletonText skeletonHeight={5} noOfLines={2} flexGrow={1} />
                   </HStack>
                 ) : (
-                  <PatientView patient={order.patient} />
+                  <PatientView patient={order?.patient} />
                 )}
               </VStack>
 
@@ -497,7 +499,7 @@ export const OrderDetailPage = () => {
                 {loading ? (
                   <SkeletonText skeletonHeight={5} noOfLines={1} width="125px" />
                 ) : (
-                  <Text fontSize="md">{formatDate(order.createdAt)}</Text>
+                  <Text fontSize="md">{formatDate(order?.createdAt)}</Text>
                 )}
               </VStack>
               {order?.externalId ? (
@@ -525,7 +527,14 @@ export const OrderDetailPage = () => {
               w="100%"
               mt={0}
             >
-              <SectionTitleRow headerText="Pharmacy Information" />
+              <SectionTitleRow
+                headerText="Pharmacy Information"
+                rightElement={
+                  order && order?.state !== 'ROUTING' ? (
+                    <RerouteOrderButton organizationId={user.organizationId} order={order} />
+                  ) : undefined
+                }
+              />
 
               {order?.state === types.OrderState.Routing ? (
                 <>
@@ -700,7 +709,7 @@ export const OrderDetailPage = () => {
                 )}
               </InfoGrid>
 
-              {!loading && order.fulfillment?.type === 'MAIL_ORDER' ? (
+              {!loading && order?.fulfillment?.type === 'MAIL_ORDER' ? (
                 <>
                   <InfoGrid name="Delivery Address">
                     {order?.address ? (
