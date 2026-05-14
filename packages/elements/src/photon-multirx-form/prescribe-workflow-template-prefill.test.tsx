@@ -1,16 +1,11 @@
-import { cleanup, render, waitFor } from '@solidjs/testing-library';
-import { GoogleServiceProvider, PhotonContext, SDKProvider } from '@photonhealth/components';
+import { cleanup, waitFor } from '@solidjs/testing-library';
 import { afterAll, afterEach, beforeAll, expect, test, vi } from 'vitest';
 import { setupServer } from 'msw/node';
 import { HttpResponse } from 'msw';
 import { PatientStore } from '../stores/patient';
-import {
-  PhotonPrescribeWorkflowComponent,
-  type PrescribeWorkflowComponentProps
-} from './photon-prescribe-workflow-component';
-import { createTestClient, createTestClientStore } from '../test-utils/createTestClient';
 import { defaultHandlers, lambdasGql, TREATMENT } from '@photonhealth/sdk/test-utils';
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
+import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
 
 vi.mock('solid-element', () => ({
   customElement: vi.fn()
@@ -102,42 +97,3 @@ test('additionalNotes are merged into prescriptions prefilled from templateIds',
   // template-prefilled rxs — only templateOverrides notes make it through.
   expect(sent.notes).toContain('Clinical additional note from host app');
 });
-
-function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponentProps> = {}) {
-  const client = createTestClient();
-  const clientStore = createTestClientStore(client);
-  const host = document.createElement('div');
-  document.body.append(host);
-
-  const baseProps: PrescribeWorkflowComponentProps = {
-    patientId: 'pat_123',
-    hideSubmit: false,
-    hideTemplates: false,
-    hidePatientCard: false,
-    enableOrder: false,
-    enableMedHistory: false,
-    enableMedHistoryLinks: false,
-    enableMedHistoryRefillButton: false,
-    enableCombineAndDuplicate: false,
-    optionalPatientAddress: false,
-    triggerSubmit: false,
-    toastBuffer: 0,
-    enableCoverageCheck: false,
-    enableLocalPickup: false,
-    enableSendToPatient: false,
-    enableDeliveryPharmacies: false
-  };
-
-  return render(
-    () => (
-      <PhotonContext.Provider value={clientStore as never}>
-        <SDKProvider client={client as never}>
-          <GoogleServiceProvider>
-            <PhotonPrescribeWorkflowComponent {...{ ...baseProps, ...props }} />
-          </GoogleServiceProvider>
-        </SDKProvider>
-      </PhotonContext.Provider>
-    ),
-    { container: host }
-  );
-}

@@ -12,6 +12,18 @@ export function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponen
   const client = createTestClient();
   const clientStore = createTestClientStore(client);
   const eventListenerHost = document.createElement('div');
+
+  // Capture bubbled CustomEvents from inside the prescribe workflow. Listeners
+  // must be attached BEFORE render so events fired during mount aren't missed.
+  const analyticsEvents: CustomEvent[] = [];
+  const attestationResolvedEvents: Event[] = [];
+  eventListenerHost.addEventListener('photon-analytics-track-event', (event: Event) => {
+    analyticsEvents.push(event as CustomEvent);
+  });
+  eventListenerHost.addEventListener('photon-signature-attestation-resolved', (event: Event) => {
+    attestationResolvedEvents.push(event);
+  });
+
   document.body.append(eventListenerHost);
 
   const baseProps: PrescribeWorkflowComponentProps = {
@@ -53,6 +65,10 @@ export function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponen
     await screen.findByRole('button', { name: /add prescription/i }, { timeout: 3000 });
   }
 
+  async function waitForSignatureAttestationModal() {
+    await screen.findByText('Prescriber Signature Attestation');
+  }
+
   async function addDraftPrescription() {
     await user.selectOptions(screen.getByLabelText(/search for treatment/i), TREATMENT.id);
     await user.type(screen.getByLabelText(/quantity/i), '30');
@@ -66,5 +82,14 @@ export function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponen
     await user.click(screen.getByRole('button', { name: /add prescription/i }));
   }
 
-  return { ...view, user, waitForPrescribeForm, addDraftPrescription };
+  return {
+    ...view,
+    user,
+    eventListenerHost,
+    analyticsEvents,
+    attestationResolvedEvents,
+    waitForPrescribeForm,
+    waitForSignatureAttestationModal,
+    addDraftPrescription
+  };
 }

@@ -1,15 +1,8 @@
-import { cleanup, render, screen, waitFor } from '@solidjs/testing-library';
-import userEvent from '@testing-library/user-event';
-import { GoogleServiceProvider, PhotonContext, SDKProvider } from '@photonhealth/components';
+import { cleanup, screen, waitFor } from '@solidjs/testing-library';
 import { afterAll, afterEach, beforeAll, expect, test, vi } from 'vitest';
-import { setupServer } from 'msw/node';
+import { setupServer, type SetupServer } from 'msw/node';
 import { HttpResponse } from 'msw';
 import { PatientStore } from '../stores/patient';
-import {
-  PhotonPrescribeWorkflowComponent,
-  type PrescribeWorkflowComponentProps
-} from './photon-prescribe-workflow-component';
-import { createTestClient, createTestClientStore } from '../test-utils/createTestClient';
 import {
   clinicalGql,
   defaultHandlers,
@@ -17,6 +10,7 @@ import {
   TREATMENT
 } from '@photonhealth/sdk/test-utils';
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
+import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
 
 vi.mock('solid-element', () => ({
   customElement: vi.fn()
@@ -58,7 +52,8 @@ afterAll(() => server.close());
 type AnalyticsDetail = Record<string, unknown>;
 
 test('page views', async () => {
-  const { analyticsEvents } = renderPrescribeWorkflow({}, { attestationStatus: 'NEEDS' });
+  useNeedsSignatureAttestation(server);
+  const { analyticsEvents, waitForSignatureAttestationModal } = renderPrescribeWorkflow();
 
   await waitForSignatureAttestationModal();
   const event = analyticsEvents.find(isPageView('Signature Attestation Page Viewed'));
@@ -71,7 +66,7 @@ test('page views', async () => {
 });
 
 test('field interactions', async () => {
-  const { analyticsEvents, user } = renderPrescribeWorkflow();
+  const { analyticsEvents, user, waitForPrescribeForm } = renderPrescribeWorkflow();
 
   await waitForPrescribeForm();
 
@@ -129,7 +124,7 @@ test('field interactions', async () => {
 });
 
 test('pharmacy tab field interactions', async () => {
-  const { analyticsEvents, user } = renderPrescribeWorkflow({
+  const { analyticsEvents, user, waitForPrescribeForm } = renderPrescribeWorkflow({
     enableOrder: true,
     enableSendToPatient: true,
     enableLocalPickup: true,
@@ -179,16 +174,17 @@ test('pharmacy tab field interactions', async () => {
 });
 
 test('Send Order CTAs', async () => {
-  const { analyticsEvents, user } = renderPrescribeWorkflow({
-    enableOrder: true,
-    enableSendToPatient: true,
-    optionalPatientAddress: true
-  });
+  const { analyticsEvents, user, waitForPrescribeForm, addDraftPrescription } =
+    renderPrescribeWorkflow({
+      enableOrder: true,
+      enableSendToPatient: true,
+      optionalPatientAddress: true
+    });
 
   await waitForPrescribeForm();
 
   // 1. Add a draft prescription
-  await addDraftPrescription(user);
+  await addDraftPrescription();
 
   const draftAddedEvent = analyticsEvents.find(isCTA('Draft Prescription Added'));
   expect(draftAddedEvent?.detail).toEqual(
@@ -228,7 +224,8 @@ test('Send Order CTAs', async () => {
 });
 
 test('attestation CTA', async () => {
-  const { analyticsEvents, user } = renderPrescribeWorkflow({}, { attestationStatus: 'NEEDS' });
+  useNeedsSignatureAttestation(server);
+  const { analyticsEvents, user, waitForSignatureAttestationModal } = renderPrescribeWorkflow();
 
   await waitForSignatureAttestationModal();
 
@@ -261,10 +258,9 @@ test('photon-signature-attestation-resolved fires when no attestation needed', a
 });
 
 test('photon-signature-attestation-resolved does not fire before user agrees when attestation required', async () => {
-  const { attestationResolvedEvents, user } = renderPrescribeWorkflow(
-    {},
-    { attestationStatus: 'NEEDS' }
-  );
+  useNeedsSignatureAttestation(server);
+  const { attestationResolvedEvents, user, waitForSignatureAttestationModal } =
+    renderPrescribeWorkflow();
 
   await waitForSignatureAttestationModal();
 
@@ -279,10 +275,9 @@ test('photon-signature-attestation-resolved does not fire before user agrees whe
 });
 
 test('Signature Attestation Page Viewed fires before photon-signature-attestation-resolved when attestation required', async () => {
-  const { analyticsEvents, attestationResolvedEvents, user } = renderPrescribeWorkflow(
-    {},
-    { attestationStatus: 'NEEDS' }
-  );
+  useNeedsSignatureAttestation(server);
+  const { analyticsEvents, attestationResolvedEvents, user, waitForSignatureAttestationModal } =
+    renderPrescribeWorkflow();
 
   await waitForSignatureAttestationModal();
 
@@ -297,111 +292,6 @@ test('Signature Attestation Page Viewed fires before photon-signature-attestatio
     expect(attestationResolvedEvents.length).toEqual(1);
   });
 });
-
-function renderPrescribeWorkflow(
-  props: Partial<PrescribeWorkflowComponentProps> = {},
-  options: { attestationStatus?: 'COMPLETE' | 'NEEDS' } = {}
-) {
-  if (options.attestationStatus === 'NEEDS') {
-    // Per-test MSW overrides
-    server.use(
-      clinicalGql.query('GetCurrentUserSignatureAttestationStatus', () =>
-        HttpResponse.json({
-          data: {
-            me: {
-              __typename: 'User',
-              id: 'usr_1',
-              signatureAttestationStatus: {
-                __typename: 'NeedsSignatureAttestation',
-                version: 'v1',
-                content: 'Please attest to your signature'
-              }
-            }
-          }
-        })
-      )
-    );
-  }
-
-  const client = createTestClient();
-  const clientStore = createTestClientStore(client);
-  const eventListenerHost = document.createElement('div');
-
-  const analyticsEvents: CustomEvent[] = [];
-  const attestationResolvedEvents: Event[] = [];
-
-  eventListenerHost.addEventListener('photon-analytics-track-event', (event: Event) => {
-    analyticsEvents.push(event as CustomEvent);
-  });
-
-  eventListenerHost.addEventListener('photon-signature-attestation-resolved', (event: Event) => {
-    attestationResolvedEvents.push(event);
-  });
-
-  document.body.append(eventListenerHost);
-
-  const baseProps: PrescribeWorkflowComponentProps = {
-    patientId: 'pat_123',
-    hideSubmit: false,
-    hideTemplates: false,
-    hidePatientCard: false,
-    enableOrder: false,
-    enableMedHistory: false,
-    enableMedHistoryLinks: false,
-    enableMedHistoryRefillButton: false,
-    enableCombineAndDuplicate: false,
-    optionalPatientAddress: false,
-    triggerSubmit: false,
-    toastBuffer: 0,
-    enableCoverageCheck: false,
-    enableLocalPickup: false,
-    enableSendToPatient: false,
-    enableDeliveryPharmacies: false
-  };
-
-  const mergedProps = { ...baseProps, ...props };
-
-  const view = render(
-    () => (
-      <PhotonContext.Provider value={clientStore as never}>
-        <SDKProvider client={client as never}>
-          <GoogleServiceProvider>
-            <PhotonPrescribeWorkflowComponent {...mergedProps} />
-          </GoogleServiceProvider>
-        </SDKProvider>
-      </PhotonContext.Provider>
-    ),
-    { container: eventListenerHost }
-  );
-
-  return {
-    ...view,
-    analyticsEvents,
-    attestationResolvedEvents,
-    user: userEvent.setup()
-  };
-}
-
-async function waitForSignatureAttestationModal() {
-  await screen.findByText('Prescriber Signature Attestation');
-}
-
-async function waitForPrescribeForm() {
-  await screen.findByRole('button', { name: /add prescription/i }), { timeout: 3000 };
-}
-
-async function addDraftPrescription(user: ReturnType<typeof userEvent.setup>) {
-  await user.selectOptions(screen.getByLabelText(/search for treatment/i), TREATMENT.id);
-  await user.type(screen.getByLabelText(/quantity/i), '30');
-  await user.selectOptions(screen.getByLabelText(/dispense unit/i), DISPENSE_UNIT.name);
-  await user.type(screen.getByLabelText(/days supply/i), '10');
-  await user.type(screen.getByLabelText(/^refills/i), '0');
-  await user.type(
-    screen.getByLabelText(/patient instructions/i),
-    'Take one capsule by mouth daily'
-  );
-  await user.click(screen.getByRole('button', { name: /add prescription/i }));
-}
 
 const isFieldInteraction = (filter: Record<string, unknown> = {}) => {
   return (event: CustomEvent) => {
@@ -432,3 +322,23 @@ const isCTA = (ctaName: string, filter: Record<string, unknown> = {}) => {
     return Object.entries(filter).every(([key, value]) => detail[key] === value);
   };
 };
+
+function useNeedsSignatureAttestation(mswServer: SetupServer) {
+  mswServer.use(
+    clinicalGql.query('GetCurrentUserSignatureAttestationStatus', () =>
+      HttpResponse.json({
+        data: {
+          me: {
+            __typename: 'User',
+            id: 'usr_1',
+            signatureAttestationStatus: {
+              __typename: 'NeedsSignatureAttestation',
+              version: 'v1',
+              content: 'Please attest to your signature'
+            }
+          }
+        }
+      })
+    )
+  );
+}
