@@ -25,8 +25,6 @@ beforeAll(() => {
     customElements.define('photon-medication-search', MockMedicationSearchElement);
   }
 
-  // Default Geocoder stub. The local-pharmacy test overrides with real
-  // coordinates so fetchLocalPharmacies proceeds.
   stubGoogleMaps();
 });
 
@@ -213,7 +211,7 @@ test('silently ignores errors from GenerateCoverageOptions (current behavior)', 
   expect(screen.queryByText(/coverage/i)).toBeNull();
   expect(screen.queryByRole('alert')).toBeNull();
 
-  // Confirm an unhandled rejection occurred (current bug we'll fix in a follow-up)
+  // Confirm an unhandled rejection occurred
   // and prevent it from failing the test run.
   await waitFor(() => expect(unhandledRejections.length).toBeGreaterThan(0));
   process.off('unhandledRejection', rejectionHandler);
