@@ -22,6 +22,7 @@ const servicesHandlers = [
     HttpResponse.json({
       data: {
         me: {
+          id: PROVIDER.id,
           signatureAttestationStatus: {
             __typename: 'CompletedSignatureAttestation',
             agreedAt: new Date().toISOString(),
@@ -40,7 +41,7 @@ const servicesHandlers = [
 
   clinicalGql.query('MeUserQuery', () =>
     HttpResponse.json({
-      data: { me: { credentials: 'MD', address: { state: 'NY' } } }
+      data: { me: { id: PROVIDER.id, credentials: 'MD', address: { state: 'NY' } } }
     })
   ),
 

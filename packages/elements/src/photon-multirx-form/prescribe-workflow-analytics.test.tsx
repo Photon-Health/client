@@ -309,6 +309,7 @@ function renderPrescribeWorkflow(
         HttpResponse.json({
           data: {
             me: {
+              id: 'prov_1',
               signatureAttestationStatus: {
                 __typename: 'NeedsSignatureAttestation',
                 version: 'v1',
