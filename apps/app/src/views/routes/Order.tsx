@@ -135,7 +135,7 @@ Description:
   `;
 }
 
-export const Order = () => {
+export const OrderDetailPage = () => {
   const params = useParams();
   const id = params.orderId;
   const { getToken } = usePhoton();
