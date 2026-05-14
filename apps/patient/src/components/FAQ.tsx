@@ -6,35 +6,13 @@ import {
   AccordionPanel,
   Container,
   HStack,
-  Link,
   Text
 } from '@chakra-ui/react';
-import { ReactNode } from 'react';
+import { renderWithLinks } from '../utils/text';
 
 export type FAQEntry = {
   question: string;
   answer: string;
-};
-
-// Renders the answer text with inline markdown-style links: [label](url).
-// Anything outside the link syntax is rendered as plain text.
-// If we need more complex markdown rendering, we can consider adding react-markdown.
-const LINK_PATTERN = /\[([^\]]+)\]\(([^)]+)\)/g;
-const renderAnswersWithLinks = (answer: string): ReactNode[] => {
-  // Split [label](url) groupings into parts: [text, label, url, text, label, url, ...]
-  const parts = answer.split(LINK_PATTERN);
-  const nodes: ReactNode[] = [];
-  for (let i = 0; i < parts.length; i += 3) {
-    if (parts[i]) nodes.push(parts[i]);
-    if (i + 2 < parts.length) {
-      nodes.push(
-        <Link key={i} href={parts[i + 2]}>
-          {parts[i + 1]}
-        </Link>
-      );
-    }
-  }
-  return nodes;
 };
 
 export const FAQContents = ({ faqs }: { faqs: FAQEntry[] }) => {
@@ -56,7 +34,7 @@ export const FAQContents = ({ faqs }: { faqs: FAQEntry[] }) => {
           </AccordionButton>
           <AccordionPanel px={0} pb={4}>
             <Text align="start" color="gray.900">
-              {renderAnswersWithLinks(answer)}
+              {renderWithLinks(answer)}
             </Text>
           </AccordionPanel>
         </AccordionItem>
