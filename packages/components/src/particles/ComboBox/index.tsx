@@ -1,9 +1,9 @@
 import {
   createContext,
   createEffect,
-  createMemo,
   createSignal,
   JSX,
+  onCleanup,
   onMount,
   Show,
   splitProps,
@@ -15,7 +15,8 @@ import Input, { InputProps } from '../Input';
 import { createStore } from 'solid-js/store';
 import clsx from 'clsx';
 import { useInputGroup } from '../InputGroup';
-import { Dynamic } from 'solid-js/web';
+import { Dynamic, Portal } from 'solid-js/web';
+import { getScrollAncestors } from '../../utils/getScrollAncestors';
 
 export type ComboBoxValueBase = { id: string };
 
@@ -108,39 +109,80 @@ export function ComboBox<T extends ComboBoxValueBase>(props: ComboBoxProps<T>) {
   );
 }
 
+type DropdownPos = { top?: number; bottom?: number; left: number; width: number };
+
 function ComboOptions(props: { children?: JSX.Element }) {
   const [state] = useContext(ComboBoxContext);
   let ref: HTMLDivElement | undefined;
+  const [pos, setPos] = createSignal<DropdownPos | null>(null);
 
-  const calculateDropdownPosition = createMemo(() => {
-    // this defaults to the dropdown being below the input, but if it's near
-    // the bottom of the viewport it will go above
-    if (state.open && ref?.getBoundingClientRect) {
-      const rect = ref.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
-      return spaceBelow > spaceAbove ? 'bottom' : 'top';
+  // Anchor the dropdown via `position: fixed` instead of `position: absolute`
+  // so it escapes any scrolling/overflow ancestor
+  const updatePosition = () => {
+    if (!ref?.getBoundingClientRect) return;
+    const rect = ref.getBoundingClientRect();
+    const inputBottom = rect.top;
+    const inputTop = ref.parentElement?.getBoundingClientRect().top ?? rect.top;
+    const spaceBelow = window.innerHeight - inputBottom;
+    const spaceAbove = inputTop;
+    if (spaceBelow > spaceAbove) {
+      setPos({ top: inputBottom + 4, left: rect.left, width: rect.width });
+    } else {
+      setPos({
+        bottom: window.innerHeight - inputTop + 4,
+        left: rect.left,
+        width: rect.width
+      });
     }
-    return 'bottom';
+  };
+
+  // Set event listeners while open to update position on scroll and resize and flip
+  createEffect(() => {
+    if (!state.open || !ref) {
+      setPos(null);
+      return;
+    }
+    updatePosition();
+    const onScroll = () => updatePosition();
+    const onResize = () => updatePosition();
+    const scrollTargets = getScrollAncestors(ref);
+    scrollTargets.forEach((t) => t.addEventListener('scroll', onScroll, { passive: true }));
+    window.addEventListener('resize', onResize, { passive: true });
+    onCleanup(() => {
+      scrollTargets.forEach((t) => t.removeEventListener('scroll', onScroll));
+      window.removeEventListener('resize', onResize);
+    });
   });
 
-  const classes = createMemo(() => {
-    return clsx(
-      'absolute z-10 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm',
-      {
-        'bottom-full mb-1': calculateDropdownPosition() === 'top',
-        'top-full mt-1': calculateDropdownPosition() === 'bottom'
-      }
-    );
-  });
+  // Portal the dropdown out of the in-flow position so it isn't clipped by
+  // scrolling/overflow ancestors
+  const getMountTarget = (): Node | undefined => {
+    if (!ref) return undefined;
+    const root = ref.getRootNode();
+    if (root instanceof ShadowRoot) return root;
+    return undefined; // Portal defaults to document.body
+  };
 
   // ref! => https://github.com/solidjs/solid/issues/116#issuecomment-1487981714
   return (
     <div ref={ref!}>
-      <Show when={state.open}>
-        <ul class={classes()} role="listbox" tabindex="-1">
-          {props.children}
-        </ul>
+      <Show when={state.open && pos()}>
+        <Portal mount={getMountTarget()}>
+          <ul
+            class="z-10 bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+            role="listbox"
+            tabindex="-1"
+            style={{
+              position: 'fixed',
+              top: pos()!.top != null ? `${pos()!.top}px` : undefined,
+              bottom: pos()!.bottom != null ? `${pos()!.bottom}px` : undefined,
+              left: `${pos()!.left}px`,
+              width: `${pos()!.width}px`
+            }}
+          >
+            {props.children}
+          </ul>
+        </Portal>
       </Show>
     </div>
   );
