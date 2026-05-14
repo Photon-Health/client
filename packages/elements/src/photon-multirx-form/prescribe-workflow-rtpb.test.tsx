@@ -41,7 +41,6 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-  // Re-register file-level overrides after server.resetHandlers() in afterEach.
   server.use(
     lambdasGql.query('patient', () => HttpResponse.json({ data: { patient: generatePatient() } })),
     lambdasGql.query('GetPatientPreferredPharmaciesAndAddress', () =>
@@ -78,8 +77,9 @@ test('does not fire GenerateCoverageOptions when enableCoverageCheck is false', 
   await addDraftPrescription();
   await screen.findByText(TREATMENT.name, {}, { timeout: 3000 });
 
-  // Give any in-flight effects a chance to settle; assertion stays negative.
+  // Give any in-flight effects a chance to settle...
   await new Promise((r) => setTimeout(r, 50));
+
   expect(generateCoverageSpy).not.toHaveBeenCalled();
 });
 
@@ -234,10 +234,8 @@ test('silently ignores errors from GenerateCoverageOptions (current behavior)', 
   await waitForPrescribeForm();
   await addDraftPrescription();
 
-  // The mutation was invoked
   await waitFor(() => expect(generateCoverageSpy).toHaveBeenCalled(), { timeout: 3000 });
 
-  // The draft still renders
   await screen.findByText(TREATMENT.name);
 
   // No user-facing error UI today
