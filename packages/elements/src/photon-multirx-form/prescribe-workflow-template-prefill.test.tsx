@@ -6,6 +6,7 @@ import { PatientStore } from '../stores/patient';
 import { defaultHandlers, lambdasGql, TREATMENT } from '@photonhealth/sdk/test-utils';
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
 import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
+import { stubGoogleMaps } from './test-utils/stub-google-maps';
 
 vi.mock('solid-element', () => ({
   customElement: vi.fn()
@@ -22,16 +23,7 @@ beforeAll(() => {
     customElements.define('photon-medication-search', MockMedicationSearchElement);
   }
 
-  Object.defineProperty(window, 'google', {
-    configurable: true,
-    writable: true,
-    value: {
-      maps: {
-        Geocoder: class Geocoder {},
-        places: { AutocompleteService: class AutocompleteService {} }
-      }
-    }
-  });
+  stubGoogleMaps();
 });
 
 afterEach(async () => {

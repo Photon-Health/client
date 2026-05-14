@@ -8,6 +8,7 @@ import { clinicalGql, defaultHandlers, lambdasGql, TREATMENT } from '@photonheal
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
 import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
 import { generateAddress, generatePatient, generatePharmacy } from './test-utils/generators';
+import { makeGeocodeResult, stubGoogleMaps } from './test-utils/stub-google-maps';
 
 vi.mock('solid-element', () => ({
   customElement: vi.fn()
@@ -24,20 +25,9 @@ beforeAll(() => {
     customElements.define('photon-medication-search', MockMedicationSearchElement);
   }
 
-  // Default Geocoder stub. The local-pharmacy test overrides `geocode` to
-  // return real coordinates so fetchLocalPharmacies proceeds.
-  Object.defineProperty(window, 'google', {
-    configurable: true,
-    writable: true,
-    value: {
-      maps: {
-        Geocoder: class Geocoder {
-          geocode = vi.fn(async () => ({ results: [] }));
-        },
-        places: { AutocompleteService: class AutocompleteService {} }
-      }
-    }
-  });
+  // Default Geocoder stub. The local-pharmacy test overrides with real
+  // coordinates so fetchLocalPharmacies proceeds.
+  stubGoogleMaps();
 });
 
 beforeEach(() => {
@@ -125,26 +115,7 @@ test("uses the patient's preferred pharmacy when one is set", async () => {
 });
 
 test('falls back to a nearby pharmacy when no preferred pharmacy', async () => {
-  // Make the geocoder return a real lat/lng so fetchLocalPharmacies proceeds.
-  Object.defineProperty(window, 'google', {
-    configurable: true,
-    writable: true,
-    value: {
-      maps: {
-        Geocoder: class Geocoder {
-          geocode = vi.fn(async () => ({
-            results: [
-              {
-                geometry: { location: { lat: () => 40.7128, lng: () => -74.006 } },
-                formatted_address: '1 Main, NY, NY 10001'
-              }
-            ]
-          }));
-        },
-        places: { AutocompleteService: class AutocompleteService {} }
-      }
-    }
-  });
+  stubGoogleMaps([makeGeocodeResult(40.7128, -74.006, '1 Main, NY, NY 10001')]);
 
   server.use(
     lambdasGql.query('GetPatientPreferredPharmaciesAndAddress', () =>
