@@ -1,4 +1,4 @@
-import type { Patient, Pharmacy } from '@photonhealth/sdk/dist/types';
+import type { Address, Patient, Pharmacy } from '@photonhealth/sdk/dist/types';
 
 export function generatePatient(overrides: Partial<Patient> = {}): Patient {
   return {
@@ -27,7 +27,7 @@ export function generateAddress(overrides: Partial<Address> = {}): Address {
     postalCode: '10001',
     country: 'US',
     ...overrides
-  } as Patient;
+  } as Address;
 }
 
 export function generatePharmacy(overrides: Partial<Pharmacy> = {}): Pharmacy {
