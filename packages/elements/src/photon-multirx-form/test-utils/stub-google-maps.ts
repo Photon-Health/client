@@ -1,5 +1,6 @@
 /// <reference types="google.maps" />
 import { vi } from 'vitest';
+import LatLngBounds = google.maps.LatLngBounds;
 
 /**
  * Stubs `window.google.maps` so code paths that touch the Google Maps SDK
@@ -22,16 +23,26 @@ export function stubGoogleMaps(geocodeResults: google.maps.GeocoderResult[] = []
   });
 }
 
-/** Builds a minimal Geocoder result for `stubGoogleMaps`. */
 export function makeGeocodeResult(
   lat: number,
   lng: number,
   formattedAddress: string
 ): google.maps.GeocoderResult {
   return {
+    address_components: [],
+    place_id: 'stub-google-maps-place-id',
+    types: [],
     geometry: {
-      location: { lat: () => lat, lng: () => lng } as google.maps.LatLng
-    } as google.maps.GeocoderGeometry,
+      location: {
+        lat: () => lat,
+        lng: () => lng,
+        equals: vi.fn(),
+        toJSON: vi.fn(),
+        toUrlValue: vi.fn()
+      },
+      location_type: google.maps.GeocoderLocationType.APPROXIMATE,
+      viewport: new LatLngBounds()
+    },
     formatted_address: formattedAddress
-  } as google.maps.GeocoderResult;
+  };
 }

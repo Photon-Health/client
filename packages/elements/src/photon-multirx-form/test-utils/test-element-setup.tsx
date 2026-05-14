@@ -13,8 +13,8 @@ export function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponen
   const clientStore = createTestClientStore(client);
   const eventListenerHost = document.createElement('div');
 
-  // Capture bubbled CustomEvents from inside the prescribe workflow. Listeners
-  // must be attached BEFORE render so events fired during mount aren't missed.
+  // Capture bubbled CustomEvents dispatched from inside the prescribe workflow.
+  // Listeners must be attached BEFORE render so events fired during mount aren't missed.
   const analyticsEvents: CustomEvent[] = [];
   const attestationResolvedEvents: Event[] = [];
   eventListenerHost.addEventListener('photon-analytics-track-event', (event: Event) => {

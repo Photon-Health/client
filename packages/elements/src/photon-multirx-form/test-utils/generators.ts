@@ -1,19 +1,24 @@
-import type { Address, Patient, Pharmacy } from '@photonhealth/sdk/dist/types';
+import { Address, Patient, Pharmacy, SexType } from '@photonhealth/sdk/dist/types';
 
 export function generatePatient(overrides: Partial<Patient> = {}): Patient {
   return {
     __typename: 'Patient',
     id: 'pat_123',
     externalId: 'ext_pat_123',
-    name: { __typename: 'Name', full: 'Sally Patient' },
+    name: {
+      __typename: 'Name',
+      full: 'Sally Patient',
+      first: 'Sally',
+      last: 'Patient'
+    },
     dateOfBirth: '1990-01-01',
-    sex: 'FEMALE',
+    sex: SexType.Female,
     gender: 'female',
     email: 'sally@example.com',
     phone: '+17185551234',
     address: null,
     ...overrides
-  } as Patient;
+  };
 }
 export function generateAddress(overrides: Partial<Address> = {}): Address {
   return {
@@ -27,7 +32,7 @@ export function generateAddress(overrides: Partial<Address> = {}): Address {
     postalCode: '10001',
     country: 'US',
     ...overrides
-  } as Address;
+  };
 }
 
 export function generatePharmacy(overrides: Partial<Pharmacy> = {}): Pharmacy {
@@ -44,5 +49,5 @@ export function generatePharmacy(overrides: Partial<Pharmacy> = {}): Pharmacy {
       country: 'US'
     },
     ...overrides
-  } as Pharmacy;
+  };
 }
