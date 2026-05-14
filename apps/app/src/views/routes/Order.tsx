@@ -47,7 +47,7 @@ import CopyText from '../components/CopyText';
 import { LocalPickup } from './NewOrder/components/SelectPharmacyCard/components/LocalPickup';
 import { LocationResults, LocationSearch } from '../components/LocationSearch';
 import SectionTitleRow from '../components/SectionTitleRow';
-import { gql, useApolloClient, useMutation, useQuery } from '@apollo/client';
+import { useApolloClient, useMutation, useQuery } from '@apollo/client';
 import { CANCEL_ORDER, ROUTE_ORDER } from '../../mutations';
 import { TicketModal } from '../components/TicketModal';
 import { Fill, Order as OrderType } from '@photonhealth/sdk/dist/types';
@@ -55,100 +55,7 @@ import { datadogRum } from '@datadog/browser-rum';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 import { StyledToast } from '../components/StyledToast';
 
-const PHARMACY_FRAGMENT = gql`
-  fragment PharmacyFragment on Pharmacy {
-    id
-    name
-    phone
-    address {
-      city
-      country
-      postalCode
-      state
-      street1
-      street2
-    }
-  }
-`;
-
-const PHARMACY_QUERY = gql`
-  ${PHARMACY_FRAGMENT}
-
-  query GetPharmacy($id: ID!) {
-    pharmacy(id: $id) {
-      ...PharmacyFragment
-    }
-  }
-`;
-
-const GET_ORDER_QUERY_NAME = 'GetOrder';
-const GET_ORDER = gql`
-  ${PHARMACY_FRAGMENT}
-
-  query ${GET_ORDER_QUERY_NAME}($id: ID!) {
-    order(id: $id) {
-      __typename
-      id
-      externalId
-      state
-      address {
-        name {
-          full
-        }
-        city
-        country
-        postalCode
-        state
-        street1
-        street2
-      }
-      fills {
-        id
-        prescription {
-          id
-          dispenseQuantity
-          dispenseUnit
-          fillsAllowed
-          instructions
-        }
-        treatment {
-          name
-        }
-        state
-        requestedAt
-        filledAt
-      }
-      patient {
-        id
-        externalId
-        name {
-          full
-        }
-        dateOfBirth
-        sex
-        gender
-        email
-        phone
-      }
-      pharmacy {
-        ...PharmacyFragment
-      }
-      fulfillment {
-        type
-        state
-        carrier
-        trackingNumber
-      }
-      exceptions {
-        type
-        message
-        createdAt
-        resolvedAt
-      }
-      createdAt
-    }
-  }
-`;
+import { GET_ORDER, GET_ORDER_QUERY_NAME, PHARMACY_QUERY } from '../../queries';
 
 export const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.PickUp]: 'Pick up',
