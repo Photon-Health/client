@@ -32,7 +32,7 @@ export interface OrderDetailsProps {
   pharmacyId?: string;
   pharmacyLogo?: string;
   prescriptions: PrescriptionData[];
-  status?: PrescriptionFulfillment['state'] | 'DELAYED' | 'FILLING' | 'SHIPPED';
+  fulfillmentState?: PrescriptionFulfillment['state'] | 'DELAYED' | 'FILLING' | 'SHIPPED';
 }
 
 export interface OrderDetailsModalProps {
@@ -133,7 +133,7 @@ export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalPr
                   <PrescriptionBlock key={`${p.rxName}-${i}`} rx={p} />
                 ))}
               </VStack>
-              {nextSteps && props.status === 'SENT' && (
+              {nextSteps && props.fulfillmentState === 'SENT' && (
                 <VStack alignItems="stretch" spacing={2} w="full">
                   <Text fontWeight="bold" fontSize="lg">
                     Next Steps

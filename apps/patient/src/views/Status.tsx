@@ -276,7 +276,7 @@ export const Status = () => {
         pharmacyId={displayPharmacy?.id}
         pharmacyLogo={displayPharmacy?.logo}
         prescriptions={prescriptions}
-        status={fulfillmentState}
+        fulfillmentState={fulfillmentState}
       />
       <Helmet>
         <title>{t.track}</title>
