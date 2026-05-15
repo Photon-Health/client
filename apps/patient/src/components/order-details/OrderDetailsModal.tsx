@@ -17,6 +17,7 @@ import dayjs from 'dayjs';
 import { ReactNode } from 'react';
 import { MdOutlineLocalPharmacy } from 'react-icons/md';
 import { renderWithLinks } from '../../utils/text';
+import { PrescriptionFulfillment } from '../../__generated__/graphql';
 
 export interface PrescriptionData {
   rxName: string;
@@ -31,6 +32,7 @@ export interface OrderDetailsProps {
   pharmacyId?: string;
   pharmacyLogo?: string;
   prescriptions: PrescriptionData[];
+  status?: PrescriptionFulfillment['state'] | 'DELAYED' | 'FILLING' | 'SHIPPED';
 }
 
 export interface OrderDetailsModalProps {
@@ -131,7 +133,7 @@ export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalPr
                   <PrescriptionBlock key={`${p.rxName}-${i}`} rx={p} />
                 ))}
               </VStack>
-              {nextSteps && (
+              {nextSteps && props.status === 'SENT' && (
                 <VStack alignItems="stretch" spacing={2} w="full">
                   <Text fontWeight="bold" fontSize="lg">
                     Next Steps
