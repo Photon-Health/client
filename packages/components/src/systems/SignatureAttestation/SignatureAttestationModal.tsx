@@ -12,6 +12,7 @@ import { usePrescribeEventDispatch } from '../PrescribeEventDispatchProvider';
 const GetCurrentUserSignatureAttestationStatus = gql`
   query GetCurrentUserSignatureAttestationStatus {
     me {
+      id
       signatureAttestationStatus {
         ... on NeedsSignatureAttestation {
           version
