@@ -1,16 +1,17 @@
-import { Button, useToast } from '@chakra-ui/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { getOrgMailOrderPharms } from '@client/settings';
-import { Dialog } from './Dialog';
 import { useApolloClient, useMutation, useQuery } from '@apollo/client';
-import { rerouteOrderMutation } from '../../mutations/clinical-api/orders';
+import { Button, useToast } from '@chakra-ui/react';
+import { getOrgMailOrderPharms } from '@client/settings';
+import { usePhoton } from '@photonhealth/react';
 import { Order, Treatment } from '@photonhealth/sdk/dist/types';
+import { FulfillmentType, OrderState } from 'packages/sdk/src/types';
+
+import { Dialog } from './Dialog';
+import { StyledToast } from './StyledToast';
+import { rerouteOrderMutation } from '../../mutations/clinical-api/orders';
 import { formatAddress } from '../../utils';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
-import { StyledToast } from './StyledToast';
 import { GET_ORDER, getOrderRoutingHistory, PHARMACY_QUERY } from '../../queries';
-import { FulfillmentType, OrderState } from 'packages/sdk/src/types';
-import { usePhoton } from '@photonhealth/react';
 
 interface RerouteOrderButtonProps {
   order: Order;
@@ -29,6 +30,7 @@ const CONFIRMATION_TEXT = 'Confirm Reroute';
 
 export function RerouteOrderButton({ order, organizationId }: RerouteOrderButtonProps) {
   const toast = useToast();
+  const apollo = useApolloClient();
   const { track } = useProviderAnalytics();
   const pharmacySelectRef = useRef<HTMLElement>(null);
   const mailOrderIds = useMemo(
@@ -47,24 +49,6 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
 
   const routingHistory = useRoutingHistory(order.id);
   const [rerouteOrder] = useRerouteOrderMutation({ order, rerouteTo: pharmacyId });
-
-  useEffect(() => {
-    // effect to set up event listener that detects pharmacy selection from the web component
-    if (!rerouteModalOpen) return;
-
-    const el = pharmacySelectRef.current;
-    if (!el) return;
-
-    const pharmacySelectedHandler = (e: Event) => {
-      const ce = e as CustomEvent<{ pharmacyId?: string; fulfillmentType?: string }>;
-      const detail = ce.detail;
-      setPharmacyId(detail?.pharmacyId ?? '');
-      setFulfillmentType(detail?.fulfillmentType);
-    };
-
-    el.addEventListener('photon-pharmacy-selected', pharmacySelectedHandler);
-    return () => el.removeEventListener('photon-pharmacy-selected', pharmacySelectedHandler);
-  }, [rerouteModalOpen]);
 
   const handleRerouteButtonClick = () => {
     setPharmacyId('');
@@ -98,10 +82,19 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
   const handleRerouteConfirmation = async () => {
     setUpdating(true);
     try {
+      let pharmacyName: string | undefined = undefined;
+      if (pharmacyId) {
+        const { data: pharmacyData } = await apollo.query<{ pharmacy: Order['pharmacy'] }>({
+          query: PHARMACY_QUERY,
+          variables: { id: pharmacyId }
+        });
+        pharmacyName = pharmacyData?.pharmacy?.name;
+      }
+
       track('Confirm Reroute Order Clicked', {
         buttonText: CONFIRMATION_TEXT,
         pharmacyId,
-        pharmacyName: '', // TODO
+        pharmacyName,
         routingType: routingTypeLabel(fulfillmentType),
         orderId: order.id,
         patientId: order.patient.id,
@@ -119,11 +112,6 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
       track('Reroute Error Message Viewed', {
         orderId: order.id,
         patientId: order.patient.id,
-        medicationIds: uniqueTreatments.map(({ id }) => id),
-        medicationNames: uniqueTreatments.map(({ name }) => name),
-        pharmacyId,
-        pharmacyName: '', // TODO
-        routingType: routingTypeLabel(fulfillmentType),
         message
       });
       toast({
@@ -142,6 +130,24 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
       setUpdating(false);
     }
   };
+
+  useEffect(() => {
+    // effect to set up event listener that detects pharmacy selection from the web component
+    if (!rerouteModalOpen) return;
+
+    const el = pharmacySelectRef.current;
+    if (!el) return;
+
+    const pharmacySelectedHandler = (e: Event) => {
+      const ce = e as CustomEvent<{ pharmacyId?: string; fulfillmentType?: string }>;
+      const detail = ce.detail;
+      setPharmacyId(detail?.pharmacyId ?? '');
+      setFulfillmentType(detail?.fulfillmentType);
+    };
+
+    el.addEventListener('photon-pharmacy-selected', pharmacySelectedHandler);
+    return () => el.removeEventListener('photon-pharmacy-selected', pharmacySelectedHandler);
+  }, [rerouteModalOpen]);
 
   return (
     <>
