@@ -23,6 +23,7 @@ import { computeNumRefillsForPrescription } from '../utils/presenters';
 import { CouponCardList } from '../components/coupons';
 import { Pharmacy } from '../utils/models';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
+import { OrderState } from 'packages/sdk/src/types';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -161,6 +162,17 @@ export const Status = () => {
   };
 
   const handleReroute = () => {
+    const isRouting = order.state === OrderState.Routing;
+    const isInitialRoute = !order.metadata?.routingHistory?.length;
+    const providerRequestedReroute = isRouting && !isInitialRoute;
+
+    if (providerRequestedReroute) {
+      const reason = 'Provider enabled rerouting';
+      setReason(reason);
+      navigateToReroute(reason);
+      return;
+    }
+
     const hasUnresolvedOrderError = order.exceptions.some(
       (e) => e.exceptionType === 'ORDER_ERROR' && !e.resolvedAt
     );
