@@ -2,14 +2,14 @@ import { Button, useToast } from '@chakra-ui/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { Dialog } from './Dialog';
-import { useApolloClient, useMutation } from '@apollo/client';
+import { useApolloClient, useMutation, useQuery } from '@apollo/client';
 import { rerouteOrderMutation } from '../../mutations/clinical-api/orders';
-import { Order } from '@photonhealth/sdk/dist/types';
+import { Order, Treatment } from '@photonhealth/sdk/dist/types';
 import { formatAddress } from '../../utils';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 import { StyledToast } from './StyledToast';
-import { GET_ORDER, PHARMACY_QUERY } from '../../queries';
-import { OrderState } from 'packages/sdk/src/types';
+import { GET_ORDER, getOrderRoutingHistory, PHARMACY_QUERY } from '../../queries';
+import { FulfillmentType, OrderState } from 'packages/sdk/src/types';
 import { usePhoton } from '@photonhealth/react';
 
 interface RerouteOrderButtonProps {
@@ -25,23 +25,27 @@ declare global {
   }
 }
 
+const CONFIRMATION_TEXT = 'Confirm Reroute';
+
 export function RerouteOrderButton({ order, organizationId }: RerouteOrderButtonProps) {
-  const { track } = useProviderAnalytics();
   const toast = useToast();
-
-  const [updating, setUpdating] = useState(false);
-  const [rerouteModalOpen, setRerouteModalOpen] = useState(false);
-  const [pharmacyId, setPharmacyId] = useState('');
-  const [fulfillmentType, setFulfillmentType] = useState<string | undefined>(undefined);
-
-  const confirmButtonDisabled = !!fulfillmentType && !pharmacyId;
-
+  const { track } = useProviderAnalytics();
   const pharmacySelectRef = useRef<HTMLElement>(null);
   const mailOrderIds = useMemo(
     () => getOrgMailOrderPharms(organizationId)?.provider?.join(',') ?? '',
     [organizationId]
   );
 
+  const [updating, setUpdating] = useState(false);
+  const [rerouteModalOpen, setRerouteModalOpen] = useState(false);
+  const [pharmacyId, setPharmacyId] = useState('');
+  const [fulfillmentType, setFulfillmentType] = useState<string | undefined>(undefined);
+  const confirmButtonDisabled = !!fulfillmentType && !pharmacyId;
+
+  const uniqueTreatments = useUniqueMeds(order);
+  const selector = useRerouteSelector();
+
+  const routingHistory = useRoutingHistory(order.id);
   const [rerouteOrder] = useRerouteOrderMutation({ order, rerouteTo: pharmacyId });
 
   useEffect(() => {
@@ -66,23 +70,43 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
     setPharmacyId('');
     setFulfillmentType(undefined);
     setRerouteModalOpen(true);
-    // TODO: Tracking event
+
+    track('Customer Clicked Reroute Order', {
+      selector,
+      numberOfReroutes: routingHistory.slice(1).length,
+      orderId: order.id,
+      patientId: order.patient.id,
+      medicationIds: uniqueTreatments.map(({ id }) => id),
+      medicationNames: uniqueTreatments.map(({ name }) => name)
+    });
   };
 
   const handleRerouteCancel = () => {
     setPharmacyId('');
     setFulfillmentType(undefined);
     setRerouteModalOpen(false);
-    // TODO: Tracking event
+
+    track('Cancel Reroute Order Clicked', {
+      selector,
+      orderId: order.id,
+      patientId: order.patient.id,
+      medicationIds: uniqueTreatments.map(({ id }) => id),
+      medicationNames: uniqueTreatments.map(({ name }) => name)
+    });
   };
 
   const handleRerouteConfirmation = async () => {
     setUpdating(true);
     try {
       track('Confirm Reroute Order Clicked', {
-        // TODO: add more attributes
+        buttonText: CONFIRMATION_TEXT,
+        pharmacyId,
+        pharmacyName: '', // TODO
+        routingType: routingTypeLabel(fulfillmentType),
         orderId: order.id,
-        pharmacyId
+        patientId: order.patient.id,
+        medicationIds: uniqueTreatments.map(({ id }) => id),
+        medicationNames: uniqueTreatments.map(({ name }) => name)
       });
 
       await rerouteOrder({ variables: { orderId: order.id, pharmacyId } });
@@ -92,6 +116,16 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
       setRerouteModalOpen(false);
     } catch (error) {
       const message = error instanceof Error ? error.message : `${error}`;
+      track('Reroute Error Message Viewed', {
+        orderId: order.id,
+        patientId: order.patient.id,
+        medicationIds: uniqueTreatments.map(({ id }) => id),
+        medicationNames: uniqueTreatments.map(({ name }) => name),
+        pharmacyId,
+        pharmacyName: '', // TODO
+        routingType: routingTypeLabel(fulfillmentType),
+        message
+      });
       toast({
         position: 'top-right',
         duration: 5000,
@@ -150,7 +184,7 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
             isDisabled={confirmButtonDisabled}
             onClick={handleRerouteConfirmation}
           >
-            Confirm Reroute
+            {CONFIRMATION_TEXT}
           </Button>
         </Dialog.Footer>
       </Dialog>
@@ -213,4 +247,65 @@ function useRerouteOrderMutation({ order, rerouteTo }: { order: Order; rerouteTo
       return;
     }
   });
+}
+
+function useRoutingHistory(id: string) {
+  const { clinicalClient } = usePhoton();
+
+  const routingHistoryRes = useQuery(getOrderRoutingHistory, {
+    client: clinicalClient,
+    variables: { id }
+  });
+  const routingHistory = routingHistoryRes.data?.order?.routingHistory ?? [];
+  return routingHistory;
+}
+
+function useUniqueMeds(order: Order) {
+  return useMemo(() => {
+    const medicationLookup = order.fills.reduce<Record<string, Treatment>>((acc, cur) => {
+      if (!acc[cur.treatment.id]) {
+        acc[cur.treatment.id] = cur.treatment;
+      }
+
+      return acc;
+    }, {});
+
+    return Object.values(medicationLookup);
+  }, [order]);
+}
+
+function useRerouteSelector() {
+  const { contextData } = useProviderAnalytics();
+
+  return useMemo(() => {
+    if (!contextData.providerRoles) return;
+
+    switch (true) {
+      case 'Administrator' in contextData.providerRoles:
+        return 'ADMIN';
+      case 'Prescriber' in contextData.providerRoles:
+        return 'PROVIDER';
+      case 'Medical Operations' in contextData.providerRoles:
+        return 'MED_OPS';
+      case 'Staff' in contextData.providerRoles:
+        return 'STAFF';
+      case 'Support' in contextData.providerRoles:
+        return 'SUPPORT';
+      case 'Developer' in contextData.providerRoles:
+        return 'DEVELOPER';
+      default:
+        return 'READ_ONLY';
+    }
+  }, [contextData.providerRoles]);
+}
+
+function routingTypeLabel(type?: string) {
+  switch (type) {
+    case FulfillmentType.PickUp:
+      return 'Local Pick-up';
+    case FulfillmentType.MailOrder:
+      return 'Mail Order';
+    default:
+      return 'Send to Patient';
+  }
 }
