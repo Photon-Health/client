@@ -63,6 +63,7 @@ import {
 } from '../../queries';
 import { OrderRoutingHistory } from '../../gql/graphql';
 import { OrderState } from 'packages/sdk/src/types';
+import usePermissions from '../../hooks/usePermissions';
 
 export const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.PickUp]: 'Pick up',
@@ -157,6 +158,10 @@ export const OrderDetailPage = () => {
   const client = useApolloClient();
   const theme = useTheme();
   const toast = useToast();
+
+  const canRerouteOrder = usePermissions(['write:order', 'update:order', 'reroute:order'], {
+    hasAny: true
+  });
 
   const { data, loading, error } = useQuery(GET_ORDER, {
     variables: { id }
@@ -544,7 +549,7 @@ export const OrderDetailPage = () => {
               <SectionTitleRow
                 headerText="Pharmacy Information"
                 rightElement={
-                  order && order?.state !== 'ROUTING' ? (
+                  canRerouteOrder && order && order?.state !== 'ROUTING' ? (
                     <RerouteOrderButton organizationId={user.organizationId} order={order} />
                   ) : undefined
                 }

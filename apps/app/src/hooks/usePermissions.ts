@@ -3,11 +3,18 @@ import jwtDecode from 'jwt-decode';
 import { Permission } from 'packages/sdk/dist/types';
 import { useEffect, useState } from 'react';
 
-function checkHasPermission(subset: Permission[], superset: Permission[]) {
+function hasEveryPermission(subset: Permission[], superset: Permission[]) {
   return subset.every((permission) => superset.includes(permission));
 }
 
-const usePermissions = (permissions: Permission[]) => {
+function hasAnyPermission(subset: Permission[], superset: Permission[]) {
+  return subset.some((permission) => superset.includes(permission));
+}
+
+const usePermissions = (
+  permissions: Permission[],
+  { hasAny = false }: { hasAny?: boolean } = {}
+) => {
   const [userPermissions, setUserPermissions] = useState<Permission[]>([]);
   const { getToken } = usePhoton();
 
@@ -26,7 +33,9 @@ const usePermissions = (permissions: Permission[]) => {
     getPermissions();
   }, []);
 
-  return checkHasPermission(permissions, userPermissions);
+  return hasAny
+    ? hasAnyPermission(permissions, userPermissions)
+    : hasEveryPermission(permissions, userPermissions);
 };
 
 export default usePermissions;
