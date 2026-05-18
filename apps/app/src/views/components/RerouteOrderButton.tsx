@@ -185,6 +185,7 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
             enable-local-pickup={true}
             enable-send-to-patient={true}
             enable-delivery-pharmacies={true}
+            infer-send-to-patient-pharmacy={false}
           />
         </Dialog.Body>
         <Dialog.Footer>

@@ -36,6 +36,7 @@ interface PharmacySelectProps {
   patientIds?: string[];
   address?: string;
   hasPreferredPharmacy?: boolean;
+  inferSendToPatientPharmacy?: boolean;
 }
 
 const fulfillmentOptions: FulfillmentOptions = [
@@ -157,7 +158,10 @@ export function PharmacySelect(props: PharmacySelectProps) {
               when={(props?.patientIds?.length || 0) > 0}
               fallback={<div>Please select a patient.</div>}
             >
-              <SendToPatient patientId={props.patientIds![0]} />
+              <SendToPatient
+                patientId={props.patientIds![0]}
+                inferSendToPatientPharmacy={props.inferSendToPatientPharmacy}
+              />
             </Show>
           </div>
         </Show>

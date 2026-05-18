@@ -47,7 +47,7 @@ const stpStates: {
   }
 };
 
-export function SendToPatient(props: { patientId: string }) {
+export function SendToPatient(props: { patientId: string; inferSendToPatientPharmacy?: boolean }) {
   const client = usePhotonClient();
   const { selectedCoverageOption } = usePrescribe();
   const { pharmacyId } = usePharmacySelectionContext();
@@ -55,9 +55,12 @@ export function SendToPatient(props: { patientId: string }) {
   const [stpState, setStpState] = createSignal<STPState>(stpStates.patientWillSelect);
   const [pharmacy, setPharmacy] = createSignal<Pharmacy | undefined>(undefined);
 
+  const inferSendToPatientPharmacy = createMemo(() => props.inferSendToPatientPharmacy ?? true);
+
   const queryOptions = createMemo(() => ({
     variables: { id: props.patientId },
-    client: client.apollo
+    client: client.apollo,
+    skip: !inferSendToPatientPharmacy()
   }));
 
   const preferredPharmaciesData = createQuery<GetPreferredPharmaciesResponse, { id: string }>(
@@ -84,7 +87,7 @@ export function SendToPatient(props: { patientId: string }) {
   });
 
   createEffect(() => {
-    if (notLoading()) {
+    if (notLoading() && inferSendToPatientPharmacy()) {
       const preferredPharmacies = preferredPharmaciesData()?.patient?.preferredPharmacies;
       const lastPharmacy = recentOrder()?.pharmacy;
       if ((preferredPharmacies?.length ?? 0) > 0) {
@@ -113,6 +116,8 @@ export function SendToPatient(props: { patientId: string }) {
   });
 
   createEffect(() => {
+    if (!inferSendToPatientPharmacy()) return;
+
     const coverageOption = selectedCoverageOption();
     const currentPharmacyId = pharmacyId();
     if (coverageOption && currentPharmacyId && coverageOption.pharmacy.id === currentPharmacyId) {
