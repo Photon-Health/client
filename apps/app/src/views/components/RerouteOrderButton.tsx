@@ -28,8 +28,6 @@ declare global {
 export function RerouteOrderButton({ order, organizationId }: RerouteOrderButtonProps) {
   const { track } = useProviderAnalytics();
   const toast = useToast();
-  const apollo = useApolloClient();
-  const { clinicalClient } = usePhoton();
 
   const [updating, setUpdating] = useState(false);
   const [rerouteModalOpen, setRerouteModalOpen] = useState(false);
@@ -43,6 +41,8 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
     () => getOrgMailOrderPharms(organizationId)?.provider?.join(',') ?? '',
     [organizationId]
   );
+
+  const [rerouteOrder] = useRerouteOrderMutation({ order, rerouteTo: pharmacyId });
 
   useEffect(() => {
     // effect to set up event listener that detects pharmacy selection from the web component
@@ -109,57 +109,6 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
     }
   };
 
-  const [rerouteOrder] = useMutation(rerouteOrderMutation, {
-    client: clinicalClient,
-    update: async () => {
-      try {
-        const cachedResponse: { order: Order } | null = apollo.readQuery({
-          query: GET_ORDER,
-          variables: { id: order.id }
-        });
-        if (!cachedResponse?.order) return;
-
-        let newPharmacy: Order['pharmacy'];
-        if (pharmacyId) {
-          // provider chose a pharmacy, get its data to update the cache
-          const { data: pharmacyData } = await apollo.query<{ pharmacy: Order['pharmacy'] }>({
-            query: PHARMACY_QUERY,
-            variables: { id: pharmacyId }
-          });
-          newPharmacy = pharmacyData.pharmacy;
-        }
-
-        apollo.writeQuery({
-          query: GET_ORDER,
-          variables: { id: order.id },
-          data: {
-            order: {
-              ...cachedResponse.order,
-              state: newPharmacy ? OrderState.Pending : OrderState.Routing,
-              pharmacy: newPharmacy || undefined
-            }
-          }
-        });
-      } catch (error) {
-        const message = error instanceof Error ? error.message : `${error}`;
-        console.error('Failure in optimistically updating the cache with pharmacy data', message);
-        toast({
-          position: 'top-right',
-          duration: 5000,
-          render: ({ onClose: onToastClose }) => (
-            <StyledToast
-              onClose={onToastClose}
-              type="error"
-              title="Error loading pharmacy data"
-              description="The order has been rerouted, but there was an error in loading the new pharmacy data. Refresh or come back later to see the updated order"
-            />
-          )
-        });
-      }
-      return;
-    }
-  });
-
   return (
     <>
       <Button
@@ -207,4 +156,61 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
       </Dialog>
     </>
   );
+}
+
+function useRerouteOrderMutation({ order, rerouteTo }: { order: Order; rerouteTo?: string }) {
+  const toast = useToast();
+  const apollo = useApolloClient();
+  const { clinicalClient } = usePhoton();
+
+  return useMutation(rerouteOrderMutation, {
+    client: clinicalClient,
+    update: async () => {
+      try {
+        const cachedResponse: { order: Order } | null = apollo.readQuery({
+          query: GET_ORDER,
+          variables: { id: order.id }
+        });
+        if (!cachedResponse?.order) return;
+
+        let newPharmacy: Order['pharmacy'];
+        if (rerouteTo) {
+          // provider chose a pharmacy, get its data to update the cache
+          const { data: pharmacyData } = await apollo.query<{ pharmacy: Order['pharmacy'] }>({
+            query: PHARMACY_QUERY,
+            variables: { id: rerouteTo }
+          });
+          newPharmacy = pharmacyData.pharmacy;
+        }
+
+        apollo.writeQuery({
+          query: GET_ORDER,
+          variables: { id: order.id },
+          data: {
+            order: {
+              ...cachedResponse.order,
+              state: newPharmacy ? OrderState.Pending : OrderState.Routing,
+              pharmacy: newPharmacy || undefined
+            }
+          }
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : `${error}`;
+        console.error('Failure in optimistically updating the cache with pharmacy data', message);
+        toast({
+          position: 'top-right',
+          duration: 5000,
+          render: ({ onClose: onToastClose }) => (
+            <StyledToast
+              onClose={onToastClose}
+              type="error"
+              title="Error loading pharmacy data"
+              description="The order has been rerouted, but there was an error in loading the new pharmacy data. Refresh or come back later to see the updated order"
+            />
+          )
+        });
+      }
+      return;
+    }
+  });
 }
