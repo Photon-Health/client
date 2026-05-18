@@ -287,17 +287,17 @@ function useRerouteSelector() {
     if (!contextData.providerRoles) return;
 
     switch (true) {
-      case 'Administrator' in contextData.providerRoles:
+      case contextData.providerRoles.includes('Administrator'):
         return 'ADMIN';
-      case 'Prescriber' in contextData.providerRoles:
+      case contextData.providerRoles.includes('Prescriber'):
         return 'PROVIDER';
-      case 'Medical Operations' in contextData.providerRoles:
+      case contextData.providerRoles.includes('Medical Operations'):
         return 'MED_OPS';
-      case 'Staff' in contextData.providerRoles:
+      case contextData.providerRoles.includes('Staff'):
         return 'STAFF';
-      case 'Support' in contextData.providerRoles:
+      case contextData.providerRoles.includes('Support'):
         return 'SUPPORT';
-      case 'Developer' in contextData.providerRoles:
+      case contextData.providerRoles.includes('Developer'):
         return 'DEVELOPER';
       default:
         return 'READ_ONLY';
