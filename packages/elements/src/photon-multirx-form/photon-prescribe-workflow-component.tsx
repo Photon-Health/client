@@ -110,6 +110,7 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
                 allowOffCatalogSearch={props.allowOffCatalogSearch}
                 disableList={props.disableList}
                 groupId={props.groupId}
+                supervisor={props.supervisor}
               />
             </PrescribeProvider>
           </PharmacySelectionProvider>
@@ -150,7 +151,8 @@ customElement(
     allowOffCatalogSearch: true,
     enableCoverageCheck: false,
     disableList: undefined,
-    groupId: undefined
+    groupId: undefined,
+    supervisor: undefined
   },
   PhotonPrescribeWorkflowComponent
 );

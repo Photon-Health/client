@@ -98,6 +98,7 @@ export type PrescribeProps = {
   allowOffCatalogSearch?: boolean;
   disableList?: DisableList;
   groupId?: string;
+  supervisor?: string;
 };
 
 export const ScreenDraftedPrescriptionsQuery = gql`
