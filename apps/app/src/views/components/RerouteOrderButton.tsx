@@ -300,7 +300,7 @@ function useRerouteSelector() {
       case contextData.providerRoles.includes('Developer'):
         return 'DEVELOPER';
       default:
-        return 'READ_ONLY';
+        return 'UNKNOWN';
     }
   }, [contextData.providerRoles]);
 }
