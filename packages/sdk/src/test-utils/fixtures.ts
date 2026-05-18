@@ -34,7 +34,7 @@ export const DISPENSE_UNIT = {
 };
 
 export const PROVIDER = {
-  id: 'prov_1',
+  id: 'usr_1',
   email: 'doc@test.com',
   credentials: 'MD',
   name: {
