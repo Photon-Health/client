@@ -57,7 +57,7 @@ export const GetPatient = gql`
 `;
 
 export const GetPatientPreferredPharmaciesAndAddress = gql`
-  query GetPatient($id: ID!) {
+  query GetPatientPreferredPharmaciesAndAddress($id: ID!) {
     patient(id: $id) {
       preferredPharmacies {
         id

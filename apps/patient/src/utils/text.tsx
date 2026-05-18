@@ -3,6 +3,23 @@ import { FulfillmentState } from 'packages/sdk/src/types';
 import React, { ReactNode } from 'react';
 import { ExtendedFulfillmentType } from './models';
 
+const LINK_PATTERN = /\[([^\]]+)\]\(([^)]+)\)/g;
+export const renderWithLinks = (copy: string): ReactNode[] => {
+  const parts = copy.split(LINK_PATTERN);
+  const nodes: ReactNode[] = [];
+  for (let i = 0; i < parts.length; i += 3) {
+    if (parts[i]) nodes.push(parts[i]);
+    if (i + 2 < parts.length) {
+      nodes.push(
+        <Link key={i} href={parts[i + 2]} isExternal color="blue.500">
+          {parts[i + 1]}
+        </Link>
+      );
+    }
+  }
+  return nodes;
+};
+
 export const text = {
   askForBestPrice: 'Ask your pharmacist to help you find the best possible price.',
   bin: 'BIN',

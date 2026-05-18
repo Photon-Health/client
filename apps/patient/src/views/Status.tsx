@@ -263,7 +263,7 @@ export const Status = () => {
   );
 
   const pharmacyEstimatedReadyAt = useMemo(() => getLatestReadyTime(fulfillments), [fulfillments]);
-  const orderState = useMemo(
+  const fulfillmentState = useMemo(
     () =>
       order.fulfillment?.type === 'MAIL_ORDER'
         ? (order.fulfillment.state as 'FILLING' | 'SHIPPED' | 'DELIVERED')
@@ -284,8 +284,11 @@ export const Status = () => {
       <OrderDetailsModal
         isOpen={orderDetailsIsOpen}
         onClose={() => setOrderDetailsIsOpen(false)}
-        pharmacyName={order.pharmacy?.name ?? 'My Pharmacy'}
+        pharmacyName={displayPharmacy?.name ?? 'My Pharmacy'}
+        pharmacyId={displayPharmacy?.id}
+        pharmacyLogo={displayPharmacy?.logo}
         prescriptions={prescriptions}
+        fulfillmentState={fulfillmentState}
       />
       <Helmet>
         <title>{t.track}</title>
@@ -297,7 +300,7 @@ export const Status = () => {
               <HolidayAlert>Holiday may affect pharmacy hours.</HolidayAlert>
               <InsuranceAlert exception={unresolvedExceptions[0]?.exceptionType} />
               <OrderStatusHeader
-                status={orderState}
+                status={fulfillmentState}
                 fulfillmentType={order.fulfillment?.type}
                 integrated={order.pharmacy?.integrated}
                 pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
