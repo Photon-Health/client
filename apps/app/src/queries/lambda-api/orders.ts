@@ -32,6 +32,7 @@ export const GET_ORDER = gql`
           instructions
         }
         treatment {
+          id
           name
         }
         state
