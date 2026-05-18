@@ -8,6 +8,17 @@ export const getOrderRoutingHistory = graphql(/* GraphQL */ `
           id
           name
           fulfillmentTypes
+          id
+          name
+          phone
+          address {
+            city
+            country
+            postalCode
+            state
+            street1
+            street2
+          }
         }
         selector
         reason
