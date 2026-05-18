@@ -169,7 +169,7 @@ function ComboOptions(props: { children?: JSX.Element }) {
       <Show when={state.open && pos()}>
         <Portal mount={getMountTarget()}>
           <ul
-            class="z-10 bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+            class="z-2000 bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
             role="listbox"
             tabindex="-1"
             style={{
