@@ -167,6 +167,7 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
         <Dialog.Body pt="0.5" pb="4" px="4">
           <photon-pharmacy-select
             ref={pharmacySelectRef}
+            data-testid="pharmacy-select"
             patient-id={order.patient.id}
             address={order.address ? formatAddress(order.address) : ''}
             pharmacy-id={order.pharmacy?.id}
