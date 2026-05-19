@@ -1,4 +1,5 @@
 import { Address, Patient, Pharmacy, SexType } from '@photonhealth/sdk/dist/types';
+import { SupervisorCardFragment } from '@photonhealth/sdk/dist/clinical-api/types';
 
 export function generatePatient(overrides: Partial<Patient> = {}): Patient {
   return {
@@ -31,6 +32,52 @@ export function generateAddress(overrides: Partial<Address> = {}): Address {
     state: 'NY',
     postalCode: '10001',
     country: 'US',
+    ...overrides
+  };
+}
+
+type SupervisorJsonShape = {
+  firstName: string;
+  lastName: string;
+  npi: string;
+  phone: string;
+  address: {
+    country: string;
+    city: string;
+    postalCode: string;
+    state: string;
+    street1: string;
+    street2: string | null;
+  };
+};
+
+export function generateSupervisorJson(overrides: Partial<SupervisorJsonShape> = {}): string {
+  return JSON.stringify({
+    firstName: 'Jane',
+    lastName: 'Doe',
+    address: generateAddress({
+      country: 'US',
+      city: 'Brooklyn',
+      postalCode: '11120',
+      state: 'NY',
+      street1: '201 N 8th St',
+      street2: null
+    }),
+    npi: '1234567890',
+    phone: '+11234567890',
+    ...overrides
+  });
+}
+
+export function generateGqlSupervisor(
+  overrides: Partial<SupervisorCardFragment> = {}
+): SupervisorCardFragment {
+  return {
+    __typename: 'Supervisor',
+    id: 'sup_defaultTestId',
+    firstName: 'test-supervisor-fn',
+    lastName: 'test-supervisor-ln',
+    npi: 'test-supervisor-npi',
     ...overrides
   };
 }
