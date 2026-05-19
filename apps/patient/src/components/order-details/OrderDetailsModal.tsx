@@ -133,16 +133,17 @@ export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalPr
                   <PrescriptionBlock key={`${p.rxName}-${i}`} rx={p} />
                 ))}
               </VStack>
-              {nextSteps && props.fulfillmentState === 'SENT' && (
-                <VStack alignItems="stretch" spacing={2} w="full">
-                  <Text fontWeight="bold" fontSize="lg">
-                    Next Steps
-                  </Text>
-                  <Box bgColor="blue.50" borderRadius="xl" p={4}>
-                    <Text whiteSpace="pre-wrap">{renderWithLinks(nextSteps)}</Text>
-                  </Box>
-                </VStack>
-              )}
+              {nextSteps &&
+                (props.fulfillmentState === 'CREATED' || props.fulfillmentState === 'SENT') && (
+                  <VStack alignItems="stretch" spacing={2} w="full">
+                    <Text fontWeight="bold" fontSize="lg">
+                      Next Steps
+                    </Text>
+                    <Box bgColor="blue.50" borderRadius="xl" p={4}>
+                      <Text whiteSpace="pre-wrap">{renderWithLinks(nextSteps)}</Text>
+                    </Box>
+                  </VStack>
+                )}
             </VStack>
           </Container>
         </ModalBody>
