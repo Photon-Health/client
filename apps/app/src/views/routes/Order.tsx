@@ -550,7 +550,7 @@ export const OrderDetailPage = () => {
                 headerText="Pharmacy Information"
                 rightElement={
                   canRerouteOrder && order && order?.state !== 'ROUTING' ? (
-                    <RerouteOrderButton organizationId={user.organizationId} order={order} />
+                    <RerouteOrderButton organizationId={user.org_id} order={order} />
                   ) : undefined
                 }
               />
