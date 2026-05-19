@@ -29,6 +29,7 @@ import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
 import { SupervisorCard } from './SupervisorCard';
 import { PrescriptionCard } from './PrescriptionCard/PrescriptionCard';
+import { SupervisorInput } from '@photonhealth/sdk/dist/clinical-api/types';
 
 const hasUsableAddress = (address?: {
   street1?: string;
@@ -152,7 +153,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchOrderError,
     dispatchClinicalAlertAcknowledge,
     dispatchClinicalAlertCancel,
-    dispatchAnalyticsTrackEvent
+    dispatchAnalyticsTrackEvent,
+    dispatchSupervisorError
   } = usePrescribeEventDispatch();
   const [needsSupervisor, setNeedsSupervisor] = createSignal<boolean>(false);
 
@@ -329,6 +331,38 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       formattedAddress()
     );
   };
+
+  createEffect(() => {
+    const supervisorRawInput = props.supervisor;
+    if (!supervisorRawInput) {
+      // Clear supervisor from formStore
+      props.formActions.updateFormValue({ key: 'supervisorId', value: undefined });
+      return;
+    }
+
+    try {
+      const supervisor = JSON.parse(supervisorRawInput) as Partial<SupervisorInput>;
+      if (
+        !(
+          supervisor.firstName &&
+          supervisor.lastName &&
+          supervisor.npi &&
+          supervisor.phone &&
+          supervisor.address &&
+          supervisor.address.street1 &&
+          supervisor.address.city &&
+          supervisor.address.state &&
+          supervisor.address.postalCode
+        )
+      ) {
+        // TODO: Add missing fields to error message
+        throw new Error('Missing required fields');
+      }
+    } catch (e) {
+      dispatchSupervisorError([(e as Error).message]);
+      props.formActions.updateFormValue({ key: 'supervisorId', value: undefined });
+    }
+  });
 
   // submits the form to create a new order
   const submitForm = async () => {
