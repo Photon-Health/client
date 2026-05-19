@@ -75,21 +75,27 @@ export const TreatmentOptionSearch = ({
       setError(undefined);
 
       try {
-        const { data } = await clinicalClient.query({
+        const { data, errors } = await clinicalClient.query({
           query: SearchTreatmentOptionsQuery,
           variables: { filter: { term: searchTermDebounce } }
         });
 
+        if (errors?.length) {
+          console.log('Treatment Search Error:', { errors });
+          throw new Error('An error occured in this search');
+        }
+
         setTreatments(
-          data.treatments?.map((treatmentOption: { id: string; name: string }) => ({
+          data?.treatments?.map((treatmentOption: { id: string; name: string }) => ({
             value: treatmentOption.id,
             label: treatmentOption.name,
             searchTerm: searchTermDebounce
           }))
         );
       } catch (err) {
+        const error = err as Error;
         setLoading(false);
-        setError(err as string);
+        setError(error.message);
       } finally {
         setLoading(false);
       }
