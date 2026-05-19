@@ -47,7 +47,15 @@ const stpStates: {
   }
 };
 
-export function SendToPatient(props: { patientId: string; inferSendToPatientPharmacy?: boolean }) {
+type SendToPatientProps = {
+  patientId: string;
+  // this is to control whether or not we infer which pharmacy is chosen in the
+  // send to patient flow. Inferences such as recent order pharmacy, preferred
+  // pharmacy, or coverage pharmacy on the STP tab.
+  inferSendToPatientPharmacy?: boolean;
+};
+
+export function SendToPatient(props: SendToPatientProps) {
   const client = usePhotonClient();
   const { selectedCoverageOption } = usePrescribe();
   const { pharmacyId } = usePharmacySelectionContext();
