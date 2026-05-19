@@ -12,6 +12,7 @@ import { PharmacyRoutingAlert } from '../RoutingConstraints';
 import { Alert } from '../../particles/Alert';
 import { MailOrderPharmacySearch } from '../PharmacySearch/MailOrderPharmacySearch';
 import { PharmacyOption } from '../PharmacySearch/PharmacySearch';
+import clsx from 'clsx';
 
 enum SendToPatientEnum {
   sendToPatient = 'SEND_TO_PATIENT'
@@ -37,6 +38,7 @@ interface PharmacySelectProps {
   address?: string;
   hasPreferredPharmacy?: boolean;
   inferSendToPatientPharmacy?: boolean;
+  stickyTabHeader?: boolean;
 }
 
 const fulfillmentOptions: FulfillmentOptions = [
@@ -150,7 +152,9 @@ export function PharmacySelect(props: PharmacySelectProps) {
 
   return (
     <div>
-      <Tabs<TabNamesEnum> tabs={tabs()} activeTab={activeTab()} setActiveTab={handleTabChange} />
+      <div class={clsx({ 'sticky top-0 bg-white z-10': props.stickyTabHeader ?? false })}>
+        <Tabs<TabNamesEnum> tabs={tabs()} activeTab={activeTab()} setActiveTab={handleTabChange} />
+      </div>
       <div class="pt-4">
         <Show when={tabs().includes(TabNamesEnum.sendToPatient)}>
           <div class={activeTab() !== TabNamesEnum.sendToPatient ? 'hidden' : ''}>

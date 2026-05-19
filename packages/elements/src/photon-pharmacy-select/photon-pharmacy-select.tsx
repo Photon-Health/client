@@ -21,6 +21,7 @@ interface PhotonPharmacySelectProps {
   enableSendToPatient: boolean;
   enableDeliveryPharmacies: boolean;
   inferSendToPatientPharmacy?: boolean;
+  stickyTabHeader?: boolean;
 }
 
 type PharmacySelectedDetail = {
@@ -33,6 +34,7 @@ const PharmacySelectWithEvents = (props: {
   patientId?: string;
   address?: string;
   inferSendToPatientPharmacy?: boolean;
+  stickyTabHeader?: boolean;
   onChange: (detail: PharmacySelectedDetail) => void;
 }) => {
   const ctx = usePharmacySelectionContext();
@@ -56,6 +58,7 @@ const PharmacySelectWithEvents = (props: {
       patientIds={props.patientId ? [props.patientId] : undefined}
       address={props.address}
       inferSendToPatientPharmacy={props.inferSendToPatientPharmacy}
+      stickyTabHeader={props.stickyTabHeader}
     />
   );
 };
@@ -97,6 +100,7 @@ const PhotonPharmacySelectComponent = (props: PhotonPharmacySelectProps) => {
                   address={props.address}
                   onChange={dispatchPharmacySelected}
                   inferSendToPatientPharmacy={props.inferSendToPatientPharmacy}
+                  stickyTabHeader={props.stickyTabHeader}
                 />
               </PrescribeProvider>
             </PharmacySelectionProvider>
@@ -117,7 +121,8 @@ customElement(
     enableLocalPickup: false,
     enableSendToPatient: false,
     enableDeliveryPharmacies: false,
-    inferSendToPatientPharmacy: true
+    inferSendToPatientPharmacy: true,
+    stickyTabHeader: false
   },
   PhotonPharmacySelectComponent
 );

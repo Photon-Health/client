@@ -176,9 +176,10 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
             enable-send-to-patient={true}
             enable-delivery-pharmacies={true}
             infer-send-to-patient-pharmacy={false}
+            sticky-tab-header={true}
           />
         </Dialog.Body>
-        <Dialog.Footer>
+        <Dialog.Footer position="sticky" bottom="0">
           <Button variant="outline" size="sm" onClick={handleRerouteCancel} disabled={updating}>
             Cancel
           </Button>

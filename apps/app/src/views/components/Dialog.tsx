@@ -2,7 +2,7 @@
 // (no Portal, no react-focus-lock, no react-remove-scroll). Use this when
 // the dialog contains a Solid web component (`<photon-*>`); the libraries
 // Modal pulls in interfere with shadow-DOM event/scroll handling.
-import { Box, BoxProps, Flex } from '@chakra-ui/react';
+import { Box, BoxProps, Flex, FlexProps } from '@chakra-ui/react';
 import { createContext, ReactNode, useContext, useEffect, useId, useMemo, useRef } from 'react';
 
 type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
@@ -98,6 +98,7 @@ const DialogRoot = ({
           maxW={SIZE_MAX_W[size]}
           w="90vw"
           maxH="90vh"
+          overflowY="scroll"
           display="flex"
           flexDirection="column"
         >
@@ -118,13 +119,13 @@ const DialogHeader = ({ children }: { children: ReactNode }) => {
 };
 
 const DialogBody = ({ children, ...boxProps }: { children: ReactNode } & BoxProps) => (
-  <Box flex="1" overflowY="scroll" px={6} py={4} {...boxProps}>
+  <Box flex="1" px={6} py={4} {...boxProps}>
     {children}
   </Box>
 );
 
-const DialogFooter = ({ children }: { children: ReactNode }) => (
-  <Flex px={6} py={4} borderTopWidth="1px" justify="flex-end" gap={2}>
+const DialogFooter = ({ children, ...flexProps }: { children: ReactNode } & FlexProps) => (
+  <Flex px={6} py={4} borderTopWidth="1px" justify="flex-end" gap={2} bg="white" {...flexProps}>
     {children}
   </Flex>
 );
