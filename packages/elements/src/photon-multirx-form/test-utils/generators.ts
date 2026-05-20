@@ -28,7 +28,6 @@ export function generatePatient(overrides: Partial<Patient> = {}): Patient {
 }
 export function generateAddress(overrides: Partial<Address> = {}): Address {
   return {
-    __typename: 'Address',
     id: undefined,
     name: null,
     street1: '1 Main',
@@ -41,7 +40,7 @@ export function generateAddress(overrides: Partial<Address> = {}): Address {
   };
 }
 
-type SupervisorJsonShape = {
+export type SupervisorPrefillShape = {
   firstName: string;
   lastName: string;
   npi: string;
@@ -49,8 +48,10 @@ type SupervisorJsonShape = {
   address: Address;
 };
 
-export function generateSupervisorJson(overrides: Partial<SupervisorJsonShape> = {}): string {
-  return JSON.stringify({
+export function generateSupervisorPrefill(
+  overrides: Partial<SupervisorPrefillShape> = {}
+): Partial<SupervisorPrefillShape> {
+  return {
     firstName: 'Jane',
     lastName: 'Doe',
     address: generateAddress({
@@ -64,7 +65,7 @@ export function generateSupervisorJson(overrides: Partial<SupervisorJsonShape> =
     npi: '1234567890',
     phone: '+11234567890',
     ...overrides
-  });
+  };
 }
 
 export function generateGqlSupervisor(

@@ -69,7 +69,7 @@ import { SignatureAttestationModal } from './systems/SignatureAttestation';
 import { PhotonContext, usePhoton } from './context';
 import { PhotonClientStore } from './store';
 import { CoverageOption, PrescribeProvider, usePrescribe } from './systems/PrescribeProvider';
-import { SupervisorProvider, useSupervisor } from './systems/SupervisorProvider';
+import { SupervisorPrefill, SupervisorProvider, useSupervisor } from './systems/SupervisorProvider';
 
 import { GoogleServiceProvider, useGoogleService } from './systems/GoogleServiceProvider';
 
@@ -166,5 +166,6 @@ export type {
   TemplateOverrides,
   PrescriptionFormData,
   CoverageOption,
+  SupervisorPrefill,
   TryCreatePrescriptionTemplateOptions
 };

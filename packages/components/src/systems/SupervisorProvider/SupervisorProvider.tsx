@@ -19,9 +19,13 @@ export interface SupervisorContextType {
 
 const SupervisorContext = createContext<SupervisorContextType>();
 
+// At runtime `solid-element`'s customElement parses the `supervisor` HTML
+// attribute as JSON. Valid JSON → object; invalid JSON → the raw string.
+export type SupervisorPrefill = Partial<SupervisorInput> | string;
+
 interface SupervisorProviderProps {
   children: JSXElement;
-  supervisor?: string;
+  supervisor?: SupervisorPrefill;
 }
 
 type SupervisorResult = { id?: string; errors?: string[] };
@@ -44,7 +48,7 @@ export const SupervisorProvider = (props: SupervisorProviderProps) => {
   const { dispatchSupervisorError } = usePrescribeEventDispatch();
 
   const [resource] = createResource(
-    () => props.supervisor || null,
+    () => props.supervisor ?? null,
     (raw) => createSupervisorFetch(client, raw)
   );
 
@@ -67,18 +71,17 @@ export const SupervisorProvider = (props: SupervisorProviderProps) => {
 
 export const createSupervisorFetch = async (
   client: PhotonClient,
-  raw: string
+  supervisorPrefill: SupervisorPrefill
 ): Promise<SupervisorResult> => {
-  let parsed: Partial<SupervisorInput>;
-  try {
-    parsed = JSON.parse(raw) as Partial<SupervisorInput>;
-  } catch {
+  if (typeof supervisorPrefill === 'string') {
     return { errors: ['Invalid supervisor json passed in'] };
   }
 
-  if (!hasRequiredFields(parsed)) {
+  if (!hasRequiredFields(supervisorPrefill)) {
     return { errors: ['Missing required supervisor fields'] };
   }
+
+  const parsed = supervisorPrefill;
 
   try {
     const result = await client.apolloClinical.mutate({

@@ -11,7 +11,7 @@ import {
   generateAddress,
   generateGqlSupervisor,
   generatePatient,
-  generateSupervisorJson,
+  generateSupervisorPrefill,
   generateUser
 } from './test-utils/generators';
 import { stubGoogleMaps } from './test-utils/stub-google-maps';
@@ -79,7 +79,7 @@ test('creates supervisor and attaches to order', async () => {
     })
   );
 
-  const supervisorPrefill = generateSupervisorJson({
+  const supervisorPrefill = generateSupervisorPrefill({
     firstName: 'test-fn',
     lastName: 'test-ln',
     address: generateAddress({
@@ -105,7 +105,7 @@ test('creates supervisor and attaches to order', async () => {
   await waitFor(
     () => {
       expect(createSupervisorMutationSpy).toHaveBeenCalledWith(
-        expect.objectContaining(JSON.parse(supervisorPrefill))
+        expect.objectContaining(supervisorPrefill)
       );
     },
     { timeout: 3000 }
@@ -150,7 +150,7 @@ test('creates supervisor and does not show visually to user', async () => {
     enableOrder: true,
     enableSendToPatient: true,
     optionalPatientAddress: true,
-    supervisor: generateSupervisorJson()
+    supervisor: generateSupervisorPrefill()
   });
 
   await waitForPrescribeForm();
@@ -204,7 +204,7 @@ test('emits supervisor error event when required fields are missing', async () =
     })
   );
 
-  const supervisorWithoutPhone = generateSupervisorJson({
+  const supervisorWithoutPhone = generateSupervisorPrefill({
     phone: undefined
   });
   const { supervisorErrorEvents } = renderPrescribeWorkflow({
@@ -239,7 +239,7 @@ test('emits supervisor error event when CreateSupervisorMutation fails', async (
     enableOrder: true,
     enableSendToPatient: true,
     optionalPatientAddress: true,
-    supervisor: generateSupervisorJson()
+    supervisor: generateSupervisorPrefill()
   });
 
   await waitForPrescribeForm();

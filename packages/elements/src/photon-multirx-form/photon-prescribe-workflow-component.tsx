@@ -4,6 +4,7 @@ import {
   PrescribeEventDispatchProvider,
   PrescribeProvider,
   RecentOrders,
+  SupervisorPrefill,
   SupervisorProvider,
   TemplateOverrides
 } from '@photonhealth/components';
@@ -34,7 +35,7 @@ export interface PrescribeWorkflowComponentProps extends PrescribeProps {
   enableSendToPatient: boolean;
   enableDeliveryPharmacies: boolean;
   mailOrderIds?: string;
-  supervisor?: string;
+  supervisor?: SupervisorPrefill;
 }
 
 export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowComponentProps) => {
