@@ -14,7 +14,7 @@ import { Logout } from './views/routes/Logout';
 import { Main } from './views/routes/Main';
 import { NewOrder } from './views/routes/NewOrder';
 import { NotFound } from './views/routes/NotFound';
-import { Order } from './views/routes/Order';
+import { OrderDetailPage } from './views/routes/Order';
 import { Orders } from './views/routes/Orders';
 import { Patient } from './views/routes/PatientDetails';
 import { PatientForm } from './views/routes/NewPatient/PatientForm';
@@ -79,7 +79,7 @@ export const App = () => {
                 <Route path="/orders">
                   <Route path="/orders" element={<Orders />} />
                   <Route path="new" element={<NewOrder />} />
-                  <Route path=":orderId" element={<Order />} />
+                  <Route path=":orderId" element={<OrderDetailPage />} />
                 </Route>
               </Route>
               <Route path="/support" element={<Support />} />

@@ -78,7 +78,7 @@ export function MailOrderPharmacySearch(props: MailOrderPharmacySearchProps) {
         <PharmacySearchInput
           label={
             <div class="mb-2">
-              <label>Search home delivery options</label>
+              <label class="text-sm font-medium">Search home delivery options</label>
             </div>
           }
           options={pharmacyOptions()}
