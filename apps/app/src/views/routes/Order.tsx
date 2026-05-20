@@ -47,108 +47,23 @@ import CopyText from '../components/CopyText';
 import { LocalPickup } from './NewOrder/components/SelectPharmacyCard/components/LocalPickup';
 import { LocationResults, LocationSearch } from '../components/LocationSearch';
 import SectionTitleRow from '../components/SectionTitleRow';
-import { gql, useApolloClient, useMutation, useQuery } from '@apollo/client';
-import { CANCEL_ORDER, REROUTE_ORDER } from '../../mutations';
+import { useApolloClient, useMutation, useQuery } from '@apollo/client';
+import { CANCEL_ORDER, ROUTE_ORDER } from '../../mutations';
 import { TicketModal } from '../components/TicketModal';
 import { Fill, Order as OrderType } from '@photonhealth/sdk/dist/types';
 import { datadogRum } from '@datadog/browser-rum';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 import { StyledToast } from '../components/StyledToast';
-
-const PHARMACY_FRAGMENT = gql`
-  fragment PharmacyFragment on Pharmacy {
-    id
-    name
-    phone
-    address {
-      city
-      country
-      postalCode
-      state
-      street1
-      street2
-    }
-  }
-`;
-
-const PHARMACY_QUERY = gql`
-  ${PHARMACY_FRAGMENT}
-
-  query GetPharmacy($id: ID!) {
-    pharmacy(id: $id) {
-      ...PharmacyFragment
-    }
-  }
-`;
-
-const GET_ORDER_QUERY_NAME = 'GetOrder';
-const GET_ORDER = gql`
-  ${PHARMACY_FRAGMENT}
-
-  query ${GET_ORDER_QUERY_NAME}($id: ID!) {
-    order(id: $id) {
-      __typename
-      id
-      externalId
-      state
-      address {
-        name {
-          full
-        }
-        city
-        country
-        postalCode
-        state
-        street1
-        street2
-      }
-      fills {
-        id
-        prescription {
-          id
-          dispenseQuantity
-          dispenseUnit
-          fillsAllowed
-          instructions
-        }
-        treatment {
-          name
-        }
-        state
-        requestedAt
-        filledAt
-      }
-      patient {
-        id
-        externalId
-        name {
-          full
-        }
-        dateOfBirth
-        sex
-        gender
-        email
-        phone
-      }
-      pharmacy {
-        ...PharmacyFragment
-      }
-      fulfillment {
-        type
-        state
-        carrier
-        trackingNumber
-      }
-      exceptions {
-        type
-        message
-        createdAt
-        resolvedAt
-      }
-      createdAt
-    }
-  }
-`;
+import { RerouteOrderButton } from '../components/RerouteOrderButton';
+import {
+  GET_ORDER,
+  GET_ORDER_QUERY_NAME,
+  getOrderRoutingHistory,
+  PHARMACY_QUERY
+} from '../../queries';
+import { OrderRoutingHistory } from '../../gql/graphql';
+import { OrderState } from 'packages/sdk/src/types';
+import usePermissions from '../../hooks/usePermissions';
 
 export const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.PickUp]: 'Pick up',
@@ -228,22 +143,35 @@ Description:
   `;
 }
 
-export const Order = () => {
+export const OrderDetailPage = () => {
   const params = useParams();
-  const id = params.orderId;
-  const { getToken } = usePhoton();
+  const id = params.orderId!;
+  const { user, getToken, clinicalClient } = usePhoton();
   const { track } = useProviderAnalytics();
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [accessToken, setAccessToken] = useState('');
   const [updating, setUpdating] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [pharmacyId, setPharmacyId] = useState('');
-  const { data, loading, error } = useQuery(GET_ORDER, { variables: { id: id! } });
   const [cancelReason, setCancelReason] = useState('');
   const cancelReasonRef = useRef(cancelReason);
   const client = useApolloClient();
   const theme = useTheme();
   const toast = useToast();
+
+  const canRerouteOrder = usePermissions(['write:order', 'update:order', 'reroute:order'], {
+    hasAny: true
+  });
+
+  const { data, loading, error } = useQuery(GET_ORDER, {
+    variables: { id }
+  });
+
+  const routingHistoryRes = useQuery(getOrderRoutingHistory, {
+    client: clinicalClient,
+    variables: { id }
+  });
+  const routingHistory = routingHistoryRes.data?.order?.routingHistory ?? [];
 
   useEffect(() => {
     cancelReasonRef.current = cancelReason;
@@ -256,7 +184,7 @@ export const Order = () => {
       }
     }
   });
-  const [rerouteOrder] = useMutation(REROUTE_ORDER, {
+  const [routeOrder] = useMutation(ROUTE_ORDER, {
     update: async (cache) => {
       // after routing an order, we need to update the cache with the new pharmacy data optimistically
       const existingOrder: { order: types.Order } | null = cache.readQuery({
@@ -455,8 +383,8 @@ export const Order = () => {
               loadingText="Canceling..."
               isDisabled={
                 loading ||
-                order.state === types.OrderState.Canceled ||
-                order.state === types.OrderState.Completed ||
+                order?.state === types.OrderState.Canceled ||
+                order?.state === types.OrderState.Completed ||
                 order?.fulfillment?.state === 'SHIPPED'
               }
               onClick={async () => {
@@ -556,8 +484,8 @@ export const Order = () => {
                 <Skeleton width="70px" height="24px" borderRadius="xl" />
               ) : (
                 <OrderStatusBadge
-                  fulfillmentState={order.fulfillment?.state}
-                  orderState={order.state}
+                  fulfillmentState={order?.fulfillment?.state}
+                  orderState={order?.state}
                 />
               )}
             </Stack>
@@ -574,7 +502,7 @@ export const Order = () => {
                     <SkeletonText skeletonHeight={5} noOfLines={2} flexGrow={1} />
                   </HStack>
                 ) : (
-                  <PatientView patient={order.patient} />
+                  <PatientView patient={order?.patient} />
                 )}
               </VStack>
 
@@ -590,7 +518,7 @@ export const Order = () => {
                 {loading ? (
                   <SkeletonText skeletonHeight={5} noOfLines={1} width="125px" />
                 ) : (
-                  <Text fontSize="md">{formatDate(order.createdAt)}</Text>
+                  <Text fontSize="md">{formatDate(order?.createdAt)}</Text>
                 )}
               </VStack>
               {order?.externalId ? (
@@ -618,7 +546,14 @@ export const Order = () => {
               w="100%"
               mt={0}
             >
-              <SectionTitleRow headerText="Pharmacy Information" />
+              <SectionTitleRow
+                headerText="Pharmacy Information"
+                rightElement={
+                  canRerouteOrder && order && order?.state !== 'ROUTING' ? (
+                    <RerouteOrderButton organizationId={user.org_id} order={order} />
+                  ) : undefined
+                }
+              />
 
               {order?.state === types.OrderState.Routing ? (
                 <>
@@ -627,13 +562,13 @@ export const Order = () => {
                       <VStack spacing={1} align="start">
                         <VStack spacing={0} align="start">
                           <Text fontSize="md" fontWeight="medium">
-                            {getRoutingOrderStatusText(order)}
+                            {getRoutingOrderStatusText(order, routingHistory)}
                           </Text>
                           <Text fontSize="md" color="gray.500">
-                            {getRoutingOrderSubText(order)}
+                            {getRoutingOrderSubText(order, routingHistory)}
                           </Text>
                         </VStack>
-                        {shouldShowSelectPharmacyButton(order) ? (
+                        {shouldShowSelectPharmacyButton(order, routingHistory) ? (
                           <Button
                             onClick={() => {
                               datadogRum.addAction('select_pharmacy_btn_click', {
@@ -713,7 +648,7 @@ export const Order = () => {
                                 orderId: id,
                                 pharmacyId
                               });
-                              await rerouteOrder({ variables: { id, pharmacyId } });
+                              await routeOrder({ variables: { id, pharmacyId } });
                               setPharmacyId('');
                               onClose();
                             } catch (error) {
@@ -743,57 +678,61 @@ export const Order = () => {
                 </>
               ) : null}
 
-              <InfoGrid name="Name">
-                {loading ? (
-                  <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-                ) : order?.pharmacy?.name ? (
-                  <Text fontSize="md">{order.pharmacy.name}</Text>
-                ) : (
-                  <Text fontSize="md" as="i" color="gray.500">
-                    None
-                  </Text>
-                )}
-              </InfoGrid>
+              {order?.state !== 'ROUTING' && (
+                <>
+                  <InfoGrid name="Name">
+                    {loading ? (
+                      <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                    ) : order?.pharmacy?.name ? (
+                      <Text fontSize="md">{order.pharmacy.name}</Text>
+                    ) : (
+                      <Text fontSize="md" as="i" color="gray.500">
+                        None
+                      </Text>
+                    )}
+                  </InfoGrid>
 
-              <InfoGrid name="Phone">
-                {loading ? (
-                  <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-                ) : order?.pharmacy?.phone ? (
-                  <Link fontSize="md" href={`tel:${order.pharmacy.phone}`} isExternal>
-                    {formatPhone(order.pharmacy.phone)}
-                  </Link>
-                ) : (
-                  <Text fontSize="md" as="i" color="gray.500">
-                    None
-                  </Text>
-                )}
-              </InfoGrid>
+                  <InfoGrid name="Phone">
+                    {loading ? (
+                      <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                    ) : order?.pharmacy?.phone ? (
+                      <Link fontSize="md" href={`tel:${order.pharmacy.phone}`} isExternal>
+                        {formatPhone(order.pharmacy.phone)}
+                      </Link>
+                    ) : (
+                      <Text fontSize="md" as="i" color="gray.500">
+                        None
+                      </Text>
+                    )}
+                  </InfoGrid>
 
-              <InfoGrid name="Address">
-                {loading ? (
-                  <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-                ) : order?.pharmacy?.address ? (
-                  <Text fontSize="md">{formatAddress(order.pharmacy.address)}</Text>
-                ) : (
-                  <Text fontSize="md" as="i" color="gray.500">
-                    None
-                  </Text>
-                )}
-              </InfoGrid>
+                  <InfoGrid name="Address">
+                    {loading ? (
+                      <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                    ) : order?.pharmacy?.address ? (
+                      <Text fontSize="md">{formatAddress(order.pharmacy.address)}</Text>
+                    ) : (
+                      <Text fontSize="md" as="i" color="gray.500">
+                        None
+                      </Text>
+                    )}
+                  </InfoGrid>
 
-              <InfoGrid name="Id">
-                {loading ? (
-                  <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-                ) : order?.pharmacy?.id ? (
-                  <CopyText text={order.pharmacy.id} />
-                ) : (
-                  <Text fontSize="md" as="i" color="gray.500">
-                    None
-                  </Text>
-                )}
-              </InfoGrid>
+                  <InfoGrid name="Id">
+                    {loading ? (
+                      <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                    ) : order?.pharmacy?.id ? (
+                      <CopyText text={order.pharmacy.id} />
+                    ) : (
+                      <Text fontSize="md" as="i" color="gray.500">
+                        None
+                      </Text>
+                    )}
+                  </InfoGrid>
+                </>
+              )}
 
-              {!loading && order.fulfillment?.type === 'MAIL_ORDER' ? (
+              {!loading && order?.fulfillment?.type === 'MAIL_ORDER' ? (
                 <>
                   <InfoGrid name="Delivery Address">
                     {order?.address ? (
@@ -870,23 +809,48 @@ export const Order = () => {
   );
 };
 
-function getRoutingOrderStatusText(order: OrderType) {
-  return isOrderMissingPharmacy(order)
-    ? 'This order is pending pharmacy selection by the patient.'
-    : 'This order is pending pharmacy confirmation by the patient.';
+function getRoutingOrderStatusText(order: OrderType, routingHistory: OrderRoutingHistory[]) {
+  switch (true) {
+    case inPreferredPharmacyRoutingWindow(order, routingHistory):
+      return 'This order is pending pharmacy confirmation by the patient.';
+    case isRequestingRerouteFromPatient(order, routingHistory):
+      return 'This order is pending a pharmacy reroute selection from the patient.';
+    default: // initial STP flow, never had an initial pharmacy selection
+      return 'This order is pending pharmacy selection by the patient.';
+  }
 }
 
-function getRoutingOrderSubText(order: OrderType) {
-  return isOrderMissingPharmacy(order)
-    ? 'Select a pharmacy for the patient if needed.'
-    : 'The order will be routed to the below pharmacy if the patient does not confirm within 15 minutes.';
+function getRoutingOrderSubText(order: OrderType, routingHistory: OrderRoutingHistory[]) {
+  switch (true) {
+    case inPreferredPharmacyRoutingWindow(order, routingHistory):
+      return 'The order will be routed to the below pharmacy if the patient does not confirm within 15 minutes.';
+    default:
+      return 'Select a pharmacy for the patient if needed.';
+  }
 }
 
-function shouldShowSelectPharmacyButton(order: OrderType): boolean {
-  const shouldShowButton = isOrderMissingPharmacy(order);
-  return shouldShowButton;
+function shouldShowSelectPharmacyButton(
+  order: OrderType,
+  routingHistory: OrderRoutingHistory[]
+): boolean {
+  return (
+    inPreferredPharmacyRoutingWindow(order, routingHistory) ||
+    isRequestingRerouteFromPatient(order, routingHistory)
+  );
 }
 
-function isOrderMissingPharmacy(order: OrderType): boolean {
-  return order.pharmacy === null || order.pharmacy === undefined;
+function inPreferredPharmacyRoutingWindow(order: OrderType, routingHistory: OrderRoutingHistory[]) {
+  const isRouting = order.state === OrderState.Routing;
+  const hasPharmacy = !!order.pharmacy;
+  const isInitialRoute = !routingHistory.length;
+
+  return isRouting && hasPharmacy && isInitialRoute;
+}
+
+function isRequestingRerouteFromPatient(order: OrderType, routingHistory: OrderRoutingHistory[]) {
+  const isRouting = order.state === OrderState.Routing;
+  const hasPharmacy = !!order.pharmacy;
+  const isInitialRoute = !routingHistory.length;
+
+  return isRouting && hasPharmacy && !isInitialRoute;
 }

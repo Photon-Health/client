@@ -29,6 +29,10 @@ const ANALYTICS_CONTEXT_QUERY = gql`
         middle
         title
       }
+      roles {
+        id
+        name
+      }
     }
     organization {
       customer {
@@ -50,6 +54,7 @@ export interface ProviderContextData {
   providerName?: string;
   providerNameFirst?: string;
   providerNameLast?: string;
+  providerRoles?: string[];
   // Organization info
   orgId?: string;
   orgName?: string;
@@ -119,6 +124,7 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
       providerName: data?.me?.name?.full,
       providerNameFirst: data?.me?.name?.first,
       providerNameLast: data?.me?.name?.last,
+      providerRoles: data?.me?.roles?.map((role: { name: string }) => role.name),
       // Organization info
       orgId: data?.organization?.id,
       orgName: data?.organization?.name,
