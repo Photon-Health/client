@@ -77,8 +77,7 @@ export const createSupervisorFetch = async (
   }
 
   if (!hasRequiredFields(parsed)) {
-    // TODO: Add missing fields to error message
-    return { errors: ['Missing required fields'] };
+    return { errors: ['Missing required supervisor fields'] };
   }
 
   try {

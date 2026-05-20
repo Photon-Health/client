@@ -219,6 +219,7 @@ test('emits supervisor error event when required fields are missing', async () =
   const detail = supervisorErrorEvents[0].detail as { errors: string[] };
   expect(Array.isArray(detail.errors)).toBe(true);
   expect(detail.errors.length).toBeGreaterThan(0);
+  expect(detail.errors[0]).toEqual('Missing required supervisor fields');
 
   expect(createSupervisorSpy).not.toHaveBeenCalled();
 
