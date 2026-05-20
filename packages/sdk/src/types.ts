@@ -949,6 +949,7 @@ export type Permission =
   | 'edit:profile_self'
   | 'manage:organization'
   | 'manage:user_roles'
+  | 'reroute:order'
   | 'read:client'
   | 'read:invite'
   | 'read:order'

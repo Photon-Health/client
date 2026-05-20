@@ -10,7 +10,7 @@ export const CANCEL_ORDER = gql`
   }
 `;
 
-export const REROUTE_ORDER = gql`
+export const ROUTE_ORDER = gql`
   mutation RouteOrder($id: ID!, $pharmacyId: ID!) {
     routeOrder(id: $id, pharmacyId: $pharmacyId) {
       id
