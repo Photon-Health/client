@@ -53,6 +53,12 @@ const servicesHandlers = [
     })
   ),
 
+  clinicalGql.query('SupervisorCardQuery', () =>
+    HttpResponse.json({
+      data: { supervisors: [], mostRecentSupervisor: null }
+    })
+  ),
+
   clinicalGql.query('AnalyticsContextQuery', () =>
     HttpResponse.json({
       data: {

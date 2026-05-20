@@ -6,74 +6,49 @@ import {
   ComboBox,
   Input,
   InputGroup,
+  NewSupervisorInput,
   Text,
   triggerToast,
-  usePhoton
+  useSupervisor
 } from '@photonhealth/components';
-import { createMemo, createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, createUniqueId, For, Show } from 'solid-js';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
-import { CreateSupervisorMutation, SupervisorCardQuery } from '@photonhealth/sdk';
 import { SupervisorCardFragment } from '@photonhealth/sdk/dist/clinical-api/types';
-
-const sortSupervisors = (supervisors: SupervisorCardFragment[]) =>
-  [...supervisors].sort(
-    (a, b) => a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName)
-  );
 
 const displaySupervisor = (supervisor?: SupervisorCardFragment) =>
   supervisor?.id
     ? `${supervisor.firstName} ${supervisor.lastName}, ${supervisor.npi}`
     : 'Select a supervisor';
 
-interface SupervisorCardProps {
-  actions: Record<string, (...args: any) => any>;
-  store: Record<string, any>;
-}
-
-export const SupervisorCard = (props: SupervisorCardProps) => {
-  const client = usePhoton();
-  const [supervisors, setSupervisors] = createSignal<SupervisorCardFragment[]>([]);
+export const SupervisorCard = () => {
+  const {
+    supervisorId,
+    setSupervisorId,
+    supervisors,
+    hasMostRecentSupervisor,
+    createSupervisor
+  } = useSupervisor();
   const [filteredSupervisors, setFilteredSupervisors] = createSignal<SupervisorCardFragment[]>([]);
-  const [hasMostRecentSupervisor, setHasMostRecentSupervisor] = createSignal<boolean>(false);
-  const currentSupervisor = createMemo(() =>
-    supervisors().find((s) => s.id === props.store.supervisorId?.value)
-  );
+  const currentSupervisor = createMemo(() => supervisors().find((s) => s.id === supervisorId()));
+
+  // Keep the filtered view in sync with the upstream list (initial load + new
+  // creates). User typing replaces this via the onInput handler below.
+  createEffect(() => {
+    setFilteredSupervisors(supervisors());
+  });
 
   const filterSupervisors = (query: string) => {
     const q = query.toLowerCase();
     if (!q) {
       return supervisors();
     }
-    const filtered = supervisors().filter((s) => displaySupervisor(s).toLowerCase().includes(q));
-    return filtered;
+    return supervisors().filter((s) => displaySupervisor(s).toLowerCase().includes(q));
   };
 
-  onMount(async () => {
-    const {
-      data: { supervisors, mostRecentSupervisor }
-    } = await client.sdk.apolloClinical.query({
-      query: SupervisorCardQuery,
-      // This query takes no variables so nothing indicates to the
-      // client-side cache when to refetch the data
-      fetchPolicy: 'network-only'
-    });
-
-    const supervisorsResult = sortSupervisors(supervisors.filter((s) => !!s));
-    setSupervisors(supervisorsResult);
-    setFilteredSupervisors(supervisorsResult);
-    if (mostRecentSupervisor) {
-      props.actions.updateFormValue({
-        key: 'supervisorId',
-        value: mostRecentSupervisor.id
-      });
-      setHasMostRecentSupervisor(true);
-    }
-  });
-
-  const handleSupervisorCreated = (supervisor: SupervisorCardFragment) => {
-    setSupervisors((prev) => sortSupervisors([...prev, supervisor]));
-    props.actions.updateFormValue({ key: 'supervisorId', value: supervisor.id });
+  const handleSubmit = async (input: NewSupervisorInput) => {
+    const supervisor = await createSupervisor(input);
+    return supervisor !== undefined;
   };
 
   return (
@@ -91,10 +66,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
             <ComboBox<SupervisorCardFragment>
               value={currentSupervisor()}
               setSelected={(value?: SupervisorCardFragment) => {
-                props.actions.updateFormValue({
-                  key: 'supervisorId',
-                  value: value?.id || undefined
-                });
+                setSupervisorId(value?.id || undefined);
                 setFilteredSupervisors(supervisors());
               }}
             >
@@ -117,10 +89,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
             </ComboBox>
           </InputGroup>
         </Show>
-        <NewSupervisorForm
-          hasSupervisors={supervisors().length > 0}
-          onCreated={handleSupervisorCreated}
-        />
+        <NewSupervisorForm hasSupervisors={supervisors().length > 0} onSubmit={handleSubmit} />
       </div>
     </Card>
   );
@@ -138,11 +107,10 @@ const supervisorSchema = zod.object({
 
 interface NewSupervisorFormProps {
   hasSupervisors: boolean;
-  onCreated: (supervisor: SupervisorCardFragment) => void;
+  onSubmit: (input: NewSupervisorInput) => Promise<boolean>;
 }
 
 const NewSupervisorForm = (props: NewSupervisorFormProps) => {
-  const client = usePhoton();
   const formId = createUniqueId();
   const [submitting, setSubmitting] = createSignal(false);
   const [isOpen, setIsOpen] = createSignal(false);
@@ -152,28 +120,22 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
       setSubmitting(true);
       try {
         validate();
-        if (!isValid()) {
-          throw new Error();
-        }
-        const { data } = await client.sdk.apolloClinical.mutate({
-          mutation: CreateSupervisorMutation,
-          variables: {
-            firstName: values.firstName,
-            lastName: values.lastName,
-            npi: String(values.npi)
-          }
+        if (!isValid()) return;
+        const ok = await props.onSubmit({
+          firstName: values.firstName,
+          lastName: values.lastName,
+          npi: String(values.npi)
         });
-        if (data?.createSupervisor) {
-          props.onCreated(data.createSupervisor);
+        if (ok) {
           setIsOpen(false);
           reset();
+        } else {
+          triggerToast({
+            header: 'Error creating new supervisor',
+            body: 'Please try again.',
+            status: 'error'
+          });
         }
-      } catch {
-        triggerToast({
-          header: 'Error creating new supervisor',
-          body: 'Please try again.',
-          status: 'error'
-        });
       } finally {
         setSubmitting(false);
       }

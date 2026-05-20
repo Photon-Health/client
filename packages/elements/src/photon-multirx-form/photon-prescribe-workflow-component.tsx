@@ -45,8 +45,7 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
     treatment: undefined,
     pharmacy: undefined,
     errors: [],
-    address: undefined,
-    supervisorId: undefined
+    address: undefined
   });
 
   onCleanup(() => {

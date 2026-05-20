@@ -154,7 +154,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchClinicalAlertCancel,
     dispatchAnalyticsTrackEvent
   } = usePrescribeEventDispatch();
-  const { supervisorId: prefilledSupervisorId } = useSupervisor();
+  const { supervisorId: ctxSupervisorId } = useSupervisor();
   const [needsSupervisor, setNeedsSupervisor] = createSignal<boolean>(false);
 
   const client = usePhoton();
@@ -331,9 +331,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   };
 
-  createEffect(() => {
-    props.formActions.updateFormValue({ key: 'supervisorId', value: prefilledSupervisorId() });
-  });
 
   // submits the form to create a new order
   const submitForm = async () => {
@@ -467,10 +464,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         pharmacyId = '';
       }
 
-      const supervisorId = props.formStore.supervisorId?.value
-        ? props.formStore.supervisorId.value
-        : undefined;
-
       const { data: orderData, errors } = await orderMutation({
         variables: {
           ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
@@ -486,7 +479,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           fills: prescriptionIds().map((id) => ({
             prescriptionId: id
           })),
-          supervisorId: supervisorId
+          supervisorId: ctxSupervisorId()
         },
         refetchQueries: [],
         awaitRefetchQueries: false
@@ -668,7 +661,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   disableList={props.disableList}
                 />
                 <Show when={props.enableOrder && needsSupervisor()}>
-                  <SupervisorCard actions={props.formActions} store={props.formStore} />
+                  <SupervisorCard />
                 </Show>
                 <Show when={props.enableOrder && !pharmacySelectionContext.isAutoRouted()}>
                   <OrderCard store={props.formStore} />
