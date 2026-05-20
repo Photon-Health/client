@@ -106,27 +106,6 @@ export const Main = () => {
   const settings = order?.organization.settings;
 
   useEffect(() => {
-    if (order) {
-      patientAnalytics.identify({
-        userId: order.patient.id,
-        address: order.address
-          ? {
-              city: order.address.city,
-              country: order.address.country,
-              postalCode: order.address.postalCode,
-              state: order.address.state,
-              street: order.address.street2
-                ? `${order.address.street1}, ${order.address.street2}`
-                : order.address.street1
-            }
-          : undefined,
-        orgId: order.organization.id,
-        orgName: order.organization.name
-      });
-    }
-  }, [order?.patient.id, order?.organization.id, order?.organization.name, order?.address]);
-
-  useEffect(() => {
     // need to parse the token and see if this is a controlled substance link
     let tokenData: TokenPayload | undefined;
     try {
@@ -167,7 +146,22 @@ export const Main = () => {
 
       const newFlattenedFills = countFillsAndRemoveDuplicates(newOrder.fills);
       setFlattenedFills(newFlattenedFills);
-
+      patientAnalytics.identify({
+        userId: newOrder.patient.id,
+        address: newOrder.address
+          ? {
+              city: newOrder.address.city,
+              country: newOrder.address.country,
+              postalCode: newOrder.address.postalCode,
+              state: newOrder.address.state,
+              street: newOrder.address.street2
+                ? `${newOrder.address.street1}, ${newOrder.address.street2}`
+                : newOrder.address.street1
+            }
+          : undefined,
+        orgId: newOrder.organization.id,
+        orgName: newOrder.organization.name
+      });
       patientAnalytics.track('Patient App Opened', newOrder, {});
     },
     [orderId, order]

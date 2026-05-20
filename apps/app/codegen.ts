@@ -14,6 +14,9 @@ const config: CodegenConfig = {
   schema: schemaByEnv[env],
   documents: [
     'src/**/Settings/**/*.tsx',
+    // should move all future queries/mutations to these two folders, for reusability and codegen
+    'src/queries/clinical-api/*.ts',
+    'src/mutations/clinical-api/*.ts',
     'src/views/routes/PrescriptionForm.tsx',
     'src/views/routes/UpdatePatientForm.tsx',
     'src/views/routes/NewPatient/PatientForm.tsx',
