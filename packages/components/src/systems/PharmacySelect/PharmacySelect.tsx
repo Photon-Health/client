@@ -39,6 +39,7 @@ interface PharmacySelectProps {
   hasPreferredPharmacy?: boolean;
   inferSendToPatientPharmacy?: boolean;
   stickyTabHeader?: boolean;
+  enableSavingPreferredPharmacy?: boolean;
 }
 
 const fulfillmentOptions: FulfillmentOptions = [
@@ -191,6 +192,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
                     pharmacySelectionContext.setPharmacyId(pharmacy.id);
                   }
                 }}
+                hidePreferred={!(props.enableSavingPreferredPharmacy ?? true)}
                 setPreferred={(shouldSetPreferred) => {
                   pharmacySelectionContext.setUpdatePreferredPharmacy(shouldSetPreferred);
                   dispatchAnalyticsTrackEvent('fieldInteraction', {
