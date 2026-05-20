@@ -8,9 +8,11 @@ import { clinicalGql, defaultHandlers, lambdasGql, TREATMENT } from '@photonheal
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
 import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
 import {
+  generateAddress,
   generateGqlSupervisor,
   generatePatient,
-  generateSupervisorJson
+  generateSupervisorJson,
+  generateUser
 } from './test-utils/generators';
 import { stubGoogleMaps } from './test-utils/stub-google-maps';
 
@@ -77,7 +79,20 @@ test('creates supervisor and attaches to order', async () => {
     })
   );
 
-  const supervisorPrefill = generateSupervisorJson();
+  const supervisorPrefill = generateSupervisorJson({
+    firstName: 'test-fn',
+    lastName: 'test-ln',
+    address: generateAddress({
+      country: 'test-country',
+      city: 'test-city',
+      postalCode: 'test-zip',
+      state: 'test-state',
+      street1: 'test-street1'
+    }),
+    npi: 'test-npi',
+    phone: 'test-phone'
+  });
+
   const { user, waitForPrescribeForm, addDraftPrescription } = renderPrescribeWorkflow({
     enableOrder: true,
     enableSendToPatient: true,
@@ -115,14 +130,9 @@ test('creates supervisor and does not show visually to user', async () => {
   server.use(
     clinicalGql.query('MeUserQuery', () =>
       HttpResponse.json({
-        data: {
-          me: {
-            __typename: 'User',
-            id: 'usr_testId1111',
-            credentials: 'NP',
-            address: { __typename: 'Address', state: 'CA' }
-          }
-        }
+        // don't assume users will have a credentials that requires a Supervisor
+        // Supervisor can be passed in by customer to force set the supervisor.
+        data: { me: generateUser({ credentials: null }) }
       })
     ),
     clinicalGql.mutation('CreateSupervisorMutation', () =>
@@ -147,7 +157,7 @@ test('creates supervisor and does not show visually to user', async () => {
   await addDraftPrescription();
   await screen.findByText(TREATMENT.name, {}, { timeout: 3000 });
 
-  // None of the SupervisorCard UI surfaces.
+  // None of the SupervisorCard UI surfaces, because user does not have NP/PA credentials
   expect(screen.queryAllByText(/supervising physician/i)).toHaveLength(0);
   expect(screen.queryByLabelText(/^supervisor$/i)).toBeNull();
   expect(screen.queryByRole('button', { name: /add supervisor/i })).toBeNull();
@@ -174,7 +184,7 @@ test('emits supervisor error event when JSON is malformed', async () => {
 
   expect(supervisorErrorEvents[0].detail).toEqual(
     expect.objectContaining({
-      errors: expect.arrayContaining([expect.any(String)])
+      errors: expect.arrayContaining(['Invalid supervisor json passed in'])
     })
   );
 

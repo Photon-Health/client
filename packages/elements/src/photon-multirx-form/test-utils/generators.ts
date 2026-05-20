@@ -1,5 +1,10 @@
 import { Address, Patient, Pharmacy, SexType } from '@photonhealth/sdk/dist/types';
-import { SupervisorCardFragment } from '@photonhealth/sdk/dist/clinical-api/types';
+import {
+  MeUserQueryQuery,
+  SupervisorCardFragment
+} from '@photonhealth/sdk/dist/clinical-api/types';
+
+type MeUser = MeUserQueryQuery['me'];
 
 export function generatePatient(overrides: Partial<Patient> = {}): Patient {
   return {
@@ -24,7 +29,7 @@ export function generatePatient(overrides: Partial<Patient> = {}): Patient {
 export function generateAddress(overrides: Partial<Address> = {}): Address {
   return {
     __typename: 'Address',
-    id: 'addr_1',
+    id: undefined,
     name: null,
     street1: '1 Main',
     street2: null,
@@ -41,14 +46,7 @@ type SupervisorJsonShape = {
   lastName: string;
   npi: string;
   phone: string;
-  address: {
-    country: string;
-    city: string;
-    postalCode: string;
-    state: string;
-    street1: string;
-    street2: string | null;
-  };
+  address: Address;
 };
 
 export function generateSupervisorJson(overrides: Partial<SupervisorJsonShape> = {}): string {
@@ -78,6 +76,16 @@ export function generateGqlSupervisor(
     firstName: 'test-supervisor-fn',
     lastName: 'test-supervisor-ln',
     npi: 'test-supervisor-npi',
+    ...overrides
+  };
+}
+
+export function generateUser(overrides: Partial<MeUser> = {}): MeUser {
+  return {
+    __typename: 'User',
+    id: 'usr_testId1111',
+    credentials: null,
+    address: { __typename: 'Address', state: 'CA' },
     ...overrides
   };
 }

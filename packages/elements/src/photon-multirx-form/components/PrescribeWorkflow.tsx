@@ -23,7 +23,7 @@ import {
   usePrescribeEventDispatch,
   useRecentOrders
 } from '@photonhealth/components';
-import { MeUserQuery, types } from '@photonhealth/sdk';
+import { CreateSupervisorMutation, MeUserQuery, types } from '@photonhealth/sdk';
 import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
@@ -340,8 +340,16 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       return;
     }
 
+    let supervisor: Partial<SupervisorInput>;
     try {
-      const supervisor = JSON.parse(supervisorRawInput) as Partial<SupervisorInput>;
+      supervisor = JSON.parse(supervisorRawInput) as Partial<SupervisorInput>;
+    } catch {
+      dispatchSupervisorError(['Invalid supervisor json passed in']);
+      props.formActions.updateFormValue({ key: 'supervisorId', value: undefined });
+      return;
+    }
+
+    try {
       if (
         !(
           supervisor.firstName &&
@@ -358,6 +366,32 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         // TODO: Add missing fields to error message
         throw new Error('Missing required fields');
       }
+
+      client.sdk.apolloClinical
+        .mutate({
+          mutation: CreateSupervisorMutation,
+          variables: {
+            firstName: supervisor.firstName,
+            lastName: supervisor.lastName,
+            npi: supervisor.npi,
+            phone: supervisor.phone,
+            address: supervisor.address
+          }
+        })
+        .then((result) => {
+          if (result.data) {
+            props.formActions.updateFormValue({
+              key: 'supervisorId',
+              value: result.data.createSupervisor.id
+            });
+          } else if (result.errors) {
+            throw new Error(result.errors[0].message);
+          }
+        })
+        .catch((e) => {
+          dispatchSupervisorError([(e as Error).message]);
+          props.formActions.updateFormValue({ key: 'supervisorId', value: undefined });
+        });
     } catch (e) {
       dispatchSupervisorError([(e as Error).message]);
       props.formActions.updateFormValue({ key: 'supervisorId', value: undefined });
@@ -496,10 +530,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         pharmacyId = '';
       }
 
-      const supervisorId =
-        needsSupervisor() && props.formStore.supervisorId?.value
-          ? props.formStore.supervisorId.value
-          : undefined;
+      const supervisorId = props.formStore.supervisorId?.value
+        ? props.formStore.supervisorId.value
+        : undefined;
 
       const { data: orderData, errors } = await orderMutation({
         variables: {
