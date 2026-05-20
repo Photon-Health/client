@@ -12,6 +12,7 @@ import { PharmacyRoutingAlert } from '../RoutingConstraints';
 import { Alert } from '../../particles/Alert';
 import { MailOrderPharmacySearch } from '../PharmacySearch/MailOrderPharmacySearch';
 import { PharmacyOption } from '../PharmacySearch/PharmacySearch';
+import clsx from 'clsx';
 
 enum SendToPatientEnum {
   sendToPatient = 'SEND_TO_PATIENT'
@@ -36,6 +37,9 @@ interface PharmacySelectProps {
   patientIds?: string[];
   address?: string;
   hasPreferredPharmacy?: boolean;
+  inferSendToPatientPharmacy?: boolean;
+  stickyTabHeader?: boolean;
+  enableSavingPreferredPharmacy?: boolean;
 }
 
 const fulfillmentOptions: FulfillmentOptions = [
@@ -149,7 +153,9 @@ export function PharmacySelect(props: PharmacySelectProps) {
 
   return (
     <div>
-      <Tabs<TabNamesEnum> tabs={tabs()} activeTab={activeTab()} setActiveTab={handleTabChange} />
+      <div class={clsx({ 'sticky top-0 bg-white z-10': props.stickyTabHeader ?? false })}>
+        <Tabs<TabNamesEnum> tabs={tabs()} activeTab={activeTab()} setActiveTab={handleTabChange} />
+      </div>
       <div class="pt-4">
         <Show when={tabs().includes(TabNamesEnum.sendToPatient)}>
           <div class={activeTab() !== TabNamesEnum.sendToPatient ? 'hidden' : ''}>
@@ -157,7 +163,10 @@ export function PharmacySelect(props: PharmacySelectProps) {
               when={(props?.patientIds?.length || 0) > 0}
               fallback={<div>Please select a patient.</div>}
             >
-              <SendToPatient patientId={props.patientIds![0]} />
+              <SendToPatient
+                patientId={props.patientIds![0]}
+                inferSendToPatientPharmacy={props.inferSendToPatientPharmacy}
+              />
             </Show>
           </div>
         </Show>
@@ -183,6 +192,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
                     pharmacySelectionContext.setPharmacyId(pharmacy.id);
                   }
                 }}
+                hidePreferred={!(props.enableSavingPreferredPharmacy ?? true)}
                 setPreferred={(shouldSetPreferred) => {
                   pharmacySelectionContext.setUpdatePreferredPharmacy(shouldSetPreferred);
                   dispatchAnalyticsTrackEvent('fieldInteraction', {
@@ -223,7 +233,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
                 />
                 {(pharmacySelectionContext.mailOrderPharmacyIds()?.length ?? 0) > 0 && (
                   <div class="space-y-2">
-                    <label>Choose a partner pharmacy</label>
+                    <label class="text-sm font-medium">Choose a partner pharmacy</label>
                     <RadioGroupCards
                       label="Pharmacies"
                       value={mailOrderId()}

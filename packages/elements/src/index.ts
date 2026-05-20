@@ -11,3 +11,4 @@ import './photon-medication-search';
 import './photon-add-medication-history-dialog';
 import './photon-med-history';
 import './photon-multirx-form-wrapper';
+import './photon-pharmacy-select';
