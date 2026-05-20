@@ -248,7 +248,7 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
         loading={fetchingPharmacies()}
         label={
           <div class="w-full flex flex-col sm:flex-row sm:items-center mb-2">
-            <label class="whitespace-nowrap mr-1">Showing near:</label>
+            <label class="text-sm font-medium whitespace-nowrap mr-1">Showing near:</label>
             <Show when={!fetchingPreferred()} fallback={<Spinner size="sm" />}>
               <button
                 type="button"
