@@ -21,15 +21,15 @@ import {
   usePharmacySelectionContext,
   usePhoton,
   usePrescribeEventDispatch,
-  useRecentOrders
+  useRecentOrders,
+  useSupervisor
 } from '@photonhealth/components';
-import { CreateSupervisorMutation, MeUserQuery, types } from '@photonhealth/sdk';
+import { MeUserQuery, types } from '@photonhealth/sdk';
 import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
 import { SupervisorCard } from './SupervisorCard';
 import { PrescriptionCard } from './PrescriptionCard/PrescriptionCard';
-import { SupervisorInput } from '@photonhealth/sdk/dist/clinical-api/types';
 
 const hasUsableAddress = (address?: {
   street1?: string;
@@ -99,7 +99,6 @@ export type PrescribeProps = {
   allowOffCatalogSearch?: boolean;
   disableList?: DisableList;
   groupId?: string;
-  supervisor?: string;
 };
 
 export const ScreenDraftedPrescriptionsQuery = gql`
@@ -153,9 +152,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchOrderError,
     dispatchClinicalAlertAcknowledge,
     dispatchClinicalAlertCancel,
-    dispatchAnalyticsTrackEvent,
-    dispatchSupervisorError
+    dispatchAnalyticsTrackEvent
   } = usePrescribeEventDispatch();
+  const { supervisorId: prefilledSupervisorId } = useSupervisor();
   const [needsSupervisor, setNeedsSupervisor] = createSignal<boolean>(false);
 
   const client = usePhoton();
@@ -333,69 +332,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   };
 
   createEffect(() => {
-    const supervisorRawInput = props.supervisor;
-    if (!supervisorRawInput) {
-      // Clear supervisor from formStore
-      props.formActions.updateFormValue({ key: 'supervisorId', value: undefined });
-      return;
-    }
-
-    let supervisor: Partial<SupervisorInput>;
-    try {
-      supervisor = JSON.parse(supervisorRawInput) as Partial<SupervisorInput>;
-    } catch {
-      dispatchSupervisorError(['Invalid supervisor json passed in']);
-      props.formActions.updateFormValue({ key: 'supervisorId', value: undefined });
-      return;
-    }
-
-    try {
-      if (
-        !(
-          supervisor.firstName &&
-          supervisor.lastName &&
-          supervisor.npi &&
-          supervisor.phone &&
-          supervisor.address &&
-          supervisor.address.street1 &&
-          supervisor.address.city &&
-          supervisor.address.state &&
-          supervisor.address.postalCode
-        )
-      ) {
-        // TODO: Add missing fields to error message
-        throw new Error('Missing required fields');
-      }
-
-      client.sdk.apolloClinical
-        .mutate({
-          mutation: CreateSupervisorMutation,
-          variables: {
-            firstName: supervisor.firstName,
-            lastName: supervisor.lastName,
-            npi: supervisor.npi,
-            phone: supervisor.phone,
-            address: supervisor.address
-          }
-        })
-        .then((result) => {
-          if (result.data) {
-            props.formActions.updateFormValue({
-              key: 'supervisorId',
-              value: result.data.createSupervisor.id
-            });
-          } else if (result.errors) {
-            throw new Error(result.errors[0].message);
-          }
-        })
-        .catch((e) => {
-          dispatchSupervisorError([(e as Error).message]);
-          props.formActions.updateFormValue({ key: 'supervisorId', value: undefined });
-        });
-    } catch (e) {
-      dispatchSupervisorError([(e as Error).message]);
-      props.formActions.updateFormValue({ key: 'supervisorId', value: undefined });
-    }
+    props.formActions.updateFormValue({ key: 'supervisorId', value: prefilledSupervisorId() });
   });
 
   // submits the form to create a new order
