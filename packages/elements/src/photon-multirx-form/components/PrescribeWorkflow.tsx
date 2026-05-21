@@ -709,7 +709,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     </div>
                   </Show>
                   <div class="flex flex-row justify-end">
-                    <Button loading={isLoadingPrefills() || isLoading()} onClick={combineOrSubmit}>
+                    <Button
+                      class="w-full sm:w-fit"
+                      loading={isLoadingPrefills() || isLoading()}
+                      onClick={combineOrSubmit}
+                    >
                       Send
                     </Button>
                   </div>
