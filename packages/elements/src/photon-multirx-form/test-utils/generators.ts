@@ -1,4 +1,10 @@
 import { Address, Patient, Pharmacy, SexType } from '@photonhealth/sdk/dist/types';
+import {
+  MeUserQueryQuery,
+  SupervisorCardFragment
+} from '@photonhealth/sdk/dist/clinical-api/types';
+
+type MeUser = MeUserQueryQuery['me'];
 
 export function generatePatient(overrides: Partial<Patient> = {}): Patient {
   return {
@@ -22,8 +28,7 @@ export function generatePatient(overrides: Partial<Patient> = {}): Patient {
 }
 export function generateAddress(overrides: Partial<Address> = {}): Address {
   return {
-    __typename: 'Address',
-    id: 'addr_1',
+    id: undefined,
     name: null,
     street1: '1 Main',
     street2: null,
@@ -31,6 +36,57 @@ export function generateAddress(overrides: Partial<Address> = {}): Address {
     state: 'NY',
     postalCode: '10001',
     country: 'US',
+    ...overrides
+  };
+}
+
+export type SupervisorPrefillShape = {
+  firstName: string;
+  lastName: string;
+  npi: string;
+  phone: string;
+  address: Address;
+};
+
+export function generateSupervisorPrefill(
+  overrides: Partial<SupervisorPrefillShape> = {}
+): Partial<SupervisorPrefillShape> {
+  return {
+    firstName: 'Jane',
+    lastName: 'Doe',
+    address: generateAddress({
+      country: 'US',
+      city: 'Brooklyn',
+      postalCode: '11120',
+      state: 'NY',
+      street1: '201 N 8th St',
+      street2: null
+    }),
+    npi: '1234567890',
+    phone: '+11234567890',
+    ...overrides
+  };
+}
+
+export function generateGqlSupervisor(
+  overrides: Partial<SupervisorCardFragment> = {}
+): SupervisorCardFragment {
+  return {
+    __typename: 'Supervisor',
+    id: 'sup_defaultTestId',
+    firstName: 'test-supervisor-fn',
+    lastName: 'test-supervisor-ln',
+    npi: 'test-supervisor-npi',
+    ...overrides
+  };
+}
+
+export function generateUser(overrides: Partial<MeUser> = {}): MeUser {
+  return {
+    __typename: 'User',
+    id: 'usr_testId1111',
+    credentials: null,
+    address: { __typename: 'Address', state: 'CA' },
     ...overrides
   };
 }
