@@ -17,11 +17,16 @@ export function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponen
   // Listeners must be attached BEFORE render so events fired during mount aren't missed.
   const analyticsEvents: CustomEvent[] = [];
   const attestationResolvedEvents: Event[] = [];
+  const supervisorErrorEvents: CustomEvent[] = [];
+
   eventListenerHost.addEventListener('photon-analytics-track-event', (event: Event) => {
     analyticsEvents.push(event as CustomEvent);
   });
   eventListenerHost.addEventListener('photon-signature-attestation-resolved', (event: Event) => {
     attestationResolvedEvents.push(event);
+  });
+  eventListenerHost.addEventListener('photon-supervisor-error', (event: Event) => {
+    supervisorErrorEvents.push(event as CustomEvent);
   });
 
   document.body.append(eventListenerHost);
@@ -88,6 +93,7 @@ export function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponen
     eventListenerHost,
     analyticsEvents,
     attestationResolvedEvents,
+    supervisorErrorEvents,
     waitForPrescribeForm,
     waitForSignatureAttestationModal,
     addDraftPrescription

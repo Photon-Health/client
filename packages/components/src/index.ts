@@ -19,8 +19,8 @@ import Card from './particles/Card';
 import Collapsible from './particles/Collapsible';
 import ComboBox from './particles/ComboBox';
 import {
-  DraftPrescriptionLayout,
   DraftPrescriptionItem,
+  DraftPrescriptionLayout,
   DraftPrescriptionsProvider,
   type PrescriptionFormData,
   type TemplateOverrides,
@@ -54,14 +54,14 @@ import {
   ScreeningAlertType
 } from './systems/ScreeningAlerts';
 import {
-  RoutingConstraint,
-  isValidPrescriptionRoutingConstraint
+  isValidPrescriptionRoutingConstraint,
+  RoutingConstraint
 } from './systems/RoutingConstraints';
 
 import triggerToast from './utils/toastTriggers';
 import generateString from './utils/generateString';
 import { createQuery } from './utils/createQuery';
-import { formatDate, CALENDAR_DATE_FORMAT } from './utils/formatDate';
+import { CALENDAR_DATE_FORMAT, formatDate } from './utils/formatDate';
 import { formatPrescriptionDetails } from './utils/formatPrescriptionDetail';
 
 import { SignatureAttestationModal } from './systems/SignatureAttestation';
@@ -69,6 +69,7 @@ import { SignatureAttestationModal } from './systems/SignatureAttestation';
 import { PhotonContext, usePhoton } from './context';
 import { PhotonClientStore } from './store';
 import { CoverageOption, PrescribeProvider, usePrescribe } from './systems/PrescribeProvider';
+import { SupervisorPrefill, SupervisorProvider, useSupervisor } from './systems/SupervisorProvider';
 
 import { GoogleServiceProvider, useGoogleService } from './systems/GoogleServiceProvider';
 
@@ -138,6 +139,8 @@ export {
   useRecentOrders,
   formatPrescriptionDetails,
   PrescribeProvider,
+  SupervisorProvider,
+  useSupervisor,
   PharmacySelectionProvider,
   GoogleServiceProvider,
   usePrescribe,
@@ -163,5 +166,6 @@ export type {
   TemplateOverrides,
   PrescriptionFormData,
   CoverageOption,
+  SupervisorPrefill,
   TryCreatePrescriptionTemplateOptions
 };
