@@ -21,7 +21,8 @@ import {
   usePharmacySelectionContext,
   usePhoton,
   usePrescribeEventDispatch,
-  useRecentOrders
+  useRecentOrders,
+  useSupervisor
 } from '@photonhealth/components';
 import { MeUserQuery, types } from '@photonhealth/sdk';
 import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
@@ -153,6 +154,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchClinicalAlertCancel,
     dispatchAnalyticsTrackEvent
   } = usePrescribeEventDispatch();
+  const { supervisorId: prefilledSupervisorId } = useSupervisor();
   const [needsSupervisor, setNeedsSupervisor] = createSignal<boolean>(false);
 
   const client = usePhoton();
@@ -329,6 +331,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   };
 
+  createEffect(() => {
+    props.formActions.updateFormValue({ key: 'supervisorId', value: prefilledSupervisorId() });
+  });
+
   // submits the form to create a new order
   const submitForm = async () => {
     if (isLoading()) {
@@ -461,10 +467,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         pharmacyId = '';
       }
 
-      const supervisorId =
-        needsSupervisor() && props.formStore.supervisorId?.value
-          ? props.formStore.supervisorId.value
-          : undefined;
+      const supervisorId = props.formStore.supervisorId?.value
+        ? props.formStore.supervisorId.value
+        : undefined;
 
       const { data: orderData, errors } = await orderMutation({
         variables: {
@@ -704,7 +709,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     </div>
                   </Show>
                   <div class="flex flex-row justify-end">
-                    <Button loading={isLoadingPrefills() || isLoading()} onClick={combineOrSubmit}>
+                    <Button
+                      class="w-full sm:w-fit"
+                      loading={isLoadingPrefills() || isLoading()}
+                      onClick={combineOrSubmit}
+                    >
                       Send
                     </Button>
                   </div>
