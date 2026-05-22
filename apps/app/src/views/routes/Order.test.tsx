@@ -106,7 +106,7 @@ test('ROUTING + preferred pharmacy + no routing history shows 15-min window text
   expect(screen.getByText(/2 Preferred Ave/)).toBeInTheDocument();
 });
 
-test('ROUTING + order pharmacy + routing history (reroute requested from patient) hides Select Pharmacy and shows pharmacy info', async () => {
+test('ROUTING + order pharmacy + routing history (reroute requested from patient) shows Select Pharmacy and hides pharmacy info', async () => {
   mockOrderQueries(
     {
       state: OrderState.Routing,
@@ -129,11 +129,16 @@ test('ROUTING + order pharmacy + routing history (reroute requested from patient
   expect(
     await screen.findByText(/pending a pharmacy reroute selection from the patient/i)
   ).toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: /^select pharmacy$/i })).not.toBeInTheDocument();
+  // Provider can intervene and pick a pharmacy themselves while the patient is
+  // being asked to reroute.
+  expect(screen.getByRole('button', { name: /^select pharmacy$/i })).toBeInTheDocument();
 
-  // Pharmacy info section is still rendered with the order's pharmacy.
-  expect(await screen.findByText('Order Pharmacy')).toBeInTheDocument();
-  expect(screen.getByText('(555) 000-1111')).toBeInTheDocument();
+  // Pharmacy info is suppressed in the reroute-requested state — the
+  // previously-routed pharmacy is no longer the "active" choice.
+  expect(screen.queryByText('Order Pharmacy')).not.toBeInTheDocument();
+  expect(screen.queryByText('Name')).not.toBeInTheDocument();
+  expect(screen.queryByText('Phone')).not.toBeInTheDocument();
+  expect(screen.queryByText('Address')).not.toBeInTheDocument();
 });
 
 test('PLACED + order pharmacy shows pharmacy info and no routing status card', async () => {

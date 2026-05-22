@@ -679,59 +679,61 @@ export const OrderDetailPage = () => {
                 </>
               ) : null}
 
-              {displayPharmacy && (
-                <>
-                  <InfoGrid name="Name">
-                    {loading ? (
-                      <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-                    ) : displayPharmacy?.name ? (
-                      <Text fontSize="md">{displayPharmacy.name}</Text>
-                    ) : (
-                      <Text fontSize="md" as="i" color="gray.500">
-                        None
-                      </Text>
-                    )}
-                  </InfoGrid>
+              {order &&
+                displayPharmacy &&
+                !isRequestingRerouteFromPatient(order, routingHistory) && (
+                  <>
+                    <InfoGrid name="Name">
+                      {loading ? (
+                        <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                      ) : displayPharmacy?.name ? (
+                        <Text fontSize="md">{displayPharmacy.name}</Text>
+                      ) : (
+                        <Text fontSize="md" as="i" color="gray.500">
+                          None
+                        </Text>
+                      )}
+                    </InfoGrid>
 
-                  <InfoGrid name="Phone">
-                    {loading ? (
-                      <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-                    ) : displayPharmacy?.phone ? (
-                      <Link fontSize="md" href={`tel:${displayPharmacy.phone}`} isExternal>
-                        {formatPhone(displayPharmacy.phone)}
-                      </Link>
-                    ) : (
-                      <Text fontSize="md" as="i" color="gray.500">
-                        None
-                      </Text>
-                    )}
-                  </InfoGrid>
+                    <InfoGrid name="Phone">
+                      {loading ? (
+                        <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                      ) : displayPharmacy?.phone ? (
+                        <Link fontSize="md" href={`tel:${displayPharmacy.phone}`} isExternal>
+                          {formatPhone(displayPharmacy.phone)}
+                        </Link>
+                      ) : (
+                        <Text fontSize="md" as="i" color="gray.500">
+                          None
+                        </Text>
+                      )}
+                    </InfoGrid>
 
-                  <InfoGrid name="Address">
-                    {loading ? (
-                      <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-                    ) : displayPharmacy?.address ? (
-                      <Text fontSize="md">{formatAddress(displayPharmacy.address)}</Text>
-                    ) : (
-                      <Text fontSize="md" as="i" color="gray.500">
-                        None
-                      </Text>
-                    )}
-                  </InfoGrid>
+                    <InfoGrid name="Address">
+                      {loading ? (
+                        <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                      ) : displayPharmacy?.address ? (
+                        <Text fontSize="md">{formatAddress(displayPharmacy.address)}</Text>
+                      ) : (
+                        <Text fontSize="md" as="i" color="gray.500">
+                          None
+                        </Text>
+                      )}
+                    </InfoGrid>
 
-                  <InfoGrid name="Id">
-                    {loading ? (
-                      <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-                    ) : displayPharmacy?.id ? (
-                      <CopyText text={displayPharmacy.id} />
-                    ) : (
-                      <Text fontSize="md" as="i" color="gray.500">
-                        None
-                      </Text>
-                    )}
-                  </InfoGrid>
-                </>
-              )}
+                    <InfoGrid name="Id">
+                      {loading ? (
+                        <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                      ) : displayPharmacy?.id ? (
+                        <CopyText text={displayPharmacy.id} />
+                      ) : (
+                        <Text fontSize="md" as="i" color="gray.500">
+                          None
+                        </Text>
+                      )}
+                    </InfoGrid>
+                  </>
+                )}
 
               {!loading && order?.fulfillment?.type === 'MAIL_ORDER' ? (
                 <>
@@ -834,10 +836,7 @@ function shouldShowSelectPharmacyButton(
   order: OrderType,
   routingHistory: OrderRoutingHistory[]
 ): boolean {
-  return (
-    inPreferredPharmacyRoutingWindow(order, routingHistory) ||
-    !isRequestingRerouteFromPatient(order, routingHistory)
-  );
+  return !order.pharmacy || isRequestingRerouteFromPatient(order, routingHistory);
 }
 
 function inPreferredPharmacyRoutingWindow(order: OrderType, routingHistory: OrderRoutingHistory[]) {
