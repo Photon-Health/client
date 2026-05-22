@@ -15,6 +15,7 @@ import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
 
+import customTheme from '../configs/theme';
 import { ProviderAnalyticsProvider } from '../hooks/useProviderAnalytics';
 import { DEFAULT_USER, harness } from '../setupTests';
 
@@ -67,12 +68,17 @@ export function setupHarness(...initialHandlers: RequestHandler[]) {
 /**
  * Render `ui` inside the standard clinical-app provider tree. Apollo's
  * default client is the lambdas client; the clinical client is reached via
- * the mocked `usePhoton().clinicalClient`.
+ * the mocked `usePhoton().clinicalClient`. Pass `initialEntries` to seed the
+ * `MemoryRouter` history when the rendered tree includes route-aware
+ * components (e.g. a `<Routes>` block with `:param`s).
  */
-export function renderWithProviders(ui: ReactNode) {
+export function renderWithProviders(
+  ui: ReactNode,
+  { initialEntries }: { initialEntries?: string[] } = {}
+) {
   return render(
-    <MemoryRouter>
-      <ChakraProvider>
+    <MemoryRouter initialEntries={initialEntries}>
+      <ChakraProvider theme={customTheme}>
         <ApolloProvider client={harness.photonClient.apollo}>
           <ProviderAnalyticsProvider>{ui}</ProviderAnalyticsProvider>
         </ApolloProvider>

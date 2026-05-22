@@ -1,9 +1,13 @@
 import { gql } from '@apollo/client';
 import { PHARMACY_FRAGMENT } from './pharmacies';
+import { PatientFieldsFragmentMap } from '../../model/fragments';
+
+const PatientFieldsAppFragment = PatientFieldsFragmentMap.PatientFieldsAppFragment;
 
 export const GET_ORDER_QUERY_NAME = 'GetOrder';
 export const GET_ORDER = gql`
   ${PHARMACY_FRAGMENT}
+  ${PatientFieldsAppFragment}
 
   query ${GET_ORDER_QUERY_NAME}($id: ID!) {
     order(id: $id) {
@@ -50,6 +54,7 @@ export const GET_ORDER = gql`
         gender
         email
         phone
+        ...PatientFieldsAppFragment
       }
       pharmacy {
         ...PharmacyFragment
