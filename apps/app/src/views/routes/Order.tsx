@@ -835,7 +835,7 @@ function shouldShowSelectPharmacyButton(
 ): boolean {
   return (
     inPreferredPharmacyRoutingWindow(order, routingHistory) ||
-    isRequestingRerouteFromPatient(order, routingHistory)
+    !isRequestingRerouteFromPatient(order, routingHistory)
   );
 }
 
