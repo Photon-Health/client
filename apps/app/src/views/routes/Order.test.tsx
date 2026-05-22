@@ -1,23 +1,11 @@
 import { OrderState } from '@photonhealth/sdk/dist/types';
 import { clinicalGql, lambdasGql } from '@photonhealth/sdk/test-utils';
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { HttpResponse } from 'msw';
-import { ReactNode } from 'react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { ApolloProvider } from '@apollo/client';
-import { ChakraProvider } from '@chakra-ui/react';
-import { beforeAll, expect, test } from 'vitest';
+import { Route, Routes } from 'react-router-dom';
+import { expect, test } from 'vitest';
 
-import customTheme from '../../configs/theme';
-import { ProviderAnalyticsProvider } from '../../hooks/useProviderAnalytics';
-import {
-  harness,
-  makeAddress,
-  makeOrder,
-  makePatient,
-  makePharmacy,
-  setupHarness
-} from '../../test-utils';
+import { makeAddress, makeOrder, makePatient, makePharmacy, setupHarness } from '../../test-utils';
 import { OrderDetailPage } from './Order';
 
 const ORDER_ID = 'ord_test';
@@ -48,47 +36,7 @@ const preferredPharmacy = makePharmacy({
   })
 });
 
-const { server } = setupHarness();
-
-beforeAll(() => {
-  // OrderDetailPage instantiates `new google.maps.Geocoder()` on every render.
-  // jsdom has no `google` global, so stub the bits the component touches.
-  (globalThis as unknown as { google: unknown }).google = {
-    maps: {
-      Geocoder: class {
-        geocode() {
-          return Promise.resolve({ results: [] });
-        }
-      },
-      // LocationSearch (rendered alongside the routing-state status card)
-      // constructs an AutocompleteService in a useEffect.
-      places: {
-        AutocompleteService: class {
-          getPlacePredictions() {
-            return Promise.resolve({ predictions: [] });
-          }
-        }
-      }
-    }
-  };
-
-  // Chakra's `useBreakpointValue` calls `matchMedia`, which jsdom lacks.
-  if (!window.matchMedia) {
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: (query: string) => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addListener: () => undefined,
-        removeListener: () => undefined,
-        addEventListener: () => undefined,
-        removeEventListener: () => undefined,
-        dispatchEvent: () => false
-      })
-    });
-  }
-});
+const { server, renderWithProviders } = setupHarness();
 
 type OrderOverrides = Parameters<typeof makeOrder>[0];
 
@@ -106,30 +54,11 @@ function mockOrderQueries(orderOverrides: OrderOverrides = {}, routingHistory: u
 }
 
 function renderOrderPage() {
-  return render(
-    <Providers initialEntries={[`/orders/${ORDER_ID}`]}>
-      <Routes>
-        <Route path="/orders/:orderId" element={<OrderDetailPage />} />
-      </Routes>
-    </Providers>
-  );
-}
-
-function Providers({
-  initialEntries,
-  children
-}: {
-  initialEntries: string[];
-  children: ReactNode;
-}) {
-  return (
-    <MemoryRouter initialEntries={initialEntries}>
-      <ChakraProvider theme={customTheme}>
-        <ApolloProvider client={harness.photonClient.apollo}>
-          <ProviderAnalyticsProvider>{children}</ProviderAnalyticsProvider>
-        </ApolloProvider>
-      </ChakraProvider>
-    </MemoryRouter>
+  return renderWithProviders(
+    <Routes>
+      <Route path="/orders/:orderId" element={<OrderDetailPage />} />
+    </Routes>,
+    { initialEntries: [`/orders/${ORDER_ID}`] }
   );
 }
 
@@ -228,10 +157,6 @@ test('PLACED + order pharmacy shows pharmacy info and no routing status card', a
 });
 
 test('PLACED + no order pharmacy + preferred pharmacy falls back to preferred pharmacy display (regression)', async () => {
-  // This is the bug the branch fixes: previously, once we got off the lambdas
-  // GET_ORDER `pharmacy` field, the pharmacy info section either hid the rows
-  // or showed "None" for every value. With the fix we fall through to the
-  // patient's first preferred pharmacy.
   mockOrderQueries({
     state: OrderState.Placed,
     pharmacy: null,
