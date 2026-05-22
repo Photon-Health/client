@@ -26,6 +26,45 @@ vi.mock('./instrumentation/setInstrumentationUserContext', () => ({
   setInstrumentationUserContext: vi.fn()
 }));
 
+// Chakra's `useBreakpointValue` (and other Chakra responsive helpers) calls
+// `window.matchMedia`, which jsdom does not implement.
+if (!window.matchMedia) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => undefined,
+      removeListener: () => undefined,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+      dispatchEvent: () => false
+    })
+  });
+}
+
+// `google.maps` is loaded at runtime by Google Maps' JS API. In jsdom we stub
+// the surface area touched at component construction time (Geocoder,
+// AutocompleteService) so pages like Order / NewOrder / LocationSearch don't
+// crash on mount.
+(globalThis as unknown as { google: unknown }).google ??= {
+  maps: {
+    Geocoder: class {
+      geocode() {
+        return Promise.resolve({ results: [] });
+      }
+    },
+    places: {
+      AutocompleteService: class {
+        getPlacePredictions() {
+          return Promise.resolve({ predictions: [] });
+        }
+      }
+    }
+  }
+};
+
 // ---------------------------------------------------------------------------
 // Shared test-harness state
 // ---------------------------------------------------------------------------
@@ -70,15 +109,19 @@ export const harness: {
 
 // Sync vi.mock factories that read directly from the module-scope `harness`.
 // No dynamic import → no cycle.
-vi.mock('@photonhealth/react', () => ({
-  usePhoton: () => ({
-    isAuthenticated: harness.isAuthenticated,
-    isLoading: harness.isLoading,
-    user: harness.user,
-    clinicalClient: harness.photonClient.apolloClinical,
-    getToken: async () => 'test-token'
-  })
-}));
+vi.mock('@photonhealth/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@photonhealth/react')>();
+  return {
+    ...actual,
+    usePhoton: () => ({
+      isAuthenticated: harness.isAuthenticated,
+      isLoading: harness.isLoading,
+      user: harness.user,
+      clinicalClient: harness.photonClient.apolloClinical,
+      getToken: async () => 'test-token'
+    })
+  };
+});
 
 vi.mock('./configs/providerAnalytics', () => ({
   getProviderAnalytics: () => ({
