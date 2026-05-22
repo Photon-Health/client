@@ -4,15 +4,6 @@ import dayjs from 'dayjs';
 import { FiInfo } from 'react-icons/fi';
 
 const holidays = [
-  '2024-05-27', // Memorial Day
-  '2024-07-04', // july 4
-  '2024-09-02', // labor day
-  '2024-11-28', // Thanksgiving
-  '2024-12-24', // Christmas Eve
-  '2024-12-25', // Christmas
-  '2024-12-31', // New Years Eve
-  '2025-01-01', // New years
-  '2025-05-26', // Memorial Day
   '2025-09-01', // Labor Day
   '2025-07-04', // july 4
   '2025-11-27', // Thanksgiving
@@ -20,7 +11,8 @@ const holidays = [
   '2025-12-25', // Christmas
   '2025-12-31', // New Years Eve
   '2025-06-19', // Juneteenth
-  '2026-01-01' // New Years Day
+  '2026-01-01', // New Years Day
+  '2026-05-25' // Memorial Day
 ];
 
 function showHolidayDisclaimer() {
