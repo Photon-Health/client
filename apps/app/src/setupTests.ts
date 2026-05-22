@@ -70,15 +70,19 @@ export const harness: {
 
 // Sync vi.mock factories that read directly from the module-scope `harness`.
 // No dynamic import → no cycle.
-vi.mock('@photonhealth/react', () => ({
-  usePhoton: () => ({
-    isAuthenticated: harness.isAuthenticated,
-    isLoading: harness.isLoading,
-    user: harness.user,
-    clinicalClient: harness.photonClient.apolloClinical,
-    getToken: async () => 'test-token'
-  })
-}));
+vi.mock('@photonhealth/react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@photonhealth/react')>();
+  return {
+    ...actual,
+    usePhoton: () => ({
+      isAuthenticated: harness.isAuthenticated,
+      isLoading: harness.isLoading,
+      user: harness.user,
+      clinicalClient: harness.photonClient.apolloClinical,
+      getToken: async () => 'test-token'
+    })
+  };
+});
 
 vi.mock('./configs/providerAnalytics', () => ({
   getProviderAnalytics: () => ({
