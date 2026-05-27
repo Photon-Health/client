@@ -24,8 +24,6 @@ test('displays order status for a freshly created order', async ({ page }) => {
   const selectedPharmacyName = await pharmacyCardToSelect.getAttribute('aria-label');
   await pharmacyCardToSelect.click();
   await page.getByRole('button', { name: /select pharmacy/i }).click();
-  await page.getByText('Urgent').click();
-  await page.getByRole('button', { name: /next/i }).click();
 
   await expect(page.getByText(/Order placed/i)).toBeVisible();
   await expect(page.getByText(selectedPharmacyName)).toBeVisible();
