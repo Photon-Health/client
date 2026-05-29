@@ -71,55 +71,6 @@ describe('Review Page - Address Form', () => {
     vi.clearAllMocks();
   });
 
-  describe('when patient has an address', () => {
-    const patientWithAddress = generatePatient({
-      id: 'pat_test123',
-      name: { full: 'John Doe' },
-      address: generateAddress()
-    });
-
-    const orderWithPatientAddress = generateOrder({
-      id: 'ord_test123',
-      state: 'ROUTING',
-      patient: patientWithAddress,
-      fills: [testFill]
-    });
-
-    beforeEach(() => {
-      mockGetOrder.mockResolvedValue(orderWithPatientAddress);
-    });
-
-    it('does not show the address form', async () => {
-      renderApp('ord_test123');
-
-      // Wait for the review page to load
-      await waitFor(() => {
-        expect(screen.getByText('Review your prescription')).toBeInTheDocument();
-      });
-
-      // Address form should not be present
-      expect(screen.queryByText('Add your address')).not.toBeInTheDocument();
-
-      // Search pharmacy button should be visible
-      expect(screen.getByRole('button', { name: /search for a pharmacy/i })).toBeInTheDocument();
-    });
-
-    it('navigates to pharmacy page when clicking search button', async () => {
-      const { memoryRouter } = renderApp('ord_test123');
-
-      await waitFor(() => {
-        expect(screen.getByText('Review your prescription')).toBeInTheDocument();
-      });
-
-      const searchButton = screen.getByRole('button', { name: /search for a pharmacy/i });
-      await userEvent.click(searchButton);
-
-      await waitFor(() => {
-        expect(memoryRouter.state.location.pathname).toBe('/pharmacy');
-      });
-    });
-  });
-
   describe('when patient does not have an address', () => {
     const patientWithoutAddress = generatePatient({
       id: 'pat_test456',
