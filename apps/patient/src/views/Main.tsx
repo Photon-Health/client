@@ -179,10 +179,7 @@ export const Main = () => {
       if (hasPharmacy) {
         redirectPath = '/status';
       } else if (newOrder.patient.address) {
-        const removeReviewStepExperiment = await patientAnalytics.getFlagValue(
-          'remove_review_your_rx_page'
-        );
-        redirectPath = removeReviewStepExperiment.skipReviewPage ? '/pharmacy' : '/review';
+        redirectPath = '/pharmacy';
       } else {
         redirectPath = '/review';
       }

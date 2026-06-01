@@ -101,7 +101,7 @@ describe('App', () => {
     resetFeatureFlagMocks();
   });
 
-  test('For Local Pickup Pharmacies: navigate from review > pharmacy > readyBy > status', async () => {
+  test('For Local Pickup Pharmacies: navigate from pharmacy > readyBy > status', async () => {
     const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('./api');
     const getOrderMock = vi.mocked(getOrder);
     getOrderMock.mockResolvedValue(testOrder);
@@ -121,18 +121,14 @@ describe('App', () => {
 
     renderApp({ order: testOrder });
 
-    expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
-    expect(mockPatientAnalytics.getFlagValue).toHaveBeenCalledWith('remove_review_your_rx_page');
-    await expectTotalPageViewAnalyticsCountToBe(1);
-    await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
     expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
-    expect(screen.queryByTestId('PrescriptionsSummary')).not.toBeInTheDocument();
-    await expectTotalPageViewAnalyticsCountToBe(2);
+    expect(screen.getByTestId('PrescriptionsSummary')).toBeInTheDocument();
+    await expectTotalPageViewAnalyticsCountToBe(1);
     await userEvent.click(screen.getByText('Test Local Pickup Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
     expect(setOrderPharmacyMock).not.toHaveBeenCalled();
     expect(await screen.findByText('When do you need your order ready by?')).toBeInTheDocument();
-    await expectTotalPageViewAnalyticsCountToBe(3);
+    await expectTotalPageViewAnalyticsCountToBe(2);
     await userEvent.click(screen.getByText('Urgent'));
     await userEvent.click(screen.getByText('Next'));
     expect(setOrderPharmacyMock).toHaveBeenCalledWith(
@@ -145,7 +141,7 @@ describe('App', () => {
     );
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
-    await expectTotalPageViewAnalyticsCountToBe(4);
+    await expectTotalPageViewAnalyticsCountToBe(3);
   }, 10_000);
 
   test('For Mail Order Pharmacies: skips the readyBy page', async () => {
@@ -169,8 +165,6 @@ describe('App', () => {
 
     renderApp({ order: testOrder });
 
-    expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
     expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
     await userEvent.click(screen.getByText('Test Mail Order Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
@@ -188,17 +182,7 @@ describe('App', () => {
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
   }, 10_000);
 
-  test('skips review and lands on pharmacy when the experiment enables it', async () => {
-    mockPatientAnalytics.getFlagValue.mockResolvedValue({
-      skipReviewPage: true,
-      showRxSummaryOnPharmacyPage: true
-    });
-
-    mockPatientAnalytics.getFlagValueSync.mockReturnValue({
-      skipReviewPage: true,
-      showRxSummaryOnPharmacyPage: true
-    });
-
+  test('skips review and lands on pharmacy when patient has address', async () => {
     const { getOrder } = await import('./api');
     vi.mocked(getOrder).mockResolvedValue(testOrder);
 
@@ -211,6 +195,24 @@ describe('App', () => {
     expect(screen.queryByText('Review your prescription')).not.toBeInTheDocument();
     expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
     expect(screen.getByTestId('PrescriptionsSummary')).toBeInTheDocument();
+  });
+
+  test('lands on review when patient has no address', async () => {
+    const { getOrder } = await import('./api');
+    const noAddressOrder = {
+      ...testOrder,
+      patient: generatePatient({ name: { full: 'Jane Doe' }, address: undefined })
+    };
+    vi.mocked(getOrder).mockResolvedValue(noAddressOrder);
+
+    const { memoryRouter } = renderApp();
+
+    await waitFor(() => {
+      expect(memoryRouter.state.location.pathname).toBe('/review');
+    });
+
+    expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
+    expect(screen.getByText('Add your address')).toBeInTheDocument();
   });
 });
 
