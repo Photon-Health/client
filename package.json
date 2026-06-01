@@ -51,7 +51,7 @@
     "@types/react-input-mask": "^3.0.2",
     "@types/tinycolor2": "^1.4.6",
     "@vitejs/plugin-react": "^4.0.0",
-    "@vitest/ui": "^3.2.4",
+    "@vitest/ui": "^4.1.8",
     "autoprefixer": "^10.4.14",
     "babel-jest": "30.0.5",
     "chromatic": "^6.17.4",
@@ -82,7 +82,7 @@
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-solid": "2.11.6",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4",
+    "vitest": "^4.1.8",
     "ws": "^8.19.0"
   },
   "dependencies": {
