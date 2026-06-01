@@ -740,7 +740,5 @@ const renderApp = () => {
 };
 
 async function navigateToPharmacyScreen() {
-  expect(await screen.findByText(/^Review your prescription/gi)).toBeInTheDocument();
-  await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
   expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
 }

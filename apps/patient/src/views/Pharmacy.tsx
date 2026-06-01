@@ -1046,11 +1046,6 @@ export const Pharmacy = () => {
   const showPickupHeading =
     (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;
 
-  let removeReviewPageExperiment;
-  if (order.patient.address) {
-    removeReviewPageExperiment = patientAnalytics.getFlagValueSync('remove_review_your_rx_page');
-  }
-
   return (
     <Box>
       {!isDemo && <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />}
@@ -1068,13 +1063,11 @@ export const Pharmacy = () => {
         options={patientMailOrderOptions}
       />
 
-      {removeReviewPageExperiment?.showRxSummaryOnPharmacyPage && (
-        <Box bgColor="white" p={4} borderBottom="1px" borderColor="gray.200">
-          <Container px={-3}>
-            <PrescriptionsSummary />
-          </Container>
-        </Box>
-      )}
+      <Box bgColor="white" p={4} borderBottom="1px" borderColor="gray.200">
+        <Container px={-3}>
+          <PrescriptionsSummary />
+        </Container>
+      </Box>
 
       <Box bgColor="white">
         <VStack spacing={4} align="span" p={4}>

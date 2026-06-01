@@ -250,6 +250,7 @@ export const DraftPrescriptionForm = (props: {
                 inputMode="decimal"
                 value={props.store.dispenseQuantity?.value ?? undefined}
                 min={0}
+                onWheel={(e) => e.preventDefault()}
                 onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
                   props.actions.updateFormValue({
                     key: 'dispenseQuantity',
@@ -334,6 +335,7 @@ export const DraftPrescriptionForm = (props: {
             inputMode="numeric"
             value={props.store.daysSupply?.value ?? undefined}
             min={0}
+            onWheel={(e) => e.preventDefault()}
             onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
               props.actions.updateFormValue({
                 key: 'daysSupply',
@@ -358,6 +360,7 @@ export const DraftPrescriptionForm = (props: {
             value={props.store.refills?.value ?? undefined}
             min={0}
             max={11}
+            onWheel={(e) => e.preventDefault()}
             onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
               props.actions.updateFormValue({
                 key: 'refills',
