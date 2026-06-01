@@ -283,12 +283,15 @@ export class PhotonClientStore {
         isAuthenticated: authenticated
       });
       const user = await this.sdk.authentication.getUser();
-      // If no org was configured upfront, derive it from the authenticated user
-      if (!this.sdk.organization && user?.org_id) {
-        this.sdk.setOrganization(user.org_id);
-      }
+
       // @ts-ignore TODO: store will be updated soon, so this will change
       const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
+
+      // If no org was configured upfront but the user has one,
+      // derive it from the authenticated user.
+      if (!this.sdk.organization && hasOrgs) {
+        this.sdk.setOrganization(user.org_id);
+      }
 
       let permissions: Permission[] = [];
       if (this.autoLogin || authenticated) {
