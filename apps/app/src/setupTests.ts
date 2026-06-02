@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { randomUUID } from 'node:crypto';
 import { PhotonClient } from '@photonhealth/sdk';
-import { vi } from 'vitest';
+import { vi, type Mock } from 'vitest';
 
 // Auth0 fix to get tests passing. This gets around the 'auth0-spa-js must run on a secure origin' error
 // More info https://github.com/auth0/auth0-spa-js/blob/master/FAQ.md#why-do-you-get-auth0-spa-js-must-run-on-a-secure-origin
@@ -92,8 +92,8 @@ export const harness: {
   user: MockUser;
   isAuthenticated: boolean;
   isLoading: boolean;
-  trackSpy: ReturnType<typeof vi.fn>;
-  identifySpy: ReturnType<typeof vi.fn>;
+  trackSpy: Mock<(...args: unknown[]) => void>;
+  identifySpy: Mock<(...args: unknown[]) => void>;
 } = {
   photonClient,
   // Mocked usePhoton return — mutable so tests can adjust auth/user state.
