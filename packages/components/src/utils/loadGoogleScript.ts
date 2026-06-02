@@ -9,10 +9,10 @@ export default function loadGoogleScript({ onLoad, onError }: LoadGoogleScriptOp
   if (window?.google?.maps) {
     onLoad();
   } else if (!scriptLoading) {
+    const googleApiKey = import.meta.env.VITE_GOOGLE_API_KEY as string;
     scriptLoading = true;
     const script = document.createElement('script');
-    script.src =
-      'https://maps.googleapis.com/maps/api/js?key=AIzaSyAvuwwE6g2Bsmih66nu4dB7-H7U1_7KQ6g&callback=Function.prototype&libraries=places';
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleApiKey}&callback=Function.prototype&libraries=places`;
     document.head.appendChild(script);
 
     script.onload = () => {
