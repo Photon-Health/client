@@ -20,8 +20,8 @@ const OPTIONS: TestOption[] = [
 function renderComboBox(props: {
   value?: TestOption;
   options?: TestOption[];
-  setSelected?: ReturnType<typeof vi.fn>;
-  onOpen?: ReturnType<typeof vi.fn>;
+  setSelected?: (selected: TestOption | undefined) => void;
+  onOpen?: () => void;
   showClear?: boolean;
 }) {
   const setSelected = props.setSelected ?? vi.fn();
