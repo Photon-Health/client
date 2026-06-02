@@ -5,3 +5,9 @@ export const rerouteOrderMutation = graphql(/* GraphQL */ `
     rerouteOrder(orderId: $orderId, pharmacyId: $pharmacyId)
   }
 `);
+
+export const resendOrderMutation = graphql(/* GraphQL */ `
+  mutation ResendOrder($orderId: ID!) {
+    resendOrder(orderId: $orderId)
+  }
+`);
