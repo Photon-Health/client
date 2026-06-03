@@ -13,6 +13,7 @@ export const BenefitsBanner = () => {
       py={3}
       spacing={2}
       align="center"
+      justifyContent="space-between"
       mx={{ base: -2, md: undefined }}
     >
       <Text fontSize="sm">

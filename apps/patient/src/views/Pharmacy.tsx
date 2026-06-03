@@ -1119,7 +1119,7 @@ export const Pharmacy = () => {
             >
               <VStack spacing={4} align="stretch">
                 <BenefitsBanner />
-                <Divider w="auto" borderColor="blue.100" mx={{ base: -2, md: undefined }} />
+                <Divider w="auto" borderColor="blue.200" mx={{ base: -2, md: undefined }} />
               </VStack>
               {(showBrandedOptionsHeader || showOffers || showBrandedOptions) && (
                 <VStack align="span" w="full" rowGap="2">
