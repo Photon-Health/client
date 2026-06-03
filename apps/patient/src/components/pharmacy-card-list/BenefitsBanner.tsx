@@ -2,7 +2,7 @@ import { HStack, Text } from '@chakra-ui/react';
 import { FiInfo } from 'react-icons/fi';
 import { Tooltip } from '../Tooltip';
 
-export const BenefitsBanner = () => {
+export const BenefitsBanner = ({ onTooltipClick }: { onTooltipClick: () => void }) => {
   return (
     <HStack
       bg="blue.100"
@@ -21,6 +21,7 @@ export const BenefitsBanner = () => {
       </Text>
       <Tooltip
         placement="bottom-end"
+        wrapperProps={{ onClick: onTooltipClick }}
         label={
           <Text fontSize="sm">
             These are cash coupon prices — what you’d pay without using insurance. Your insurance

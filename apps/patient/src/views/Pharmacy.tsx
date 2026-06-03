@@ -1118,7 +1118,11 @@ export const Pharmacy = () => {
               aria-label="Select a pharmacy"
             >
               <VStack spacing={4} align="stretch">
-                <BenefitsBanner />
+                <BenefitsBanner
+                  onTooltipClick={() =>
+                    patientAnalytics.track('Benefits Banner Tooltip Clicked', order)
+                  }
+                />
                 <Divider w="auto" borderColor="blue.200" mx={{ base: -2, md: undefined }} />
               </VStack>
               {(showBrandedOptionsHeader || showOffers || showBrandedOptions) && (
