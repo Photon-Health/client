@@ -4,9 +4,11 @@ import {
   Modal,
   ModalBody,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   ModalOverlay,
   Text,
+  useBreakpointValue,
   useToast,
   VStack
 } from '@chakra-ui/react';
@@ -127,6 +129,19 @@ export function ResendOrderButton({ order }: ResendOrderButtonProps) {
     });
   };
 
+  const showCTAsInHeader = useBreakpointValue({ base: false, md: true });
+
+  const CTAs = (
+    <HStack justify="flex-end" justifySelf="flex-end">
+      <Button disabled={resending} variant="outline" onClick={handleResendCancel}>
+        Cancel
+      </Button>
+      <Button isLoading={resending} onClick={handleResendConfirmation}>
+        {CONFIRMATION_CTA_TEXT}
+      </Button>
+    </HStack>
+  );
+
   return (
     <>
       <Button
@@ -143,23 +158,20 @@ export function ResendOrderButton({ order }: ResendOrderButtonProps) {
 
       <Modal isOpen={resendModalOpen} onClose={handleResendCancel} size="xl" isCentered>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader borderBottom="1px" borderColor="gray.300">
-            <HStack justify="space-between" width="full">
+        <ModalContent marginX="3">
+          <ModalHeader
+            borderBottom="1px"
+            borderColor="gray.300"
+            px={useBreakpointValue({ base: '3', md: '6' })}
+          >
+            <HStack justify="space-between" width="full" flexWrap="wrap">
               <Text fontSize="md" fontWeight="normal" color="gray.500">
                 Confirm resend to existing pharmacy
               </Text>
-              <HStack justify="right">
-                <Button disabled={resending} variant="ghost" onClick={handleResendCancel}>
-                  Cancel
-                </Button>
-                <Button isLoading={resending} onClick={handleResendConfirmation}>
-                  {CONFIRMATION_CTA_TEXT}
-                </Button>
-              </HStack>
+              {showCTAsInHeader && CTAs}
             </HStack>
           </ModalHeader>
-          <ModalBody p="6">
+          <ModalBody p={useBreakpointValue({ base: '3', md: '6' })}>
             <VStack
               alignItems="flex-start"
               border="1px"
@@ -178,6 +190,7 @@ export function ResendOrderButton({ order }: ResendOrderButtonProps) {
               )}
             </VStack>
           </ModalBody>
+          {!showCTAsInHeader && <ModalFooter px="3">{CTAs}</ModalFooter>}
         </ModalContent>
       </Modal>
     </>
