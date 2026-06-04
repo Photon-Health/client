@@ -5,6 +5,7 @@ import {
   Center,
   CircularProgress,
   Container,
+  Divider,
   Heading,
   HStack,
   Link,
@@ -50,6 +51,7 @@ import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
 import _ from 'lodash';
 import {
+  BenefitsBanner,
   BrandedOptionOverrides,
   BrandedOptions,
   BrandedOptionsHeader,
@@ -1115,6 +1117,14 @@ export const Pharmacy = () => {
               role="radiogroup"
               aria-label="Select a pharmacy"
             >
+              <VStack spacing={4} align="stretch">
+                <BenefitsBanner
+                  onTooltipClick={() =>
+                    patientAnalytics.track('Benefits Banner Tooltip Clicked', order)
+                  }
+                />
+                <Divider w="auto" borderColor="blue.200" mx={{ base: -2, md: undefined }} />
+              </VStack>
               {(showBrandedOptionsHeader || showOffers || showBrandedOptions) && (
                 <VStack align="span" w="full" rowGap="2">
                   {showBrandedOptionsHeader && (
