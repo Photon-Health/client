@@ -64,6 +64,7 @@ import {
 import { OrderRoutingHistory } from '../../gql/graphql';
 import { OrderState } from 'packages/sdk/src/types';
 import usePermissions from '../../hooks/usePermissions';
+import { ResendOrderButton } from '../components/ResendOrderButton';
 
 export const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.PickUp]: 'Pick up',
@@ -551,7 +552,10 @@ export const OrderDetailPage = () => {
                 headerText="Pharmacy Information"
                 rightElement={
                   canRerouteOrder && order && order?.state !== 'ROUTING' ? (
-                    <RerouteOrderButton organizationId={user.org_id} order={order} />
+                    <HStack justify="right" spacing="2">
+                      {order.pharmacy && <ResendOrderButton order={order} />}
+                      <RerouteOrderButton organizationId={user.org_id} order={order} />
+                    </HStack>
                   ) : undefined
                 }
               />
