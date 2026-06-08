@@ -14,6 +14,7 @@ vi.mock('./api', () => ({
   }),
   getPharmacies: vi.fn().mockResolvedValue({ pharmacies: [] }),
   getOfferBundles: vi.fn().mockResolvedValue([]),
+  getPatientCopy: vi.fn().mockResolvedValue({ faqs: [], copy: {} }),
   triggerDemoNotification: vi.fn()
 }));
 

@@ -27,7 +27,7 @@ import { OrderState } from 'packages/sdk/src/types';
 
 export const Status = () => {
   const navigate = useNavigate();
-  const { order, setOrder, isDemo, setFaqModalIsOpen, setReason } = useOrderContext();
+  const { order, setOrder, isDemo, setFaqModalIsOpen, setReason, copy } = useOrderContext();
   const patientAnalytics = usePatientAnalytics();
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
   const rerouteReasonDialog = useDisclosure();
@@ -285,10 +285,10 @@ export const Status = () => {
         isOpen={orderDetailsIsOpen}
         onClose={() => setOrderDetailsIsOpen(false)}
         pharmacyName={displayPharmacy?.name ?? 'My Pharmacy'}
-        pharmacyId={displayPharmacy?.id}
         pharmacyLogo={displayPharmacy?.logo}
         prescriptions={prescriptions}
         fulfillmentState={fulfillmentState}
+        nextSteps={copy.nextSteps}
       />
       <Helmet>
         <title>{t.track}</title>

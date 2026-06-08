@@ -9,8 +9,9 @@ import {
 } from 'react-router-dom';
 import queryString from 'query-string';
 
-import { AUTH_HEADER_ERRORS, getOrder } from '../api';
+import { AUTH_HEADER_ERRORS, getOrder, getPatientCopy } from '../api';
 import { Nav } from '../components';
+import { FAQEntry } from '../components/FAQ';
 import { setAuthHeader } from '../configs/graphqlClient';
 import theme from '../configs/theme';
 import { demoOrder } from '../data/demoOrder';
@@ -43,6 +44,8 @@ export interface OrderContextType {
   setFaqModalIsOpen: (isOpen: boolean) => void;
   reason: string;
   setReason: (reason: string) => void;
+  faqs: FAQEntry[] | undefined;
+  copy: Record<string, string>;
 }
 export const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
@@ -101,6 +104,8 @@ export const Main = () => {
   usePageAnalytics({ pageName: 'Main' });
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
   const [reason, setReason] = useState<string>('');
+  const [faqs, setFaqs] = useState<FAQEntry[]>([]);
+  const [copy, setCopy] = useState<Record<string, string>>({});
 
   const orgId = order?.organization.id;
   const settings = order?.organization.settings;
@@ -243,6 +248,16 @@ export const Main = () => {
     }
   }, [order, orderId, fetchOrder, isDemo]);
 
+  useEffect(() => {
+    if (!orderId) return;
+    const fetchPatientCopy = async () => {
+      const patientCopy = await getPatientCopy(orderId);
+      setFaqs(patientCopy.faqs);
+      setCopy(patientCopy.copy);
+    };
+    fetchPatientCopy();
+  }, [orderId, order?.pharmacy?.id]);
+
   const fetchLogo = useCallback(async (fileName: string) => {
     if (fileName === 'photon') {
       setLogo('photon');
@@ -297,7 +312,9 @@ export const Main = () => {
     fetchOrder,
     setFaqModalIsOpen,
     reason,
-    setReason
+    setReason,
+    faqs,
+    copy
   };
 
   const isAutomatedOrder = order.organization.settings?.patientUx.enableAutomatedOps;

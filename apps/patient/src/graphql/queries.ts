@@ -501,11 +501,17 @@ export const GET_OFFER_BUNDLES = gql`
   }
 `;
 
-export const GET_FAQS = gql`
-  query GetFaqs($orderId: ID!) {
-    faqs(orderId: $orderId) {
-      question
-      answer
+export const GET_PATIENT_COPY = gql`
+  query GetPatientCopy($orderId: ID!) {
+    patientCopy(orderId: $orderId) {
+      faqs {
+        question
+        answer
+      }
+      copy {
+        key
+        value
+      }
     }
   }
 `;

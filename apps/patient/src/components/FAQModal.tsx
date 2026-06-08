@@ -15,12 +15,10 @@ import {
   useToast,
   VStack
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
 import { Card } from './Card';
-import { FAQContents, FAQEntry } from './FAQ';
+import { FAQContents } from './FAQ';
 import { useOrderContext } from '../views/Main';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
-import { getFaqs } from '../api';
 
 export const FAQModal = ({
   isOpen,
@@ -31,24 +29,9 @@ export const FAQModal = ({
   onClose: () => void;
   allowMessageSupport?: boolean;
 }) => {
-  const { order, isDemo } = useOrderContext();
+  const { order, isDemo, faqs } = useOrderContext();
   const toast = useToast();
   const patientAnalytics = usePatientAnalytics();
-
-  const [faqs, setFaqs] = useState<FAQEntry[] | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!isOpen || !order?.id) {
-      return;
-    }
-    setLoading(true);
-    (async () => {
-      const result = await getFaqs(order.id);
-      setFaqs(result);
-      setLoading(false);
-    })();
-  }, [isOpen, order?.id]);
 
   const handleMessageSupport = () => {
     if (isDemo) {
@@ -75,13 +58,13 @@ export const FAQModal = ({
           <Container>
             <VStack alignItems="stretch" spacing={6} w="full">
               <VStack bgColor="white" borderRadius="xl" px={4} py={1} alignItems={'start'} w="full">
-                {loading ? (
+                {faqs ? (
+                  <FAQContents faqs={faqs} />
+                ) : (
                   <Stack w="full" py={2} spacing={3}>
                     <Skeleton height="20px" />
                     <SkeletonText noOfLines={2} spacing="2" />
                   </Stack>
-                ) : (
-                  <FAQContents faqs={faqs || []} />
                 )}
               </VStack>
 
