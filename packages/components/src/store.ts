@@ -285,11 +285,12 @@ export class PhotonClientStore {
       const user = await this.sdk.authentication.getUser();
 
       // @ts-ignore TODO: store will be updated soon, so this will change
-      const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
+      const isUserLoggedIntoAnOrganization = !!user?.org_id;
+      const isOrganizationIdSelectedInPhotonClient = !!this.sdk?.organization;
 
-      // If no org was configured upfront but the user has one,
+      // If no org was configured upfront but the user was logged into one,
       // derive it from the authenticated user.
-      if (!this.sdk.organization && hasOrgs) {
+      if (!isOrganizationIdSelectedInPhotonClient && isUserLoggedIntoAnOrganization) {
         this.sdk.setOrganization(user.org_id);
       }
 
@@ -306,7 +307,12 @@ export class PhotonClientStore {
       }
 
       // @ts-ignore TODO store will be updated soon, so this will change
-      const isInOrg = authenticated && hasOrgs && this.sdk.organization === user.org_id;
+      const selectedOrganizationId = this.sdk?.organization;
+      const isInOrg =
+        authenticated &&
+        isOrganizationIdSelectedInPhotonClient &&
+        isUserLoggedIntoAnOrganization &&
+        selectedOrganizationId === user.org_id;
 
       this.setStore('authentication', {
         ...this.store.authentication,
