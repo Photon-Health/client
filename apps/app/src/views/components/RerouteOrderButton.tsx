@@ -3,7 +3,7 @@ import { useApolloClient, useMutation, useQuery } from '@apollo/client';
 import { Button, useToast } from '@chakra-ui/react';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { usePhoton } from '@photonhealth/react';
-import { Order, Treatment } from '@photonhealth/sdk/dist/types';
+import { Order } from '@photonhealth/sdk/dist/types';
 import { FulfillmentType, OrderState } from 'packages/sdk/src/types';
 
 import { Dialog } from './Dialog';
@@ -12,6 +12,8 @@ import { rerouteOrderMutation } from '../../mutations/clinical-api/orders';
 import { formatAddress } from '../../utils';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 import { GET_ORDER, getOrderRoutingHistory, PHARMACY_QUERY } from '../../queries';
+import { useOrderUniqueTreatments } from '../../hooks/useOrderUniqueTreatments';
+import { useHighestUserRole } from '../../hooks/useHighestUserRole';
 
 interface RerouteOrderButtonProps {
   order: Order;
@@ -44,8 +46,8 @@ export function RerouteOrderButton({ order, organizationId }: RerouteOrderButton
   const [fulfillmentType, setFulfillmentType] = useState<string | undefined>(undefined);
   const confirmButtonDisabled = !!fulfillmentType && !pharmacyId;
 
-  const uniqueTreatments = useUniqueMeds(order);
-  const selector = useRerouteSelector();
+  const uniqueTreatments = useOrderUniqueTreatments(order);
+  const selector = useHighestUserRole();
 
   const routingHistory = useRoutingHistory(order.id);
   const [rerouteOrder] = useRerouteOrderMutation({ order, rerouteTo: pharmacyId });
@@ -266,45 +268,6 @@ function useRoutingHistory(id: string) {
   });
   const routingHistory = routingHistoryRes.data?.order?.routingHistory ?? [];
   return routingHistory;
-}
-
-function useUniqueMeds(order: Order) {
-  return useMemo(() => {
-    const medicationLookup = order.fills.reduce<Record<string, Treatment>>((acc, cur) => {
-      if (!acc[cur.treatment.id]) {
-        acc[cur.treatment.id] = cur.treatment;
-      }
-
-      return acc;
-    }, {});
-
-    return Object.values(medicationLookup);
-  }, [order]);
-}
-
-function useRerouteSelector() {
-  const { contextData } = useProviderAnalytics();
-
-  return useMemo(() => {
-    if (!contextData.providerRoles) return;
-
-    switch (true) {
-      case contextData.providerRoles.includes('Administrator'):
-        return 'ADMIN';
-      case contextData.providerRoles.includes('Prescriber'):
-        return 'PROVIDER';
-      case contextData.providerRoles.includes('Medical Operations'):
-        return 'MED_OPS';
-      case contextData.providerRoles.includes('Staff'):
-        return 'STAFF';
-      case contextData.providerRoles.includes('Support'):
-        return 'SUPPORT';
-      case contextData.providerRoles.includes('Developer'):
-        return 'DEVELOPER';
-      default:
-        return 'UNKNOWN';
-    }
-  }, [contextData.providerRoles]);
 }
 
 function routingTypeLabel(type?: string) {
