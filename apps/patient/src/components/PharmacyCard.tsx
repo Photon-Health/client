@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Button, Card, CardBody, CardFooter, Collapse, Divider } from '@chakra-ui/react';
 import { FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
@@ -49,9 +49,20 @@ export const PharmacyCard = memo(function PharmacyCard({
 
   const isSkipPreferredPharmacyOrg =
     order?.organization.id === ignorePreferredPharmacyOrgs[import.meta.env.VITE_ENV_NAME ?? ''];
-  const skipPreferredPharmacy = isSkipPreferredPharmacyOrg
-    ? patientAnalytics.getFlagValueSync('skip_preferred_pharmacy').isActive
-    : false;
+  const [skipPreferredPharmacy, setSkipPreferredPharmacy] = useState(false);
+
+  useEffect(() => {
+    if (!isSkipPreferredPharmacyOrg) {
+      setSkipPreferredPharmacy(false);
+      return;
+    }
+
+    const fetchFlag = async () => {
+      const { isActive } = await patientAnalytics.getFlagValue('skip_preferred_pharmacy');
+      setSkipPreferredPharmacy(isActive);
+    };
+    fetchFlag();
+  }, [isSkipPreferredPharmacyOrg, patientAnalytics]);
 
   if (!pharmacy) return null;
 
