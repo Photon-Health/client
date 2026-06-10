@@ -6,9 +6,11 @@ import {
   ComboBox,
   Input,
   InputGroup,
+  PhoneInput,
   Text,
   triggerToast,
-  usePhoton
+  usePhoton,
+  validateRealPhoneNumber
 } from '@photonhealth/components';
 import { createMemo, createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
 import { createForm } from '@felte/solid';
@@ -133,7 +135,11 @@ const supervisorSchema = zod.object({
   lastName: zod.string({ required_error: 'Last name is required' }).min(1, 'Last name is required'),
   npi: zod.coerce
     .string({ required_error: 'NPI is required' })
-    .regex(/^[0-9]{10}$/, 'Enter a valid 10-digit NPI')
+    .regex(/^[0-9]{10}$/, 'Enter a valid 10-digit NPI'),
+  phone: zod
+    .string({ required_error: 'Phone number is required' })
+    .min(1, 'Phone number is required')
+    .refine((value) => validateRealPhoneNumber(value), 'Enter a valid phone number')
 });
 
 interface NewSupervisorFormProps {
@@ -147,7 +153,7 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
   const [submitting, setSubmitting] = createSignal(false);
   const [isOpen, setIsOpen] = createSignal(false);
 
-  const { form, errors, validate, isValid, reset } = createForm({
+  const { form, data, errors, validate, isValid, reset, setData } = createForm({
     onSubmit: async (values) => {
       setSubmitting(true);
       try {
@@ -203,6 +209,14 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
         </InputGroup>
         <InputGroup label="NPI" error={errors().npi?.[0]}>
           <Input name="npi" type="number" inputMode="numeric" />
+        </InputGroup>
+        <InputGroup label="Phone number" error={errors().phone?.[0]}>
+          <PhoneInput
+            value={data().phone}
+            onPhoneChange={(value) => {
+              setData('phone', value);
+            }}
+          />
         </InputGroup>
         <div class="flex justify-end">
           <Button

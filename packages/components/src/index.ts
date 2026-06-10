@@ -84,6 +84,7 @@ import {
   PATIENT_FORM_FIELDS
 } from './analytics/buildFieldSnapshot';
 import { PatientSelect } from './systems/PatientSelect';
+import { validateRealPhoneNumber } from './utils/validateRealPhoneNumber';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
 
@@ -154,7 +155,8 @@ export {
   PATIENT_FORM_FIELDS,
   DRAFT_PRESCRIPTION_FORM_FIELDS,
   PatientSelect,
-  isValidPrescriptionRoutingConstraint
+  isValidPrescriptionRoutingConstraint,
+  validateRealPhoneNumber
 };
 
 // Export types
