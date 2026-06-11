@@ -1,6 +1,6 @@
 import { For, JSX } from 'solid-js';
 import Select from '../Select';
-import { states } from '../../systems/AddressForm/states';
+import { states } from '../../systems/PatientAddressForm/states';
 
 export interface StateSelectProps {
   value?: string;

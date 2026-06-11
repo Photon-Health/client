@@ -13,13 +13,14 @@ import { usePhotonClient } from '../SDKProvider';
 import { createSignal } from 'solid-js';
 import triggerToast from '../../utils/toastTriggers';
 import Banner from '../../particles/Banner';
+import { zipCodeRegex } from '../../utils/regex';
 
 const addressSchema = zod.object({
   street1: zod.string().min(1, { message: 'Street 1 is required' }),
   street2: zod.string().optional(),
   city: zod.string().min(1, { message: 'City is required' }),
-  state: zod.string().min(1, { message: 'State is required' }),
-  postalCode: zod.string().min(5, { message: 'Postal code must be 5 digits' })
+  state: zod.string().length(2, { message: 'Enter a valid state' }),
+  postalCode: zod.string().regex(zipCodeRegex, 'Enter a valid zip code')
 });
 
 const UPDATE_PATIENT_ADDRESS = gql`
@@ -48,14 +49,14 @@ type AddressProps = {
   country: string;
 };
 
-type AddressFormProps = {
+type PatientAddressFormProps = {
   patientId: string;
   setAddress?: (address: AddressProps) => void;
   showRequiredBanner?: boolean;
   openStateDropdownUpward?: boolean;
 };
 
-export default function AddressForm(props: AddressFormProps) {
+export default function PatientAddressForm(props: PatientAddressFormProps) {
   const [submitting, setSubmitting] = createSignal(false);
   const client = usePhotonClient();
   const showRequiredBanner = () => props.showRequiredBanner ?? true;

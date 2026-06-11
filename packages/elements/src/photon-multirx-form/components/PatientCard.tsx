@@ -1,7 +1,7 @@
 import { any, record, string } from 'superstruct';
 import { createEffect, createMemo, createSignal, onMount, Show } from 'solid-js';
 import {
-  AddressForm,
+  PatientAddressForm,
   Button,
   Card,
   PatientInfo,
@@ -266,7 +266,7 @@ export const PatientCard = (props: {
         </div>
       </Show>
       <Show when={showAddressForm()}>
-        <AddressForm
+        <PatientAddressForm
           patientId={patientId()}
           setAddress={(address: Address) => {
             props.actions.updateFormValue({
