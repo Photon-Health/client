@@ -131,7 +131,7 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
   );
 };
 
-const supervisorSchema = zod.object({
+const supervisorInputSchema = zod.object({
   firstName: zod
     .string({ required_error: 'First name is required' })
     .min(1, 'First name is required'),
@@ -146,6 +146,8 @@ const supervisorSchema = zod.object({
   ...addressSchema.shape
 });
 
+type SupervisorInput = zod.infer<typeof supervisorInputSchema>;
+
 interface NewSupervisorFormProps {
   hasSupervisors: boolean;
   onCreated: (supervisor: SupervisorCardFragment) => void;
@@ -158,7 +160,7 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
   const [isOpen, setIsOpen] = createSignal(false);
 
   const { form, data, errors, validate, isValid, reset, setFields } = createForm({
-    onSubmit: async (values) => {
+    onSubmit: async (values: SupervisorInput) => {
       setSubmitting(true);
       try {
         validate();
@@ -170,7 +172,16 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
           variables: {
             firstName: values.firstName,
             lastName: values.lastName,
-            npi: String(values.npi)
+            npi: String(values.npi),
+            phone: values.phone,
+            address: {
+              street1: values.street1,
+              street2: values.street2,
+              city: values.city,
+              state: values.state,
+              postalCode: values.postalCode,
+              country: 'US'
+            }
           }
         });
         if (data?.createSupervisor) {
@@ -188,7 +199,7 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
         setSubmitting(false);
       }
     },
-    extend: validator({ schema: supervisorSchema })
+    extend: validator({ schema: supervisorInputSchema })
   });
 
   return (
