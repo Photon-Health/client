@@ -95,7 +95,7 @@ export default function PatientAddressForm(props: PatientAddressFormProps) {
         )}
         <form ref={form} id="patient-address" class="mt-4">
           <AddressForm
-            data={{ state: data().state }}
+            data={{ street1: data().street1, state: data().state }}
             errors={{
               street1: errors().street1?.[0],
               city: errors().city?.[0],

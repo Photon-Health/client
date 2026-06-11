@@ -3,6 +3,7 @@ import InputGroup from '../particles/InputGroup';
 import StateSelect from '../particles/StateSelect';
 import * as zod from 'zod';
 import { zipCodeRegex } from '../utils/regex';
+import AddressAutocompleteInput from '../particles/AddressAutocompleteInput';
 
 export const AddressSchema = zod.object({
   street1: zod.string().min(1, { message: 'Street 1 is required' }),
@@ -13,7 +14,7 @@ export const AddressSchema = zod.object({
 });
 
 export const AddressForm = (props: {
-  data: Pick<zod.infer<typeof AddressSchema>, 'state'>;
+  data: Pick<zod.infer<typeof AddressSchema>, 'street1' | 'state'>;
   errors: {
     street1?: string;
     city?: string;
@@ -21,11 +22,29 @@ export const AddressForm = (props: {
     postalCode?: string;
   };
   showRequired?: boolean;
+  // TODO: Could we just turn this on for all instances?
+  setAutocompleteFields?: (key: string, value: unknown) => void;
 }) => {
   return (
     <>
       <InputGroup label="Address Line 1" error={props.errors.street1} required={props.showRequired}>
-        <Input type="text" name="street1" />
+        {props.setAutocompleteFields ? (
+          <AddressAutocompleteInput
+            value={props.data.street1}
+            onInput={(e: InputEvent & { currentTarget: HTMLInputElement }) => {
+              props.setAutocompleteFields!('street1', e.currentTarget.value);
+            }}
+            onAddressSelect={(address) => {
+              props.setAutocompleteFields!('street1', address.street1);
+              props.setAutocompleteFields!('street2', address.street2);
+              props.setAutocompleteFields!('city', address.city);
+              props.setAutocompleteFields!('state', address.state);
+              props.setAutocompleteFields!('postalCode', address.postalCode);
+            }}
+          />
+        ) : (
+          <Input type="text" name="street1" />
+        )}
       </InputGroup>
       <InputGroup label="Address Line 2">
         <Input type="text" name="street2" />
