@@ -23,7 +23,7 @@ import { SupervisorCardFragment } from '@photonhealth/sdk/dist/clinical-api/type
 
 const sortSupervisors = (supervisors: SupervisorCardFragment[]) =>
   [...supervisors].sort(
-    (a, b) => a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName)
+    (a, b) => a.firstName.localeCompare(b.lastName) || a.lastName.localeCompare(b.firstName)
   );
 
 const displaySupervisor = (supervisor?: SupervisorCardFragment) =>
