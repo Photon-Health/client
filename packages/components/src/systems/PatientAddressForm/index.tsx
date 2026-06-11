@@ -4,8 +4,6 @@ import * as zod from 'zod';
 import gql from 'graphql-tag';
 import Input from '../../particles/Input';
 import InputGroup from '../../particles/InputGroup';
-import { states } from './states';
-import ListSelect from '../../particles/ListBox';
 import Card from '../../particles/Card';
 import Text from '../../particles/Text';
 import Button from '../../particles/Button';
@@ -14,6 +12,7 @@ import { createSignal } from 'solid-js';
 import triggerToast from '../../utils/toastTriggers';
 import Banner from '../../particles/Banner';
 import { zipCodeRegex } from '../../utils/regex';
+import StateSelect from '../../particles/StateSelect';
 
 const addressSchema = zod.object({
   street1: zod.string().min(1, { message: 'Street 1 is required' }),
@@ -77,7 +76,7 @@ export default function PatientAddressForm(props: PatientAddressFormProps) {
     }
   };
 
-  const { form, errors } = createForm({
+  const { form, data, errors } = createForm({
     onSubmit: async (values) => {
       setSubmitting(true);
       try {
@@ -118,12 +117,7 @@ export default function PatientAddressForm(props: PatientAddressFormProps) {
           </InputGroup>
           <div class="grid grid-cols-1 sm:gap-4 sm:grid-cols-2">
             <InputGroup label="State *" error={errors().state}>
-              <ListSelect
-                list={states}
-                selectMessage="Select a State"
-                name="state"
-                openUpward={props.openStateDropdownUpward}
-              />
+              <StateSelect name="state" value={data().state} />
             </InputGroup>
             <InputGroup label="Zip Code *" error={errors().postalCode}>
               <Input type="text" name="postalCode" />
