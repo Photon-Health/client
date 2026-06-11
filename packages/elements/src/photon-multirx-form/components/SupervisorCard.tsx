@@ -159,6 +159,15 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
   const [submitting, setSubmitting] = createSignal(false);
   const [isOpen, setIsOpen] = createSignal(false);
 
+  // When the provider has no supervisors, the form is always open.
+  // - Adding a supervisor is optional, but we don't have a good way to
+  //   convey that the entire form is optional but fields within
+  //   the form are required
+  // When the provider has supervisors, the form is collapsed by default
+  // - When the provider clicks Add new to expand the form,
+  //   it's fine to show which fields are required
+  const showRequired = () => props.hasSupervisors;
+
   const { form, data, errors, validate, isValid, reset, setFields } = createForm({
     onSubmit: async (values: SupervisorInput) => {
       setSubmitting(true);
@@ -216,16 +225,16 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
       }}
     >
       <form ref={form} id={formId}>
-        <InputGroup label="First Name" error={errors().firstName?.[0]}>
+        <InputGroup label="First Name" error={errors().firstName?.[0]} required={showRequired()}>
           <Input name="firstName" />
         </InputGroup>
-        <InputGroup label="Last Name" error={errors().lastName?.[0]}>
+        <InputGroup label="Last Name" error={errors().lastName?.[0]} required={showRequired()}>
           <Input name="lastName" />
         </InputGroup>
-        <InputGroup label="NPI" error={errors().npi?.[0]}>
+        <InputGroup label="NPI" error={errors().npi?.[0]} required={showRequired()}>
           <Input name="npi" type="number" inputMode="numeric" />
         </InputGroup>
-        <InputGroup label="Phone Number" error={errors().phone?.[0]}>
+        <InputGroup label="Phone Number" error={errors().phone?.[0]} required={showRequired()}>
           <PhoneInput
             value={data().phone}
             onPhoneChange={(value) => {
@@ -242,6 +251,7 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
             postalCode: errors().postalCode?.[0]
           }}
           setAutocompleteFields={setFields}
+          showRequired={showRequired()}
         />
         <div class="flex justify-end">
           <Button
