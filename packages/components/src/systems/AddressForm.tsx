@@ -5,16 +5,22 @@ import * as zod from 'zod';
 import { zipCodeRegex } from '../utils/regex';
 import AddressAutocompleteInput from '../particles/AddressAutocompleteInput';
 
-export const AddressSchema = zod.object({
-  street1: zod.string().min(1, { message: 'Street 1 is required' }),
+export const addressSchema = zod.object({
+  street1: zod
+    .string({ required_error: 'Address line 1 is required' })
+    .min(1, { message: 'Address line 1 is required' }),
   street2: zod.string().optional(),
-  city: zod.string().min(1, { message: 'City is required' }),
-  state: zod.string().length(2, { message: 'Enter a valid state' }),
-  postalCode: zod.string().regex(zipCodeRegex, 'Enter a valid zip code')
+  city: zod.string({ required_error: 'City is required' }).min(1, { message: 'City is required' }),
+  state: zod
+    .string({ required_error: 'State is required' })
+    .length(2, { message: 'Enter a valid state' }),
+  postalCode: zod
+    .string({ required_error: 'Zip code is required' })
+    .regex(zipCodeRegex, 'Enter a valid zip code')
 });
 
 export const AddressForm = (props: {
-  data: Pick<zod.infer<typeof AddressSchema>, 'street1' | 'state'>;
+  data: Pick<zod.infer<typeof addressSchema>, 'street1' | 'state'>;
   errors: {
     street1?: string;
     city?: string;

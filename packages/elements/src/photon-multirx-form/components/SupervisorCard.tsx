@@ -1,11 +1,14 @@
 import * as zod from 'zod';
 import {
+  AddressForm,
+  addressSchema,
   Button,
   Card,
   Collapsible,
   ComboBox,
   Input,
   InputGroup,
+  npiRegex,
   PhoneInput,
   Text,
   triggerToast,
@@ -135,11 +138,12 @@ const supervisorSchema = zod.object({
   lastName: zod.string({ required_error: 'Last name is required' }).min(1, 'Last name is required'),
   npi: zod.coerce
     .string({ required_error: 'NPI is required' })
-    .regex(/^[0-9]{10}$/, 'Enter a valid 10-digit NPI'),
+    .regex(npiRegex, 'Enter a valid 10-digit NPI'),
   phone: zod
     .string({ required_error: 'Phone number is required' })
     .min(1, 'Phone number is required')
-    .refine((value) => validateRealPhoneNumber(value), 'Enter a valid phone number')
+    .refine((value) => validateRealPhoneNumber(value), 'Enter a valid phone number'),
+  ...addressSchema.shape
 });
 
 interface NewSupervisorFormProps {
@@ -153,7 +157,7 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
   const [submitting, setSubmitting] = createSignal(false);
   const [isOpen, setIsOpen] = createSignal(false);
 
-  const { form, data, errors, validate, isValid, reset, setData } = createForm({
+  const { form, data, errors, validate, isValid, reset, setFields } = createForm({
     onSubmit: async (values) => {
       setSubmitting(true);
       try {
@@ -210,14 +214,24 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
         <InputGroup label="NPI" error={errors().npi?.[0]}>
           <Input name="npi" type="number" inputMode="numeric" />
         </InputGroup>
-        <InputGroup label="Phone number" error={errors().phone?.[0]}>
+        <InputGroup label="Phone Number" error={errors().phone?.[0]}>
           <PhoneInput
             value={data().phone}
             onPhoneChange={(value) => {
-              setData('phone', value);
+              setFields('phone', value);
             }}
           />
         </InputGroup>
+        <AddressForm
+          data={{ street1: data().street1, state: data().state }}
+          errors={{
+            street1: errors().street1?.[0],
+            city: errors().city?.[0],
+            state: errors().state?.[0],
+            postalCode: errors().postalCode?.[0]
+          }}
+          setAutocompleteFields={setFields}
+        />
         <div class="flex justify-end">
           <Button
             type="submit"

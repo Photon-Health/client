@@ -8,7 +8,7 @@ import { usePhotonClient } from '../SDKProvider';
 import { createSignal } from 'solid-js';
 import triggerToast from '../../utils/toastTriggers';
 import Banner from '../../particles/Banner';
-import { AddressForm, AddressSchema } from '../AddressForm';
+import { AddressForm, addressSchema } from '../AddressForm';
 
 const UPDATE_PATIENT_ADDRESS = gql`
   mutation UpdateAddress($id: ID!, $address: AddressInput) {
@@ -78,7 +78,7 @@ export default function PatientAddressForm(props: PatientAddressFormProps) {
         });
       }
     },
-    extend: validator({ schema: AddressSchema })
+    extend: validator({ schema: addressSchema })
   });
 
   return (

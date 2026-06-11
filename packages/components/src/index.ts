@@ -86,6 +86,7 @@ import {
 import { PatientSelect } from './systems/PatientSelect';
 import { validateRealPhoneNumber } from './utils/validateRealPhoneNumber';
 import { npiRegex, zipCodeRegex } from './utils/regex';
+import { addressSchema, AddressForm } from './systems/AddressForm';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
 
@@ -159,7 +160,9 @@ export {
   isValidPrescriptionRoutingConstraint,
   validateRealPhoneNumber,
   npiRegex,
-  zipCodeRegex
+  zipCodeRegex,
+  addressSchema,
+  AddressForm
 };
 
 // Export types
