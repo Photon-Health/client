@@ -15,7 +15,15 @@ import {
   usePhoton,
   validateRealPhoneNumber
 } from '@photonhealth/components';
-import { createMemo, createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  createUniqueId,
+  For,
+  onMount,
+  Show
+} from 'solid-js';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
 import { CreateSupervisorMutation, SupervisorCardQuery } from '@photonhealth/sdk';
@@ -168,6 +176,8 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
   //   it's fine to show which fields are required
   const showRequired = () => props.hasSupervisors;
 
+  createEffect(() => console.log(data()));
+
   const { form, data, errors, validate, isValid, reset, setFields } = createForm({
     onSubmit: async (values: SupervisorInput) => {
       setSubmitting(true);
@@ -243,7 +253,13 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
           />
         </InputGroup>
         <AddressForm
-          data={{ street1: data().street1, state: data().state }}
+          data={{
+            street1: data().street1,
+            street2: data().street2,
+            city: data().city,
+            state: data().state,
+            postalCode: data().postalCode
+          }}
           errors={{
             street1: errors().street1?.[0],
             city: errors().city?.[0],

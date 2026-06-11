@@ -19,8 +19,10 @@ export const addressSchema = zod.object({
     .regex(zipCodeRegex, 'Enter a valid zip code')
 });
 
+// This component is currently designed for use with createForm from @felte
+// If it needs to be used with other form stores, add an onChange handler
 export const AddressForm = (props: {
-  data: Pick<zod.infer<typeof addressSchema>, 'street1' | 'state'>;
+  data: zod.infer<typeof addressSchema>;
   errors: {
     street1?: string;
     city?: string;
@@ -49,21 +51,22 @@ export const AddressForm = (props: {
             }}
           />
         ) : (
-          <Input type="text" name="street1" />
+          <Input type="text" name="street1" value={props.data.street1} />
         )}
       </InputGroup>
       <InputGroup label="Address Line 2">
-        <Input type="text" name="street2" />
+        <Input type="text" name="street2" value={props.data.street2} />
       </InputGroup>
       <InputGroup label="City" error={props.errors.city} required={props.showRequired}>
-        <Input type="text" name="city" />
+        <Input type="text" name="city" value={props.data.city} />
       </InputGroup>
       <div class="grid grid-cols-1 sm:gap-4 sm:grid-cols-2">
         <InputGroup label="State" error={props.errors.state} required={props.showRequired}>
+          {/* Need to pass value for styling */}
           <StateSelect name="state" value={props.data.state} />
         </InputGroup>
         <InputGroup label="Zip Code" error={props.errors.postalCode} required={props.showRequired}>
-          <Input type="text" name="postalCode" />
+          <Input type="text" name="postalCode" value={props.data.postalCode} />
         </InputGroup>
       </div>
     </>
