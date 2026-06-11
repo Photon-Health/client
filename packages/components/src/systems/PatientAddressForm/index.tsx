@@ -107,14 +107,10 @@ export default function PatientAddressForm(props: PatientAddressFormProps) {
           <Banner status="info">Patient address is required to write a prescription</Banner>
         )}
         <form ref={form} id="patient-address" class="mt-4">
-          <InputGroup
-            label="Address Line 1 *"
-            subLabel="Enter Street Number and Name"
-            error={errors().street1}
-          >
+          <InputGroup label="Address Line 1 *" error={errors().street1}>
             <Input type="text" name="street1" />
           </InputGroup>
-          <InputGroup label="Address Line 2" subLabel="Enter Apt, Unit, or Suite">
+          <InputGroup label="Address Line 2">
             <Input type="text" name="street2" />
           </InputGroup>
           <InputGroup label="City *" error={errors().city}>
