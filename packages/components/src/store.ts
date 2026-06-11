@@ -299,7 +299,25 @@ export class PhotonClientStore {
         // getAccessToken is triggering the SSO screen to appear, so for auto-login=false, we don't want to call it
         try {
           const token = await this.sdk.authentication.getAccessToken();
-          const decoded: { permissions: Permission[] } = jwtDecode(token);
+          const decoded: {
+            permissions: Permission[];
+            'https://photon.health/assigned_org_id'?: string;
+          } = jwtDecode(token);
+          const assignedOrgId = decoded['https://photon.health/assigned_org_id'];
+          if (
+            !isOrganizationIdSelectedInPhotonClient &&
+            !isUserLoggedIntoAnOrganization &&
+            assignedOrgId
+          ) {
+            // No org was configured upfront and the user isn't logged into one, but the
+            // token assigns them an org — re-login scoped to that org. Once the redirect
+            // comes back, user.org_id is set, so this only happens once.
+            this.sdk.setOrganization(assignedOrgId);
+            await this.sdk.authentication.login({
+              appState: { returnTo: `${window.location.pathname}${window.location.search}` }
+            });
+            return;
+          }
           permissions = decoded?.permissions || [];
         } catch (_err) {
           permissions = [];
