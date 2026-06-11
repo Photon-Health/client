@@ -102,6 +102,7 @@ export default function PatientAddressForm(props: PatientAddressFormProps) {
               state: errors().state?.[0],
               postalCode: errors().postalCode?.[0]
             }}
+            showRequired={true}
           />
         </form>
       </div>

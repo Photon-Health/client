@@ -20,23 +20,24 @@ export const AddressForm = (props: {
     state?: string;
     postalCode?: string;
   };
+  showRequired?: boolean;
 }) => {
   return (
     <>
-      <InputGroup label="Address Line 1 *" error={props.errors.street1}>
+      <InputGroup label="Address Line 1" error={props.errors.street1} required={props.showRequired}>
         <Input type="text" name="street1" />
       </InputGroup>
       <InputGroup label="Address Line 2">
         <Input type="text" name="street2" />
       </InputGroup>
-      <InputGroup label="City *" error={props.errors.city}>
+      <InputGroup label="City" error={props.errors.city} required={props.showRequired}>
         <Input type="text" name="city" />
       </InputGroup>
       <div class="grid grid-cols-1 sm:gap-4 sm:grid-cols-2">
-        <InputGroup label="State *" error={props.errors.state}>
+        <InputGroup label="State" error={props.errors.state} required={props.showRequired}>
           <StateSelect name="state" value={props.data.state} />
         </InputGroup>
-        <InputGroup label="Zip Code *" error={props.errors.postalCode}>
+        <InputGroup label="Zip Code" error={props.errors.postalCode} required={props.showRequired}>
           <Input type="text" name="postalCode" />
         </InputGroup>
       </div>
