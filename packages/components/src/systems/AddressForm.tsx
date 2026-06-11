@@ -1,0 +1,45 @@
+import Input from '../particles/Input';
+import InputGroup from '../particles/InputGroup';
+import StateSelect from '../particles/StateSelect';
+import * as zod from 'zod';
+import { zipCodeRegex } from '../utils/regex';
+
+export const AddressSchema = zod.object({
+  street1: zod.string().min(1, { message: 'Street 1 is required' }),
+  street2: zod.string().optional(),
+  city: zod.string().min(1, { message: 'City is required' }),
+  state: zod.string().length(2, { message: 'Enter a valid state' }),
+  postalCode: zod.string().regex(zipCodeRegex, 'Enter a valid zip code')
+});
+
+export const AddressForm = (props: {
+  data: Pick<zod.infer<typeof AddressSchema>, 'state'>;
+  errors: {
+    street1?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+  };
+}) => {
+  return (
+    <>
+      <InputGroup label="Address Line 1 *" error={props.errors.street1}>
+        <Input type="text" name="street1" />
+      </InputGroup>
+      <InputGroup label="Address Line 2">
+        <Input type="text" name="street2" />
+      </InputGroup>
+      <InputGroup label="City *" error={props.errors.city}>
+        <Input type="text" name="city" />
+      </InputGroup>
+      <div class="grid grid-cols-1 sm:gap-4 sm:grid-cols-2">
+        <InputGroup label="State *" error={props.errors.state}>
+          <StateSelect name="state" value={props.data.state} />
+        </InputGroup>
+        <InputGroup label="Zip Code *" error={props.errors.postalCode}>
+          <Input type="text" name="postalCode" />
+        </InputGroup>
+      </div>
+    </>
+  );
+};
