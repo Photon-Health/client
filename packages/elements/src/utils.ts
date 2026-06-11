@@ -29,10 +29,6 @@ export const toTitleCase = (str: string) => {
   });
 };
 
-export const isZip = (zip: string) => {
-  return /^\d{5}(-\d{4})?$/.test(zip);
-};
-
 export function checkHasPermission(subset: Permission[], superset: Permission[]) {
   return subset.every((permission) => superset.includes(permission));
 }
