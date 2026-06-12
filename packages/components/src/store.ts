@@ -299,9 +299,9 @@ export class PhotonClientStore {
 
       // If no org was configured upfront but the user was logged into one,
       // derive it from the authenticated user.
-      // if (!isOrganizationIdSelectedInPhotonClient && isUserLoggedIntoAnOrganization) {
-      //   this.sdk.setOrganization(user.org_id);
-      // }
+      if (!isOrganizationIdSelectedInPhotonClient && isUserLoggedIntoAnOrganization) {
+        this.sdk.setOrganization(user.org_id);
+      }
 
       let permissions: Permission[] = [];
       if (this.autoLogin || authenticated) {
