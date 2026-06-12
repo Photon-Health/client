@@ -50,7 +50,7 @@ export type SupervisorPrefillShape = {
 
 export function generateSupervisorPrefill(
   overrides: Partial<SupervisorPrefillShape> = {}
-): Partial<SupervisorPrefillShape> {
+): SupervisorPrefillShape {
   return {
     firstName: 'Jane',
     lastName: 'Doe',
