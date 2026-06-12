@@ -299,9 +299,9 @@ export class PhotonClientStore {
 
       // If no org was configured upfront but the user was logged into one,
       // derive it from the authenticated user.
-      if (!isOrganizationIdSelectedInPhotonClient && isUserLoggedIntoAnOrganization) {
-        this.sdk.setOrganization(user.org_id);
-      }
+      // if (!isOrganizationIdSelectedInPhotonClient && isUserLoggedIntoAnOrganization) {
+      //   this.sdk.setOrganization(user.org_id);
+      // }
 
       let permissions: Permission[] = [];
       if (this.autoLogin || authenticated) {
@@ -318,7 +318,6 @@ export class PhotonClientStore {
             !isUserLoggedIntoAnOrganization &&
             assignedOrgId
           ) {
-            console.log('ZAC SETTING ORG AND LOGGIN IN');
             // No org was configured upfront and the user isn't logged into one, but the
             // token assigns them an org — re-login scoped to that org. Once the redirect
             // comes back, user.org_id is set, so this only happens once.
