@@ -15,15 +15,7 @@ import {
   usePhoton,
   validateRealPhoneNumber
 } from '@photonhealth/components';
-import {
-  createEffect,
-  createMemo,
-  createSignal,
-  createUniqueId,
-  For,
-  onMount,
-  Show
-} from 'solid-js';
+import { createMemo, createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
 import { CreateSupervisorMutation, SupervisorCardQuery } from '@photonhealth/sdk';
@@ -175,8 +167,6 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
   // - When the provider clicks Add new to expand the form,
   //   it's fine to show which fields are required
   const showRequired = () => props.hasSupervisors;
-
-  createEffect(() => console.log(data()));
 
   const { form, data, errors, validate, isValid, reset, setFields } = createForm({
     onSubmit: async (values: SupervisorInput) => {
