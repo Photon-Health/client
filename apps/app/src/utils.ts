@@ -168,6 +168,14 @@ function getUnitAbbreviation(quantity: string): string {
   return quantityAbbreviations[loweredQuantity] || quantity;
 }
 
+/**
+ * Check that number is a real, callable phone number
+ */
+const validateRealPhoneNumber = (number: string) => {
+  const parsedNumber = parsePhoneNumber(number, 'US');
+  return parsedNumber?.isValid() || false;
+};
+
 export {
   formatDate,
   formatDateUTC,
@@ -180,5 +188,6 @@ export {
   titleCase,
   unique,
   getUnitAbbreviation,
-  getMatchingPartsFromSubstring
+  getMatchingPartsFromSubstring,
+  validateRealPhoneNumber
 };

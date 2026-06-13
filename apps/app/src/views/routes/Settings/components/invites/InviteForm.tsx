@@ -20,12 +20,12 @@ import { graphql } from 'apps/app/src/gql';
 import { InvitesQueryDocument } from 'apps/app/src/gql/graphql';
 import { ErrorMessage, Field, Formik, validateYupSchema, yupToFormErrors } from 'formik';
 import * as yup from 'yup';
-import parsePhoneNumberFromString from 'libphonenumber-js';
 import { usePhoton } from '@photonhealth/react';
 import { hasPrescriberRole, rolesSchema, RolesSelect } from '../utils/Roles';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 import { npiRegex, phoneRegex, zipCodeRegex } from '../utils/Validation';
 import { AddressInput } from 'packages/sdk/dist/types';
+import { validateRealPhoneNumber } from 'apps/app/src/utils';
 
 const organizationSettingsQuery = graphql(/* GraphQL */ `
   query FaxPreferenceQuery {
@@ -56,8 +56,7 @@ const requiredForPrescribers =
 
 const isValidUSPhone = (value?: string) => {
   if (!value) return true;
-  const parsed = parsePhoneNumberFromString(value, 'US');
-  return !!parsed?.isValid();
+  return validateRealPhoneNumber(value);
 };
 
 const inviteSchema = yup

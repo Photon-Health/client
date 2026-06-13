@@ -1,5 +1,5 @@
 import './index.css';
-import AddressForm from './systems/AddressForm';
+import PatientAddressForm from './systems/PatientAddressForm';
 import { Alert } from './particles/Alert';
 import Checkbox from './particles/Checkbox';
 import DispenseUnitSelect from './particles/DispenseUnitSelect';
@@ -84,11 +84,14 @@ import {
   PATIENT_FORM_FIELDS
 } from './analytics/buildFieldSnapshot';
 import { PatientSelect } from './systems/PatientSelect';
+import { validateRealPhoneNumber } from './utils/validateRealPhoneNumber';
+import { npiRegex, zipCodeRegex } from './utils/regex';
+import { addressSchema, AddressForm } from './systems/AddressForm';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
 
 export {
-  AddressForm,
+  PatientAddressForm,
   AddressAutocompleteInput,
   Alert,
   Banner,
@@ -154,7 +157,12 @@ export {
   PATIENT_FORM_FIELDS,
   DRAFT_PRESCRIPTION_FORM_FIELDS,
   PatientSelect,
-  isValidPrescriptionRoutingConstraint
+  isValidPrescriptionRoutingConstraint,
+  validateRealPhoneNumber,
+  npiRegex,
+  zipCodeRegex,
+  addressSchema,
+  AddressForm
 };
 
 // Export types

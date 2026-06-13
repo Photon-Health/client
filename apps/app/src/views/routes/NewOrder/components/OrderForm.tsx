@@ -16,6 +16,7 @@ import { PatientAddressCard } from './PatientAddressCard';
 import { OrganizationSettings } from 'apps/app/src/gql/graphql';
 import { graphql } from 'apps/app/src/gql';
 import { useQuery } from '@apollo/client';
+import { zipCodeRegex } from '../../Settings/components/utils/Validation';
 
 const EMPTY_FORM_VALUES = {
   patientId: '',
@@ -59,7 +60,7 @@ const orderSchema = yup.object({
       postalCode: yup
         .string()
         .required('Please enter a zip code...')
-        .matches(/^\d{5}(-\d{4})?$/, 'Must be a valid zip code...'),
+        .matches(zipCodeRegex, 'Must be a valid zip code...'),
       country: yup.string().required('Please enter a country...'),
       state: yup.string().required('Please enter a state...'),
       city: yup.string().required('Please enter a city...')
