@@ -84,7 +84,6 @@ export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
     'photon:order:canceled',
     'photon:prescription:created',
     'photon:prescription:depleted',
-    'photon:prescription:expired',
     'photon:prescription:active'
   ];
 
@@ -110,7 +109,6 @@ export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
             onSubmit={async (values, { validateForm }) => {
               validateForm(values);
               if (eventValue === 'all') {
-                // eslint-disable-next-line no-param-reassign
                 values.filters = allFilters;
               }
               createWebhook({
