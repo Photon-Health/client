@@ -1,11 +1,6 @@
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
-import * as zod from 'zod';
 import gql from 'graphql-tag';
-import Input from '../../particles/Input';
-import InputGroup from '../../particles/InputGroup';
-import { states } from './states';
-import ListSelect from '../../particles/ListBox';
 import Card from '../../particles/Card';
 import Text from '../../particles/Text';
 import Button from '../../particles/Button';
@@ -13,14 +8,7 @@ import { usePhotonClient } from '../SDKProvider';
 import { createSignal } from 'solid-js';
 import triggerToast from '../../utils/toastTriggers';
 import Banner from '../../particles/Banner';
-
-const addressSchema = zod.object({
-  street1: zod.string().min(1, { message: 'Street 1 is required' }),
-  street2: zod.string().optional(),
-  city: zod.string().min(1, { message: 'City is required' }),
-  state: zod.string().min(1, { message: 'State is required' }),
-  postalCode: zod.string().min(5, { message: 'Postal code must be 5 digits' })
-});
+import { AddressForm, addressSchema } from '../AddressForm';
 
 const UPDATE_PATIENT_ADDRESS = gql`
   mutation UpdateAddress($id: ID!, $address: AddressInput) {
@@ -48,14 +36,14 @@ type AddressProps = {
   country: string;
 };
 
-type AddressFormProps = {
+type PatientAddressFormProps = {
   patientId: string;
   setAddress?: (address: AddressProps) => void;
   showRequiredBanner?: boolean;
   openStateDropdownUpward?: boolean;
 };
 
-export default function AddressForm(props: AddressFormProps) {
+export default function PatientAddressForm(props: PatientAddressFormProps) {
   const [submitting, setSubmitting] = createSignal(false);
   const client = usePhotonClient();
   const showRequiredBanner = () => props.showRequiredBanner ?? true;
@@ -76,7 +64,7 @@ export default function AddressForm(props: AddressFormProps) {
     }
   };
 
-  const { form, errors } = createForm({
+  const { form, data, errors } = createForm({
     onSubmit: async (values) => {
       setSubmitting(true);
       try {
@@ -106,32 +94,22 @@ export default function AddressForm(props: AddressFormProps) {
           <Banner status="info">Patient address is required to write a prescription</Banner>
         )}
         <form ref={form} id="patient-address" class="mt-4">
-          <InputGroup
-            label="Address Line 1 *"
-            subLabel="Enter Street Number and Name"
-            error={errors().street1}
-          >
-            <Input type="text" name="street1" />
-          </InputGroup>
-          <InputGroup label="Address Line 2" subLabel="Enter Apt, Unit, or Suite">
-            <Input type="text" name="street2" />
-          </InputGroup>
-          <InputGroup label="City *" error={errors().city}>
-            <Input type="text" name="city" />
-          </InputGroup>
-          <div class="grid grid-cols-1 sm:gap-4 sm:grid-cols-2">
-            <InputGroup label="State *" error={errors().state}>
-              <ListSelect
-                list={states}
-                selectMessage="Select a State"
-                name="state"
-                openUpward={props.openStateDropdownUpward}
-              />
-            </InputGroup>
-            <InputGroup label="Zip Code *" error={errors().postalCode}>
-              <Input type="text" name="postalCode" />
-            </InputGroup>
-          </div>
+          <AddressForm
+            data={{
+              street1: data().street1,
+              street2: data().street2,
+              city: data().city,
+              state: data().state,
+              postalCode: data().postalCode
+            }}
+            errors={{
+              street1: errors().street1?.[0],
+              city: errors().city?.[0],
+              state: errors().state?.[0],
+              postalCode: errors().postalCode?.[0]
+            }}
+            showRequired={true}
+          />
         </form>
       </div>
     </Card>

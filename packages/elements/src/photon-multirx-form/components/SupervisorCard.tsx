@@ -1,14 +1,19 @@
 import * as zod from 'zod';
 import {
+  AddressForm,
+  addressSchema,
   Button,
   Card,
   Collapsible,
   ComboBox,
   Input,
   InputGroup,
+  npiRegex,
+  PhoneInput,
   Text,
   triggerToast,
-  usePhoton
+  usePhoton,
+  validateRealPhoneNumber
 } from '@photonhealth/components';
 import { createMemo, createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
 import { createForm } from '@felte/solid';
@@ -18,7 +23,7 @@ import { SupervisorCardFragment } from '@photonhealth/sdk/dist/clinical-api/type
 
 const sortSupervisors = (supervisors: SupervisorCardFragment[]) =>
   [...supervisors].sort(
-    (a, b) => a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName)
+    (a, b) => a.firstName.localeCompare(b.lastName) || a.lastName.localeCompare(b.firstName)
   );
 
 const displaySupervisor = (supervisor?: SupervisorCardFragment) =>
@@ -126,15 +131,22 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
   );
 };
 
-const supervisorSchema = zod.object({
+const supervisorInputSchema = zod.object({
   firstName: zod
     .string({ required_error: 'First name is required' })
     .min(1, 'First name is required'),
   lastName: zod.string({ required_error: 'Last name is required' }).min(1, 'Last name is required'),
   npi: zod.coerce
     .string({ required_error: 'NPI is required' })
-    .regex(/^[0-9]{10}$/, 'Enter a valid 10-digit NPI')
+    .regex(npiRegex, 'Enter a valid 10-digit NPI'),
+  phone: zod
+    .string({ required_error: 'Phone number is required' })
+    .min(1, 'Phone number is required')
+    .refine((value) => validateRealPhoneNumber(value), 'Enter a valid phone number'),
+  ...addressSchema.shape
 });
+
+type SupervisorInput = zod.infer<typeof supervisorInputSchema>;
 
 interface NewSupervisorFormProps {
   hasSupervisors: boolean;
@@ -147,8 +159,17 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
   const [submitting, setSubmitting] = createSignal(false);
   const [isOpen, setIsOpen] = createSignal(false);
 
-  const { form, errors, validate, isValid, reset } = createForm({
-    onSubmit: async (values) => {
+  // When the provider has no supervisors, the form is always open.
+  // - Adding a supervisor is optional, but we don't have a good way to
+  //   convey that the entire form is optional but fields within
+  //   the form are required
+  // When the provider has supervisors, the form is collapsed by default
+  // - When the provider clicks Add new to expand the form,
+  //   it's fine to show which fields are required
+  const showRequired = () => props.hasSupervisors;
+
+  const { form, data, errors, validate, isValid, reset, setFields } = createForm({
+    onSubmit: async (values: SupervisorInput) => {
       setSubmitting(true);
       try {
         validate();
@@ -160,7 +181,16 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
           variables: {
             firstName: values.firstName,
             lastName: values.lastName,
-            npi: String(values.npi)
+            npi: String(values.npi),
+            phone: values.phone,
+            address: {
+              street1: values.street1,
+              street2: values.street2,
+              city: values.city,
+              state: values.state,
+              postalCode: values.postalCode,
+              country: 'US'
+            }
           }
         });
         if (data?.createSupervisor) {
@@ -178,7 +208,7 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
         setSubmitting(false);
       }
     },
-    extend: validator({ schema: supervisorSchema })
+    extend: validator({ schema: supervisorInputSchema })
   });
 
   return (
@@ -195,15 +225,40 @@ const NewSupervisorForm = (props: NewSupervisorFormProps) => {
       }}
     >
       <form ref={form} id={formId}>
-        <InputGroup label="First Name" error={errors().firstName?.[0]}>
+        <InputGroup label="First Name" error={errors().firstName?.[0]} required={showRequired()}>
           <Input name="firstName" />
         </InputGroup>
-        <InputGroup label="Last Name" error={errors().lastName?.[0]}>
+        <InputGroup label="Last Name" error={errors().lastName?.[0]} required={showRequired()}>
           <Input name="lastName" />
         </InputGroup>
-        <InputGroup label="NPI" error={errors().npi?.[0]}>
+        <InputGroup label="NPI" error={errors().npi?.[0]} required={showRequired()}>
           <Input name="npi" type="number" inputMode="numeric" />
         </InputGroup>
+        <InputGroup label="Phone Number" error={errors().phone?.[0]} required={showRequired()}>
+          <PhoneInput
+            value={data().phone}
+            onPhoneChange={(value) => {
+              setFields('phone', value);
+            }}
+          />
+        </InputGroup>
+        <AddressForm
+          data={{
+            street1: data().street1,
+            street2: data().street2,
+            city: data().city,
+            state: data().state,
+            postalCode: data().postalCode
+          }}
+          errors={{
+            street1: errors().street1?.[0],
+            city: errors().city?.[0],
+            state: errors().state?.[0],
+            postalCode: errors().postalCode?.[0]
+          }}
+          setAutocompleteFields={setFields}
+          showRequired={showRequired()}
+        />
         <div class="flex justify-end">
           <Button
             type="submit"

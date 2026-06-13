@@ -1,4 +1,4 @@
-import { CALENDAR_DATE_FORMAT } from '@photonhealth/components';
+import { CALENDAR_DATE_FORMAT, zipCodeRegex } from '@photonhealth/components';
 import { differenceInHours, isToday, parse } from 'date-fns';
 import { Struct, is, define, refine, string, any } from 'superstruct';
 
@@ -25,7 +25,7 @@ export const afterDate = (
 
 export const zipString = () =>
   refine(string(), 'zipString', (value) => {
-    return /^\d{5}(-\d{4})?$/.test(value as string);
+    return zipCodeRegex.test(value as string);
   });
 
 export const email = () =>
