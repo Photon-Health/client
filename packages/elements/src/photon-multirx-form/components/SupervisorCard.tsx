@@ -15,7 +15,7 @@ import {
   usePhoton,
   validateRealPhoneNumber
 } from '@photonhealth/components';
-import { createMemo, createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
+import { batch, createMemo, createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
 import { CreateSupervisorMutation, SupervisorCardQuery } from '@photonhealth/sdk';
@@ -77,8 +77,14 @@ export const SupervisorCard = (props: SupervisorCardProps) => {
   });
 
   const handleSupervisorCreated = (supervisor: SupervisorCardFragment) => {
-    setSupervisors((prev) => sortSupervisors([...prev, supervisor]));
-    props.actions.updateFormValue({ key: 'supervisorId', value: supervisor.id });
+    // I noticed that sometimes the supervisor Combobox doesn't display
+    // the most recently created supervisor after the mutation runs
+    // Hard bug to replicate but it may be related to SolidJS batching
+    // not being enforced by default in this handler
+    batch(() => {
+      setSupervisors((prev) => sortSupervisors([...prev, supervisor]));
+      props.actions.updateFormValue({ key: 'supervisorId', value: supervisor.id });
+    });
   };
 
   return (
