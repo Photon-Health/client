@@ -4,7 +4,7 @@ import { FC } from 'react';
 import * as yup from 'yup';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 import { hasPrescriberRole, rolesSchema } from '../utils/Roles';
-import { phoneRegex, zipCodeRegex } from '../utils/Validation';
+import { npiRegex, phoneRegex, zipCodeRegex } from '../utils/Validation';
 
 export const profileFormSchema = yup.object({
   name: yup.object({
@@ -45,7 +45,7 @@ export const profileFormSchema = yup.object({
     }),
   npi: yup
     .string()
-    .matches(/^[0-9]+$/, { message: 'Enter a valid NPI' })
+    .matches(npiRegex, { message: 'Enter a valid NPI' })
     .when('roles', (roles: { value: string; label: string }[], schema: yup.BaseSchema) => {
       return hasPrescriberRole(roles)
         ? schema.required('NPI is required for prescribers')
