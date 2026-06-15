@@ -70,6 +70,10 @@ import { PhotonContext, usePhoton } from './context';
 import { PhotonClientStore } from './store';
 import { CoverageOption, PrescribeProvider, usePrescribe } from './systems/PrescribeProvider';
 import { SupervisorPrefill, SupervisorProvider, useSupervisor } from './systems/SupervisorProvider';
+import {
+  PrescriptionScreeningProvider,
+  usePrescriptionScreening
+} from './systems/PrescriptionScreeningProvider';
 
 import { GoogleServiceProvider, useGoogleService } from './systems/GoogleServiceProvider';
 
@@ -162,7 +166,9 @@ export {
   npiRegex,
   zipCodeRegex,
   addressSchema,
-  AddressForm
+  AddressForm,
+  PrescriptionScreeningProvider,
+  usePrescriptionScreening
 };
 
 // Export types
