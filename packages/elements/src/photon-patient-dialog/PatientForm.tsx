@@ -15,10 +15,10 @@ import {
   SEX_OPTIONS,
   SexSelect,
   Spinner,
-  StateSelect
+  StateSelect,
+  zipCodeRegex
 } from '@photonhealth/components';
 import { email, empty, message, notFutureDate, zipString } from '../validators';
-import { isZip } from '../utils';
 import { PhotonAuthorized } from '../photon-authorized';
 
 const validators = {
@@ -331,7 +331,7 @@ export const PatientForm = (props: {
                   <p class="font-sans text-sm m-0 mt-6">Preferred pharmacy</p>
                   <PharmacySearch
                     address={
-                      isZip(props.store['address_zip']?.value)
+                      zipCodeRegex.test(props.store['address_zip']?.value)
                         ? props.store['address_zip']?.value
                         : undefined
                     }

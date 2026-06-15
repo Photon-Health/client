@@ -7,7 +7,7 @@ import { PatientCard } from './PatientCard';
 import { PharmacyCard } from './PharmacyCard';
 import clearForm from './PrescriptionCard/util/clearForm';
 import {
-  AddressForm,
+  PatientAddressForm,
   Alert,
   Button,
   RecentOrders,
@@ -674,7 +674,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   <OrderCard store={props.formStore} />
                 </Show>
                 <Show when={forceAddressForm() && props.formStore.patient?.value?.id}>
-                  <AddressForm
+                  <PatientAddressForm
                     patientId={props.formStore.patient?.value?.id}
                     showRequiredBanner={false}
                     openStateDropdownUpward={true}

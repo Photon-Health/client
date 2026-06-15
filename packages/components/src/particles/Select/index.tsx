@@ -6,6 +6,7 @@ export interface SelectProps {
   value?: string;
   required?: boolean;
   disabled?: boolean;
+  name?: string;
   onChange?: JSX.EventHandlerUnion<HTMLSelectElement, Event>;
   onBlur?: JSX.EventHandlerUnion<HTMLSelectElement, FocusEvent>;
   children: JSX.Element;
@@ -43,6 +44,7 @@ export default function Select(props: SelectProps) {
       onBlur={props.onBlur}
       value={props.value ?? ''}
       class={selectClass()}
+      name={props.name}
     >
       {props.children}
     </select>
