@@ -41,3 +41,28 @@ export const SupervisorCardQuery = graphql(`
     }
   }
 `);
+
+export const ScreenDraftedPrescriptionsQuery = graphql(`
+  query ScreenDraftedPrescriptionsQuery(
+    $draftedPrescriptions: [DraftedPrescriptionInput!]!
+    $patientId: ID!
+    $diagnosisCodes: [DiagnosisCode!]
+  ) {
+    prescriptionScreen(
+      draftedPrescriptions: $draftedPrescriptions
+      patientId: $patientId
+      diagnosisCodes: $diagnosisCodes
+    ) {
+      alerts {
+        type
+        description
+        involvedEntities {
+          id
+          name
+          __typename
+        }
+        severity
+      }
+    }
+  }
+`);

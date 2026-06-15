@@ -1,4 +1,3 @@
-import { gql } from 'graphql-tag';
 import { PhotonAuthorized } from '../../photon-authorized';
 import type { FormError } from '../../stores/form';
 import { checkHasPermission } from '../../utils';
@@ -24,7 +23,7 @@ import {
   useRecentOrders,
   useSupervisor
 } from '@photonhealth/components';
-import { MeUserQuery, types } from '@photonhealth/sdk';
+import { MeUserQuery, ScreenDraftedPrescriptionsQuery, types } from '@photonhealth/sdk';
 import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
@@ -100,26 +99,6 @@ export type PrescribeProps = {
   disableList?: DisableList;
   groupId?: string;
 };
-
-export const ScreenDraftedPrescriptionsQuery = gql`
-  query ScreenDraftedPrescriptionsQuery(
-    $draftedPrescriptions: [DraftedPrescriptionInput!]!
-    $patientId: ID!
-  ) {
-    prescriptionScreen(draftedPrescriptions: $draftedPrescriptions, patientId: $patientId) {
-      alerts {
-        type
-        description
-        involvedEntities {
-          id
-          name
-          __typename
-        }
-        severity
-      }
-    }
-  }
-`;
 
 const calculateNeedsSupervisor = ({
   credentials,
