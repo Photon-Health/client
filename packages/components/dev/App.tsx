@@ -19,7 +19,7 @@ import { randomNames } from '../src/sampleData/randomNames';
 import ComboBox from '../src/particles/ComboBox';
 import Card from '../src/particles/Card';
 import PatientMedHistory from '../src/systems/PatientMedHistory';
-import AddressForm from '../src/systems/AddressForm';
+import PatientAddressForm from '../src/systems/PatientAddressForm';
 import { Prescription } from '@photonhealth/sdk/dist/types';
 
 // todo: fix this. it broke since we change how draft prescriptions work, and refactored logic into useContexts
@@ -71,7 +71,7 @@ const App = () => {
       >
         <div class="mb-10">
           <h2>Address Form</h2>
-          <AddressForm patientId="pat_01HAW8GT14ZTJRBADVEY68NQKK" />
+          <PatientAddressForm patientId="pat_01HAW8GT14ZTJRBADVEY68NQKK" />
         </div>
 
         <div class="mb-10">

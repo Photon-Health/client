@@ -27,7 +27,7 @@ import React from 'react';
 import * as yup from 'yup';
 import { RolesSelect, hasPrescriberRole, rolesSchema } from '../utils/Roles';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
-import { phoneRegex, zipCodeRegex } from '../utils/Validation';
+import { npiRegex, phoneRegex, zipCodeRegex } from '../utils/Validation';
 
 export const userFragment = graphql(/* GraphQL */ `
   fragment EditRolesActionUserFragment on User {
@@ -87,7 +87,7 @@ const roleSchema = yup
     roles: rolesSchema.required().min(1, 'Must have at least one role'),
     npi: yup
       .string()
-      .matches(/^[0-9]+$/, { message: 'Enter a valid NPI' })
+      .matches(npiRegex, { message: 'Enter a valid NPI' })
       .when('roles', requiredForPrescribers('NPI is required')),
     phone: yup
       .string()
