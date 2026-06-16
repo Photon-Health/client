@@ -68,6 +68,8 @@ export const PrescriptionScreeningProvider = (props: PrescriptionScreeningProvid
   const [screeningAlerts, setScreeningAlerts] = createSignal<ScreeningAlertType[]>([]);
 
   const screenDraftedPrescriptions = async () => {
+    // start out by getting the treatment id of the prescription we're drafting now -
+    // this won't be included in draftPrescriptions
     const inProgressDraftedPrescriptionTreatmentId = props.formStore.treatment?.value?.id;
 
     const draftedPrescriptions: ScreenablePrescription[] = draftPrescriptions().map(
@@ -92,6 +94,10 @@ export const PrescriptionScreeningProvider = (props: PrescriptionScreeningProvid
   };
 
   createEffect(() => {
+    // if drafted prescriptions gets appended to,
+    // such as in the case of re-prescribing from
+    // med history, we need to screen the new
+    // prescriptions
     if (draftPrescriptions().length > 0) {
       screenDraftedPrescriptions();
     }
