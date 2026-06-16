@@ -1,9 +1,9 @@
 import { Center, CircularProgress } from '@chakra-ui/react';
 import { useState, useEffect, useMemo } from 'react';
-import GraphiQL from 'graphiql';
+import { GraphiQL } from 'graphiql';
 import { usePhoton } from '@photonhealth/react';
 
-import 'graphiql/graphiql.min.css';
+import 'graphiql/style.css';
 import './Playground.css';
 
 const defaultQuery = `
@@ -51,7 +51,7 @@ export const Playground = () => {
       <div style={{ height: 'calc(100vh - 64px)' }}>
         <GraphiQL
           fetcher={fetcher}
-          headers={`{"authorization":"${token}"}`}
+          initialHeaders={`{"authorization":"${token}"}`}
           defaultQuery={defaultQuery}
           isHeadersEditorEnabled={false}
         />
