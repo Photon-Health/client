@@ -110,7 +110,7 @@
     "dob-to-age": "^1.0.0",
     "formik": "^2.2.9",
     "framer-motion": "^11.0.20",
-    "graphiql": "^2.4.1",
+    "graphiql": "^5.2.4",
     "graphql": "^16.14.0",
     "graphql-request": "^6.1.0",
     "graphql-scalars": "^1.23.0",
