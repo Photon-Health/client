@@ -25,6 +25,7 @@ const PrescribeEventDispatchContext = createContext<{
     event: AnalyticsEventMap[C]
   ) => void;
   dispatchSupervisorError: (errors: string[]) => void;
+  dispatchDiagnosisCodeError: (errors: string[]) => void;
 }>();
 
 interface DraftPrescriptionProviderProps {
@@ -196,6 +197,15 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref?.dispatchEvent(event);
   };
 
+  const dispatchDiagnosisCodeError = (errors: string[]) => {
+    const event = new CustomEvent('photon-diagnosis-code-error', {
+      composed: true,
+      bubbles: true,
+      detail: { errors }
+    });
+    ref?.dispatchEvent(event);
+  };
+
   const value = {
     dispatchFormValidate,
     dispatchDraftPrescriptionCreated,
@@ -212,7 +222,8 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     dispatchSignatureAttestationCanceled,
     dispatchAttestationResolved,
     dispatchAnalyticsTrackEvent,
-    dispatchSupervisorError
+    dispatchSupervisorError,
+    dispatchDiagnosisCodeError
   };
 
   return (

@@ -11,6 +11,8 @@ import { Prescription } from '@photonhealth/sdk/dist/types';
 import { usePhoton } from '../context';
 import { useDraftPrescriptions } from './DraftPrescriptions/DraftPrescriptionsProvider';
 import { ScreeningAlertType } from './ScreeningAlerts/ScreeningAlert';
+import { usePrescribeEventDispatch } from './PrescribeEventDispatchProvider';
+import { DiagnosisCode, DiagnosisCodeType } from '@photonhealth/sdk/dist/clinical-api/types';
 
 type ScreenablePrescription = {
   dispenseAsWritten?: boolean;
@@ -56,16 +58,57 @@ export interface PrescriptionScreeningContextType {
 
 const PrescriptionScreeningContext = createContext<PrescriptionScreeningContextType>();
 
+export type DiagnosisCodesPrefill = Partial<DiagnosisCode>[] | string;
+
 interface PrescriptionScreeningProviderProps {
   children: JSXElement;
   formStore: any;
+  diagnosisCodes?: DiagnosisCodesPrefill;
 }
 
 export const PrescriptionScreeningProvider = (props: PrescriptionScreeningProviderProps) => {
   const client = usePhoton();
   const { draftPrescriptions } = useDraftPrescriptions();
-
+  const { dispatchDiagnosisCodeError } = usePrescribeEventDispatch();
   const [screeningAlerts, setScreeningAlerts] = createSignal<ScreeningAlertType[]>([]);
+  const [diagnosisCodes, setDiagnosisCodes] = createSignal<DiagnosisCode[]>();
+
+  createEffect(() => {
+    if (!props.diagnosisCodes) {
+      return;
+    }
+    if (typeof props.diagnosisCodes === 'string') {
+      const error = 'Invalid diagnosis codes json passed in';
+      // TODO: Thoughts on logging to console as well?
+      console.error(error);
+      dispatchDiagnosisCodeError([error]);
+      return;
+    }
+
+    const validCodes = [];
+    const invalidCodes = [];
+    for (const dc of props.diagnosisCodes) {
+      const isValid =
+        dc.code &&
+        dc.type &&
+        Object.values(DiagnosisCodeType).includes(dc.code as DiagnosisCodeType);
+
+      if (isValid) {
+        validCodes.push(dc);
+      } else {
+        invalidCodes.push(dc);
+      }
+    }
+    if (invalidCodes.length) {
+      const error = `Invalid diagnosis codes detected: ${JSON.stringify(invalidCodes)}`;
+      console.error(error);
+      dispatchDiagnosisCodeError([error]);
+      // TODO: should we abort entirely or continue screening with valid codes?
+      return;
+    }
+
+    setDiagnosisCodes(validCodes);
+  });
 
   const screenDraftedPrescriptions = async () => {
     // start out by getting the treatment id of the prescription we're drafting now -
@@ -86,7 +129,8 @@ export const PrescriptionScreeningProvider = (props: PrescriptionScreeningProvid
       query: ScreenDraftedPrescriptionsQuery,
       variables: {
         patientId: props.formStore.patient?.value?.id,
-        draftedPrescriptions: dedupedSanitizedPrescriptions
+        draftedPrescriptions: dedupedSanitizedPrescriptions,
+        diagnosisCodes: diagnosisCodes()
       }
     });
 
