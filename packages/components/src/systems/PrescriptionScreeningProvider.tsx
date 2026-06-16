@@ -91,7 +91,7 @@ export const PrescriptionScreeningProvider = (props: PrescriptionScreeningProvid
       const isValid =
         dc.code &&
         dc.type &&
-        Object.values(DiagnosisCodeType).includes(dc.code as DiagnosisCodeType);
+        Object.values(DiagnosisCodeType).includes(dc.type as DiagnosisCodeType);
 
       if (isValid) {
         validCodes.push(dc);

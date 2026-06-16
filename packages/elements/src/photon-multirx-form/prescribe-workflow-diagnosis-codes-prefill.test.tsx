@@ -48,6 +48,37 @@ afterEach(async () => {
 
 afterAll(() => server.close());
 
+test('attaches diagnosis codes to prescription screening request', async () => {
+  const screenPrescriptionsQuerySpy = vi.fn();
+  server.use(
+    clinicalGql.query('ScreenDraftedPrescriptionsQuery', ({ variables }) => {
+      screenPrescriptionsQuerySpy(variables);
+      return HttpResponse.json({ data: {} });
+    })
+  );
+
+  const diagnosisCodes = [
+    generateDiagnosisCodePrefill({ code: 'test-code-1' }),
+    generateDiagnosisCodePrefill({ code: 'test-code-2' })
+  ];
+
+  const { waitForPrescribeForm, addDraftPrescription, waitForDraftPrescription } =
+    renderPrescribeWorkflow({
+      enableOrder: true,
+      enableSendToPatient: true,
+      optionalPatientAddress: true,
+      diagnosisCodes: diagnosisCodes as Partial<DiagnosisCode>[]
+    });
+
+  await waitForPrescribeForm();
+  await addDraftPrescription();
+  await waitForDraftPrescription();
+
+  expect(screenPrescriptionsQuerySpy).toHaveBeenCalledWith(
+    expect.objectContaining({ diagnosisCodes })
+  );
+});
+
 test('emits diagnosis codes error event when JSON is malformed', async () => {
   const screenPrescriptionsQuerySpy = vi.fn();
   server.use(
@@ -88,7 +119,7 @@ test('emits diagnosis codes error event when JSON is malformed', async () => {
   );
 });
 
-test('emits diagnosis codes error event when code contains invalid code type', async () => {
+test('emits diagnosis codes error event when JSON contains invalid code type', async () => {
   const screenPrescriptionsQuerySpy = vi.fn();
   server.use(
     clinicalGql.query('ScreenDraftedPrescriptionsQuery', ({ variables }) => {
