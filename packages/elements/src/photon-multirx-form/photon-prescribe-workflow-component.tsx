@@ -86,7 +86,7 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
               patientId={store.patient?.value?.id}
               enableCoverageCheck={props.enableCoverageCheck}
             >
-              <PrescriptionScreeningProvider>
+              <PrescriptionScreeningProvider formStore={store}>
                 <SupervisorProvider supervisor={props.supervisor}>
                   <style>{tailwind}</style>
                   <style>{shoelaceDarkStyles}</style>

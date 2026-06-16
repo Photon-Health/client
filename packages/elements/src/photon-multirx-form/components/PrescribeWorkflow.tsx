@@ -11,7 +11,6 @@ import {
   Button,
   RecentOrders,
   ScreeningAlertAcknowledgementDialog,
-  ScreeningAlertType,
   SignatureAttestationModal,
   Spinner,
   Toaster,
@@ -20,11 +19,12 @@ import {
   usePharmacySelectionContext,
   usePhoton,
   usePrescribeEventDispatch,
+  usePrescriptionScreening,
   useRecentOrders,
   useSupervisor
 } from '@photonhealth/components';
-import { MeUserQuery, ScreenDraftedPrescriptionsQuery, types } from '@photonhealth/sdk';
-import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
+import { MeUserQuery, types } from '@photonhealth/sdk';
+import { PrescriptionState } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
 import { SupervisorCard } from './SupervisorCard';
@@ -143,7 +143,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     client?.authentication.state.isAuthenticated || false
   );
   const [, recentOrdersActions] = useRecentOrders();
-  const [screeningAlerts, setScreeningAlerts] = createSignal<ScreeningAlertType[]>([]);
+  const { screeningAlerts, screenDraftedPrescriptions } = usePrescriptionScreening();
 
   const [overrideScreenAlerts, setOverrideScreenAlerts] = createSignal<boolean>(false);
 
@@ -234,66 +234,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     const { __typename, name, ...filteredPatientAddress } = patientAddress;
     const address = { street2: '', country: 'US', ...filteredPatientAddress };
     return address;
-  });
-
-  const removeDuplicateTreatments = (
-    prescriptions: ScreenablePrescription[]
-  ): ScreenablePrescription[] => {
-    // let's remove any duplicate treatment ids
-    // as there's no point to sending up multiple
-    // of the same medication
-    const seenTreatmentIds = new Set<string>();
-    return prescriptions.filter((entity) => {
-      const treatmentId = entity.treatment.id;
-      if (seenTreatmentIds.has(treatmentId)) {
-        return false;
-      } else {
-        seenTreatmentIds.add(treatmentId);
-        return true;
-      }
-    });
-  };
-
-  // let's start screening all of the prescriptions we're drafting
-  const screenDraftedPrescriptions = async () => {
-    // start out by getting the treatment id of the prescription we're drafting now -
-    // we'll want to knwo about it so we cn show an alert underneath it, before it gets
-    // added to the order
-    const inProgressDraftedPrescriptionTreatmentId = props.formStore.treatment?.value?.id;
-
-    // and then get the ones already added to the order (but not persisted)
-    const draftedPrescriptions: ScreenablePrescription[] = draftPrescriptions().map(
-      toScreenableDraftPrescription
-    );
-
-    // if there is one, add in the prescription being created
-    if (inProgressDraftedPrescriptionTreatmentId) {
-      draftedPrescriptions.push({
-        treatment: { id: inProgressDraftedPrescriptionTreatmentId }
-      });
-    }
-    const dedupedSanitizedPrescriptions = removeDuplicateTreatments(draftedPrescriptions);
-
-    // make the screening request
-    const { data } = await clinicalClient.query({
-      query: ScreenDraftedPrescriptionsQuery,
-      variables: {
-        patientId: props.formStore.patient?.value.id,
-        draftedPrescriptions: dedupedSanitizedPrescriptions
-      }
-    });
-
-    setScreeningAlerts(data?.prescriptionScreen?.alerts ?? []);
-  };
-
-  createEffect(() => {
-    if (draftPrescriptions().length > 0) {
-      // if drafted prescriptions gets appended to,
-      // such as in the case of re-prescribing from
-      // med history, we need to screen the new
-      // prescriptions
-      screenDraftedPrescriptions();
-    }
   });
 
   const displayAlertsWarning = () => {
@@ -705,34 +645,3 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     </div>
   );
 }
-
-type ScreenablePrescription = {
-  dispenseAsWritten?: boolean;
-  dispenseQuantity?: number;
-  dispenseUnit?: string;
-  fillsAllowed?: number;
-  daysSupply?: number;
-  instructions?: string;
-  notes?: string;
-  effectiveDate?: string;
-  treatment: {
-    id: string;
-  };
-};
-
-const toScreenableDraftPrescription = (prescription: Prescription): ScreenablePrescription => {
-  return {
-    dispenseAsWritten: prescription.dispenseAsWritten || undefined,
-    dispenseQuantity: prescription.dispenseQuantity,
-    dispenseUnit: prescription.dispenseUnit,
-    fillsAllowed: prescription.fillsAllowed,
-    daysSupply: prescription.daysSupply || undefined,
-    instructions: prescription.instructions,
-    notes: prescription.notes || undefined,
-    // TODO: is effectiveDate needed to screen prescription?
-    effectiveDate: prescription.effectiveDate,
-    treatment: {
-      id: prescription.treatment.id
-    }
-  };
-};
