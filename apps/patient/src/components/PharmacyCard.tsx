@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react';
+import { memo } from 'react';
 import { Button, Card, CardBody, CardFooter, Collapse, Divider } from '@chakra-ui/react';
 import { FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
@@ -6,18 +6,8 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { PharmacyInfo } from './PharmacyInfo';
-import { useOrderContext } from '../views/Main';
-import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 
 dayjs.extend(customParseFormat);
-
-// feature flagging preferred pharmacy skip for certain orgs
-// should eventually be replaced with passing context in runtime properties when evaluating flag
-const ignorePreferredPharmacyOrgs: Record<string, string> = {
-  boson: 'org_4ukJmtK1kahiwSjh',
-  neutron: 'org_tA6GiBBgGBZwnf4e',
-  photon: 'org_vhFRkpsq7JXLxjXr'
-};
 
 interface PharmacyCardProps {
   pharmacy: EnrichedPharmacy;
@@ -44,26 +34,6 @@ export const PharmacyCard = memo(function PharmacyCard({
   showPrice = false,
   isCurrentPharmacy = false
 }: PharmacyCardProps) {
-  const { order } = useOrderContext();
-  const patientAnalytics = usePatientAnalytics();
-
-  const isSkipPreferredPharmacyOrg =
-    order?.organization.id === ignorePreferredPharmacyOrgs[import.meta.env.VITE_ENV_NAME ?? ''];
-  const [skipPreferredPharmacy, setSkipPreferredPharmacy] = useState(false);
-
-  useEffect(() => {
-    if (!isSkipPreferredPharmacyOrg) {
-      setSkipPreferredPharmacy(false);
-      return;
-    }
-
-    const fetchFlag = async () => {
-      const { isActive } = await patientAnalytics.getFlagValue('skip_preferred_pharmacy');
-      setSkipPreferredPharmacy(isActive);
-    };
-    fetchFlag();
-  }, [isSkipPreferredPharmacyOrg, patientAnalytics]);
-
   if (!pharmacy) return null;
 
   return (
@@ -106,7 +76,7 @@ export const PharmacyCard = memo(function PharmacyCard({
         <Collapse in={selected && !preferred} animateOpacity>
           <Divider />
           <CardFooter p={2}>
-            {onSetPreferred && !skipPreferredPharmacy ? (
+            {onSetPreferred ? (
               <Button
                 mx="auto"
                 size="sm"
