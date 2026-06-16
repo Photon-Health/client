@@ -1,5 +1,6 @@
 import { Address, Patient, Pharmacy, SexType } from '@photonhealth/sdk/dist/types';
 import {
+  DiagnosisCodeType,
   MeUserQueryQuery,
   SupervisorCardFragment
 } from '@photonhealth/sdk/dist/clinical-api/types';
@@ -104,6 +105,21 @@ export function generatePharmacy(overrides: Partial<Pharmacy> = {}): Pharmacy {
       postalCode: '10001',
       country: 'US'
     },
+    ...overrides
+  };
+}
+
+type DiagnosisCodePrefillShape = {
+  code: string;
+  type: DiagnosisCodeType | string;
+};
+
+export function generateDiagnosisCodePrefill(
+  overrides: Partial<DiagnosisCodePrefillShape> = {}
+): DiagnosisCodePrefillShape {
+  return {
+    code: 'test-code',
+    type: 'ICD10',
     ...overrides
   };
 }

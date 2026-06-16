@@ -6,8 +6,9 @@ import { PatientStore } from '../stores/patient';
 import { clinicalGql, defaultHandlers, lambdasGql } from '@photonhealth/sdk/test-utils';
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
 import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
-import { generatePatient } from './test-utils/generators';
+import { generateDiagnosisCodePrefill, generatePatient } from './test-utils/generators';
 import { stubGoogleMaps } from './test-utils/stub-google-maps';
+import { DiagnosisCode } from '@photonhealth/sdk/dist/clinical-api/types';
 
 vi.mock('solid-element', () => ({
   customElement: vi.fn()
@@ -56,18 +57,21 @@ test('emits diagnosis codes error event when JSON is malformed', async () => {
     })
   );
 
-  const { diagnosisCodeErrorEvents, waitForPrescribeForm, addDraftPrescription } =
-    renderPrescribeWorkflow({
-      enableOrder: true,
-      enableSendToPatient: true,
-      optionalPatientAddress: true,
-      diagnosisCodes: '[not valid json'
-    });
+  const {
+    diagnosisCodeErrorEvents,
+    waitForPrescribeForm,
+    addDraftPrescription,
+    waitForDraftPrescription
+  } = renderPrescribeWorkflow({
+    enableOrder: true,
+    enableSendToPatient: true,
+    optionalPatientAddress: true,
+    diagnosisCodes: '[not valid json'
+  });
 
   await waitFor(() => {
     expect(diagnosisCodeErrorEvents.length).toBeGreaterThan(0);
   });
-
   expect(diagnosisCodeErrorEvents[0].detail).toEqual(
     expect.objectContaining({
       errors: expect.arrayContaining(['Invalid diagnosis codes json passed in'])
@@ -76,8 +80,52 @@ test('emits diagnosis codes error event when JSON is malformed', async () => {
 
   await waitForPrescribeForm();
   await addDraftPrescription();
+  await waitForDraftPrescription();
 
-  // Bad JSON must not reach the API.
+  expect(screenPrescriptionsQuerySpy).toHaveBeenCalled();
+  expect(screenPrescriptionsQuerySpy).not.toHaveBeenCalledWith(
+    expect.objectContaining({ diagnosisCodes: expect.anything() })
+  );
+});
+
+test('emits diagnosis codes error event when code contains invalid code type', async () => {
+  const screenPrescriptionsQuerySpy = vi.fn();
+  server.use(
+    clinicalGql.query('ScreenDraftedPrescriptionsQuery', ({ variables }) => {
+      screenPrescriptionsQuerySpy(variables);
+      return HttpResponse.json({ data: {} });
+    })
+  );
+
+  const invalidCode = generateDiagnosisCodePrefill({ type: 'invalid-type' });
+
+  const {
+    diagnosisCodeErrorEvents,
+    waitForPrescribeForm,
+    addDraftPrescription,
+    waitForDraftPrescription
+  } = renderPrescribeWorkflow({
+    enableOrder: true,
+    enableSendToPatient: true,
+    optionalPatientAddress: true,
+    diagnosisCodes: [invalidCode] as Partial<DiagnosisCode>[]
+  });
+
+  await waitFor(() => {
+    expect(diagnosisCodeErrorEvents.length).toBeGreaterThan(0);
+  });
+  expect(diagnosisCodeErrorEvents[0].detail).toEqual(
+    expect.objectContaining({
+      errors: expect.arrayContaining([
+        `Invalid diagnosis codes detected: ${JSON.stringify([invalidCode])}`
+      ])
+    })
+  );
+
+  await waitForPrescribeForm();
+  await addDraftPrescription();
+  await waitForDraftPrescription();
+
   expect(screenPrescriptionsQuerySpy).toHaveBeenCalled();
   expect(screenPrescriptionsQuerySpy).not.toHaveBeenCalledWith(
     expect.objectContaining({ diagnosisCodes: expect.anything() })

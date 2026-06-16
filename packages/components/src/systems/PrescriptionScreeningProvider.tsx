@@ -99,6 +99,7 @@ export const PrescriptionScreeningProvider = (props: PrescriptionScreeningProvid
         invalidCodes.push(dc);
       }
     }
+
     if (invalidCodes.length) {
       const error = `Invalid diagnosis codes detected: ${JSON.stringify(invalidCodes)}`;
       console.error(error);
@@ -107,7 +108,9 @@ export const PrescriptionScreeningProvider = (props: PrescriptionScreeningProvid
       return;
     }
 
-    setDiagnosisCodes(validCodes);
+    if (validCodes.length) {
+      setDiagnosisCodes(validCodes);
+    }
   });
 
   const screenDraftedPrescriptions = async () => {
