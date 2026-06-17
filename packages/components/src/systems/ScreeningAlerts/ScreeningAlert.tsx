@@ -62,9 +62,9 @@ const getDescriptorByType = (type: string): string => {
   return TYPE_TO_DESCRIPTOR_MAP[type] ?? '';
 };
 
-const textClasses = () => clsx('text-pretty mr-2 text-black text-base', {});
+const textClasses = () => clsx('text-sm text-pretty mr-2 text-black text-base', {});
 
-const getTitle = (props: {
+const Title = (props: {
   owningId?: string;
   screeningAlert: PrescriptionScreeningAlert;
 }): JSXElement => {
@@ -127,7 +127,7 @@ export const ScreeningAlert = (props: {
     >
       <div class="flex grid-flow-col justify-start">
         <div class="flex flex-col gap-2">
-          <div class="text-sm"> {getTitle(props)}</div>
+          <Title owningId={props.owningId} screeningAlert={props.screeningAlert} />
           <Show when={isExpanded() || isAllergen()}>
             <div class={`text-sm text-gray-700`}>{props.screeningAlert.description}</div>
           </Show>

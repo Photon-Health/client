@@ -2,6 +2,12 @@ import { Address, Patient, Pharmacy, SexType } from '@photonhealth/sdk/dist/type
 import {
   DiagnosisCodeType,
   MeUserQueryQuery,
+  PrescriptionScreeningAlert,
+  PrescriptionScreeningAlertInvolvedAllergen,
+  PrescriptionScreeningAlertInvolvedDraftedPrescription,
+  PrescriptionScreeningAlertInvolvedExistingPrescription,
+  PrescriptionScreeningAlertSeverity,
+  PrescriptionScreeningAlertType,
   SupervisorCardFragment
 } from '@photonhealth/sdk/dist/clinical-api/types';
 
@@ -120,6 +126,36 @@ export function generateDiagnosisCodePrefill(
   return {
     code: 'test-code',
     type: 'ICD10',
+    ...overrides
+  };
+}
+
+type InvolvedEntity =
+  | PrescriptionScreeningAlertInvolvedAllergen
+  | PrescriptionScreeningAlertInvolvedDraftedPrescription
+  | PrescriptionScreeningAlertInvolvedExistingPrescription;
+
+type PrescriptionScreeningAlertWithInvolvedEntities = Omit<
+  PrescriptionScreeningAlert,
+  'involvedEntities'
+> & {
+  involvedEntities: InvolvedEntity[];
+};
+
+export function generatePrescriptionScreeningAlert(
+  overrides: Partial<PrescriptionScreeningAlertWithInvolvedEntities> = {}
+): PrescriptionScreeningAlertWithInvolvedEntities {
+  return {
+    type: PrescriptionScreeningAlertType.Drug,
+    description: 'test description',
+    severity: PrescriptionScreeningAlertSeverity.Major,
+    involvedEntities: [
+      {
+        __typename: 'PrescriptionScreeningAlertInvolvedDraftedPrescription',
+        id: 'involved-entity-id',
+        name: 'involved-entity-name'
+      }
+    ],
     ...overrides
   };
 }
