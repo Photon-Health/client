@@ -1,8 +1,8 @@
 import { For } from 'solid-js';
-import { ScreeningAlertType } from './ScreeningAlert';
 import { AlertsForEntity, ScreeningAlertByEntity } from './ScreeningAlertByEntity';
+import { PrescriptionScreeningAlert } from '@photonhealth/sdk/dist/clinical-api/types';
 
-function groupAlertsByEntities(screeningAlerts: ScreeningAlertType[]): AlertsForEntity[] {
+function groupAlertsByEntities(screeningAlerts: PrescriptionScreeningAlert[]): AlertsForEntity[] {
   const alertsByEntity = Object.values(
     screeningAlerts
       .flatMap((alert) =>
@@ -24,7 +24,9 @@ function groupAlertsByEntities(screeningAlerts: ScreeningAlertType[]): AlertsFor
 /**
  * This component renders alerts grouped by the entities within
  */
-export const ScreeningAlertsByEntity = (props: { screeningAlerts: ScreeningAlertType[] }) => {
+export const ScreeningAlertsByEntity = (props: {
+  screeningAlerts: PrescriptionScreeningAlert[];
+}) => {
   return (
     <div class="grid gap-4">
       <For

@@ -9,12 +9,12 @@ import {
   InputGroup,
   PrescriptionFormData,
   ScreeningAlerts,
-  ScreeningAlertType,
   Textarea,
   triggerToast,
   TryCreatePrescriptionTemplateOptions,
   useDraftPrescriptions,
-  usePrescribeEventDispatch
+  usePrescribeEventDispatch,
+  usePrescriptionScreening
 } from '@photonhealth/components';
 import { Medication, Prescription } from '@photonhealth/sdk/dist/types';
 import {
@@ -60,8 +60,6 @@ export const DraftPrescriptionForm = (props: {
   weight?: number;
   weightUnit?: string;
   prefillNotes?: string;
-  screenDraftedPrescriptions: () => void;
-  screeningAlerts: ScreeningAlertType[];
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
   disableList?: DisableList;
@@ -69,6 +67,7 @@ export const DraftPrescriptionForm = (props: {
 }) => {
   const { tryCreatePrescription, draftPrescriptions } = useDraftPrescriptions();
   const { dispatchOrderError, dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
+  const { screenDraftedPrescriptions, screeningAlerts } = usePrescriptionScreening();
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
   const [searchText, setSearchText] = createSignal<string>('');
@@ -113,7 +112,7 @@ export const DraftPrescriptionForm = (props: {
       });
     }
 
-    props.screenDraftedPrescriptions();
+    screenDraftedPrescriptions();
   };
 
   const handleAddPrescription = async () => {
@@ -168,7 +167,7 @@ export const DraftPrescriptionForm = (props: {
     props.onHideForm();
 
     // todo: move screening up to prescribeContext (for med history Refill button clicks)
-    props.screenDraftedPrescriptions();
+    screenDraftedPrescriptions();
 
     // RESET THE FORM
     setOffCatalog(undefined);
@@ -204,14 +203,14 @@ export const DraftPrescriptionForm = (props: {
         on:photon-treatment-unselected={() => {
           clearForm(props.actions, { notes: props.prefillNotes });
 
-          props.screenDraftedPrescriptions();
+          screenDraftedPrescriptions();
         }}
         on:photon-search-text-changed={(e: any) => setSearchText(e.detail.text)}
       />
 
       <ScreeningAlerts
         /** we'll want to make sure we're only showing screening alerts that are involved with this entity */
-        screeningAlerts={props.screeningAlerts.filter(
+        screeningAlerts={screeningAlerts().filter(
           (screeningAlert) =>
             screeningAlert.involvedEntities
               .map((involvedEntity) => involvedEntity.id)

@@ -48,11 +48,7 @@ import Table from './particles/Table';
 import Text from './particles/Text';
 import Textarea from './particles/Textarea';
 import Toaster from './particles/Toaster';
-import {
-  ScreeningAlertAcknowledgementDialog,
-  ScreeningAlerts,
-  ScreeningAlertType
-} from './systems/ScreeningAlerts';
+import { ScreeningAlertAcknowledgementDialog, ScreeningAlerts } from './systems/ScreeningAlerts';
 import {
   isValidPrescriptionRoutingConstraint,
   RoutingConstraint
@@ -175,7 +171,6 @@ export {
 export type {
   ParsedAddress,
   PharmacyOption,
-  ScreeningAlertType,
   RoutingConstraint,
   TemplateOverrides,
   PrescriptionFormData,

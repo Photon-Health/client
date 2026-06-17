@@ -10,9 +10,12 @@ import { ScreenDraftedPrescriptionsQuery } from '@photonhealth/sdk';
 import { Prescription } from '@photonhealth/sdk/dist/types';
 import { usePhoton } from '../context';
 import { useDraftPrescriptions } from './DraftPrescriptions/DraftPrescriptionsProvider';
-import { ScreeningAlertType } from './ScreeningAlerts/ScreeningAlert';
 import { usePrescribeEventDispatch } from './PrescribeEventDispatchProvider';
-import { DiagnosisCode, DiagnosisCodeType } from '@photonhealth/sdk/dist/clinical-api/types';
+import {
+  DiagnosisCode,
+  DiagnosisCodeType,
+  PrescriptionScreeningAlert
+} from '@photonhealth/sdk/dist/clinical-api/types';
 
 type ScreenablePrescription = {
   dispenseAsWritten?: boolean;
@@ -51,12 +54,12 @@ const removeDuplicateTreatments = (
   });
 };
 
-export interface PrescriptionScreeningContextType {
-  screeningAlerts: Accessor<ScreeningAlertType[]>;
+export interface PrescriptionScreeningContextValue {
+  screeningAlerts: Accessor<PrescriptionScreeningAlert[]>;
   screenDraftedPrescriptions: () => Promise<void>;
 }
 
-const PrescriptionScreeningContext = createContext<PrescriptionScreeningContextType>();
+const PrescriptionScreeningContext = createContext<PrescriptionScreeningContextValue>();
 
 export type DiagnosisCodesPrefill = Partial<DiagnosisCode>[] | string;
 
@@ -70,7 +73,7 @@ export const PrescriptionScreeningProvider = (props: PrescriptionScreeningProvid
   const client = usePhoton();
   const { draftPrescriptions } = useDraftPrescriptions();
   const { dispatchDiagnosisCodeError } = usePrescribeEventDispatch();
-  const [screeningAlerts, setScreeningAlerts] = createSignal<ScreeningAlertType[]>([]);
+  const [screeningAlerts, setScreeningAlerts] = createSignal<PrescriptionScreeningAlert[]>([]);
   const [diagnosisCodes, setDiagnosisCodes] = createSignal<DiagnosisCode[]>();
 
   createEffect(() => {
@@ -150,7 +153,7 @@ export const PrescriptionScreeningProvider = (props: PrescriptionScreeningProvid
     }
   });
 
-  const value: PrescriptionScreeningContextType = {
+  const value: PrescriptionScreeningContextValue = {
     screeningAlerts,
     screenDraftedPrescriptions
   };

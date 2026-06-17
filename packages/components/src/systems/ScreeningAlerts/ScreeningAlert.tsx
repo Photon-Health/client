@@ -2,13 +2,12 @@ import { createEffect, createSignal, For, JSXElement, Show } from 'solid-js';
 import Text from '../../particles/Text';
 import Banner, { BannerStatus } from '../../particles/Banner';
 import clsx from 'clsx';
-
-export interface ScreeningAlertType {
-  description: string;
-  type: string;
-  severity: string;
-  involvedEntities: { id: string; name: string; __typename: string }[];
-}
+import {
+  PrescriptionScreeningAlert,
+  PrescriptionScreeningAlertInvolvedAllergen,
+  PrescriptionScreeningAlertInvolvedDraftedPrescription,
+  PrescriptionScreeningAlertInvolvedExistingPrescription
+} from '@photonhealth/sdk/dist/clinical-api/types';
 
 /**
  * Helper function to capitalize the severity
@@ -46,9 +45,13 @@ const TYPE_TO_DESCRIPTOR_MAP: Record<string, string> = {
  * by nature of the association
  */
 const filterOutOwningId = (
-  involvedEntities: { id: string; name: string; __typename: string }[],
+  involvedEntities: Array<
+    | PrescriptionScreeningAlertInvolvedAllergen
+    | PrescriptionScreeningAlertInvolvedDraftedPrescription
+    | PrescriptionScreeningAlertInvolvedExistingPrescription
+  >,
   owningId?: string
-): { id: string; name: string; __typename: string }[] => {
+) => {
   return involvedEntities.filter((element) => element.id !== owningId);
 };
 
@@ -61,7 +64,10 @@ const getDescriptorByType = (type: string): string => {
 
 const textClasses = () => clsx('text-pretty mr-2 text-black text-base', {});
 
-const getTitle = (props: { owningId?: string; screeningAlert: ScreeningAlertType }): JSXElement => {
+const getTitle = (props: {
+  owningId?: string;
+  screeningAlert: PrescriptionScreeningAlert;
+}): JSXElement => {
   return (
     <Show
       when={props.screeningAlert.type === 'DRUG'}
@@ -79,7 +85,7 @@ const getTitle = (props: { owningId?: string; screeningAlert: ScreeningAlertType
             return (
               <>
                 <span class="font-semibold">{entity.name}</span>{' '}
-                {getDescriptorByType(entity.__typename)}
+                {getDescriptorByType(entity.__typename!)}
                 {index() <
                   filterOutOwningId(props.screeningAlert.involvedEntities, props.owningId).length -
                     1 && ' and '}
@@ -100,7 +106,7 @@ const getTitle = (props: { owningId?: string; screeningAlert: ScreeningAlertType
  */
 export const ScreeningAlert = (props: {
   owningId?: string;
-  screeningAlert: ScreeningAlertType;
+  screeningAlert: PrescriptionScreeningAlert;
 }) => {
   const [isAllergen, setIsAllergen] = createSignal<boolean>();
   const [isExpanded, setIsExpanded] = createSignal<boolean>(false);

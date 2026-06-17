@@ -143,7 +143,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     client?.authentication.state.isAuthenticated || false
   );
   const [, recentOrdersActions] = useRecentOrders();
-  const { screeningAlerts, screenDraftedPrescriptions } = usePrescriptionScreening();
+  const { screeningAlerts } = usePrescriptionScreening();
 
   const [overrideScreenAlerts, setOverrideScreenAlerts] = createSignal<boolean>(false);
 
@@ -579,8 +579,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   weight={props.weight}
                   weightUnit={props.weightUnit}
                   prefillNotes={rxNotesPrefill()}
-                  screenDraftedPrescriptions={screenDraftedPrescriptions}
-                  screeningAlerts={screeningAlerts()}
                   enableOrder={props.enableOrder}
                   catalogId={props.catalogId}
                   allowOffCatalogSearch={props.allowOffCatalogSearch}
