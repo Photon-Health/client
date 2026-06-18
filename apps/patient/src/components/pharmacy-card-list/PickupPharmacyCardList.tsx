@@ -1,4 +1,4 @@
-import { Button, SlideFade, Text, VStack } from '@chakra-ui/react';
+import { Button, SlideFade, VStack } from '@chakra-ui/react';
 import { PropsWithChildren } from 'react';
 
 import { Pharmacy as EnrichedPharmacy } from '../../utils/models';
@@ -30,25 +30,6 @@ interface PickupPharmacyCardListProps {
   setCouponModalOpen: (isOpen: boolean) => void;
   numberOfBrandedOptions: number;
   shouldTrackOfferImpressionsAndSelections: boolean;
-}
-
-export function PickupTabBar() {
-  return (
-    <Text
-      as="span"
-      display="inline-block"
-      fontWeight="semibold"
-      fontSize="md"
-      color="gray.900"
-      pb={3}
-      borderBottom="2px solid"
-      borderColor="blue.500"
-      aria-selected="true"
-      role="tab"
-    >
-      {t.pickUp}
-    </Text>
-  );
 }
 
 export const PickupPharmacyCardList = ({

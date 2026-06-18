@@ -51,8 +51,7 @@ import {
   BrandedOptionOverrides,
   BrandedOptions,
   BrandedOptionsHeader,
-  PickupPharmacyCardList,
-  PickupTabBar
+  PickupPharmacyCardList
 } from '../components/pharmacy-card-list';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
@@ -70,6 +69,27 @@ const WALGREENS_PHARMACY_RADIUS = 15; // miles
 
 function isMailOrderPharmacy(pharmacy: EnrichedPharmacy): boolean {
   return !!pharmacy.fulfillmentTypes?.includes('MAIL_ORDER');
+}
+
+function FulfillmentTypeTabBar() {
+  // TODO: eventually we'll have more than one selectable fulfillment type in this bar (mail order)
+  // for now, we'll just show the pickup tab bar
+  return (
+    <Text
+      as="span"
+      display="inline-block"
+      fontWeight="semibold"
+      fontSize="md"
+      color="gray.900"
+      pb={3}
+      borderBottom="2px solid"
+      borderColor="blue.500"
+      aria-selected="true"
+      role="tab"
+    >
+      {t.pickUp}
+    </Text>
+  );
 }
 
 export const Pharmacy = () => {
@@ -1126,7 +1146,7 @@ export const Pharmacy = () => {
         <>
           <Box bg="white" w="full" borderBottom="1px" borderColor="gray.200">
             <Container px={-3} pt={4} pb={0}>
-              <PickupTabBar />
+              <FulfillmentTypeTabBar />
             </Container>
           </Box>
           <Box bg="gray.50" w="full">
