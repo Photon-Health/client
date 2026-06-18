@@ -412,7 +412,7 @@ export const DraftPrescriptionForm = (props: {
       </InputGroup>
       <InputGroup
         label="Pharmacy Note"
-        subLabel={formatCharacterCount(props.store.notes?.value?.length ?? 0)}
+        headingSubLabel={formatCharacterCount(props.store.notes?.value?.length ?? 0)}
         showOptionalSubtext
         error={props.store.notes?.error}
       >
