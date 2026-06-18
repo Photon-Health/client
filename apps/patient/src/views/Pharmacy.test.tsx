@@ -312,7 +312,7 @@ describe('Pharmacy page', () => {
       await navigateToPharmacyScreen();
 
       // Wait for component to render
-      await screen.findByText('Select a pharmacy');
+      await screen.findByRole('heading', { name: 'Choose a Pharmacy' });
 
       // Should not show delivery section
       expect(screen.queryByText('Delivery')).not.toBeInTheDocument();
@@ -324,8 +324,7 @@ describe('Pharmacy page', () => {
       expect(screen.queryByText('Prime Rx Price')).not.toBeInTheDocument();
 
       // Should only show pickup section
-      expect(screen.getByText('Pick Up')).toBeInTheDocument();
-      expect(screen.getByText('Get your medication at a nearby pharmacy')).toBeInTheDocument();
+      expect(screen.getByText('Pick up')).toBeInTheDocument();
     }, 10_000);
 
     test('shows location even when order has no address (current behavior)', async () => {
@@ -409,8 +408,7 @@ describe('Pharmacy page', () => {
       expect(screen.queryByText('Insurance Price')).not.toBeInTheDocument();
 
       // Should only show pickup section
-      expect(screen.getByText('Pick Up')).toBeInTheDocument();
-      expect(screen.getByText('Get your medication at a nearby pharmacy')).toBeInTheDocument();
+      expect(screen.getByText('Pick up')).toBeInTheDocument();
     }, 10_000);
   });
 
@@ -740,5 +738,5 @@ const renderApp = () => {
 };
 
 async function navigateToPharmacyScreen() {
-  expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
 }

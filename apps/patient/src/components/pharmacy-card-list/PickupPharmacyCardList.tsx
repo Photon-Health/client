@@ -1,4 +1,5 @@
-import { Button, Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
+import { Button, SlideFade, Text, VStack } from '@chakra-ui/react';
+import { PropsWithChildren } from 'react';
 
 import { Pharmacy as EnrichedPharmacy } from '../../utils/models';
 import { text as t } from '../../utils/text';
@@ -17,18 +18,37 @@ interface PickupPharmacyCardListProps {
   handleSetPreferred: (id: string) => void;
   loadingMore: boolean;
   showingAllPharmacies: boolean;
-  showHeading: boolean;
   showPrice?: boolean;
   enableOpenNow: boolean;
   enable24Hr: boolean;
   enablePrice: boolean;
   setEnableOpenNow: (isOpen: boolean) => void;
   setEnable24Hr: (is24Hr: boolean) => void;
+  showFilters: boolean;
   location: string;
   currentPharmacyId?: string;
   setCouponModalOpen: (isOpen: boolean) => void;
   numberOfBrandedOptions: number;
   shouldTrackOfferImpressionsAndSelections: boolean;
+}
+
+export function PickupTabBar() {
+  return (
+    <Text
+      as="span"
+      display="inline-block"
+      fontWeight="semibold"
+      fontSize="md"
+      color="gray.900"
+      pb={3}
+      borderBottom="2px solid"
+      borderColor="blue.500"
+      aria-selected="true"
+      role="tab"
+    >
+      {t.pickUp}
+    </Text>
+  );
 }
 
 export const PickupPharmacyCardList = ({
@@ -41,36 +61,34 @@ export const PickupPharmacyCardList = ({
   handleSetPreferred,
   loadingMore,
   showingAllPharmacies,
-  showHeading,
   showPrice = true,
   enableOpenNow,
   enable24Hr,
   setEnableOpenNow,
   setEnable24Hr,
+  showFilters = true,
   currentPharmacyId,
   numberOfBrandedOptions = 0,
-  shouldTrackOfferImpressionsAndSelections
-}: PickupPharmacyCardListProps) => {
+  shouldTrackOfferImpressionsAndSelections,
+  children
+}: PropsWithChildren<PickupPharmacyCardListProps>) => {
   return (
-    <VStack spacing={3} align="span" w="full">
-      {showHeading ? (
+    <VStack spacing={4} align="stretch" w="full">
+      {children ? (
+        <VStack spacing={3} align="stretch">
+          {children}
+        </VStack>
+      ) : null}
+      {showFilters ? (
         <SlideFade offsetY="60px" in={true}>
-          <VStack spacing={1} align="start">
-            <Heading as="h5" size="sm">
-              {t.pickUp}
-            </Heading>
-            <Text>{t.getNearby}</Text>
-          </VStack>
+          <PharmacyFilters
+            enableOpenNow={enableOpenNow}
+            enable24Hr={enable24Hr}
+            setEnableOpenNow={setEnableOpenNow}
+            setEnable24Hr={setEnable24Hr}
+          />
         </SlideFade>
       ) : null}
-      <SlideFade offsetY="60px" in={true}>
-        <PharmacyFilters
-          enableOpenNow={enableOpenNow}
-          enable24Hr={enable24Hr}
-          setEnableOpenNow={setEnableOpenNow}
-          setEnable24Hr={setEnable24Hr}
-        />
-      </SlideFade>
       <HolidayAlert>
         Holiday may affect pharmacy hours. Consider sending to a 24 hour pharmacy.
       </HolidayAlert>

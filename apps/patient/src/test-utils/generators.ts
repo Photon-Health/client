@@ -30,7 +30,7 @@ export const generateOrder = (overrides: Partial<Order> = {}): Order => ({
 
 export const generatePatient = (overrides: Partial<Order['patient']> = {}): Order['patient'] => ({
   id: 'pat_defaultTestId',
-  name: { full: 'John Doe' },
+  name: { full: 'John Doe', first: 'John' },
   dateOfBirth: new Date(),
   sex: 'MALE',
   address: {
@@ -66,6 +66,23 @@ export const generateFill = (treatmentName: string): Order['fills'][number] => {
     treatment: {
       id: `med_testIdDefault_${fillIdCounter}`,
       name: treatmentName
+    },
+    prescription: {
+      id: `rx_testIdDefault_${fillIdCounter}`,
+      daysSupply: undefined,
+      dispenseQuantity: 0,
+      dispenseUnit: '',
+      dispenseAsWritten: false,
+      expirationDate: undefined,
+      fillsAllowed: 0,
+      provider: {
+        id: 'prv_test_default',
+        name: {
+          full: 'Jane Provider',
+          last: 'Provider',
+          title: undefined
+        }
+      }
     }
   };
 };

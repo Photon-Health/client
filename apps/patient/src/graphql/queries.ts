@@ -224,6 +224,8 @@ export const GET_ORDER = gql`
           provider {
             id
             name {
+              title
+              last
               full
             }
           }
@@ -232,6 +234,7 @@ export const GET_ORDER = gql`
       patient {
         id
         name {
+          first
           full
         }
         dateOfBirth
