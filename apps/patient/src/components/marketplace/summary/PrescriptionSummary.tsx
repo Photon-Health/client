@@ -11,7 +11,7 @@ export function PrescriptionSummary() {
   if (numberOfPrescriptions === 1) {
     return (
       <Text as="span">
-        your{' '}
+        {' '}
         <Text as="span" fontWeight="bold">
           {flattenedFills[0].treatment.name}
         </Text>

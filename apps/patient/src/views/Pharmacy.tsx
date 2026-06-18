@@ -1144,12 +1144,12 @@ export const Pharmacy = () => {
 
       {patientLocation && (
         <>
-          <Box bg="white" w="full" borderBottom="1px" borderColor="gray.200">
-            <Container px={-3} pt={4} pb={0}>
+          <Box bg="white" w="full" borderBottom="1px" borderColor="gray.200" px={4} pt={4} pb={0}>
+            <Container px={-3}>
               <FulfillmentTypeTabBar />
             </Container>
           </Box>
-          <Box bg="gray.50" w="full">
+          <Box bg="gray.50" w="full" px={4}>
             <Container px={-3} pb={showFooter ? 32 : 8} pt={4}>
               <VStack
                 spacing={2}
@@ -1198,7 +1198,6 @@ export const Pharmacy = () => {
                       borderRadius="lg"
                       px={4}
                       py={3}
-                      mx={{ base: -2, md: undefined }}
                     >
                       <Text fontSize="sm" color="gray.600">
                         Don&apos;t see your pharmacy?{' '}
