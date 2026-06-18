@@ -4,10 +4,11 @@ import { PrescriptionSummary } from './PrescriptionSummary';
 
 export function MarketplaceSummary() {
   const { order } = useOrderContext();
-  const providerName = order.fills[0].prescription.provider.name;
-  const formattedProviderName = providerName.title
-    ? `${providerName.title} ${providerName.last}`
-    : providerName.full;
+  const providerName = order.fills[0]?.prescription?.provider?.name;
+  const formattedProviderName =
+    providerName?.title != null
+      ? `${providerName.title} ${providerName.last}`
+      : providerName?.full ?? '';
 
   return (
     <VStack data-testid="PrescriptionsSummary" spacing={2} alignItems="start">

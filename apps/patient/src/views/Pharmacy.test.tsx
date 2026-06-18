@@ -15,6 +15,7 @@ import { routeElements } from '../Routes';
 import { getOfferBundles, getOrder, getPharmaciesByLocation, setOrderPharmacy } from '../api';
 import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
 import { FulfillmentType } from '../__generated__/graphql';
+import { OfferBundleDetails } from '../utils/models';
 
 // Mock the settings and pharmacy utils before any imports
 vi.mock('@client/settings', () => ({
@@ -114,7 +115,7 @@ describe('Pharmacy page', () => {
     let getPharmaciesByLocationMock: MockedFunction<typeof getPharmaciesByLocation>;
     let setOrderPharmacyMock: MockedFunction<typeof setOrderPharmacy>;
 
-    const mockOfferBundles = [
+    const mockOfferBundles: OfferBundleDetails[] = [
       {
         costType: 'INSURANCE_ESTIMATE',
         deliveryEstimate: 'Delivers in 2-3 days',

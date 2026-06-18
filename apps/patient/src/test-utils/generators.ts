@@ -28,7 +28,11 @@ export const generateOrder = (overrides: Partial<Order> = {}): Order => ({
   ...overrides
 });
 
-export const generatePatient = (overrides: Partial<Order['patient']> = {}): Order['patient'] => {
+type PatientOverrides = Partial<Omit<Order['patient'], 'name'>> & {
+  name?: Partial<NonNullable<Order['patient']['name']>>;
+};
+
+export const generatePatient = (overrides: PatientOverrides = {}): Order['patient'] => {
   const { name: nameOverride, ...patientOverrides } = overrides;
 
   return {
