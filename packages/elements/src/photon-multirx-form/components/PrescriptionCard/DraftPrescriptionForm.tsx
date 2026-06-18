@@ -283,6 +283,7 @@ export const DraftPrescriptionForm = (props: {
         <InputGroup label="Dispense Unit" required error={props.store.dispenseUnit?.error}>
           <DispenseUnitSelect
             value={props.store.dispenseUnit?.value ?? undefined}
+            recommendedUnits={props.store.treatment?.value?.recommendedDispenseUnits ?? undefined}
             onChange={(e: Event & { currentTarget: HTMLSelectElement }) => {
               props.actions.updateFormValue({
                 key: 'dispenseUnit',
