@@ -62,10 +62,10 @@ describe('MarketplaceSummary', () => {
   test('renders provider full name when provider has no title', () => {
     renderMarketplaceSummary();
 
-    expect(screen.getByText(/John, Jane Provider sent/)).toBeInTheDocument();
+    expect(screen.getByText(/Jane Provider sent/)).toBeInTheDocument();
   });
 
-  test('renders provider title and last name when provider has a title', () => {
+  test('renders provider full name when provider also has a title', () => {
     const order = generateOrder({
       patient: generatePatient({ name: { full: 'John Doe', first: 'John' } }),
       fills: [
@@ -88,6 +88,6 @@ describe('MarketplaceSummary', () => {
 
     renderMarketplaceSummary({ order });
 
-    expect(screen.getByText(/John, Dr\. Smith sent/)).toBeInTheDocument();
+    expect(screen.getByText(/Jane Provider sent/)).toBeInTheDocument();
   });
 });

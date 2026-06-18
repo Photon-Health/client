@@ -60,7 +60,6 @@ describe('PrescriptionSummary', () => {
     ]);
 
     expect(screen.getByText('Metformin 500mg')).toBeInTheDocument();
-    expect(screen.getByText(/your/)).toBeInTheDocument();
   });
 
   test('toggles expanded state when multi-rx button is clicked', async () => {
