@@ -28,22 +28,26 @@ export const generateOrder = (overrides: Partial<Order> = {}): Order => ({
   ...overrides
 });
 
-export const generatePatient = (overrides: Partial<Order['patient']> = {}): Order['patient'] => ({
-  id: 'pat_defaultTestId',
-  name: { full: 'John Doe', first: 'John' },
-  dateOfBirth: new Date(),
-  sex: 'MALE',
-  address: {
-    id: 'addr_defaultTestId',
-    street1: '123 Test St',
-    city: 'New York',
-    state: 'NY',
-    postalCode: '10001',
-    country: 'US'
-  },
-  preferredPharmacies: [],
-  ...overrides
-});
+export const generatePatient = (overrides: Partial<Order['patient']> = {}): Order['patient'] => {
+  const { name: nameOverride, ...patientOverrides } = overrides;
+
+  return {
+    id: 'pat_defaultTestId',
+    dateOfBirth: new Date(),
+    sex: 'MALE',
+    address: {
+      id: 'addr_defaultTestId',
+      street1: '123 Test St',
+      city: 'New York',
+      state: 'NY',
+      postalCode: '10001',
+      country: 'US'
+    },
+    preferredPharmacies: [],
+    ...patientOverrides,
+    name: { full: 'John Doe', first: 'John', ...nameOverride }
+  };
+};
 
 export const generateAddress = (
   overrides: Partial<NonNullable<Order['patient']['address']>> = {}

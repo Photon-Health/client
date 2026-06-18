@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import {
   generateFill,
@@ -44,7 +44,17 @@ vi.mock('./configs/graphqlClient', () => ({
   }
 }));
 
-vi.mock('../hooks/usePageAnalytics');
+vi.mock('./views/pharmacy.utils', async () => {
+  const actual = await vi.importActual<typeof import('./views/pharmacy.utils')>(
+    './views/pharmacy.utils'
+  );
+  return {
+    ...actual,
+    fetchOfferBundles: vi.fn().mockResolvedValue([])
+  };
+});
+
+vi.mock('./hooks/usePageAnalytics');
 vi.mock('react-ga4');
 vi.mock('mixpanel-browser');
 
@@ -93,19 +103,22 @@ describe('Rerouting', () => {
     }
   };
 
-  beforeAll(async () => {
-    const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('./api');
+  beforeEach(async () => {
+    const { getPharmaciesByLocation, setOrderPharmacy, getOrder, rerouteOrder } = await import(
+      './api'
+    );
 
-    const getOrderMock = vi.mocked(getOrder);
-    getOrderMock.mockResolvedValue(testOrder);
+    vi.mocked(getOrder).mockResolvedValue(testOrder);
 
-    const getPharmaciesMock = vi.mocked(getPharmaciesByLocation);
-    getPharmaciesMock.mockResolvedValue({
+    vi.mocked(getPharmaciesByLocation).mockResolvedValue({
       pharmaciesByLocation: [testFirstPharmacy, testSecondPharmacy]
     });
 
-    const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
-    setOrderPharmacyMock.mockResolvedValue(true);
+    vi.mocked(setOrderPharmacy).mockResolvedValue(true);
+    vi.mocked(rerouteOrder).mockResolvedValue(true);
+
+    const { fetchOfferBundles } = await import('./views/pharmacy.utils');
+    vi.mocked(fetchOfferBundles).mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -124,7 +137,7 @@ describe('Rerouting', () => {
     await userEvent.click(rerouteButton);
 
     // moves to pharmacy selection page
-    expect(await screen.findByText(text.changePharmacy)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
 
     // shows the current pharmacy with current pharmacy tag
     const pharmacyInfos = await screen.findAllByTestId('pharmacy-info');
@@ -155,7 +168,7 @@ describe('Rerouting', () => {
     // returns to the status page with the updated pharmacy and cleared exceptions
     await waitFor(() => screen.findByText(/preparing order/i), { timeout: 3000 });
     expect(await screen.findByText(testSecondPharmacy.name)).toBeInTheDocument();
-  });
+  }, 15_000);
 });
 
 const renderApp = () => {

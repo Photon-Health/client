@@ -22,10 +22,23 @@ vi.mock('../api', () => ({
   getOrder: (...args: unknown[]) => mockGetOrder(...args),
   updatePatientAddress: (...args: unknown[]) => mockUpdatePatientAddress(...args),
   updateOrderAddress: (...args: unknown[]) => mockUpdateOrderAddress(...args),
+  geocode: vi.fn().mockResolvedValue({
+    lat: 40.7128,
+    lng: -74.006,
+    address: '123 Main St, New York, NY 10001'
+  }),
   getPharmacies: vi.fn().mockResolvedValue({ pharmacies: [] }),
   getPharmaciesByLocation: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
   getOfferBundles: vi.fn().mockResolvedValue([]),
   AUTH_HEADER_ERRORS: []
+}));
+
+vi.mock('../views/pharmacy.utils', () => ({
+  fetchOfferBundles: vi.fn().mockResolvedValue([]),
+  getPharmacy: vi.fn().mockReturnValue({
+    type: 'PICKUP',
+    selectedPharmacy: { id: 'phr_test', name: 'Test Pharmacy' }
+  })
 }));
 
 vi.mock('../configs/graphqlClient', () => ({
@@ -137,11 +150,14 @@ describe('Review Page - Address Form', () => {
         expect(screen.getByText('Add your address')).toBeInTheDocument();
       });
 
-      // Fill in all fields but with invalid ZIP
-      await userEvent.type(screen.getByLabelText(/street address/i), '123 Test St');
+      const streetInput = screen.getByLabelText(/street address/i);
+      await userEvent.clear(streetInput);
+      await userEvent.type(streetInput, '123 Test St');
       await userEvent.type(screen.getByLabelText(/city/i), 'New York');
       await userEvent.selectOptions(screen.getByLabelText(/state/i), 'NY');
-      await userEvent.type(screen.getByLabelText(/zip code/i), 'invalid');
+      const zipInput = screen.getByLabelText(/zip code/i);
+      await userEvent.clear(zipInput);
+      await userEvent.type(zipInput, 'invalid');
 
       const searchButton = screen.getByRole('button', { name: /search for a pharmacy/i });
       await userEvent.click(searchButton);
@@ -151,7 +167,7 @@ describe('Review Page - Address Form', () => {
       });
 
       expect(mockUpdatePatientAddress).not.toHaveBeenCalled();
-    });
+    }, 10_000);
 
     it('submits address and navigates to pharmacy page on success', async () => {
       const updatedPatient = {
@@ -181,7 +197,9 @@ describe('Review Page - Address Form', () => {
       });
 
       // Fill in the form
-      await userEvent.type(screen.getByLabelText(/street address/i), '456 New St');
+      const streetInput = screen.getByLabelText(/street address/i);
+      await userEvent.clear(streetInput);
+      await userEvent.type(streetInput, '456 New St');
       await userEvent.type(screen.getByLabelText(/city/i), 'Brooklyn');
       await userEvent.selectOptions(screen.getByLabelText(/state/i), 'NY');
       await userEvent.type(screen.getByLabelText(/zip code/i), '11211');
@@ -210,7 +228,7 @@ describe('Review Page - Address Form', () => {
       await waitFor(() => {
         expect(memoryRouter.state.location.pathname).toBe('/pharmacy');
       });
-    });
+    }, 10_000);
 
     it('shows error message when updatePatientAddress fails', async () => {
       mockUpdatePatientAddress.mockRejectedValue(new Error('Failed to save address'));

@@ -2,6 +2,15 @@ import { Order } from '../utils/models';
 
 const oneYearFromNow = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString();
 
+const demoProvider = {
+  id: 'prv_demo',
+  name: {
+    full: 'Demo Provider',
+    last: 'Provider',
+    title: 'Dr.'
+  }
+};
+
 export const demoOrder: Order = {
   __typename: 'Order',
   readyBy: undefined,
@@ -17,7 +26,8 @@ export const demoOrder: Order = {
         dispenseAsWritten: false,
         expirationDate: oneYearFromNow,
         fillsAllowed: 1,
-        id: 'rx_01H91JW889FRF34ger7QC5V3PYBNWD0'
+        id: 'rx_01H91JW889FRF34ger7QC5V3PYBNWD0',
+        provider: demoProvider
       },
       treatment: {
         id: 'med_01GZH4K86J1ZF85C43rf061G1DTGYZ',
@@ -33,7 +43,8 @@ export const demoOrder: Order = {
         dispenseAsWritten: false,
         expirationDate: oneYearFromNow,
         fillsAllowed: 1,
-        id: 'rx_01H9154tgJW889FRF7QC5V3PYBNWD0'
+        id: 'rx_01H9154tgJW889FRF7QC5V3PYBNWD0',
+        provider: demoProvider
       },
       treatment: {
         id: 'med_01GZH4K86J1ZF85C061G14fe4DTGYZ',
@@ -55,7 +66,8 @@ export const demoOrder: Order = {
   patient: {
     id: 'pat_01H7KBFG7BQRAYQF735EWMK4CX',
     name: {
-      full: 'Jessie Demo'
+      full: 'Jessie Demo',
+      first: 'Jessie'
     },
     dateOfBirth: '1990-01-01',
     sex: 'FEMALE',
