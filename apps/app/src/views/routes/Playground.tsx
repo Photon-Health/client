@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { GraphiQL } from 'graphiql';
 import { usePhoton } from '@photonhealth/react';
 
-import 'graphiql/style.css';
+import 'graphiql/graphiql.min.css';
 import './Playground.css';
 
 const defaultQuery = `
@@ -51,7 +51,7 @@ export const Playground = () => {
       <div style={{ height: 'calc(100vh - 64px)' }}>
         <GraphiQL
           fetcher={fetcher}
-          initialHeaders={`{"authorization":"${token}"}`}
+          headers={`{"authorization":"${token}"}`}
           defaultQuery={defaultQuery}
           isHeadersEditorEnabled={false}
         />
