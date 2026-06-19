@@ -36,6 +36,7 @@ import clearForm from './util/clearForm';
 import repopulateForm from './util/repopulateForm';
 import { DisableList } from '../PrescribeWorkflow';
 import { afterDate, message } from '../../../validators';
+import { formatCharacterCount } from './util/formatCharacterCount';
 
 const validators = {
   treatment: message(record(string(), any()), 'Please select a treatment'),
@@ -47,6 +48,10 @@ const validators = {
   daysSupply: message(min(number(), 0), 'Days Supply must be at least 0'),
   refills: message(intersection([min(number(), 0), max(number(), 11)]), 'Refills must be 0 to 11'),
   instructions: message(nonempty(string()), 'Please enter instructions for the patient'),
+  notes: message(
+    refine(string(), 'Note length', (value) => value.length <= 210),
+    'Note cannot be longer than 210 characters'
+  ),
   doNotFillBeforeDate: message(
     optional(afterDate(new Date())),
     "Please choose a date that isn't in the past"
@@ -283,6 +288,7 @@ export const DraftPrescriptionForm = (props: {
         <InputGroup label="Dispense Unit" required error={props.store.dispenseUnit?.error}>
           <DispenseUnitSelect
             value={props.store.dispenseUnit?.value ?? undefined}
+            recommendedUnits={props.store.treatment?.value?.recommendedDispenseUnits ?? undefined}
             onChange={(e: Event & { currentTarget: HTMLSelectElement }) => {
               props.actions.updateFormValue({
                 key: 'dispenseUnit',
@@ -404,7 +410,12 @@ export const DraftPrescriptionForm = (props: {
           }}
         />
       </InputGroup>
-      <InputGroup label="Pharmacy Note" showOptionalSubtext>
+      <InputGroup
+        label="Pharmacy Note"
+        headingSubLabel={formatCharacterCount(props.store.notes?.value?.length ?? 0)}
+        showOptionalSubtext
+        error={props.store.notes?.error}
+      >
         <Textarea
           placeholder="Enter pharmacy note"
           value={props.store.notes?.value}
