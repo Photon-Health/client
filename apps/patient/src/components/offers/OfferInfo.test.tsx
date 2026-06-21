@@ -33,14 +33,7 @@ describe('OfferInfo', () => {
   };
 
   test('renders pharmacy name and logo', () => {
-    render(
-      <OfferInfo
-        pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
-        isCurrentPharmacy={false}
-        isPreferred={false}
-      />
-    );
+    render(<OfferInfo pharmacy={baseOffer.pharmacy} offer={baseOffer} isPreferred={false} />);
 
     expect(screen.getByText('Test Pharmacy')).toBeInTheDocument();
     expect(screen.getByRole('img')).toHaveAttribute('src', 'https://example.com/logo.png');
@@ -49,28 +42,14 @@ describe('OfferInfo', () => {
   test('renders without logo when not provided', () => {
     const pharmacyWithoutLogo = { ...baseOffer.pharmacy, logo: undefined };
 
-    render(
-      <OfferInfo
-        pharmacy={pharmacyWithoutLogo}
-        offer={baseOffer}
-        isCurrentPharmacy={false}
-        isPreferred={false}
-      />
-    );
+    render(<OfferInfo pharmacy={pharmacyWithoutLogo} offer={baseOffer} isPreferred={false} />);
 
     expect(screen.getByText('Test Pharmacy')).toBeInTheDocument();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   test('renders cost information when available', () => {
-    render(
-      <OfferInfo
-        pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
-        isCurrentPharmacy={false}
-        isPreferred={false}
-      />
-    );
+    render(<OfferInfo pharmacy={baseOffer.pharmacy} offer={baseOffer} isPreferred={false} />);
 
     expect(screen.getByText('Insurance Price')).toBeInTheDocument();
     expect(screen.getByText('$25.99')).toBeInTheDocument();
@@ -79,14 +58,7 @@ describe('OfferInfo', () => {
   });
 
   test('shows retail price with strikethrough when greater than cost', () => {
-    render(
-      <OfferInfo
-        pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
-        isCurrentPharmacy={false}
-        isPreferred={false}
-      />
-    );
+    render(<OfferInfo pharmacy={baseOffer.pharmacy} offer={baseOffer} isPreferred={false} />);
 
     const retailPriceElement = screen.getByText('$150');
     expect(retailPriceElement).toBeInTheDocument();
@@ -98,12 +70,7 @@ describe('OfferInfo', () => {
     const offerWithLowerRetail = { ...baseOffer, costAmount: 150.0, retailAmount: 100.0 };
 
     const { unmount } = render(
-      <OfferInfo
-        pharmacy={baseOffer.pharmacy}
-        offer={offerWithSameCost}
-        isCurrentPharmacy={false}
-        isPreferred={false}
-      />
+      <OfferInfo pharmacy={baseOffer.pharmacy} offer={offerWithSameCost} isPreferred={false} />
     );
     expect(screen.getByText('$150')).toBeInTheDocument();
     expect(screen.queryByText('Retail')).not.toBeInTheDocument();
@@ -111,68 +78,29 @@ describe('OfferInfo', () => {
     unmount();
 
     render(
-      <OfferInfo
-        pharmacy={baseOffer.pharmacy}
-        offer={offerWithLowerRetail}
-        isCurrentPharmacy={false}
-        isPreferred={false}
-      />
+      <OfferInfo pharmacy={baseOffer.pharmacy} offer={offerWithLowerRetail} isPreferred={false} />
     );
     expect(screen.getByText('$150')).toBeInTheDocument();
     expect(screen.queryByText('Retail')).not.toBeInTheDocument();
   });
 
   test('renders delivery estimate', () => {
-    render(
-      <OfferInfo
-        pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
-        isCurrentPharmacy={false}
-        isPreferred={false}
-      />
-    );
+    render(<OfferInfo pharmacy={baseOffer.pharmacy} offer={baseOffer} isPreferred={false} />);
 
     expect(screen.getByText('Delivers in 2-3 days')).toBeInTheDocument();
   });
 
   test('renders offer tags', () => {
-    render(
-      <OfferInfo
-        pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
-        isCurrentPharmacy={false}
-        isPreferred={false}
-      />
-    );
+    render(<OfferInfo pharmacy={baseOffer.pharmacy} offer={baseOffer} isPreferred={false} />);
 
     expect(screen.getByText('In Stock')).toBeInTheDocument();
     expect(screen.getByText('Free Shipping')).toBeInTheDocument();
   });
 
   test('shows preferred tag when isPreferred is true', () => {
-    render(
-      <OfferInfo
-        pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
-        isCurrentPharmacy={false}
-        isPreferred={true}
-      />
-    );
+    render(<OfferInfo pharmacy={baseOffer.pharmacy} offer={baseOffer} isPreferred={true} />);
 
     expect(screen.getByText('Preferred')).toBeInTheDocument();
-  });
-
-  test('shows current pharmacy tag when isCurrentPharmacy is true', () => {
-    render(
-      <OfferInfo
-        pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
-        isCurrentPharmacy={true}
-        isPreferred={false}
-      />
-    );
-
-    expect(screen.getByText('Current Pharmacy')).toBeInTheDocument();
   });
 
   test('handles missing cost information gracefully', () => {
@@ -185,12 +113,7 @@ describe('OfferInfo', () => {
     };
 
     render(
-      <OfferInfo
-        pharmacy={baseOffer.pharmacy}
-        offer={offerWithoutCost}
-        isCurrentPharmacy={false}
-        isPreferred={false}
-      />
+      <OfferInfo pharmacy={baseOffer.pharmacy} offer={offerWithoutCost} isPreferred={false} />
     );
 
     expect(screen.getByText('Test Pharmacy')).toBeInTheDocument();
@@ -208,12 +131,7 @@ describe('OfferInfo', () => {
     };
 
     render(
-      <OfferInfo
-        pharmacy={baseOffer.pharmacy}
-        offer={offerWithOnlyRetail}
-        isCurrentPharmacy={false}
-        isPreferred={false}
-      />
+      <OfferInfo pharmacy={baseOffer.pharmacy} offer={offerWithOnlyRetail} isPreferred={false} />
     );
 
     expect(screen.getByText('Retail Price')).toBeInTheDocument();
@@ -224,12 +142,7 @@ describe('OfferInfo', () => {
 
   test('renders without pharmacy when pharmacy is null', () => {
     const { container } = render(
-      <OfferInfo
-        pharmacy={null as any}
-        offer={baseOffer}
-        isCurrentPharmacy={false}
-        isPreferred={false}
-      />
+      <OfferInfo pharmacy={null as any} offer={baseOffer} isPreferred={false} />
     );
 
     expect(container.firstChild).toBeNull();
@@ -237,12 +150,7 @@ describe('OfferInfo', () => {
 
   test('renders without pharmacy when pharmacy is undefined', () => {
     const { container } = render(
-      <OfferInfo
-        pharmacy={undefined}
-        offer={baseOffer}
-        isCurrentPharmacy={false}
-        isPreferred={false}
-      />
+      <OfferInfo pharmacy={undefined} offer={baseOffer} isPreferred={false} />
     );
 
     expect(container.firstChild).toBeNull();
@@ -255,12 +163,7 @@ describe('OfferInfo', () => {
     };
 
     render(
-      <OfferInfo
-        pharmacy={baseOffer.pharmacy}
-        offer={offerWithoutTags}
-        isCurrentPharmacy={false}
-        isPreferred={false}
-      />
+      <OfferInfo pharmacy={baseOffer.pharmacy} offer={offerWithoutTags} isPreferred={false} />
     );
 
     expect(screen.getByText('Test Pharmacy')).toBeInTheDocument();
@@ -268,18 +171,10 @@ describe('OfferInfo', () => {
     expect(screen.queryByText('Free Shipping')).not.toBeInTheDocument();
   });
 
-  test('combines preferred and current pharmacy tags with offer tags', () => {
-    render(
-      <OfferInfo
-        pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
-        isCurrentPharmacy={true}
-        isPreferred={true}
-      />
-    );
+  test('renders preferred tag with offer tags', () => {
+    render(<OfferInfo pharmacy={baseOffer.pharmacy} offer={baseOffer} isPreferred={true} />);
 
     expect(screen.getByText('Preferred')).toBeInTheDocument();
-    expect(screen.getByText('Current Pharmacy')).toBeInTheDocument();
     expect(screen.getByText('In Stock')).toBeInTheDocument();
     expect(screen.getByText('Free Shipping')).toBeInTheDocument();
   });
@@ -294,7 +189,6 @@ describe('OfferInfo', () => {
       <OfferInfo
         pharmacy={amazonPharmacy}
         offer={{ ...baseOffer, pharmacy: amazonPharmacy }}
-        isCurrentPharmacy={false}
         isPreferred={false}
       />
     );
@@ -330,7 +224,6 @@ describe('OfferInfo', () => {
         <OfferInfo
           pharmacy={emptyMedsBundle.pharmacy}
           offer={emptyMedsBundle}
-          isCurrentPharmacy={false}
           isPreferred={false}
         />
       );
@@ -349,7 +242,6 @@ describe('OfferInfo', () => {
         <OfferInfo
           pharmacy={singleMedBundle.pharmacy}
           offer={singleMedBundle}
-          isCurrentPharmacy={false}
           isPreferred={false}
         />
       );
@@ -367,14 +259,7 @@ describe('OfferInfo', () => {
         ]
       };
 
-      render(
-        <OfferInfo
-          pharmacy={bundle.pharmacy}
-          offer={bundle}
-          isCurrentPharmacy={false}
-          isPreferred={false}
-        />
-      );
+      render(<OfferInfo pharmacy={bundle.pharmacy} offer={bundle} isPreferred={false} />);
 
       const retailPrices = screen.getAllByText('$100');
       expect(retailPrices).toHaveLength(1);
@@ -412,7 +297,6 @@ describe('OfferInfo', () => {
         <OfferInfo
           pharmacy={baseSingleMedBundle.pharmacy}
           offer={baseSingleMedBundle}
-          isCurrentPharmacy={false}
           isPreferred={false}
         />
       );
@@ -435,7 +319,6 @@ describe('OfferInfo', () => {
         <OfferInfo
           pharmacy={offerWithCoupon.pharmacy}
           offer={offerWithCoupon}
-          isCurrentPharmacy={false}
           isPreferred={false}
         />
       );
@@ -459,7 +342,6 @@ describe('OfferInfo', () => {
         <OfferInfo
           pharmacy={offerWithZeroCoupon.pharmacy}
           offer={offerWithZeroCoupon}
-          isCurrentPharmacy={false}
           isPreferred={false}
         />
       );
@@ -489,7 +371,6 @@ describe('OfferInfo', () => {
         <OfferInfo
           pharmacy={multiMedWithCoupons.pharmacy}
           offer={multiMedWithCoupons}
-          isCurrentPharmacy={false}
           isPreferred={false}
         />
       );
@@ -515,7 +396,6 @@ describe('OfferInfo', () => {
         <OfferInfo
           pharmacy={multiMedPartialCoupons.pharmacy}
           offer={multiMedPartialCoupons}
-          isCurrentPharmacy={false}
           isPreferred={false}
         />
       );

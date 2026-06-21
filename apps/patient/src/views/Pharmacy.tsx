@@ -1138,6 +1138,7 @@ export const Pharmacy = () => {
                       }
                       selectedPharmacyId={selectedId}
                       preferredPharmacyId={effectivePreferredPharmacyId}
+                      fulfillingPharmacyId={order.pharmacy?.id}
                       handleSelect={handleSelect}
                     />
                   )}

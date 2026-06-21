@@ -8,12 +8,14 @@ export const OffersList = ({
   shouldTrackOfferImpressionsAndSelections,
   selectedPharmacyId,
   preferredPharmacyId,
+  fulfillingPharmacyId,
   handleSelect
 }: {
   offers: OfferBundleDetails[];
   shouldTrackOfferImpressionsAndSelections: boolean;
   selectedPharmacyId: string;
   preferredPharmacyId: string;
+  fulfillingPharmacyId?: string;
   handleSelect: (id: string) => void;
 }) => {
   return (
@@ -34,7 +36,7 @@ export const OffersList = ({
             <OfferCard
               key={offer.pharmacy.id}
               offer={offer}
-              isPharmacyFulfillingCurrentOrder={false}
+              isPharmacyFulfillingCurrentOrder={fulfillingPharmacyId === offer.pharmacy.id}
               selected={selectedPharmacyId === offer.pharmacy.id}
               isPreferred={preferredPharmacyId === offer.pharmacy.id}
               handleSelect={handleSelect}

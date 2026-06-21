@@ -11,6 +11,8 @@ import novocareLogo from '../../assets/novo_circle.png';
 import capsulePharmacyIdLookup from '../../data/capsulePharmacyIds.json';
 import { PharmacyInfo } from '../PharmacyInfo';
 import { BrandedOptionOverrides } from './BrandedOptions';
+import { PharmacyCardSentHereFrame } from '../PharmacyCardSentHereFrame';
+import { getPharmacyCardBorderStyle } from '../pharmacyCardSentHereStyles';
 
 interface Props {
   pharmacyId: string;
@@ -79,47 +81,45 @@ export const BrandedPharmacyCard = ({
   if (!brand) return null;
 
   const pharmacy = { id: pharmacyId, name: brand.name, logo: brand.logo };
+  const borderStyle = getPharmacyCardBorderStyle({
+    isSentHere: isPharmacyFulfillingCurrentOrder,
+    selected
+  });
 
   return (
-    <Card
-      // if the pharmacy is fulfilling the current order
-      // we should not be able to select it again
-      bgColor={isPharmacyFulfillingCurrentOrder ? 'gray.200' : 'white'}
-      border="2px solid"
-      borderWidth={selected ? '2px' : '1px'}
-      borderColor={
-        selected ? 'brand.500' : isPharmacyFulfillingCurrentOrder ? 'gray.300' : 'gray.200'
-      }
-      borderRadius="lg"
-      shadow={'none'}
-      onClick={() => handleSelect(pharmacyId)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleSelect(pharmacyId);
-        }
-      }}
-      mx={{ base: -2, md: undefined }}
-      cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
-      pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
-      opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}
-      role="radio"
-      aria-checked={selected}
-      aria-label={brand.name}
-      aria-disabled={isPharmacyFulfillingCurrentOrder}
-      tabIndex={isPharmacyFulfillingCurrentOrder ? -1 : 0}
-    >
-      <CardBody p={3}>
-        <PharmacyInfo
-          pharmacy={pharmacy}
-          tagline={brand.description}
-          availableInYourArea={brand.name === 'Capsule Pharmacy'}
-          isCurrentPharmacy={isPharmacyFulfillingCurrentOrder}
-          freeDelivery={brand.name === 'Amazon Pharmacy'}
-          brandedOptionOverride={brandedOptionOverrides}
-          boldPharmacyName={false}
-        />
-      </CardBody>
-    </Card>
+    <PharmacyCardSentHereFrame isSentHere={isPharmacyFulfillingCurrentOrder}>
+      <Card
+        {...borderStyle}
+        borderRadius="lg"
+        shadow={'none'}
+        onClick={() => handleSelect(pharmacyId)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleSelect(pharmacyId);
+          }
+        }}
+        mx={{ base: -2, md: undefined }}
+        cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
+        pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
+        opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}
+        role="radio"
+        aria-checked={selected}
+        aria-label={brand.name}
+        aria-disabled={isPharmacyFulfillingCurrentOrder}
+        tabIndex={isPharmacyFulfillingCurrentOrder ? -1 : 0}
+      >
+        <CardBody p={3}>
+          <PharmacyInfo
+            pharmacy={pharmacy}
+            tagline={brand.description}
+            availableInYourArea={brand.name === 'Capsule Pharmacy'}
+            freeDelivery={brand.name === 'Amazon Pharmacy'}
+            brandedOptionOverride={brandedOptionOverrides}
+            boldPharmacyName={false}
+          />
+        </CardBody>
+      </Card>
+    </PharmacyCardSentHereFrame>
   );
 };

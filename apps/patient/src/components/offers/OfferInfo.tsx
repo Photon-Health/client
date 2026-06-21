@@ -14,23 +14,6 @@ const PreferredTag = () => {
   );
 };
 
-const CurrentPharmacyTag = () => {
-  return (
-    <Tag
-      size="md"
-      bgColor="red.50"
-      color="red.600"
-      borderColor="red.200"
-      borderRadius="full"
-      borderWidth="1px"
-    >
-      <TagLabel data-testid="pharmacy-info-current-pharmacy" fontWeight="bold">
-        Current Pharmacy
-      </TagLabel>
-    </Tag>
-  );
-};
-
 const getLargestPromotionAmount = (promotions: Array<Promotion> | undefined): number =>
   Math.max(...(promotions ?? []).map((p) => p.amountSaved ?? 0));
 
@@ -71,25 +54,18 @@ const CouponTag = ({
 interface OfferInfoProps {
   pharmacy?: Pick<OfferBundleDetails['pharmacy'], 'id' | 'name' | 'logo'>;
   offer: OfferBundleDetails;
-  isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
 }
 
-export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: OfferInfoProps) => {
+export const OfferInfo = ({ pharmacy, offer, isPreferred }: OfferInfoProps) => {
   if (!pharmacy) {
     return null;
   }
 
-  const offerTags = [
-    ...offer.tags,
-    ...(isPreferred ? [t.preferred] : []),
-    ...(isCurrentPharmacy ? ['current'] : [])
-  ].map((tag) => {
+  const offerTags = [...offer.tags, ...(isPreferred ? [t.preferred] : [])].map((tag) => {
     switch (tag) {
       case t.preferred:
         return <PreferredTag />;
-      case 'current':
-        return <CurrentPharmacyTag />;
       default:
         return (
           <Tag key={tag} size="sm" colorScheme="blue">

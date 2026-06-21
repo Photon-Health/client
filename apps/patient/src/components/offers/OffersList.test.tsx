@@ -13,11 +13,18 @@ vi.mock('../../utils/tracking/OfferImpressionTracker', () => ({
 
 // Mock the OfferCard component
 vi.mock('./OfferCard', () => ({
-  OfferCard: ({ offer, selected, isPreferred, handleSelect }: any) => (
+  OfferCard: ({
+    offer,
+    selected,
+    isPreferred,
+    isPharmacyFulfillingCurrentOrder,
+    handleSelect
+  }: any) => (
     <div
       data-testid={`offer-card-${offer.pharmacy.id}`}
       data-selected={selected}
       data-preferred={isPreferred}
+      data-fulfilling-current-order={isPharmacyFulfillingCurrentOrder}
       onClick={() => handleSelect(offer.pharmacy.id, offer)}
     >
       <div data-testid="pharmacy-info">
@@ -115,6 +122,16 @@ describe('OffersList', () => {
 
     expect(amazonCard).toHaveAttribute('data-preferred', 'false');
     expect(novocareCard).toHaveAttribute('data-preferred', 'true');
+  });
+
+  test('marks offer card as fulfilling current order when pharmacy matches order pharmacy', () => {
+    render(<OffersList {...defaultProps} fulfillingPharmacyId="amazon-pharmacy" />);
+
+    const amazonCard = screen.getByTestId('offer-card-amazon-pharmacy');
+    const novocareCard = screen.getByTestId('offer-card-novocare-pharmacy');
+
+    expect(amazonCard).toHaveAttribute('data-fulfilling-current-order', 'true');
+    expect(novocareCard).toHaveAttribute('data-fulfilling-current-order', 'false');
   });
 
   test('calls handleSelect when offer card is clicked', async () => {
