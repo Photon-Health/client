@@ -86,40 +86,44 @@ export const BrandedPharmacyCard = ({
     selected
   });
 
-  return (
-    <PharmacyCardSentHereFrame isSentHere={isPharmacyFulfillingCurrentOrder}>
-      <Card
-        {...borderStyle}
-        borderRadius="lg"
-        shadow={'none'}
-        onClick={() => handleSelect(pharmacyId)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleSelect(pharmacyId);
-          }
-        }}
-        mx={{ base: -2, md: undefined }}
-        cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
-        pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
-        opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}
-        role="radio"
-        aria-checked={selected}
-        aria-label={brand.name}
-        aria-disabled={isPharmacyFulfillingCurrentOrder}
-        tabIndex={isPharmacyFulfillingCurrentOrder ? -1 : 0}
-      >
-        <CardBody p={3}>
-          <PharmacyInfo
-            pharmacy={pharmacy}
-            tagline={brand.description}
-            availableInYourArea={brand.name === 'Capsule Pharmacy'}
-            freeDelivery={brand.name === 'Amazon Pharmacy'}
-            brandedOptionOverride={brandedOptionOverrides}
-            boldPharmacyName={false}
-          />
-        </CardBody>
-      </Card>
-    </PharmacyCardSentHereFrame>
+  const card = (
+    <Card
+      {...borderStyle}
+      borderRadius="lg"
+      shadow={'none'}
+      onClick={() => handleSelect(pharmacyId)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleSelect(pharmacyId);
+        }
+      }}
+      mx={{ base: -2, md: undefined }}
+      cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
+      pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
+      opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}
+      role="radio"
+      aria-checked={selected}
+      aria-label={brand.name}
+      aria-disabled={isPharmacyFulfillingCurrentOrder}
+      tabIndex={isPharmacyFulfillingCurrentOrder ? -1 : 0}
+    >
+      <CardBody p={3}>
+        <PharmacyInfo
+          pharmacy={pharmacy}
+          tagline={brand.description}
+          availableInYourArea={brand.name === 'Capsule Pharmacy'}
+          freeDelivery={brand.name === 'Amazon Pharmacy'}
+          brandedOptionOverride={brandedOptionOverrides}
+          boldPharmacyName={false}
+        />
+      </CardBody>
+    </Card>
+  );
+
+  return isPharmacyFulfillingCurrentOrder ? (
+    <PharmacyCardSentHereFrame>{card}</PharmacyCardSentHereFrame>
+  ) : (
+    card
   );
 };

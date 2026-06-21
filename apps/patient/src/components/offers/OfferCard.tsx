@@ -24,22 +24,26 @@ export const OfferCard = ({
     selected
   });
 
-  return (
-    <PharmacyCardSentHereFrame isSentHere={isPharmacyFulfillingCurrentOrder}>
-      <Card
-        {...borderStyle}
-        borderRadius="lg"
-        shadow={'none'}
-        onClick={() => handleSelect(offer.pharmacy.id, offer)}
-        mx={{ base: -2, md: undefined }}
-        cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
-        pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
-        opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}
-      >
-        <CardBody p={3}>
-          <OfferInfo pharmacy={offer.pharmacy} offer={offer} isPreferred={isPreferred} />
-        </CardBody>
-      </Card>
-    </PharmacyCardSentHereFrame>
+  const card = (
+    <Card
+      {...borderStyle}
+      borderRadius="lg"
+      shadow={'none'}
+      onClick={() => handleSelect(offer.pharmacy.id, offer)}
+      mx={{ base: -2, md: undefined }}
+      cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
+      pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
+      opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}
+    >
+      <CardBody p={3}>
+        <OfferInfo pharmacy={offer.pharmacy} offer={offer} isPreferred={isPreferred} />
+      </CardBody>
+    </Card>
+  );
+
+  return isPharmacyFulfillingCurrentOrder ? (
+    <PharmacyCardSentHereFrame>{card}</PharmacyCardSentHereFrame>
+  ) : (
+    card
   );
 };
