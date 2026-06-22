@@ -25,7 +25,10 @@ vi.mock('../../../views/Main', () => {
 
 import { OrderContext } from '../../../views/Main';
 
-const renderPrescriptionSummary = (flattenedFills: OrderContextType['flattenedFills']) => {
+const renderPrescriptionSummary = (
+  flattenedFills: OrderContextType['flattenedFills'],
+  providerName = 'Jane Provider'
+) => {
   const orderContextValue: OrderContextType = {
     fetchOrder() {
       return Promise.resolve(undefined);
@@ -46,7 +49,7 @@ const renderPrescriptionSummary = (flattenedFills: OrderContextType['flattenedFi
     <MemoryRouter>
       <ChakraProvider>
         <OrderContext.Provider value={orderContextValue}>
-          <PrescriptionSummary />
+          <PrescriptionSummary providerName={providerName} />
         </OrderContext.Provider>
       </ChakraProvider>
     </MemoryRouter>
@@ -54,11 +57,12 @@ const renderPrescriptionSummary = (flattenedFills: OrderContextType['flattenedFi
 };
 
 describe('PrescriptionSummary', () => {
-  test('renders single prescription treatment name', () => {
+  test('renders single prescription treatment name on one line with provider', () => {
     renderPrescriptionSummary([
       generateFlattenedFill({ treatment: { id: 'med_1', name: 'Metformin 500mg' } })
     ]);
 
+    expect(screen.getByText(/Jane Provider sent/)).toBeInTheDocument();
     expect(screen.getByText('Metformin 500mg')).toBeInTheDocument();
   });
 

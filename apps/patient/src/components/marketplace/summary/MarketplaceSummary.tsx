@@ -1,9 +1,10 @@
-import { Heading, HStack, Text, VStack } from '@chakra-ui/react';
+import { Heading, HStack, VStack } from '@chakra-ui/react';
 import { useOrderContext } from '../../../views/Main';
 import { PrescriptionSummary } from './PrescriptionSummary';
 
 export function MarketplaceSummary() {
   const { order } = useOrderContext();
+  const providerName = order.fills[0]?.prescription?.provider?.name?.full ?? '';
 
   return (
     <VStack data-testid="PrescriptionsSummary" spacing={2} alignItems="start">
@@ -12,12 +13,7 @@ export function MarketplaceSummary() {
           Choose a Pharmacy
         </Heading>
       </HStack>
-      <HStack spacing="1.5" alignItems="flex-start" flexWrap="wrap">
-        <Text fontWeight="medium" className="mp-mask">
-          {order.fills[0]?.prescription?.provider?.name?.full ?? ''} sent
-          <PrescriptionSummary />
-        </Text>
-      </HStack>
+      <PrescriptionSummary providerName={providerName} />
     </VStack>
   );
 }

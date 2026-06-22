@@ -34,7 +34,11 @@ const renderMarketplaceSummary = (orderContextValueOverride: Partial<OrderContex
     fetchOrder() {
       return Promise.resolve(undefined);
     },
-    flattenedFills: [],
+    flattenedFills: order.fills.map((fill) => ({
+      ...fill,
+      count: 1,
+      treatment: fill.treatment
+    })),
     isDemo: false,
     logo: undefined,
     order,
