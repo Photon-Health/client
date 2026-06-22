@@ -89,6 +89,7 @@ export interface InputGroupProps {
   subLabel?: string;
   error?: string;
   showOptionalSubtext?: boolean;
+  headingSubLabel?: string;
   helpText?: string | JSX.Element;
   children?: JSX.Element;
   loading?: boolean;
@@ -146,6 +147,9 @@ function InputGroupWrapper(props: InputGroupProps) {
             <div class="text-xs leading-6 text-gray-500">{props.subLabel}</div>
           </Show>
         </div>
+        <Show when={props.headingSubLabel}>
+          <span class="text-xs text-gray-400">{props.headingSubLabel}</span>
+        </Show>
       </div>
 
       {props.children}
