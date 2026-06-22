@@ -1098,49 +1098,59 @@ export const Pharmacy = () => {
         </Container>
       </Box>
 
-      <Container pb={patientLocation ? 0 : showFooter ? 32 : 8}>
-        {patientLocation && (
-          <VStack spacing={6} align="stretch" pt={4}>
-            {((filteredOffers || []).length > 0 || brandedOptions.length > 0) && (
-              <VStack
-                align="span"
-                w="full"
-                rowGap="2"
-                role="radiogroup"
-                aria-label="Select a pharmacy"
-              >
-                {showBrandedOptionsHeader && (
-                  <BrandedOptionsHeader title={t.delivery} description={t.getDelivered} />
-                )}
-                {showOffers && (
-                  <OffersList
-                    offers={filteredOffers || []}
-                    shouldTrackOfferImpressionsAndSelections={
-                      shouldTrackOfferImpressionsAndSelections
-                    }
-                    selectedPharmacyId={selectedId}
-                    preferredPharmacyId={effectivePreferredPharmacyId}
-                    handleSelect={handleSelect}
-                  />
-                )}
-                {showBrandedOptions && (
-                  <BrandedOptions
-                    options={brandedOptions}
-                    location={patientLocation}
-                    selectedId={selectedId}
-                    handleSelect={handleSelect}
-                    fulfillingPharmacyId={order.pharmacy?.id}
-                    brandedOptionOverrides={brandedOptionsOverride ?? {}}
-                    shouldTrackOfferImpressionsAndSelections={
-                      shouldTrackOfferImpressionsAndSelections
-                    }
-                  />
-                )}
-              </VStack>
-            )}
-          </VStack>
-        )}
-      </Container>
+      <Box px={4}>
+        <Container
+          px={-3}
+          pb={patientLocation ? 0 : showFooter ? 32 : 8}
+          mb={
+            patientLocation && ((filteredOffers || []).length > 0 || brandedOptions.length > 0)
+              ? 6
+              : 0
+          }
+        >
+          {patientLocation && (
+            <VStack spacing={6} align="stretch" pt={4}>
+              {((filteredOffers || []).length > 0 || brandedOptions.length > 0) && (
+                <VStack
+                  align="span"
+                  w="full"
+                  rowGap="2"
+                  role="radiogroup"
+                  aria-label="Select a pharmacy"
+                >
+                  {showBrandedOptionsHeader && (
+                    <BrandedOptionsHeader title={t.delivery} description={t.getDelivered} />
+                  )}
+                  {showOffers && (
+                    <OffersList
+                      offers={filteredOffers || []}
+                      shouldTrackOfferImpressionsAndSelections={
+                        shouldTrackOfferImpressionsAndSelections
+                      }
+                      selectedPharmacyId={selectedId}
+                      preferredPharmacyId={effectivePreferredPharmacyId}
+                      handleSelect={handleSelect}
+                    />
+                  )}
+                  {showBrandedOptions && (
+                    <BrandedOptions
+                      options={brandedOptions}
+                      location={patientLocation}
+                      selectedId={selectedId}
+                      handleSelect={handleSelect}
+                      fulfillingPharmacyId={order.pharmacy?.id}
+                      brandedOptionOverrides={brandedOptionsOverride ?? {}}
+                      shouldTrackOfferImpressionsAndSelections={
+                        shouldTrackOfferImpressionsAndSelections
+                      }
+                    />
+                  )}
+                </VStack>
+              )}
+            </VStack>
+          )}
+        </Container>
+      </Box>
 
       {patientLocation && (
         <>
