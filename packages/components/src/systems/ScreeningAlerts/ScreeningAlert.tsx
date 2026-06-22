@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import {
   PrescriptionScreeningAlert,
   PrescriptionScreeningAlertInvolvedAllergen,
+  PrescriptionScreeningAlertInvolvedCondition,
   PrescriptionScreeningAlertInvolvedDraftedPrescription,
   PrescriptionScreeningAlertInvolvedExistingPrescription
 } from '@photonhealth/sdk/dist/clinical-api/types';
@@ -50,6 +51,7 @@ const filterOutOwningId = (
     | PrescriptionScreeningAlertInvolvedAllergen
     | PrescriptionScreeningAlertInvolvedDraftedPrescription
     | PrescriptionScreeningAlertInvolvedExistingPrescription
+    | PrescriptionScreeningAlertInvolvedCondition
   >,
   owningId?: string
 ) => {

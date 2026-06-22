@@ -4,6 +4,7 @@ import Text from '../../particles/Text';
 import {
   PrescriptionScreeningAlert,
   PrescriptionScreeningAlertInvolvedAllergen,
+  PrescriptionScreeningAlertInvolvedCondition,
   PrescriptionScreeningAlertInvolvedDraftedPrescription,
   PrescriptionScreeningAlertInvolvedExistingPrescription
 } from '@photonhealth/sdk/dist/clinical-api/types';
@@ -11,7 +12,8 @@ import {
 type Entity =
   | PrescriptionScreeningAlertInvolvedAllergen
   | PrescriptionScreeningAlertInvolvedDraftedPrescription
-  | PrescriptionScreeningAlertInvolvedExistingPrescription;
+  | PrescriptionScreeningAlertInvolvedExistingPrescription
+  | PrescriptionScreeningAlertInvolvedCondition;
 export interface AlertsForEntity {
   entity: Entity;
   alerts: PrescriptionScreeningAlert[];
