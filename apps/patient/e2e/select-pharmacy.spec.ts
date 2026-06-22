@@ -15,7 +15,7 @@ test('displays order status for a freshly created order', async ({ page }) => {
     return;
   }
 
-  await expect(page.getByRole('heading', { name: /select a pharmacy/i })).toBeVisible({
+  await expect(page.getByRole('heading', { name: /choose a pharmacy/i })).toBeVisible({
     timeout: 15_000
   });
 
@@ -36,7 +36,7 @@ async function getLandingPage(page: Page): Promise<LandingPageNames> {
 
   return Promise.race([
     page
-      .getByText(/change pharmacy/i)
+      .getByRole('heading', { name: /choose a pharmacy/i })
       .waitFor({ timeout: 15_000 })
       .then(() => 'pharmacy-select' as const),
     page
