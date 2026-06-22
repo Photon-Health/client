@@ -36,7 +36,7 @@ async function getLandingPage(page: Page): Promise<LandingPageNames> {
 
   return Promise.race([
     page
-      .getByText(/select a pharmacy/i)
+      .getByText(/change pharmacy/i)
       .waitFor({ timeout: 15_000 })
       .then(() => 'pharmacy-select' as const),
     page
