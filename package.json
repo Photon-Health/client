@@ -158,6 +158,7 @@
   },
   "overrides": {
     "lodash": "^4.18.1",
+    "undici": "^7.28.0",
     "markdown-it": "^14.2.0",
     "picomatch": "4.0.4",
     "@chakra-ui/react": {
