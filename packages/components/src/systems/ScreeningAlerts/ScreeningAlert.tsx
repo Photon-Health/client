@@ -36,7 +36,8 @@ const getStatus = (severity: string, type: string): BannerStatus => {
 const TYPE_TO_DESCRIPTOR_MAP: Record<string, string> = {
   PrescriptionScreeningAlertInvolvedDraftedPrescription: '(Pending Rx)',
   PrescriptionScreeningAlertInvolvedExistingPrescription: '(Existing Rx)',
-  PrescriptionScreeningAlertInvolvedAllergen: '(Allergen)'
+  PrescriptionScreeningAlertInvolvedAllergen: '(Allergen)',
+  PrescriptionScreeningAlertInvolvedCondition: '(Condition)'
 };
 
 /**
@@ -68,33 +69,33 @@ const Title = (props: {
   owningId?: string;
   screeningAlert: PrescriptionScreeningAlert;
 }): JSXElement => {
+  const entities = () => filterOutOwningId(props.screeningAlert.involvedEntities, props.owningId);
+
   return (
-    <Show
-      when={props.screeningAlert.type === 'DRUG'}
-      fallback={
+    <>
+      <Show when={props.screeningAlert.type !== 'ALLERGEN'}>
+        <div class={textClasses()}>
+          <span class="font-semibold">{getSeverityText(props.screeningAlert.severity)}</span>{' '}
+          interaction with{' '}
+          <For each={entities()}>
+            {(entity, index) => {
+              return (
+                <>
+                  <span class="font-semibold">{entity.name}</span>{' '}
+                  {getDescriptorByType(entity.__typename!)}
+                  {index() < entities().length - 1 && ' and '}
+                </>
+              );
+            }}
+          </For>
+        </div>
+      </Show>
+      <Show when={props.screeningAlert.type === 'ALLERGEN'}>
         <Text bold class={textClasses()}>
           Allergy found
         </Text>
-      }
-    >
-      <div class={textClasses()}>
-        <span class="font-semibold">{getSeverityText(props.screeningAlert.severity)}</span>{' '}
-        interaction with{' '}
-        <For each={filterOutOwningId(props.screeningAlert.involvedEntities, props.owningId)}>
-          {(entity, index) => {
-            return (
-              <>
-                <span class="font-semibold">{entity.name}</span>{' '}
-                {getDescriptorByType(entity.__typename!)}
-                {index() <
-                  filterOutOwningId(props.screeningAlert.involvedEntities, props.owningId).length -
-                    1 && ' and '}
-              </>
-            );
-          }}
-        </For>
-      </div>
-    </Show>
+      </Show>
+    </>
   );
 };
 

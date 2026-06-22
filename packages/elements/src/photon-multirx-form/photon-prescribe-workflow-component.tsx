@@ -164,7 +164,8 @@ customElement(
     enableCoverageCheck: false,
     disableList: undefined,
     groupId: undefined,
-    supervisor: undefined
+    supervisor: undefined,
+    diagnosisCodes: undefined
   },
   PhotonPrescribeWorkflowComponent
 );

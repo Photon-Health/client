@@ -110,3 +110,61 @@ test('surfaces prescription screening alert between draft rx and existing rx', a
     { timeout: 3000 }
   );
 });
+
+test('surfaces prescription screening alert between draft rx and diagnosis code', async () => {
+  const alert = generatePrescriptionScreeningAlert({
+    type: PrescriptionScreeningAlertType.Drug,
+    description:
+      'Plasma concentrations and pharmacologic effects of alfuzosin may be increased by strong CYP3A4 inhibitors (eg, Paxlovid (300/100) Oral Tablet Therapy Pack 20 x 150 MG & 10 x 100MG). Coadministration is contraindicated.',
+    // Mark treatment that we are currently drafting a prescription for as an involvedEntity
+    // TREATMENT is the object returned by MockMedicationSearchElement
+    involvedEntities: [
+      {
+        id: TREATMENT.id,
+        name: TREATMENT.name,
+        __typename: 'PrescriptionScreeningAlertInvolvedDraftedPrescription'
+      },
+      {
+        id: '93',
+        name: 'Hypertension',
+        __typename: 'PrescriptionScreeningAlertInvolvedCondition'
+      }
+    ],
+    severity: PrescriptionScreeningAlertSeverity.Major
+  });
+
+  const screenPrescriptionsQuerySpy = vi.fn();
+  server.use(
+    clinicalGql.query('ScreenDraftedPrescriptionsQuery', ({ variables }) => {
+      screenPrescriptionsQuerySpy(variables);
+      return HttpResponse.json({
+        data: {
+          prescriptionScreen: { alerts: [alert] }
+        }
+      });
+    })
+  );
+
+  const { waitForPrescribeForm, addDraftPrescription, waitForDraftPrescription } =
+    renderPrescribeWorkflow({
+      enableOrder: true,
+      enableSendToPatient: true,
+      optionalPatientAddress: true
+    });
+
+  await waitForPrescribeForm();
+  await addDraftPrescription();
+  await waitForDraftPrescription();
+  await waitFor(
+    () => {
+      expect(screenPrescriptionsQuerySpy).toHaveBeenCalled();
+      // Text is broken up with span elements so plain getByText doesn't work
+      expect(
+        screen.getByText(
+          (_, element) => element?.textContent === 'Major interaction with Hypertension (Condition)'
+        )
+      ).toBeInTheDocument();
+    },
+    { timeout: 3000 }
+  );
+});

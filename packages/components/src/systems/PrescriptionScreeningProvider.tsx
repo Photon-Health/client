@@ -88,7 +88,7 @@ export const PrescriptionScreeningProvider = (props: PrescriptionScreeningProvid
       return;
     }
 
-    const validCodes = [];
+    const validCodes: DiagnosisCode[] = [];
     const invalidCodes = [];
     for (const dc of props.diagnosisCodes) {
       const isValid =
@@ -97,7 +97,7 @@ export const PrescriptionScreeningProvider = (props: PrescriptionScreeningProvid
         Object.values(DiagnosisCodeType).includes(dc.type as DiagnosisCodeType);
 
       if (isValid) {
-        validCodes.push(dc);
+        validCodes.push(dc as DiagnosisCode);
       } else {
         invalidCodes.push(dc);
       }

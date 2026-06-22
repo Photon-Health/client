@@ -6,6 +6,7 @@ import {
   PrescriptionScreeningAlertInvolvedAllergen,
   PrescriptionScreeningAlertInvolvedDraftedPrescription,
   PrescriptionScreeningAlertInvolvedExistingPrescription,
+  PrescriptionScreeningAlertInvolvedCondition,
   PrescriptionScreeningAlertSeverity,
   PrescriptionScreeningAlertType,
   SupervisorCardFragment
@@ -133,7 +134,8 @@ export function generateDiagnosisCodePrefill(
 type InvolvedEntity =
   | PrescriptionScreeningAlertInvolvedAllergen
   | PrescriptionScreeningAlertInvolvedDraftedPrescription
-  | PrescriptionScreeningAlertInvolvedExistingPrescription;
+  | PrescriptionScreeningAlertInvolvedExistingPrescription
+  | PrescriptionScreeningAlertInvolvedCondition;
 
 type PrescriptionScreeningAlertWithInvolvedEntities = Omit<
   PrescriptionScreeningAlert,
