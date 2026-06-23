@@ -7,7 +7,8 @@ import { getPharmacyCardBorderStyle } from '../pharmacyCardSentHereStyles';
 
 interface Props {
   offer: OfferBundleDetails;
-  isPharmacyFulfillingCurrentOrder: boolean;
+  isAutoroutedPharmacy: boolean;
+  isCurrentPharmacy: boolean;
   selected: boolean;
   isPreferred: boolean;
   handleSelect: (id: string, offer?: OfferBundleDetails) => void;
@@ -16,11 +17,13 @@ export const OfferCard = ({
   offer,
   selected,
   handleSelect,
-  isPharmacyFulfillingCurrentOrder,
+  isAutoroutedPharmacy,
+  isCurrentPharmacy,
   isPreferred
 }: Props) => {
   const borderStyle = getPharmacyCardBorderStyle({
-    isSentHere: isPharmacyFulfillingCurrentOrder,
+    isAutoroutedPharmacy,
+    isCurrentPharmacy,
     selected
   });
 
@@ -30,17 +33,20 @@ export const OfferCard = ({
       borderRadius="lg"
       shadow={'none'}
       onClick={() => handleSelect(offer.pharmacy.id, offer)}
-      cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
-      pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
-      opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}
+      cursor="pointer"
     >
       <CardBody p={3}>
-        <OfferInfo pharmacy={offer.pharmacy} offer={offer} isPreferred={isPreferred} />
+        <OfferInfo
+          pharmacy={offer.pharmacy}
+          offer={offer}
+          isCurrentPharmacy={isCurrentPharmacy && selected}
+          isPreferred={isPreferred}
+        />
       </CardBody>
     </Card>
   );
 
-  return isPharmacyFulfillingCurrentOrder ? (
+  return isAutoroutedPharmacy ? (
     <PharmacyCardSentHereFrame>{card}</PharmacyCardSentHereFrame>
   ) : (
     card

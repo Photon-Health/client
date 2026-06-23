@@ -15,6 +15,7 @@ import { setAuthHeader } from '../configs/graphqlClient';
 import theme from '../configs/theme';
 import { demoOrder } from '../data/demoOrder';
 import { countFillsAndRemoveDuplicates, FillWithCount } from '../utils/general';
+import { hasConfirmedAutoroutedPharmacy } from '../utils/autoroutedPharmacyConfirmationStorage';
 import { getOrderFetchRedirectPath } from '../utils/getOrderFetchRedirectPath';
 import { Order } from '../utils/models';
 import { Pharmacy } from '../__generated__/graphql';
@@ -169,7 +170,9 @@ export const Main = () => {
   );
   const navigateForOrder = useCallback(
     async (newOrder: Order) => {
-      const redirectPath = getOrderFetchRedirectPath(newOrder);
+      const redirectPath = getOrderFetchRedirectPath(newOrder, {
+        hasConfirmedAutoroutedPharmacy: hasConfirmedAutoroutedPharmacy(newOrder.id)
+      });
 
       if (redirectPath === '/canceled') {
         navigate('/canceled', { replace: true });

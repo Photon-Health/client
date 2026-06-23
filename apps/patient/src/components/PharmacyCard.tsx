@@ -21,6 +21,7 @@ interface PharmacyCardProps {
   selectable?: boolean;
   showDetails?: boolean;
   showPrice?: boolean;
+  isAutoroutedPharmacy?: boolean;
   isCurrentPharmacy?: boolean;
 }
 
@@ -34,13 +35,16 @@ export const PharmacyCard = memo(function PharmacyCard({
   selectable = false,
   showDetails = true,
   showPrice = false,
+  isAutoroutedPharmacy = false,
   isCurrentPharmacy = false
 }: PharmacyCardProps) {
   if (!pharmacy) return null;
 
+  const isSelected = selected && !!onSelect;
   const borderStyle = getPharmacyCardBorderStyle({
-    isSentHere: isCurrentPharmacy,
-    selected: selected && !!onSelect
+    isAutoroutedPharmacy,
+    isCurrentPharmacy,
+    selected: isSelected
   });
 
   const card = (
@@ -56,13 +60,10 @@ export const PharmacyCard = memo(function PharmacyCard({
         }
       }}
       cursor={selectable ? 'pointer' : undefined}
-      pointerEvents={isCurrentPharmacy ? 'none' : undefined}
-      opacity={isCurrentPharmacy ? 0.7 : undefined}
       role="radio"
       aria-checked={selected}
       aria-label={pharmacy.name}
-      aria-disabled={isCurrentPharmacy}
-      tabIndex={isCurrentPharmacy ? -1 : 0}
+      tabIndex={0}
     >
       <CardBody p={3}>
         <PharmacyInfo
@@ -72,6 +73,7 @@ export const PharmacyCard = memo(function PharmacyCard({
           showPrice={showPrice}
           boldPharmacyName={false}
           selected={selected}
+          isCurrentPharmacy={isCurrentPharmacy && isSelected}
           isStatus={false}
         />
       </CardBody>
@@ -98,5 +100,9 @@ export const PharmacyCard = memo(function PharmacyCard({
     </Card>
   );
 
-  return isCurrentPharmacy ? <PharmacyCardSentHereFrame>{card}</PharmacyCardSentHereFrame> : card;
+  return isAutoroutedPharmacy ? (
+    <PharmacyCardSentHereFrame>{card}</PharmacyCardSentHereFrame>
+  ) : (
+    card
+  );
 });

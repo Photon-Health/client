@@ -17,14 +17,16 @@ vi.mock('./OfferCard', () => ({
     offer,
     selected,
     isPreferred,
-    isPharmacyFulfillingCurrentOrder,
+    isAutoroutedPharmacy,
+    isCurrentPharmacy,
     handleSelect
   }: any) => (
     <div
       data-testid={`offer-card-${offer.pharmacy.id}`}
       data-selected={selected}
       data-preferred={isPreferred}
-      data-fulfilling-current-order={isPharmacyFulfillingCurrentOrder}
+      data-autorouted-pharmacy={isAutoroutedPharmacy}
+      data-current-pharmacy={isCurrentPharmacy}
       onClick={() => handleSelect(offer.pharmacy.id, offer)}
     >
       <div data-testid="pharmacy-info">
@@ -124,14 +126,24 @@ describe('OffersList', () => {
     expect(novocareCard).toHaveAttribute('data-preferred', 'true');
   });
 
-  test('marks offer card as fulfilling current order when pharmacy matches order pharmacy', () => {
-    render(<OffersList {...defaultProps} fulfillingPharmacyId="amazon-pharmacy" />);
+  test('marks offer card as current pharmacy when pharmacy matches current pharmacy', () => {
+    render(<OffersList {...defaultProps} currentPharmacyId="amazon-pharmacy" />);
 
     const amazonCard = screen.getByTestId('offer-card-amazon-pharmacy');
     const novocareCard = screen.getByTestId('offer-card-novocare-pharmacy');
 
-    expect(amazonCard).toHaveAttribute('data-fulfilling-current-order', 'true');
-    expect(novocareCard).toHaveAttribute('data-fulfilling-current-order', 'false');
+    expect(amazonCard).toHaveAttribute('data-current-pharmacy', 'true');
+    expect(novocareCard).toHaveAttribute('data-current-pharmacy', 'false');
+  });
+
+  test('marks offer card as autorouted when pharmacy matches autorouted pharmacy', () => {
+    render(<OffersList {...defaultProps} autoroutedPharmacyId="amazon-pharmacy" />);
+
+    const amazonCard = screen.getByTestId('offer-card-amazon-pharmacy');
+    const novocareCard = screen.getByTestId('offer-card-novocare-pharmacy');
+
+    expect(amazonCard).toHaveAttribute('data-autorouted-pharmacy', 'true');
+    expect(novocareCard).toHaveAttribute('data-autorouted-pharmacy', 'false');
   });
 
   test('calls handleSelect when offer card is clicked', async () => {

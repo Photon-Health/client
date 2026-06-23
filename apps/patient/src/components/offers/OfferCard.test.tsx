@@ -24,7 +24,8 @@ describe('OfferCard', () => {
     render(
       <OfferCard
         offer={baseOffer}
-        isPharmacyFulfillingCurrentOrder={true}
+        isAutoroutedPharmacy={true}
+        isCurrentPharmacy={false}
         selected={false}
         isPreferred={false}
         handleSelect={vi.fn()}
@@ -38,7 +39,8 @@ describe('OfferCard', () => {
     render(
       <OfferCard
         offer={baseOffer}
-        isPharmacyFulfillingCurrentOrder={false}
+        isAutoroutedPharmacy={false}
+        isCurrentPharmacy={false}
         selected={false}
         isPreferred={false}
         handleSelect={vi.fn()}

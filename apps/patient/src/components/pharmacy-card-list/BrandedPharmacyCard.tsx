@@ -16,7 +16,8 @@ import { getPharmacyCardBorderStyle } from '../pharmacyCardSentHereStyles';
 
 interface Props {
   pharmacyId: string;
-  isPharmacyFulfillingCurrentOrder: boolean;
+  isAutoroutedPharmacy: boolean;
+  isCurrentPharmacy: boolean;
   selected: boolean;
   handleSelect: (id: string) => void;
   brandedOptionOverrides?: BrandedOptionOverrides;
@@ -74,7 +75,8 @@ export const BrandedPharmacyCard = ({
   pharmacyId,
   selected,
   handleSelect,
-  isPharmacyFulfillingCurrentOrder,
+  isAutoroutedPharmacy,
+  isCurrentPharmacy,
   brandedOptionOverrides
 }: Props) => {
   const brand = PHARMACY_BRANDING[pharmacyId];
@@ -82,7 +84,8 @@ export const BrandedPharmacyCard = ({
 
   const pharmacy = { id: pharmacyId, name: brand.name, logo: brand.logo };
   const borderStyle = getPharmacyCardBorderStyle({
-    isSentHere: isPharmacyFulfillingCurrentOrder,
+    isAutoroutedPharmacy,
+    isCurrentPharmacy,
     selected
   });
 
@@ -98,14 +101,11 @@ export const BrandedPharmacyCard = ({
           handleSelect(pharmacyId);
         }
       }}
-      cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
-      pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
-      opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}
+      cursor="pointer"
       role="radio"
       aria-checked={selected}
       aria-label={brand.name}
-      aria-disabled={isPharmacyFulfillingCurrentOrder}
-      tabIndex={isPharmacyFulfillingCurrentOrder ? -1 : 0}
+      tabIndex={0}
     >
       <CardBody p={3}>
         <PharmacyInfo
@@ -114,13 +114,14 @@ export const BrandedPharmacyCard = ({
           availableInYourArea={brand.name === 'Capsule Pharmacy'}
           freeDelivery={brand.name === 'Amazon Pharmacy'}
           brandedOptionOverride={brandedOptionOverrides}
+          isCurrentPharmacy={isCurrentPharmacy && selected}
           boldPharmacyName={false}
         />
       </CardBody>
     </Card>
   );
 
-  return isPharmacyFulfillingCurrentOrder ? (
+  return isAutoroutedPharmacy ? (
     <PharmacyCardSentHereFrame>{card}</PharmacyCardSentHereFrame>
   ) : (
     card

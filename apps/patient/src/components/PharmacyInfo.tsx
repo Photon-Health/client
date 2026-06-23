@@ -254,6 +254,7 @@ interface PharmacyInfoProps {
   isStatus?: boolean;
   selected?: boolean;
   showHours?: boolean;
+  isCurrentPharmacy?: boolean;
   orderFulfillment?: OrderFulfillment;
   brandedOptionOverride?: BrandedOptionOverrides;
 }
@@ -269,6 +270,7 @@ export const PharmacyInfo = ({
   boldPharmacyName = true,
   isStatus = false,
   showHours = false,
+  isCurrentPharmacy = false,
   orderFulfillment,
   brandedOptionOverride
 }: PharmacyInfoProps) => {
@@ -413,6 +415,21 @@ export const PharmacyInfo = ({
             </Tag>
           ) : null}
         </HStack>
+      ) : null}
+      {isCurrentPharmacy ? (
+        <Tag
+          size="md"
+          bgColor="red.50"
+          color="red.600"
+          borderColor="red.200"
+          borderRadius="full"
+          borderWidth="1px"
+          mb={1}
+        >
+          <TagLabel data-testid="pharmacy-info-current-pharmacy" fontWeight="bold">
+            Current Pharmacy
+          </TagLabel>
+        </Tag>
       ) : null}
       {trackingLink && (
         <HStack spacing={0}>

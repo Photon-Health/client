@@ -5,13 +5,23 @@ type PharmacyCardBorderStyle = {
 };
 
 export const getPharmacyCardBorderStyle = ({
-  isSentHere,
+  isAutoroutedPharmacy,
+  isCurrentPharmacy,
   selected
 }: {
-  isSentHere: boolean;
+  isAutoroutedPharmacy: boolean;
+  isCurrentPharmacy: boolean;
   selected: boolean;
 }): PharmacyCardBorderStyle => {
-  if (isSentHere) {
+  if (selected) {
+    return {
+      bgColor: isCurrentPharmacy ? 'gray.200' : 'white',
+      borderWidth: '2px',
+      borderColor: 'brand.500'
+    };
+  }
+
+  if (isAutoroutedPharmacy) {
     return {
       bgColor: 'blue.50',
       borderWidth: '2px',
@@ -19,11 +29,11 @@ export const getPharmacyCardBorderStyle = ({
     };
   }
 
-  if (selected) {
+  if (isCurrentPharmacy) {
     return {
-      bgColor: 'white',
-      borderWidth: '2px',
-      borderColor: 'brand.500'
+      bgColor: 'gray.200',
+      borderWidth: '1px',
+      borderColor: 'gray.300'
     };
   }
 

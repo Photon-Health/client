@@ -139,8 +139,8 @@ describe('Rerouting', () => {
     // moves to pharmacy selection page
     expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
 
-    // shows the current pharmacy with sent here badge
-    expect(screen.getAllByTestId('pharmacy-sent-here-badge')).toHaveLength(1);
+    // current pharmacy is selectable during reroute — no sent here badge
+    expect(screen.queryByTestId('pharmacy-sent-here-badge')).not.toBeInTheDocument();
     expect(await screen.findByText(testFirstPharmacy.name)).toBeInTheDocument();
 
     // shows the select pharmacy button after clicking on a pharmacy option
