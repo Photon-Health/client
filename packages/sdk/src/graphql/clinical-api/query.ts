@@ -5,6 +5,9 @@ export const SearchTreatmentsQuery = graphql(`
     treatments(filter: $filter) {
       id
       name
+      ... on Medication {
+        recommendedDispenseUnits
+      }
     }
   }
 `);
@@ -15,6 +18,9 @@ export const SearchTreatmentOptionsQuery = graphql(`
       __typename
       id
       name
+      ... on Medication {
+        recommendedDispenseUnits
+      }
     }
   }
 `);

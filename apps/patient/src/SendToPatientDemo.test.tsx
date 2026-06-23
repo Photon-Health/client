@@ -21,6 +21,14 @@ vi.mock('./utils/preloadImage', () => ({
   preloadImage: vi.fn().mockResolvedValue(undefined)
 }));
 
+vi.mock('./views/pharmacy.utils', () => ({
+  fetchOfferBundles: vi.fn().mockResolvedValue([]),
+  getPharmacy: vi.fn().mockReturnValue({
+    type: 'PICKUP',
+    selectedPharmacy: { id: 'phr_demo', name: 'Central Pharmacy' }
+  })
+}));
+
 vi.mock('./hooks/usePageAnalytics');
 vi.mock('react-ga4');
 vi.mock('mixpanel-browser');
@@ -35,7 +43,7 @@ describe('Send To Patient Demo', () => {
 
     expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
-    expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
     await userEvent.click(screen.getByText('Central Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
 
@@ -54,7 +62,7 @@ describe('Send To Patient Demo', () => {
 
     expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
-    expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
     expect(screen.getByText('Home Delivery')).toBeInTheDocument();
     await userEvent.click(screen.getByText('See all mail orders'));
 
@@ -78,7 +86,7 @@ describe('Send To Patient Demo', () => {
 
     expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
-    expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
 
     await userEvent.click(screen.getByText('Amazon Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));

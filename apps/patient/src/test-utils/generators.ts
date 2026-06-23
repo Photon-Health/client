@@ -28,22 +28,30 @@ export const generateOrder = (overrides: Partial<Order> = {}): Order => ({
   ...overrides
 });
 
-export const generatePatient = (overrides: Partial<Order['patient']> = {}): Order['patient'] => ({
-  id: 'pat_defaultTestId',
-  name: { full: 'John Doe' },
-  dateOfBirth: new Date(),
-  sex: 'MALE',
-  address: {
-    id: 'addr_defaultTestId',
-    street1: '123 Test St',
-    city: 'New York',
-    state: 'NY',
-    postalCode: '10001',
-    country: 'US'
-  },
-  preferredPharmacies: [],
-  ...overrides
-});
+type PatientOverrides = Partial<Omit<Order['patient'], 'name'>> & {
+  name?: Partial<NonNullable<Order['patient']['name']>>;
+};
+
+export const generatePatient = (overrides: PatientOverrides = {}): Order['patient'] => {
+  const { name: nameOverride, ...patientOverrides } = overrides;
+
+  return {
+    id: 'pat_defaultTestId',
+    dateOfBirth: new Date(),
+    sex: 'MALE',
+    address: {
+      id: 'addr_defaultTestId',
+      street1: '123 Test St',
+      city: 'New York',
+      state: 'NY',
+      postalCode: '10001',
+      country: 'US'
+    },
+    preferredPharmacies: [],
+    ...patientOverrides,
+    name: { full: 'John Doe', first: 'John', ...nameOverride }
+  };
+};
 
 export const generateAddress = (
   overrides: Partial<NonNullable<Order['patient']['address']>> = {}
@@ -66,6 +74,23 @@ export const generateFill = (treatmentName: string): Order['fills'][number] => {
     treatment: {
       id: `med_testIdDefault_${fillIdCounter}`,
       name: treatmentName
+    },
+    prescription: {
+      id: `rx_testIdDefault_${fillIdCounter}`,
+      daysSupply: undefined,
+      dispenseQuantity: 0,
+      dispenseUnit: '',
+      dispenseAsWritten: false,
+      expirationDate: undefined,
+      fillsAllowed: 0,
+      provider: {
+        id: 'prv_test_default',
+        name: {
+          full: 'Jane Provider',
+          last: 'Provider',
+          title: undefined
+        }
+      }
     }
   };
 };
