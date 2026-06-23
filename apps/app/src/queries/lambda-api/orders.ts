@@ -72,6 +72,11 @@ export const GET_ORDER = gql`
         resolvedAt
       }
       createdAt
+      supervisor {
+        firstName
+        lastName
+        npi
+      }
     }
   }
 `;
