@@ -1,8 +1,10 @@
 import {
+  DiagnosisCodesPrefill,
   DraftPrescriptionsProvider,
   PharmacySelectionProvider,
   PrescribeEventDispatchProvider,
   PrescribeProvider,
+  PrescriptionScreeningProvider,
   RecentOrders,
   SupervisorPrefill,
   SupervisorProvider,
@@ -36,6 +38,7 @@ export interface PrescribeWorkflowComponentProps extends PrescribeProps {
   enableDeliveryPharmacies: boolean;
   mailOrderIds?: string;
   supervisor?: SupervisorPrefill;
+  diagnosisCodes?: DiagnosisCodesPrefill;
 }
 
 export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowComponentProps) => {
@@ -85,37 +88,42 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
               patientId={store.patient?.value?.id}
               enableCoverageCheck={props.enableCoverageCheck}
             >
-              <SupervisorProvider supervisor={props.supervisor}>
-                <style>{tailwind}</style>
-                <style>{shoelaceDarkStyles}</style>
-                <style>{shoelaceLightStyles}</style>
-                <style>{styles}</style>
-                <PrescribeWorkflow
-                  patientId={props.patientId}
-                  hideSubmit={props.hideSubmit}
-                  hideTemplates={props.hideTemplates}
-                  hidePatientCard={props.hidePatientCard}
-                  enableOrder={props.enableOrder}
-                  enableMedHistory={props.enableMedHistory}
-                  enableMedHistoryLinks={props.enableMedHistoryLinks}
-                  enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
-                  enableCombineAndDuplicate={props.enableCombineAndDuplicate}
-                  optionalPatientAddress={props.optionalPatientAddress}
-                  address={props.address}
-                  weight={props.weight}
-                  weightUnit={props.weightUnit}
-                  additionalNotes={props.additionalNotes}
-                  triggerSubmit={props.triggerSubmit}
-                  toastBuffer={props.toastBuffer}
-                  formStore={store}
-                  formActions={actions}
-                  externalOrderId={props.externalOrderId}
-                  catalogId={props.catalogId}
-                  allowOffCatalogSearch={props.allowOffCatalogSearch}
-                  disableList={props.disableList}
-                  groupId={props.groupId}
-                />
-              </SupervisorProvider>
+              <PrescriptionScreeningProvider
+                formStore={store}
+                diagnosisCodes={props.diagnosisCodes}
+              >
+                <SupervisorProvider supervisor={props.supervisor}>
+                  <style>{tailwind}</style>
+                  <style>{shoelaceDarkStyles}</style>
+                  <style>{shoelaceLightStyles}</style>
+                  <style>{styles}</style>
+                  <PrescribeWorkflow
+                    patientId={props.patientId}
+                    hideSubmit={props.hideSubmit}
+                    hideTemplates={props.hideTemplates}
+                    hidePatientCard={props.hidePatientCard}
+                    enableOrder={props.enableOrder}
+                    enableMedHistory={props.enableMedHistory}
+                    enableMedHistoryLinks={props.enableMedHistoryLinks}
+                    enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
+                    enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+                    optionalPatientAddress={props.optionalPatientAddress}
+                    address={props.address}
+                    weight={props.weight}
+                    weightUnit={props.weightUnit}
+                    additionalNotes={props.additionalNotes}
+                    triggerSubmit={props.triggerSubmit}
+                    toastBuffer={props.toastBuffer}
+                    formStore={store}
+                    formActions={actions}
+                    externalOrderId={props.externalOrderId}
+                    catalogId={props.catalogId}
+                    allowOffCatalogSearch={props.allowOffCatalogSearch}
+                    disableList={props.disableList}
+                    groupId={props.groupId}
+                  />
+                </SupervisorProvider>
+              </PrescriptionScreeningProvider>
             </PrescribeProvider>
           </PharmacySelectionProvider>
         </DraftPrescriptionsProvider>
@@ -156,7 +164,8 @@ customElement(
     enableCoverageCheck: false,
     disableList: undefined,
     groupId: undefined,
-    supervisor: undefined
+    supervisor: undefined,
+    diagnosisCodes: undefined
   },
   PhotonPrescribeWorkflowComponent
 );
