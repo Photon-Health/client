@@ -57,13 +57,14 @@ test('does not fire GenerateCoverageOptions when enableCoverageCheck is false', 
     })
   );
 
-  const { waitForPrescribeForm, addDraftPrescription } = renderPrescribeWorkflow({
-    enableCoverageCheck: false
-  });
+  const { waitForPrescribeForm, addDraftPrescription, waitForDraftPrescription } =
+    renderPrescribeWorkflow({
+      enableCoverageCheck: false
+    });
 
   await waitForPrescribeForm();
   await addDraftPrescription();
-  await screen.findByText(TREATMENT.name, {}, { timeout: 3000 });
+  await waitForDraftPrescription();
 
   // Give any in-flight effects a chance to settle...
   await new Promise((r) => setTimeout(r, 50));

@@ -7,11 +7,11 @@ import {
   isValidPrescriptionRoutingConstraint,
   PrescriptionFormData,
   RoutingConstraint,
-  ScreeningAlertType,
   Text,
   useDraftPrescriptions,
   usePrescribe,
-  usePrescribeEventDispatch
+  usePrescribeEventDispatch,
+  usePrescriptionScreening
 } from '@photonhealth/components';
 import repopulateForm from './util/repopulateForm';
 
@@ -32,8 +32,6 @@ export const DraftPrescriptions = (props: {
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
   expandForm: () => void;
-  handleDraftPrescriptionsChange: () => void;
-  screeningAlerts: ScreeningAlertType[];
   routingConstraints: RoutingConstraint[];
   enableOrder: boolean;
 }) => {
@@ -47,6 +45,7 @@ export const DraftPrescriptions = (props: {
   const { selectOtherCoverageOption, coverageOptions } = usePrescribe();
   const { draftPrescriptions, deletePrescription, isLoadingPrefills, prescriptionIds } =
     useDraftPrescriptions();
+  const { screenDraftedPrescriptions, screeningAlerts } = usePrescriptionScreening();
   const prescriptionRoutingConstraints = createMemo((): Map<string, RoutingConstraint> => {
     return getPrescriptionRoutingConstraints(props.routingConstraints);
   });
@@ -70,7 +69,7 @@ export const DraftPrescriptions = (props: {
         block: 'start'
       });
 
-      props.handleDraftPrescriptionsChange();
+      screenDraftedPrescriptions();
     }
   };
 
@@ -124,7 +123,7 @@ export const DraftPrescriptions = (props: {
     setDeleteDialogOpen(false);
     setDeleteDraftId(undefined);
 
-    props.handleDraftPrescriptionsChange();
+    screenDraftedPrescriptions();
   };
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);
@@ -174,7 +173,7 @@ export const DraftPrescriptions = (props: {
             <For each={draftPrescriptions()}>
               {(draftPrescription) => (
                 <DraftPrescriptionItem
-                  screeningAlerts={props.screeningAlerts}
+                  screeningAlerts={screeningAlerts()}
                   routingConstraint={prescriptionRoutingConstraints().get(draftPrescription.id)}
                   draft={draftPrescription}
                   coverageOptions={coverageOptions().filter(

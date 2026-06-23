@@ -5,6 +5,9 @@ export const SearchTreatmentsQuery = graphql(`
     treatments(filter: $filter) {
       id
       name
+      ... on Medication {
+        recommendedDispenseUnits
+      }
     }
   }
 `);
@@ -15,6 +18,9 @@ export const SearchTreatmentOptionsQuery = graphql(`
       __typename
       id
       name
+      ... on Medication {
+        recommendedDispenseUnits
+      }
     }
   }
 `);
@@ -38,6 +44,31 @@ export const SupervisorCardQuery = graphql(`
     }
     mostRecentSupervisor {
       id
+    }
+  }
+`);
+
+export const ScreenDraftedPrescriptionsQuery = graphql(`
+  query ScreenDraftedPrescriptionsQuery(
+    $draftedPrescriptions: [DraftedPrescriptionInput!]!
+    $patientId: ID!
+    $diagnosisCodes: [DiagnosisCode!]
+  ) {
+    prescriptionScreen(
+      draftedPrescriptions: $draftedPrescriptions
+      patientId: $patientId
+      diagnosisCodes: $diagnosisCodes
+    ) {
+      alerts {
+        type
+        description
+        involvedEntities {
+          id
+          name
+          __typename
+        }
+        severity
+      }
     }
   }
 `);

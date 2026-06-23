@@ -3,18 +3,18 @@ import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
-import { ScreeningAlertType } from './ScreeningAlert';
 import { ScreeningAlertsByEntity } from './ScreeningAlertsByEntity';
 import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
+import { PrescriptionScreeningAlert } from '@photonhealth/sdk/dist/clinical-api/types';
 
 type ScreeningAlertAcknowledgementDialogProps = {
   isOpen: boolean;
-  alerts: ScreeningAlertType[];
+  alerts: PrescriptionScreeningAlert[];
   onIgnoreWarningAndCreateAnyway: () => void;
   onRevisitPrescriptions: () => void;
 };
 
-function formatWarning(alerts: ScreeningAlertType[]): string {
+function formatWarning(alerts: PrescriptionScreeningAlert[]): string {
   const numAllergenWarnings = alerts.filter((alert) => alert.type === 'ALLERGEN').length;
   const numInteractionWarnings = alerts.filter((alert) => alert.type === 'DRUG').length;
 

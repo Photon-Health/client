@@ -3,7 +3,7 @@ import { createMemo, JSXElement, Show } from 'solid-js';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
 import formatRxString from '../../utils/formatRxString';
-import { ScreeningAlerts, ScreeningAlertType } from '../ScreeningAlerts';
+import { ScreeningAlerts } from '../ScreeningAlerts';
 import { RoutingConstraint, PrescriptionRoutingAlert } from '../RoutingConstraints';
 import { CoverageOption } from '../PrescribeProvider';
 import { CoverageOptionSummary } from './CoverageOptions/CoverageOptionSummary';
@@ -11,6 +11,7 @@ import { OtherCoverageOptionsList } from './CoverageOptions/OtherCoverageOptions
 import { toPrescriptionFormData } from './utils/mappers';
 import { PrescriptionFormData } from './DraftPrescriptionsProvider';
 import Card from '../../particles/Card';
+import { PrescriptionScreeningAlert } from '@photonhealth/sdk/dist/clinical-api/types';
 
 export function DraftPrescriptionItem(props: {
   draft: Prescription;
@@ -18,7 +19,7 @@ export function DraftPrescriptionItem(props: {
   handleEdit?: (prescription: PrescriptionFormData) => void;
   handleDelete?: (prescriptionId: string) => void;
   handleSwapToOtherPrescription: (coverageOption: CoverageOption) => void;
-  screeningAlerts: ScreeningAlertType[];
+  screeningAlerts: PrescriptionScreeningAlert[];
   routingConstraint?: RoutingConstraint;
 }) {
   // we'll want to ensure that we're only rendering

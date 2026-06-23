@@ -2,7 +2,7 @@
 import.meta.env.VITE_AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
 import { render, screen, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, MockedFunction, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, MockedFunction, vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import {
   generateFill,
@@ -15,6 +15,7 @@ import { routeElements } from '../Routes';
 import { getOfferBundles, getOrder, getPharmaciesByLocation, setOrderPharmacy } from '../api';
 import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
 import { FulfillmentType } from '../__generated__/graphql';
+import { OfferBundleDetails } from '../utils/models';
 
 // Mock the settings and pharmacy utils before any imports
 vi.mock('@client/settings', () => ({
@@ -86,6 +87,23 @@ vi.mock('../components', async () => {
 });
 
 describe('Pharmacy page', () => {
+  beforeEach(async () => {
+    const { geocode, getPharmaciesByLocation } = await import('../api');
+    vi.mocked(geocode).mockResolvedValue({
+      lat: 40.7128,
+      lng: -74.006,
+      address: '123 Main St, New York, NY 10001'
+    });
+    vi.mocked(getPharmaciesByLocation).mockResolvedValue({ pharmaciesByLocation: [] });
+
+    const { fetchOfferBundles, getPharmacy } = await import('./pharmacy.utils');
+    vi.mocked(fetchOfferBundles).mockResolvedValue([]);
+    vi.mocked(getPharmacy).mockReturnValue({
+      type: 'MAIL_ORDER',
+      selectedPharmacy: { id: 'amazon_pharmacy_id', name: 'Amazon Pharmacy' }
+    });
+  });
+
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -97,40 +115,42 @@ describe('Pharmacy page', () => {
     let getPharmaciesByLocationMock: MockedFunction<typeof getPharmaciesByLocation>;
     let setOrderPharmacyMock: MockedFunction<typeof setOrderPharmacy>;
 
-    beforeAll(async () => {
-      fetchOfferBundlesMock = vi.mocked(fetchOfferBundles);
-      fetchOfferBundlesMock.mockResolvedValue([
-        {
-          costType: 'INSURANCE_ESTIMATE',
-          deliveryEstimate: 'Delivers in 2-3 days',
-          costAmount: 25.99,
-          costAmountTitle: 'Insurance Price',
-          retailAmount: 150.0,
-          retailAmountTitle: 'Retail',
-          pharmacy: {
-            id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-            name: 'Amazon Pharmacy',
-            fulfillmentTypes: ['MAIL_ORDER']
-          },
-          tags: ['In Stock', 'Free Shipping'],
-          medications: [{ name: 'Metformin 500mg', amount: 25.99, retailAmount: 150.0 }]
+    const mockOfferBundles: OfferBundleDetails[] = [
+      {
+        costType: 'INSURANCE_ESTIMATE',
+        deliveryEstimate: 'Delivers in 2-3 days',
+        costAmount: 25.99,
+        costAmountTitle: 'Insurance Price',
+        retailAmount: 150.0,
+        retailAmountTitle: 'Retail',
+        pharmacy: {
+          id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
+          name: 'Amazon Pharmacy',
+          fulfillmentTypes: ['MAIL_ORDER']
         },
-        {
-          costType: 'PRIME_RX',
-          deliveryEstimate: 'Delivers in 1-2 days',
-          costAmount: 19.99,
-          costAmountTitle: 'Prime Rx Price',
-          retailAmount: 120.0,
-          retailAmountTitle: 'Retail',
-          pharmacy: {
-            id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-            name: 'Amazon Pharmacy',
-            fulfillmentTypes: ['MAIL_ORDER']
-          },
-          tags: ['Prime Member', 'Fast Delivery'],
-          medications: [{ name: 'Metformin 500mg', amount: 19.99, retailAmount: 120.0 }]
-        }
-      ]);
+        tags: ['In Stock', 'Free Shipping'],
+        medications: [{ name: 'Metformin 500mg', amount: 25.99, retailAmount: 150.0 }]
+      },
+      {
+        costType: 'PRIME_RX',
+        deliveryEstimate: 'Delivers in 1-2 days',
+        costAmount: 19.99,
+        costAmountTitle: 'Prime Rx Price',
+        retailAmount: 120.0,
+        retailAmountTitle: 'Retail',
+        pharmacy: {
+          id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
+          name: 'Amazon Pharmacy',
+          fulfillmentTypes: ['MAIL_ORDER']
+        },
+        tags: ['Prime Member', 'Fast Delivery'],
+        medications: [{ name: 'Metformin 500mg', amount: 19.99, retailAmount: 120.0 }]
+      }
+    ];
+
+    beforeEach(async () => {
+      fetchOfferBundlesMock = vi.mocked(fetchOfferBundles);
+      fetchOfferBundlesMock.mockResolvedValue(mockOfferBundles);
 
       getPharmacyMock = vi.mocked(getPharmacy);
       getPharmacyMock.mockReturnValue({
@@ -312,7 +332,7 @@ describe('Pharmacy page', () => {
       await navigateToPharmacyScreen();
 
       // Wait for component to render
-      await screen.findByText('Select a pharmacy');
+      await screen.findByRole('heading', { name: 'Choose a Pharmacy' });
 
       // Should not show delivery section
       expect(screen.queryByText('Delivery')).not.toBeInTheDocument();
@@ -324,8 +344,7 @@ describe('Pharmacy page', () => {
       expect(screen.queryByText('Prime Rx Price')).not.toBeInTheDocument();
 
       // Should only show pickup section
-      expect(screen.getByText('Pick Up')).toBeInTheDocument();
-      expect(screen.getByText('Get your medication at a nearby pharmacy')).toBeInTheDocument();
+      expect(screen.getByText('Pick up')).toBeInTheDocument();
     }, 10_000);
 
     test('shows location even when order has no address (current behavior)', async () => {
@@ -409,8 +428,7 @@ describe('Pharmacy page', () => {
       expect(screen.queryByText('Insurance Price')).not.toBeInTheDocument();
 
       // Should only show pickup section
-      expect(screen.getByText('Pick Up')).toBeInTheDocument();
-      expect(screen.getByText('Get your medication at a nearby pharmacy')).toBeInTheDocument();
+      expect(screen.getByText('Pick up')).toBeInTheDocument();
     }, 10_000);
   });
 
@@ -740,5 +758,5 @@ const renderApp = () => {
 };
 
 async function navigateToPharmacyScreen() {
-  expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
 }

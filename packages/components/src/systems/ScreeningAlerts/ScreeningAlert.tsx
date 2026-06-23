@@ -2,13 +2,13 @@ import { createEffect, createSignal, For, JSXElement, Show } from 'solid-js';
 import Text from '../../particles/Text';
 import Banner, { BannerStatus } from '../../particles/Banner';
 import clsx from 'clsx';
-
-export interface ScreeningAlertType {
-  description: string;
-  type: string;
-  severity: string;
-  involvedEntities: { id: string; name: string; __typename: string }[];
-}
+import {
+  PrescriptionScreeningAlert,
+  PrescriptionScreeningAlertInvolvedAllergen,
+  PrescriptionScreeningAlertInvolvedCondition,
+  PrescriptionScreeningAlertInvolvedDraftedPrescription,
+  PrescriptionScreeningAlertInvolvedExistingPrescription
+} from '@photonhealth/sdk/dist/clinical-api/types';
 
 /**
  * Helper function to capitalize the severity
@@ -37,7 +37,8 @@ const getStatus = (severity: string, type: string): BannerStatus => {
 const TYPE_TO_DESCRIPTOR_MAP: Record<string, string> = {
   PrescriptionScreeningAlertInvolvedDraftedPrescription: '(Pending Rx)',
   PrescriptionScreeningAlertInvolvedExistingPrescription: '(Existing Rx)',
-  PrescriptionScreeningAlertInvolvedAllergen: '(Allergen)'
+  PrescriptionScreeningAlertInvolvedAllergen: '(Allergen)',
+  PrescriptionScreeningAlertInvolvedCondition: '(Condition)'
 };
 
 /**
@@ -46,9 +47,14 @@ const TYPE_TO_DESCRIPTOR_MAP: Record<string, string> = {
  * by nature of the association
  */
 const filterOutOwningId = (
-  involvedEntities: { id: string; name: string; __typename: string }[],
+  involvedEntities: Array<
+    | PrescriptionScreeningAlertInvolvedAllergen
+    | PrescriptionScreeningAlertInvolvedDraftedPrescription
+    | PrescriptionScreeningAlertInvolvedExistingPrescription
+    | PrescriptionScreeningAlertInvolvedCondition
+  >,
   owningId?: string
-): { id: string; name: string; __typename: string }[] => {
+) => {
   return involvedEntities.filter((element) => element.id !== owningId);
 };
 
@@ -59,36 +65,39 @@ const getDescriptorByType = (type: string): string => {
   return TYPE_TO_DESCRIPTOR_MAP[type] ?? '';
 };
 
-const textClasses = () => clsx('text-pretty mr-2 text-black text-base', {});
+const textClasses = () => clsx('text-sm text-pretty mr-2 text-black text-base', {});
 
-const getTitle = (props: { owningId?: string; screeningAlert: ScreeningAlertType }): JSXElement => {
+const Title = (props: {
+  owningId?: string;
+  screeningAlert: PrescriptionScreeningAlert;
+}): JSXElement => {
+  const entities = () => filterOutOwningId(props.screeningAlert.involvedEntities, props.owningId);
+
   return (
-    <Show
-      when={props.screeningAlert.type === 'DRUG'}
-      fallback={
+    <>
+      <Show when={props.screeningAlert.type !== 'ALLERGEN'}>
+        <div class={textClasses()}>
+          <span class="font-semibold">{getSeverityText(props.screeningAlert.severity)}</span>{' '}
+          interaction with{' '}
+          <For each={entities()}>
+            {(entity, index) => {
+              return (
+                <>
+                  <span class="font-semibold">{entity.name}</span>{' '}
+                  {getDescriptorByType(entity.__typename!)}
+                  {index() < entities().length - 1 && ' and '}
+                </>
+              );
+            }}
+          </For>
+        </div>
+      </Show>
+      <Show when={props.screeningAlert.type === 'ALLERGEN'}>
         <Text bold class={textClasses()}>
           Allergy found
         </Text>
-      }
-    >
-      <div class={textClasses()}>
-        <span class="font-semibold">{getSeverityText(props.screeningAlert.severity)}</span>{' '}
-        interaction with{' '}
-        <For each={filterOutOwningId(props.screeningAlert.involvedEntities, props.owningId)}>
-          {(entity, index) => {
-            return (
-              <>
-                <span class="font-semibold">{entity.name}</span>{' '}
-                {getDescriptorByType(entity.__typename)}
-                {index() <
-                  filterOutOwningId(props.screeningAlert.involvedEntities, props.owningId).length -
-                    1 && ' and '}
-              </>
-            );
-          }}
-        </For>
-      </div>
-    </Show>
+      </Show>
+    </>
   );
 };
 
@@ -100,7 +109,7 @@ const getTitle = (props: { owningId?: string; screeningAlert: ScreeningAlertType
  */
 export const ScreeningAlert = (props: {
   owningId?: string;
-  screeningAlert: ScreeningAlertType;
+  screeningAlert: PrescriptionScreeningAlert;
 }) => {
   const [isAllergen, setIsAllergen] = createSignal<boolean>();
   const [isExpanded, setIsExpanded] = createSignal<boolean>(false);
@@ -121,7 +130,7 @@ export const ScreeningAlert = (props: {
     >
       <div class="flex grid-flow-col justify-start">
         <div class="flex flex-col gap-2">
-          <div class="text-sm"> {getTitle(props)}</div>
+          <Title owningId={props.owningId} screeningAlert={props.screeningAlert} />
           <Show when={isExpanded() || isAllergen()}>
             <div class={`text-sm text-gray-700`}>{props.screeningAlert.description}</div>
           </Show>

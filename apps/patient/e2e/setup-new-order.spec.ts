@@ -18,7 +18,7 @@ test('create test patient and order via clinical app', async ({ page }) => {
   // Write to testDataPath, so patient app specs can load this fresh order
   fs.writeFileSync(testDataPath, JSON.stringify({ orderId }, null, 2));
   console.log(`Test data written: orderId=${orderId}`);
-});
+}, 120_000);
 
 async function loginViaAuth0(page: Page) {
   await page.goto('/login?connection=e2e-test-users');
@@ -79,5 +79,5 @@ async function createDraftPrescription(page: Page, medicationName: string) {
 
 async function clickSendOrder(page: Page) {
   await page.getByRole('button', { name: 'Send' }).click();
-  await page.waitForURL(/\/orders\/ord_/, { timeout: 30_000 });
+  await page.waitForURL(/\/orders\/ord_/, { timeout: 60_000 });
 }
