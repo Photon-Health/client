@@ -16,7 +16,6 @@
     "./dist/index.css": "./dist/index.css"
   },
   "scripts": {
-    "start": "vite --port 3000",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "chromatic": "npx chromatic --project-token=CHROMATIC_PROJECT_TOKEN --exit-zero-on-changes --allow-console-errors"
