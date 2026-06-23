@@ -13,9 +13,9 @@ export const getPharmacyCardBorderStyle = ({
 }): PharmacyCardBorderStyle => {
   if (isSentHere) {
     return {
-      bgColor: 'green.50',
+      bgColor: 'blue.50',
       borderWidth: '2px',
-      borderColor: 'green.600'
+      borderColor: 'blue.500'
     };
   }
 

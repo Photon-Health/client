@@ -1,15 +1,19 @@
 import { HStack, Icon, Text } from '@chakra-ui/react';
 import { FiCheck } from 'react-icons/fi';
 
-export const SentHereBadge = () => {
+type SentHereBadgeProps = {
+  top?: number;
+};
+
+export const SentHereBadge = ({ top = 0 }: SentHereBadgeProps) => {
   return (
     <HStack
       position="absolute"
-      top={0}
+      top={top}
       left={4}
       transform="translateY(-50%)"
       zIndex={1}
-      bgColor="green.600"
+      bgColor="blue.500"
       color="white"
       borderRadius="full"
       px={3}

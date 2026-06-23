@@ -1,10 +1,10 @@
 import { getPharmacyCardBorderStyle } from './pharmacyCardSentHereStyles';
 
-test('getPharmacyCardBorderStyle returns green border when order was sent to pharmacy', () => {
+test('getPharmacyCardBorderStyle returns blue border when order was sent to pharmacy', () => {
   expect(getPharmacyCardBorderStyle({ isSentHere: true, selected: false })).toEqual({
-    bgColor: 'green.50',
+    bgColor: 'blue.50',
     borderWidth: '2px',
-    borderColor: 'green.600'
+    borderColor: 'blue.500'
   });
 });
 
@@ -18,8 +18,8 @@ test('getPharmacyCardBorderStyle returns brand border when pharmacy is selected'
 
 test('getPharmacyCardBorderStyle prioritizes sent here styling over selected styling', () => {
   expect(getPharmacyCardBorderStyle({ isSentHere: true, selected: true })).toEqual({
-    bgColor: 'green.50',
+    bgColor: 'blue.50',
     borderWidth: '2px',
-    borderColor: 'green.600'
+    borderColor: 'blue.500'
   });
 });
