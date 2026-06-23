@@ -55,6 +55,14 @@ vi.mock('./configs/graphqlClient', () => ({
   }
 }));
 
+vi.mock('./views/pharmacy.utils', () => ({
+  fetchOfferBundles: vi.fn().mockResolvedValue([]),
+  getPharmacy: vi.fn().mockReturnValue({
+    type: 'PICKUP',
+    selectedPharmacy: { id: 'phr_testId123', name: 'Test Local Pickup Pharmacy' }
+  })
+}));
+
 vi.mock('react-ga4');
 vi.mock('mixpanel-browser');
 
@@ -121,7 +129,7 @@ describe('App', () => {
 
     renderApp({ order: testOrder });
 
-    expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
     expect(screen.getByTestId('PrescriptionsSummary')).toBeInTheDocument();
     await expectTotalPageViewAnalyticsCountToBe(1);
     await userEvent.click(screen.getByText('Test Local Pickup Pharmacy'));
@@ -165,7 +173,7 @@ describe('App', () => {
 
     renderApp({ order: testOrder });
 
-    expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
     await userEvent.click(screen.getByText('Test Mail Order Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
     expect(setOrderPharmacyMock).toHaveBeenCalled();
@@ -193,7 +201,7 @@ describe('App', () => {
     });
 
     expect(screen.queryByText('Review your prescription')).not.toBeInTheDocument();
-    expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
     expect(screen.getByTestId('PrescriptionsSummary')).toBeInTheDocument();
   });
 

@@ -18,6 +18,7 @@ export function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponen
   const analyticsEvents: CustomEvent[] = [];
   const attestationResolvedEvents: Event[] = [];
   const supervisorErrorEvents: CustomEvent[] = [];
+  const diagnosisCodeErrorEvents: CustomEvent[] = [];
 
   eventListenerHost.addEventListener('photon-analytics-track-event', (event: Event) => {
     analyticsEvents.push(event as CustomEvent);
@@ -27,6 +28,9 @@ export function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponen
   });
   eventListenerHost.addEventListener('photon-supervisor-error', (event: Event) => {
     supervisorErrorEvents.push(event as CustomEvent);
+  });
+  eventListenerHost.addEventListener('photon-diagnosis-code-error', (event: Event) => {
+    diagnosisCodeErrorEvents.push(event as CustomEvent);
   });
 
   document.body.append(eventListenerHost);
@@ -87,6 +91,10 @@ export function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponen
     await user.click(screen.getByRole('button', { name: /add prescription/i }));
   }
 
+  async function waitForDraftPrescription() {
+    await screen.findByText(TREATMENT.name, {}, { timeout: 3000 });
+  }
+
   return {
     ...view,
     user,
@@ -94,8 +102,10 @@ export function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponen
     analyticsEvents,
     attestationResolvedEvents,
     supervisorErrorEvents,
+    diagnosisCodeErrorEvents,
     waitForPrescribeForm,
     waitForSignatureAttestationModal,
-    addDraftPrescription
+    addDraftPrescription,
+    waitForDraftPrescription
   };
 }
