@@ -1,4 +1,5 @@
 import {
+  DiagnosisCodesPrefill,
   DraftPrescriptionsProvider,
   PharmacySelectionProvider,
   PrescribeEventDispatchProvider,
@@ -23,7 +24,6 @@ import '@shoelace-style/shoelace/dist/components/switch/switch';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-import { DiagnosisCodesPrefill } from '@photonhealth/components/systems/PrescriptionScreeningProvider';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 

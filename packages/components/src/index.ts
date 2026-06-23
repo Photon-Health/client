@@ -67,6 +67,7 @@ import { PhotonClientStore } from './store';
 import { CoverageOption, PrescribeProvider, usePrescribe } from './systems/PrescribeProvider';
 import { SupervisorPrefill, SupervisorProvider, useSupervisor } from './systems/SupervisorProvider';
 import {
+  DiagnosisCodesPrefill,
   PrescriptionScreeningProvider,
   usePrescriptionScreening
 } from './systems/PrescriptionScreeningProvider';
@@ -176,5 +177,6 @@ export type {
   PrescriptionFormData,
   CoverageOption,
   SupervisorPrefill,
-  TryCreatePrescriptionTemplateOptions
+  TryCreatePrescriptionTemplateOptions,
+  DiagnosisCodesPrefill
 };
