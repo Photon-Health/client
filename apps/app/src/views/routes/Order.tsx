@@ -65,6 +65,7 @@ import { OrderRoutingHistory } from '../../gql/graphql';
 import { OrderState } from 'packages/sdk/src/types';
 import usePermissions from '../../hooks/usePermissions';
 import { ResendOrderButton } from '../components/ResendOrderButton';
+import NameView from '../components/NameView';
 
 export const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.PickUp]: 'Pick up',
@@ -495,7 +496,7 @@ export const OrderDetailPage = () => {
           <Divider color="gray.100" />
           <CardBody>
             <Stack direction={{ base: 'column', sm: 'row' }} gap={[5, 3]} w="full">
-              <VStack align="start" borderRadius={6}>
+              <VStack align="start">
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">
                   Patient
                 </Text>
@@ -507,28 +508,45 @@ export const OrderDetailPage = () => {
                   <PatientView patient={order?.patient} />
                 )}
               </VStack>
-
               <Show above="sm">
                 <Divider orientation="vertical" height="auto" />
               </Show>
-
-              <VStack align="start" borderRadius={6}>
+              <VStack align="start">
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">
                   Created At
                 </Text>
-
                 {loading ? (
                   <SkeletonText skeletonHeight={5} noOfLines={1} width="125px" />
                 ) : (
                   <Text fontSize="md">{formatDate(order?.createdAt)}</Text>
                 )}
               </VStack>
+              {order?.supervisor && (
+                <>
+                  <Show above="sm">
+                    <Divider orientation="vertical" height="auto" />
+                  </Show>
+                  <VStack align="start">
+                    <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                      Supervisor
+                    </Text>
+                    {loading ? (
+                      <SkeletonText skeletonHeight={5} noOfLines={1} width="125px" />
+                    ) : (
+                      <NameView
+                        name={`${order.supervisor.firstName} ${order.supervisor.lastName}`}
+                        sub={`NPI: ${order.supervisor.npi}`}
+                      />
+                    )}
+                  </VStack>
+                </>
+              )}
               {order?.externalId ? (
                 <>
                   <Show above="sm">
                     <Divider orientation="vertical" height="auto" />
                   </Show>
-                  <VStack align="start" borderRadius={6}>
+                  <VStack align="start">
                     <Text color="gray.500" fontWeight="medium" fontSize="sm">
                       External Id
                     </Text>
