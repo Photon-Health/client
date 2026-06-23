@@ -96,6 +96,7 @@ export function makeOrder(overrides: Partial<Order> = {}): Order {
     fulfillment: null,
     exceptions: [],
     createdAt: '2026-01-01T00:00:00Z',
+    supervisor: null,
     ...overrides
   } as unknown as Order;
 }
