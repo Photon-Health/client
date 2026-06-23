@@ -55,7 +55,6 @@ export const PharmacyCard = memo(function PharmacyCard({
           onSelect();
         }
       }}
-      mx={{ base: -2, md: undefined }}
       cursor={selectable ? 'pointer' : undefined}
       pointerEvents={isCurrentPharmacy ? 'none' : undefined}
       opacity={isCurrentPharmacy ? 0.7 : undefined}

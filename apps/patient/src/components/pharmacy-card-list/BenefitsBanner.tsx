@@ -4,21 +4,7 @@ import { Tooltip } from '../Tooltip';
 
 export const BenefitsBanner = ({ onTooltipClick }: { onTooltipClick: () => void }) => {
   return (
-    <HStack
-      bg="blue.100"
-      border="1px solid"
-      borderColor="blue.200"
-      borderRadius="xl"
-      px={4}
-      py={3}
-      spacing={2}
-      align="center"
-      justifyContent="space-between"
-      mx={{ base: -2, md: undefined }}
-    >
-      <Text fontSize="sm">
-        <Text as="b">Using insurance?</Text> Your price might be different.
-      </Text>
+    <HStack spacing={2} align="center">
       <Tooltip
         placement="bottom-end"
         wrapperProps={{ onClick: onTooltipClick }}
@@ -31,8 +17,14 @@ export const BenefitsBanner = ({ onTooltipClick }: { onTooltipClick: () => void 
           </Text>
         }
       >
-        <FiInfo color="var(--chakra-colors-blue-500)" size={20} />
+        <FiInfo color="var(--chakra-colors-gray.500)" size={18} />
       </Tooltip>
+      <Text fontSize="sm" color="gray.700">
+        <Text as="span" fontWeight="semibold">
+          Using insurance?
+        </Text>{' '}
+        Your price might be different.
+      </Text>
     </HStack>
   );
 };
