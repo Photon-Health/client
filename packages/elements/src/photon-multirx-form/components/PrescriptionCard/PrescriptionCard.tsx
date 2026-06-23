@@ -1,7 +1,6 @@
 import {
   Button,
   Card,
-  ScreeningAlertType,
   Spinner,
   Text,
   useDraftPrescriptions,
@@ -20,8 +19,6 @@ export const PrescriptionCard = (props: {
   weight?: number;
   weightUnit?: string;
   prefillNotes?: string;
-  screenDraftedPrescriptions: () => void;
-  screeningAlerts: ScreeningAlertType[];
   enableOrder: boolean;
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
@@ -78,8 +75,6 @@ export const PrescriptionCard = (props: {
             actions={props.actions}
             store={props.store}
             expandForm={() => setShowForm(true)}
-            handleDraftPrescriptionsChange={props.screenDraftedPrescriptions}
-            screeningAlerts={props.screeningAlerts}
             routingConstraints={pharmacySelectionContext.routingConstraints()}
             enableOrder={props.enableOrder}
           />
@@ -102,8 +97,6 @@ export const PrescriptionCard = (props: {
                 weight={props.weight}
                 weightUnit={props.weightUnit}
                 prefillNotes={props.prefillNotes}
-                screenDraftedPrescriptions={props.screenDraftedPrescriptions}
-                screeningAlerts={props.screeningAlerts}
                 catalogId={props.catalogId}
                 allowOffCatalogSearch={props.allowOffCatalogSearch}
                 disableList={props.disableList}

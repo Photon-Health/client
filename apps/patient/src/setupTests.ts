@@ -53,6 +53,19 @@ if (typeof window !== 'undefined' && !('IntersectionObserver' in window)) {
 
 vi.stubGlobal('scrollTo', vi.fn());
 
+vi.stubGlobal('google', {
+  maps: {
+    places: {
+      AutocompleteService: vi.fn().mockImplementation(() => ({
+        getPlacePredictions: vi.fn((_request, callback) => callback([], 'OK'))
+      }))
+    },
+    Geocoder: vi.fn().mockImplementation(() => ({
+      geocode: vi.fn((_request, callback) => callback([], 'OK'))
+    }))
+  }
+});
+
 // Fixes bug in Chakra UI https://github.com/chakra-ui/chakra-ui/issues/6036
 // useBreakpointValue causes bug during unit tests
 Object.defineProperty(window, 'matchMedia', {

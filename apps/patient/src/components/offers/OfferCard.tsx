@@ -30,7 +30,6 @@ export const OfferCard = ({
       borderRadius="lg"
       shadow={'none'}
       onClick={() => handleSelect(offer.pharmacy.id, offer)}
-      mx={{ base: -2, md: undefined }}
       cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
       pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
       opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}

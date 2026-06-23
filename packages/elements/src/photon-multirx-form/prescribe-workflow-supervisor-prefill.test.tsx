@@ -93,12 +93,13 @@ test('creates supervisor and attaches to order', async () => {
     phone: 'test-phone'
   });
 
-  const { user, waitForPrescribeForm, addDraftPrescription } = renderPrescribeWorkflow({
-    enableOrder: true,
-    enableSendToPatient: true,
-    optionalPatientAddress: true,
-    supervisor: supervisorPrefill
-  });
+  const { user, waitForPrescribeForm, addDraftPrescription, waitForDraftPrescription } =
+    renderPrescribeWorkflow({
+      enableOrder: true,
+      enableSendToPatient: true,
+      optionalPatientAddress: true,
+      supervisor: supervisorPrefill
+    });
 
   await waitForPrescribeForm();
 
@@ -112,7 +113,7 @@ test('creates supervisor and attaches to order', async () => {
   );
 
   await addDraftPrescription();
-  await screen.findByText(TREATMENT.name, {}, { timeout: 3000 });
+  await waitForDraftPrescription();
 
   await user.click(screen.getByRole('button', { name: /^send$/i }));
 
@@ -146,16 +147,17 @@ test('creates supervisor and does not show visually to user', async () => {
     )
   );
 
-  const { waitForPrescribeForm, addDraftPrescription } = renderPrescribeWorkflow({
-    enableOrder: true,
-    enableSendToPatient: true,
-    optionalPatientAddress: true,
-    supervisor: generateSupervisorPrefill()
-  });
+  const { waitForPrescribeForm, addDraftPrescription, waitForDraftPrescription } =
+    renderPrescribeWorkflow({
+      enableOrder: true,
+      enableSendToPatient: true,
+      optionalPatientAddress: true,
+      supervisor: generateSupervisorPrefill()
+    });
 
   await waitForPrescribeForm();
   await addDraftPrescription();
-  await screen.findByText(TREATMENT.name, {}, { timeout: 3000 });
+  await waitForDraftPrescription();
 
   // None of the SupervisorCard UI surfaces, because user does not have NP/PA credentials
   expect(screen.queryAllByText(/supervising physician/i)).toHaveLength(0);

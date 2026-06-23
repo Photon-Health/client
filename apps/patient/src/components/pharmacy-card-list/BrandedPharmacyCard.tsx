@@ -99,7 +99,6 @@ export const BrandedPharmacyCard = ({
           handleSelect(pharmacyId);
         }
       }}
-      mx={{ base: -2, md: undefined }}
       cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
       pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
       opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}
