@@ -1,16 +1,22 @@
 import { For, Show } from 'solid-js';
 import Banner from '../../particles/Banner';
-import { ScreeningAlertType } from './ScreeningAlert';
 import Text from '../../particles/Text';
+import {
+  PrescriptionScreeningAlert,
+  PrescriptionScreeningAlertInvolvedAllergen,
+  PrescriptionScreeningAlertInvolvedCondition,
+  PrescriptionScreeningAlertInvolvedDraftedPrescription,
+  PrescriptionScreeningAlertInvolvedExistingPrescription
+} from '@photonhealth/sdk/dist/clinical-api/types';
 
-interface Entity {
-  id: string;
-  name: string;
-  __typename: string;
-}
+type Entity =
+  | PrescriptionScreeningAlertInvolvedAllergen
+  | PrescriptionScreeningAlertInvolvedDraftedPrescription
+  | PrescriptionScreeningAlertInvolvedExistingPrescription
+  | PrescriptionScreeningAlertInvolvedCondition;
 export interface AlertsForEntity {
   entity: Entity;
-  alerts: ScreeningAlertType[];
+  alerts: PrescriptionScreeningAlert[];
 }
 
 /**
@@ -67,7 +73,7 @@ export const ScreeningAlertByEntity = (props: {
     <Banner withoutIcon withBorder status="suggestion">
       <div class="flex grid-flow-col justify-start">
         <div class="flex flex-col gap-2">
-          <Show when={!isTypenameAllergenBased(props.screeningAlertByEntity.entity.__typename)}>
+          <Show when={!isTypenameAllergenBased(props.screeningAlertByEntity.entity.__typename!)}>
             <Text bold>{props.screeningAlertByEntity.entity.name}</Text>
             <For each={props.screeningAlertByEntity.alerts}>
               {(alert) => {
@@ -76,20 +82,20 @@ export const ScreeningAlertByEntity = (props: {
                     {(involvedEntity) => {
                       return (
                         <>
-                          <Show when={!isTypenameAllergenBased(involvedEntity.__typename)}>
+                          <Show when={!isTypenameAllergenBased(involvedEntity.__typename!)}>
                             <Show
                               when={involvedEntity.id != props.screeningAlertByEntity.entity.id}
                             >
                               <div class={`text-sm text-gray-700`}>
                                 {getSeverityText(alert.severity)} interaction with{' '}
                                 {involvedEntity.name}{' '}
-                                {getDescriptorByType(involvedEntity.__typename)}
+                                {getDescriptorByType(involvedEntity.__typename!)}
                               </div>
                             </Show>
                           </Show>
                           {/* if we're an allergen we'll need to show the contents of the alert
                            instead of this text based off the names of the entities */}
-                          <Show when={isTypenameAllergenBased(involvedEntity.__typename)}>
+                          <Show when={isTypenameAllergenBased(involvedEntity.__typename!)}>
                             <For
                               each={props.otherAlertsByEntity.filter(
                                 (otherAlertByEntity) =>
