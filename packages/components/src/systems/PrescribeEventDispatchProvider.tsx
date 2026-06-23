@@ -218,6 +218,7 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
 
   const dispatchDiagnosisCodeError: PrescribeEventDispatchContextValue['dispatchDiagnosisCodeError'] =
     (errors) => {
+      console.error(errors);
       const event = new CustomEvent('photon-diagnosis-code-error', {
         composed: true,
         bubbles: true,

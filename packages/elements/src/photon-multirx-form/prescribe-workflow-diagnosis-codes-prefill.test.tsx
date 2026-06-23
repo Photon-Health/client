@@ -105,7 +105,9 @@ test('emits diagnosis codes error event when JSON is malformed', async () => {
   });
   expect(diagnosisCodeErrorEvents[0].detail).toEqual(
     expect.objectContaining({
-      errors: expect.arrayContaining(['Invalid diagnosis codes json passed in'])
+      errors: expect.arrayContaining([
+        'Invalid diagnosis codes JSON passed in, cannot pass to screening request'
+      ])
     })
   );
 
@@ -148,7 +150,9 @@ test('emits diagnosis codes error event when JSON contains invalid code type', a
   expect(diagnosisCodeErrorEvents[0].detail).toEqual(
     expect.objectContaining({
       errors: expect.arrayContaining([
-        `Invalid diagnosis codes detected: ${JSON.stringify([invalidCode])}`
+        `Invalid diagnosis codes detected, cannot pass to screening request: ${JSON.stringify([
+          invalidCode
+        ])}`
       ])
     })
   );

@@ -81,9 +81,7 @@ export const PrescriptionScreeningProvider = (props: PrescriptionScreeningProvid
       return;
     }
     if (typeof props.diagnosisCodes === 'string') {
-      const error = 'Invalid diagnosis codes json passed in';
-      // TODO: Thoughts on logging to console as well?
-      console.error(error);
+      const error = 'Invalid diagnosis codes JSON passed in, cannot pass to screening request';
       dispatchDiagnosisCodeError([error]);
       return;
     }
@@ -104,10 +102,10 @@ export const PrescriptionScreeningProvider = (props: PrescriptionScreeningProvid
     }
 
     if (invalidCodes.length) {
-      const error = `Invalid diagnosis codes detected: ${JSON.stringify(invalidCodes)}`;
-      console.error(error);
+      const error = `Invalid diagnosis codes detected, cannot pass to screening request: ${JSON.stringify(
+        invalidCodes
+      )}`;
       dispatchDiagnosisCodeError([error]);
-      // TODO: should we abort entirely or continue screening with valid codes?
       return;
     }
 
