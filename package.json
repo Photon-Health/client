@@ -82,7 +82,7 @@
     "vite-plugin-solid": "2.11.6",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.1.8",
-    "ws": "^8.19.0"
+    "ws": "^8.21.0"
   },
   "dependencies": {
     "@apollo/client": "^3.7.10",
@@ -160,6 +160,7 @@
     "lodash": "^4.18.1",
     "undici": "^7.28.0",
     "markdown-it": "^14.2.0",
+    "ws": "^8.21.0",
     "picomatch": "4.0.4",
     "@chakra-ui/react": {
       "@zag-js/focus-visible": "^1.18.0"

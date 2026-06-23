@@ -166,12 +166,17 @@ test('pharmacy tab field interactions', async () => {
 });
 
 test('Send Order CTAs', async () => {
-  const { analyticsEvents, user, waitForPrescribeForm, addDraftPrescription } =
-    renderPrescribeWorkflow({
-      enableOrder: true,
-      enableSendToPatient: true,
-      optionalPatientAddress: true
-    });
+  const {
+    analyticsEvents,
+    user,
+    waitForPrescribeForm,
+    addDraftPrescription,
+    waitForDraftPrescription
+  } = renderPrescribeWorkflow({
+    enableOrder: true,
+    enableSendToPatient: true,
+    optionalPatientAddress: true
+  });
 
   await waitForPrescribeForm();
 
@@ -193,7 +198,7 @@ test('Send Order CTAs', async () => {
   );
 
   // Verify draft was added
-  await screen.findByText(TREATMENT.name, {}, { timeout: 3000 });
+  await waitForDraftPrescription();
 
   // 2. Send the order
   await user.click(screen.getByRole('button', { name: /^send$/i }));

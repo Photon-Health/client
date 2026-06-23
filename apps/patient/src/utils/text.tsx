@@ -94,7 +94,7 @@ export const text = {
   pickedUp: 'Picked up',
   pickedUpRx: (isPlural: boolean) =>
     `I picked up my ${isPlural ? 'prescriptions' : 'prescription'}`,
-  pickUp: 'Pick Up',
+  pickUp: 'Pick up',
   pickUpLabel: 'Pick Up:',
   pleaseReview: (isPlural: boolean) =>
     `Please review the ${
