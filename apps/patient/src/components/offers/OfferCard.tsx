@@ -10,7 +10,7 @@ interface Props {
   /** sole auto route with no reroutes — shows "sent here" treatment */
   isAutoroutedPharmacy: boolean;
   /** order.pharmacy when not autorouted — independent of selected */
-  isCurrentPharmacy: boolean;
+  isPharmacyFulfillingCurrentOrder: boolean;
   /** patient clicked this card in the pharmacy list */
   selected: boolean;
   isPreferred: boolean;
@@ -21,12 +21,12 @@ export const OfferCard = ({
   selected,
   handleSelect,
   isAutoroutedPharmacy,
-  isCurrentPharmacy,
+  isPharmacyFulfillingCurrentOrder,
   isPreferred
 }: Props) => {
   const borderStyle = getPharmacyCardBorderStyle({
     isAutoroutedPharmacy,
-    isCurrentPharmacy,
+    isPharmacyFulfillingCurrentOrder,
     selected
   });
 
@@ -42,7 +42,7 @@ export const OfferCard = ({
         <OfferInfo
           pharmacy={offer.pharmacy}
           offer={offer}
-          isCurrentPharmacy={isCurrentPharmacy}
+          isPharmacyFulfillingCurrentOrder={isPharmacyFulfillingCurrentOrder}
           isPreferred={isPreferred}
         />
       </CardBody>

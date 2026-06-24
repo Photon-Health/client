@@ -255,7 +255,7 @@ interface PharmacyInfoProps {
   selected?: boolean;
   showHours?: boolean;
   /** order.pharmacy when not autorouted — independent of selected */
-  isCurrentPharmacy?: boolean;
+  isPharmacyFulfillingCurrentOrder?: boolean;
   orderFulfillment?: OrderFulfillment;
   brandedOptionOverride?: BrandedOptionOverrides;
 }
@@ -271,7 +271,7 @@ export const PharmacyInfo = ({
   boldPharmacyName = true,
   isStatus = false,
   showHours = false,
-  isCurrentPharmacy = false,
+  isPharmacyFulfillingCurrentOrder = false,
   orderFulfillment,
   brandedOptionOverride
 }: PharmacyInfoProps) => {
@@ -417,7 +417,7 @@ export const PharmacyInfo = ({
           ) : null}
         </HStack>
       ) : null}
-      {isCurrentPharmacy ? (
+      {isPharmacyFulfillingCurrentOrder ? (
         <Tag
           size="md"
           bgColor="red.50"

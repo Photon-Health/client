@@ -53,7 +53,7 @@ export const BrandedOptions = ({
             <BrandedPharmacyCard
               pharmacyId={id}
               isAutoroutedPharmacy={autoroutedPharmacyId === id}
-              isCurrentPharmacy={currentPharmacyId === id}
+              isPharmacyFulfillingCurrentOrder={currentPharmacyId === id}
               selected={selectedId === id}
               handleSelect={handleSelect}
               brandedOptionOverrides={brandedOptionOverrides}

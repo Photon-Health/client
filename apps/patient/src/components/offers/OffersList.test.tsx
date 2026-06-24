@@ -18,7 +18,7 @@ vi.mock('./OfferCard', () => ({
     selected,
     isPreferred,
     isAutoroutedPharmacy,
-    isCurrentPharmacy,
+    isPharmacyFulfillingCurrentOrder,
     handleSelect
   }: any) => (
     <div
@@ -26,7 +26,7 @@ vi.mock('./OfferCard', () => ({
       data-selected={selected}
       data-preferred={isPreferred}
       data-autorouted-pharmacy={isAutoroutedPharmacy}
-      data-current-pharmacy={isCurrentPharmacy}
+      data-fulfilling-current-order={isPharmacyFulfillingCurrentOrder}
       onClick={() => handleSelect(offer.pharmacy.id, offer)}
     >
       <div data-testid="pharmacy-info">
@@ -126,14 +126,14 @@ describe('OffersList', () => {
     expect(novocareCard).toHaveAttribute('data-preferred', 'true');
   });
 
-  test('marks offer card as current pharmacy when pharmacy matches current pharmacy', () => {
+  test('marks offer card as fulfilling current order when pharmacy matches current pharmacy', () => {
     render(<OffersList {...defaultProps} currentPharmacyId="amazon-pharmacy" />);
 
     const amazonCard = screen.getByTestId('offer-card-amazon-pharmacy');
     const novocareCard = screen.getByTestId('offer-card-novocare-pharmacy');
 
-    expect(amazonCard).toHaveAttribute('data-current-pharmacy', 'true');
-    expect(novocareCard).toHaveAttribute('data-current-pharmacy', 'false');
+    expect(amazonCard).toHaveAttribute('data-fulfilling-current-order', 'true');
+    expect(novocareCard).toHaveAttribute('data-fulfilling-current-order', 'false');
   });
 
   test('marks offer card as autorouted when pharmacy matches autorouted pharmacy', () => {

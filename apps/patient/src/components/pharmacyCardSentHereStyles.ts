@@ -8,7 +8,7 @@ type PharmacyCardBorderStyleInput = {
   // sole auto route with no reroutes — shows "sent here" treatment
   isAutoroutedPharmacy: boolean;
   // order.pharmacy when not autorouted — grey card + "current pharmacy" tag
-  isCurrentPharmacy: boolean;
+  isPharmacyFulfillingCurrentOrder: boolean;
   // patient clicked this card in the pharmacy list
   selected: boolean;
 };
@@ -16,12 +16,12 @@ type PharmacyCardBorderStyleInput = {
 // border/background only — does not determine current vs autorouted; callers pass those flags in.
 export const getPharmacyCardBorderStyle = ({
   isAutoroutedPharmacy,
-  isCurrentPharmacy,
+  isPharmacyFulfillingCurrentOrder,
   selected
 }: PharmacyCardBorderStyleInput): PharmacyCardBorderStyle => {
   if (selected) {
     return {
-      bgColor: isCurrentPharmacy ? 'gray.200' : 'white',
+      bgColor: isPharmacyFulfillingCurrentOrder ? 'gray.200' : 'white',
       borderWidth: '2px',
       borderColor: 'brand.500'
     };
@@ -35,7 +35,7 @@ export const getPharmacyCardBorderStyle = ({
     };
   }
 
-  if (isCurrentPharmacy) {
+  if (isPharmacyFulfillingCurrentOrder) {
     return {
       bgColor: 'gray.200',
       borderWidth: '1px',

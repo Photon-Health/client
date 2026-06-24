@@ -19,7 +19,7 @@ interface Props {
   /** sole auto route with no reroutes — shows "sent here" treatment */
   isAutoroutedPharmacy: boolean;
   /** order.pharmacy when not autorouted — independent of selected */
-  isCurrentPharmacy: boolean;
+  isPharmacyFulfillingCurrentOrder: boolean;
   /** patient clicked this card in the pharmacy list */
   selected: boolean;
   handleSelect: (id: string) => void;
@@ -79,7 +79,7 @@ export const BrandedPharmacyCard = ({
   selected,
   handleSelect,
   isAutoroutedPharmacy,
-  isCurrentPharmacy,
+  isPharmacyFulfillingCurrentOrder,
   brandedOptionOverrides
 }: Props) => {
   const brand = PHARMACY_BRANDING[pharmacyId];
@@ -88,7 +88,7 @@ export const BrandedPharmacyCard = ({
   const pharmacy = { id: pharmacyId, name: brand.name, logo: brand.logo };
   const borderStyle = getPharmacyCardBorderStyle({
     isAutoroutedPharmacy,
-    isCurrentPharmacy,
+    isPharmacyFulfillingCurrentOrder,
     selected
   });
 
@@ -117,7 +117,7 @@ export const BrandedPharmacyCard = ({
           availableInYourArea={brand.name === 'Capsule Pharmacy'}
           freeDelivery={brand.name === 'Amazon Pharmacy'}
           brandedOptionOverride={brandedOptionOverrides}
-          isCurrentPharmacy={isCurrentPharmacy}
+          isPharmacyFulfillingCurrentOrder={isPharmacyFulfillingCurrentOrder}
           boldPharmacyName={false}
         />
       </CardBody>

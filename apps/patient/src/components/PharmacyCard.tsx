@@ -25,7 +25,7 @@ interface PharmacyCardProps {
   /** sole auto route with no reroutes — shows "sent here" treatment */
   isAutoroutedPharmacy?: boolean;
   /** order.pharmacy when not autorouted — independent of selected */
-  isCurrentPharmacy?: boolean;
+  isPharmacyFulfillingCurrentOrder?: boolean;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
@@ -39,14 +39,14 @@ export const PharmacyCard = memo(function PharmacyCard({
   showDetails = true,
   showPrice = false,
   isAutoroutedPharmacy = false,
-  isCurrentPharmacy = false
+  isPharmacyFulfillingCurrentOrder = false
 }: PharmacyCardProps) {
   if (!pharmacy) return null;
 
   const isSelected = selected && !!onSelect;
   const borderStyle = getPharmacyCardBorderStyle({
     isAutoroutedPharmacy,
-    isCurrentPharmacy,
+    isPharmacyFulfillingCurrentOrder,
     selected: isSelected
   });
 
@@ -76,7 +76,7 @@ export const PharmacyCard = memo(function PharmacyCard({
           showPrice={showPrice}
           boldPharmacyName={false}
           selected={selected}
-          isCurrentPharmacy={isCurrentPharmacy}
+          isPharmacyFulfillingCurrentOrder={isPharmacyFulfillingCurrentOrder}
           isStatus={false}
         />
       </CardBody>

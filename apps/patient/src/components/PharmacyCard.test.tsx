@@ -7,14 +7,14 @@ import { generatePharmacy } from '../test-utils/generators';
 vi.mock('./PharmacyInfo', () => ({
   PharmacyInfo: ({
     pharmacy,
-    isCurrentPharmacy
+    isPharmacyFulfillingCurrentOrder
   }: {
     pharmacy: { name: string };
-    isCurrentPharmacy?: boolean;
+    isPharmacyFulfillingCurrentOrder?: boolean;
   }) => (
     <div data-testid="pharmacy-info">
       {pharmacy.name}
-      {isCurrentPharmacy ? (
+      {isPharmacyFulfillingCurrentOrder ? (
         <span data-testid="pharmacy-info-current-pharmacy">Current Pharmacy</span>
       ) : null}
     </div>
@@ -54,7 +54,7 @@ describe('PharmacyCard', () => {
     render(
       <PharmacyCard
         pharmacy={pharmacy}
-        isCurrentPharmacy={true}
+        isPharmacyFulfillingCurrentOrder={true}
         selected={false}
         selectable={true}
         onSelect={vi.fn()}
@@ -68,7 +68,7 @@ describe('PharmacyCard', () => {
     render(
       <PharmacyCard
         pharmacy={pharmacy}
-        isCurrentPharmacy={true}
+        isPharmacyFulfillingCurrentOrder={true}
         selected={true}
         selectable={true}
         onSelect={vi.fn()}
@@ -82,7 +82,7 @@ describe('PharmacyCard', () => {
     render(
       <PharmacyCard
         pharmacy={pharmacy}
-        isCurrentPharmacy={false}
+        isPharmacyFulfillingCurrentOrder={false}
         selected={true}
         selectable={true}
         onSelect={vi.fn()}

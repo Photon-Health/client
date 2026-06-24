@@ -4,7 +4,7 @@ test('getPharmacyCardBorderStyle returns blue border when pharmacy was autoroute
   expect(
     getPharmacyCardBorderStyle({
       isAutoroutedPharmacy: true,
-      isCurrentPharmacy: false,
+      isPharmacyFulfillingCurrentOrder: false,
       selected: false
     })
   ).toEqual({
@@ -18,7 +18,7 @@ test('getPharmacyCardBorderStyle returns grey border when pharmacy is current bu
   expect(
     getPharmacyCardBorderStyle({
       isAutoroutedPharmacy: false,
-      isCurrentPharmacy: true,
+      isPharmacyFulfillingCurrentOrder: true,
       selected: false
     })
   ).toEqual({
@@ -32,7 +32,7 @@ test('getPharmacyCardBorderStyle returns brand border when pharmacy is selected 
   expect(
     getPharmacyCardBorderStyle({
       isAutoroutedPharmacy: false,
-      isCurrentPharmacy: false,
+      isPharmacyFulfillingCurrentOrder: false,
       selected: true
     })
   ).toEqual({
@@ -46,7 +46,7 @@ test('getPharmacyCardBorderStyle returns grey background with brand border when 
   expect(
     getPharmacyCardBorderStyle({
       isAutoroutedPharmacy: false,
-      isCurrentPharmacy: true,
+      isPharmacyFulfillingCurrentOrder: true,
       selected: true
     })
   ).toEqual({
@@ -60,7 +60,7 @@ test('getPharmacyCardBorderStyle prioritizes selected styling over autorouted st
   expect(
     getPharmacyCardBorderStyle({
       isAutoroutedPharmacy: true,
-      isCurrentPharmacy: false,
+      isPharmacyFulfillingCurrentOrder: false,
       selected: true
     })
   ).toEqual({

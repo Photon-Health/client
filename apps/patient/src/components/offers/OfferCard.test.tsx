@@ -4,9 +4,13 @@ import { OfferCard } from './OfferCard';
 import { OfferBundleDetails } from '../../utils/models';
 
 vi.mock('./OfferInfo', () => ({
-  OfferInfo: ({ isCurrentPharmacy }: { isCurrentPharmacy?: boolean }) => (
+  OfferInfo: ({
+    isPharmacyFulfillingCurrentOrder
+  }: {
+    isPharmacyFulfillingCurrentOrder?: boolean;
+  }) => (
     <div data-testid="offer-info">
-      {isCurrentPharmacy ? (
+      {isPharmacyFulfillingCurrentOrder ? (
         <span data-testid="pharmacy-info-current-pharmacy">Current Pharmacy</span>
       ) : null}
     </div>
@@ -31,7 +35,7 @@ describe('OfferCard', () => {
       <OfferCard
         offer={baseOffer}
         isAutoroutedPharmacy={true}
-        isCurrentPharmacy={false}
+        isPharmacyFulfillingCurrentOrder={false}
         selected={false}
         isPreferred={false}
         handleSelect={vi.fn()}
@@ -46,7 +50,7 @@ describe('OfferCard', () => {
       <OfferCard
         offer={baseOffer}
         isAutoroutedPharmacy={false}
-        isCurrentPharmacy={false}
+        isPharmacyFulfillingCurrentOrder={false}
         selected={false}
         isPreferred={false}
         handleSelect={vi.fn()}
@@ -61,7 +65,7 @@ describe('OfferCard', () => {
       <OfferCard
         offer={baseOffer}
         isAutoroutedPharmacy={false}
-        isCurrentPharmacy={true}
+        isPharmacyFulfillingCurrentOrder={true}
         selected={false}
         isPreferred={false}
         handleSelect={vi.fn()}

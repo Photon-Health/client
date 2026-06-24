@@ -95,7 +95,7 @@ export const PickupPharmacyCardList = ({
                 selectable={true}
                 showPrice={showPrice}
                 isAutoroutedPharmacy={pharmacy.id === autoroutedPharmacyId}
-                isCurrentPharmacy={pharmacy.id === currentPharmacyId}
+                isPharmacyFulfillingCurrentOrder={pharmacy.id === currentPharmacyId}
               />
             </OfferImpressionTracker>
           </SlideFade>

@@ -39,7 +39,7 @@ export const OffersList = ({
               key={offer.pharmacy.id}
               offer={offer}
               isAutoroutedPharmacy={autoroutedPharmacyId === offer.pharmacy.id}
-              isCurrentPharmacy={currentPharmacyId === offer.pharmacy.id}
+              isPharmacyFulfillingCurrentOrder={currentPharmacyId === offer.pharmacy.id}
               selected={selectedPharmacyId === offer.pharmacy.id}
               isPreferred={preferredPharmacyId === offer.pharmacy.id}
               handleSelect={handleSelect}
