@@ -172,8 +172,10 @@ export const Pharmacy = () => {
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
   const isLoading = loadingLocation || loadingPharmacies;
   const orderIsMultiRx = flattenedFills.length > 1;
+  // sole auto route — "sent here" card; selecting it persists confirmation in local storage
   const autoroutedPharmacyId =
     order && hasSingleAutoRouteWithNoReroutes(order) ? order.pharmacy?.id : undefined;
+  // order.pharmacy when not autorouted — grey card + "current pharmacy" tag; unrelated to selected
   const currentPharmacyId =
     order?.pharmacy?.id && order.pharmacy.id !== autoroutedPharmacyId
       ? order.pharmacy.id

@@ -7,8 +7,11 @@ import { getPharmacyCardBorderStyle } from '../pharmacyCardSentHereStyles';
 
 interface Props {
   offer: OfferBundleDetails;
+  /** sole auto route with no reroutes — shows "sent here" treatment */
   isAutoroutedPharmacy: boolean;
+  /** order.pharmacy when not autorouted — independent of selected */
   isCurrentPharmacy: boolean;
+  /** patient clicked this card in the pharmacy list */
   selected: boolean;
   isPreferred: boolean;
   handleSelect: (id: string, offer?: OfferBundleDetails) => void;
@@ -39,7 +42,7 @@ export const OfferCard = ({
         <OfferInfo
           pharmacy={offer.pharmacy}
           offer={offer}
-          isCurrentPharmacy={isCurrentPharmacy && selected}
+          isCurrentPharmacy={isCurrentPharmacy}
           isPreferred={isPreferred}
         />
       </CardBody>

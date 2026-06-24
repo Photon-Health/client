@@ -254,6 +254,7 @@ interface PharmacyInfoProps {
   isStatus?: boolean;
   selected?: boolean;
   showHours?: boolean;
+  /** order.pharmacy when not autorouted — independent of selected */
   isCurrentPharmacy?: boolean;
   orderFulfillment?: OrderFulfillment;
   brandedOptionOverride?: BrandedOptionOverrides;

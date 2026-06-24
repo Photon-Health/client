@@ -14,7 +14,7 @@ test('getPharmacyCardBorderStyle returns blue border when pharmacy was autoroute
   });
 });
 
-test('getPharmacyCardBorderStyle returns grey border when pharmacy is current but not autorouted', () => {
+test('getPharmacyCardBorderStyle returns grey border when pharmacy is current but not selected', () => {
   expect(
     getPharmacyCardBorderStyle({
       isAutoroutedPharmacy: false,
@@ -28,7 +28,7 @@ test('getPharmacyCardBorderStyle returns grey border when pharmacy is current bu
   });
 });
 
-test('getPharmacyCardBorderStyle returns brand border when pharmacy is selected', () => {
+test('getPharmacyCardBorderStyle returns brand border when pharmacy is selected and not current', () => {
   expect(
     getPharmacyCardBorderStyle({
       isAutoroutedPharmacy: false,

@@ -16,8 +16,11 @@ import { getPharmacyCardBorderStyle } from '../pharmacyCardSentHereStyles';
 
 interface Props {
   pharmacyId: string;
+  /** sole auto route with no reroutes — shows "sent here" treatment */
   isAutoroutedPharmacy: boolean;
+  /** order.pharmacy when not autorouted — independent of selected */
   isCurrentPharmacy: boolean;
+  /** patient clicked this card in the pharmacy list */
   selected: boolean;
   handleSelect: (id: string) => void;
   brandedOptionOverrides?: BrandedOptionOverrides;
@@ -114,7 +117,7 @@ export const BrandedPharmacyCard = ({
           availableInYourArea={brand.name === 'Capsule Pharmacy'}
           freeDelivery={brand.name === 'Amazon Pharmacy'}
           brandedOptionOverride={brandedOptionOverrides}
-          isCurrentPharmacy={isCurrentPharmacy && selected}
+          isCurrentPharmacy={isCurrentPharmacy}
           boldPharmacyName={false}
         />
       </CardBody>

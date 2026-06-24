@@ -4,7 +4,13 @@ import { OfferCard } from './OfferCard';
 import { OfferBundleDetails } from '../../utils/models';
 
 vi.mock('./OfferInfo', () => ({
-  OfferInfo: () => <div data-testid="offer-info" />
+  OfferInfo: ({ isCurrentPharmacy }: { isCurrentPharmacy?: boolean }) => (
+    <div data-testid="offer-info">
+      {isCurrentPharmacy ? (
+        <span data-testid="pharmacy-info-current-pharmacy">Current Pharmacy</span>
+      ) : null}
+    </div>
+  )
 }));
 
 describe('OfferCard', () => {
@@ -48,5 +54,20 @@ describe('OfferCard', () => {
     );
 
     expect(screen.queryByTestId('pharmacy-sent-here-badge')).not.toBeInTheDocument();
+  });
+
+  test('OfferCard shows current pharmacy tag when pharmacy is current regardless of selected', () => {
+    render(
+      <OfferCard
+        offer={baseOffer}
+        isAutoroutedPharmacy={false}
+        isCurrentPharmacy={true}
+        selected={false}
+        isPreferred={false}
+        handleSelect={vi.fn()}
+      />
+    );
+
+    expect(screen.getByTestId('pharmacy-info-current-pharmacy')).toBeInTheDocument();
   });
 });
