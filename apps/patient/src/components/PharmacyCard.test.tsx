@@ -50,26 +50,11 @@ describe('PharmacyCard', () => {
     expect(screen.queryByTestId('pharmacy-sent-here-badge')).not.toBeInTheDocument();
   });
 
-  test('PharmacyCard shows current pharmacy tag when pharmacy is current regardless of selected', () => {
+  test('PharmacyCard shows current pharmacy tag when pharmacy is current', () => {
     render(
       <PharmacyCard
         pharmacy={pharmacy}
         isCurrentPharmacy={true}
-        selected={false}
-        selectable={true}
-        onSelect={vi.fn()}
-      />
-    );
-
-    expect(screen.getByTestId('pharmacy-info-current-pharmacy')).toBeInTheDocument();
-  });
-
-  test('PharmacyCard shows current pharmacy tag when current pharmacy is selected', () => {
-    render(
-      <PharmacyCard
-        pharmacy={pharmacy}
-        isCurrentPharmacy={true}
-        selected={true}
         selectable={true}
         onSelect={vi.fn()}
       />

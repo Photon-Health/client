@@ -139,7 +139,19 @@ describe('Rerouting', () => {
     // moves to pharmacy selection page
     expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
 
-    // current pharmacy is selectable during reroute — no sent here badge
+    // shows the current pharmacy with current pharmacy tag
+    const pharmacyInfos = await screen.findAllByTestId('pharmacy-info');
+    for (const pharmacyInfo of pharmacyInfos) {
+      const pharmacyName = pharmacyInfo.querySelector(`[data-testid="pharmacy-info-name"]`);
+      const currentPharmacyTag = pharmacyInfo.querySelector(
+        `[data-testid="pharmacy-info-current-pharmacy"]`
+      );
+      if (pharmacyName?.textContent?.includes(testFirstPharmacy.name)) {
+        expect(currentPharmacyTag).toBeInTheDocument();
+      } else {
+        expect(currentPharmacyTag).toBeNull();
+      }
+    }
     expect(screen.queryByTestId('pharmacy-sent-here-badge')).not.toBeInTheDocument();
     expect(await screen.findByText(testFirstPharmacy.name)).toBeInTheDocument();
 

@@ -15,16 +15,13 @@ interface PharmacyCardProps {
   pharmacy: EnrichedPharmacy;
   preferred?: boolean;
   savingPreferred?: boolean;
-  /** patient clicked this card in the pharmacy list */
   selected?: boolean;
   onSelect?: () => void;
   onSetPreferred?: () => void;
   selectable?: boolean;
   showDetails?: boolean;
   showPrice?: boolean;
-  /** sole auto route with no reroutes — shows "sent here" treatment */
   isAutoroutedPharmacy?: boolean;
-  /** order.pharmacy when not autorouted — independent of selected */
   isCurrentPharmacy?: boolean;
 }
 

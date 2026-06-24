@@ -11,14 +11,6 @@ type OrderFetchRedirectOptions = {
   hasConfirmedAutoroutedPharmacy?: boolean;
 };
 
-/**
- * after the initial order fetch, send the patient to the first step they still need.
- *
- * pharmacy assigned + sole AUTO route + reroutable + not yet confirmed → pharmacy
- * pharmacy assigned otherwise                                           → status
- * no pharmacy + patient address                                         → pharmacy
- * no pharmacy + no address                                              → review
- */
 export const getOrderFetchRedirectPath = (
   order: Order,
   options: OrderFetchRedirectOptions = {}

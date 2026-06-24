@@ -71,7 +71,6 @@ const CouponTag = ({
 interface OfferInfoProps {
   pharmacy?: Pick<OfferBundleDetails['pharmacy'], 'id' | 'name' | 'logo'>;
   offer: OfferBundleDetails;
-  /** order.pharmacy when not autorouted — independent of selected */
   isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
 }
