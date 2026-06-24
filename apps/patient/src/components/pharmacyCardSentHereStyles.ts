@@ -13,6 +13,17 @@ type PharmacyCardBorderStyleInput = {
   selected: boolean;
 };
 
+type PharmacyCardSelectableInput = Pick<
+  PharmacyCardBorderStyleInput,
+  'isAutoroutedPharmacy' | 'isPharmacyFulfillingCurrentOrder'
+>;
+
+export const isPharmacyCardSelectable = ({
+  isAutoroutedPharmacy,
+  isPharmacyFulfillingCurrentOrder
+}: PharmacyCardSelectableInput): boolean =>
+  isAutoroutedPharmacy || !isPharmacyFulfillingCurrentOrder;
+
 // border/background only — does not determine current vs autorouted; callers pass those flags in.
 export const getPharmacyCardBorderStyle = ({
   isAutoroutedPharmacy,

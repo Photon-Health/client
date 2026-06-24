@@ -1,4 +1,4 @@
-import { getPharmacyCardBorderStyle } from './pharmacyCardSentHereStyles';
+import { getPharmacyCardBorderStyle, isPharmacyCardSelectable } from './pharmacyCardSentHereStyles';
 
 test('getPharmacyCardBorderStyle returns blue border when pharmacy was autorouted', () => {
   expect(
@@ -68,4 +68,31 @@ test('getPharmacyCardBorderStyle prioritizes selected styling over autorouted st
     borderWidth: '2px',
     borderColor: 'brand.500'
   });
+});
+
+test('isPharmacyCardSelectable returns false when pharmacy is current and not autorouted', () => {
+  expect(
+    isPharmacyCardSelectable({
+      isAutoroutedPharmacy: false,
+      isPharmacyFulfillingCurrentOrder: true
+    })
+  ).toBe(false);
+});
+
+test('isPharmacyCardSelectable returns true when pharmacy is autorouted', () => {
+  expect(
+    isPharmacyCardSelectable({
+      isAutoroutedPharmacy: true,
+      isPharmacyFulfillingCurrentOrder: false
+    })
+  ).toBe(true);
+});
+
+test('isPharmacyCardSelectable returns true when pharmacy is not current', () => {
+  expect(
+    isPharmacyCardSelectable({
+      isAutoroutedPharmacy: false,
+      isPharmacyFulfillingCurrentOrder: false
+    })
+  ).toBe(true);
 });

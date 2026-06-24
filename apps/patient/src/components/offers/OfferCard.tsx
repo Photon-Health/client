@@ -3,7 +3,10 @@ import { Card, CardBody } from '@chakra-ui/react';
 import { OfferInfo } from './OfferInfo';
 import { OfferBundleDetails } from '../../utils/models';
 import { PharmacyCardSentHereFrame } from '../PharmacyCardSentHereFrame';
-import { getPharmacyCardBorderStyle } from '../pharmacyCardSentHereStyles';
+import {
+  getPharmacyCardBorderStyle,
+  isPharmacyCardSelectable
+} from '../pharmacyCardSentHereStyles';
 
 interface Props {
   offer: OfferBundleDetails;
@@ -26,14 +29,20 @@ export const OfferCard = ({
     isPharmacyFulfillingCurrentOrder,
     selected
   });
+  const isSelectable = isPharmacyCardSelectable({
+    isAutoroutedPharmacy,
+    isPharmacyFulfillingCurrentOrder
+  });
 
   const card = (
     <Card
       {...borderStyle}
       borderRadius="lg"
       shadow={'none'}
-      onClick={() => handleSelect(offer.pharmacy.id, offer)}
-      cursor="pointer"
+      onClick={() => isSelectable && handleSelect(offer.pharmacy.id, offer)}
+      cursor={isSelectable ? 'pointer' : undefined}
+      pointerEvents={isSelectable ? undefined : 'none'}
+      opacity={isSelectable ? undefined : 0.7}
     >
       <CardBody p={3}>
         <OfferInfo

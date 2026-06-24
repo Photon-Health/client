@@ -7,7 +7,7 @@ import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { PharmacyInfo } from './PharmacyInfo';
 import { PharmacyCardSentHereFrame } from './PharmacyCardSentHereFrame';
-import { getPharmacyCardBorderStyle } from './pharmacyCardSentHereStyles';
+import { getPharmacyCardBorderStyle, isPharmacyCardSelectable } from './pharmacyCardSentHereStyles';
 
 dayjs.extend(customParseFormat);
 
@@ -46,24 +46,33 @@ export const PharmacyCard = memo(function PharmacyCard({
     isPharmacyFulfillingCurrentOrder: isCurrentPharmacy,
     selected: isSelected
   });
+  const isSelectable =
+    selectable &&
+    isPharmacyCardSelectable({
+      isAutoroutedPharmacy,
+      isPharmacyFulfillingCurrentOrder: isCurrentPharmacy
+    });
 
   const card = (
     <Card
       {...borderStyle}
       shadow={'none'}
       borderRadius="lg"
-      onClick={() => onSelect && onSelect()}
+      onClick={() => isSelectable && onSelect && onSelect()}
       onKeyDown={(e) => {
-        if ((e.key === 'Enter' || e.key === ' ') && onSelect) {
+        if (isSelectable && (e.key === 'Enter' || e.key === ' ') && onSelect) {
           e.preventDefault();
           onSelect();
         }
       }}
-      cursor={selectable ? 'pointer' : undefined}
+      cursor={isSelectable ? 'pointer' : undefined}
+      pointerEvents={isSelectable ? undefined : 'none'}
+      opacity={isSelectable ? undefined : 0.7}
       role="radio"
       aria-checked={selected}
       aria-label={pharmacy.name}
-      tabIndex={0}
+      aria-disabled={selectable && !isSelectable ? true : undefined}
+      tabIndex={isSelectable ? 0 : -1}
     >
       <CardBody p={3}>
         <PharmacyInfo

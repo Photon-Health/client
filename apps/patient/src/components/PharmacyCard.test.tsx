@@ -93,4 +93,24 @@ describe('PharmacyCard', () => {
 
     expect(onSelect).toHaveBeenCalledTimes(1);
   });
+
+  test('PharmacyCard does not call onSelect when current pharmacy is not autorouted', async () => {
+    const onSelect = vi.fn();
+
+    render(
+      <PharmacyCard
+        pharmacy={pharmacy}
+        isCurrentPharmacy={true}
+        isAutoroutedPharmacy={false}
+        selectable={true}
+        onSelect={onSelect}
+      />
+    );
+
+    expect(screen.getByRole('radio', { name: pharmacy.name })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    );
+    expect(onSelect).not.toHaveBeenCalled();
+  });
 });

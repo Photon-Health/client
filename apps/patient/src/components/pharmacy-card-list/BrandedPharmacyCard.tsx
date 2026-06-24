@@ -12,7 +12,10 @@ import capsulePharmacyIdLookup from '../../data/capsulePharmacyIds.json';
 import { PharmacyInfo } from '../PharmacyInfo';
 import { BrandedOptionOverrides } from './BrandedOptions';
 import { PharmacyCardSentHereFrame } from '../PharmacyCardSentHereFrame';
-import { getPharmacyCardBorderStyle } from '../pharmacyCardSentHereStyles';
+import {
+  getPharmacyCardBorderStyle,
+  isPharmacyCardSelectable
+} from '../pharmacyCardSentHereStyles';
 
 interface Props {
   pharmacyId: string;
@@ -88,24 +91,31 @@ export const BrandedPharmacyCard = ({
     isPharmacyFulfillingCurrentOrder,
     selected
   });
+  const isSelectable = isPharmacyCardSelectable({
+    isAutoroutedPharmacy,
+    isPharmacyFulfillingCurrentOrder
+  });
 
   const card = (
     <Card
       {...borderStyle}
       borderRadius="lg"
       shadow={'none'}
-      onClick={() => handleSelect(pharmacyId)}
+      onClick={() => isSelectable && handleSelect(pharmacyId)}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (isSelectable && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
           handleSelect(pharmacyId);
         }
       }}
-      cursor="pointer"
+      cursor={isSelectable ? 'pointer' : undefined}
+      pointerEvents={isSelectable ? undefined : 'none'}
+      opacity={isSelectable ? undefined : 0.7}
       role="radio"
       aria-checked={selected}
       aria-label={brand.name}
-      tabIndex={0}
+      aria-disabled={!isSelectable}
+      tabIndex={isSelectable ? 0 : -1}
     >
       <CardBody p={3}>
         <PharmacyInfo

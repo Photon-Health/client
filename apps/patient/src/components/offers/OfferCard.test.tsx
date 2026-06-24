@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
 import { OfferCard } from './OfferCard';
 import { OfferBundleDetails } from '../../utils/models';
@@ -69,5 +70,23 @@ describe('OfferCard', () => {
     );
 
     expect(screen.getByTestId('pharmacy-info-current-pharmacy')).toBeInTheDocument();
+  });
+
+  test('OfferCard does not call handleSelect when current pharmacy is not autorouted', () => {
+    const handleSelect = vi.fn();
+
+    const { container } = render(
+      <OfferCard
+        offer={baseOffer}
+        isAutoroutedPharmacy={false}
+        isPharmacyFulfillingCurrentOrder={true}
+        selected={false}
+        isPreferred={false}
+        handleSelect={handleSelect}
+      />
+    );
+
+    expect(container.firstChild).toHaveStyle({ pointerEvents: 'none' });
+    expect(handleSelect).not.toHaveBeenCalled();
   });
 });
