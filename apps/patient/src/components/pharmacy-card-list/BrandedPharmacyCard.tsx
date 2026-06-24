@@ -117,7 +117,7 @@ export const BrandedPharmacyCard = ({
           availableInYourArea={brand.name === 'Capsule Pharmacy'}
           freeDelivery={brand.name === 'Amazon Pharmacy'}
           brandedOptionOverride={brandedOptionOverrides}
-          isPharmacyFulfillingCurrentOrder={isPharmacyFulfillingCurrentOrder}
+          isCurrentPharmacy={isPharmacyFulfillingCurrentOrder}
           boldPharmacyName={false}
         />
       </CardBody>
