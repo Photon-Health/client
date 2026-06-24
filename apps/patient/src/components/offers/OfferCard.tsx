@@ -42,7 +42,7 @@ export const OfferCard = ({
         <OfferInfo
           pharmacy={offer.pharmacy}
           offer={offer}
-          isPharmacyFulfillingCurrentOrder={isPharmacyFulfillingCurrentOrder}
+          isCurrentPharmacy={isPharmacyFulfillingCurrentOrder}
           isPreferred={isPreferred}
         />
       </CardBody>

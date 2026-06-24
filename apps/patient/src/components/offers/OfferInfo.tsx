@@ -72,16 +72,11 @@ interface OfferInfoProps {
   pharmacy?: Pick<OfferBundleDetails['pharmacy'], 'id' | 'name' | 'logo'>;
   offer: OfferBundleDetails;
   /** order.pharmacy when not autorouted — independent of selected */
-  isPharmacyFulfillingCurrentOrder?: boolean;
+  isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
 }
 
-export const OfferInfo = ({
-  pharmacy,
-  offer,
-  isPharmacyFulfillingCurrentOrder,
-  isPreferred
-}: OfferInfoProps) => {
+export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: OfferInfoProps) => {
   if (!pharmacy) {
     return null;
   }
@@ -89,7 +84,7 @@ export const OfferInfo = ({
   const offerTags = [
     ...offer.tags,
     ...(isPreferred ? [t.preferred] : []),
-    ...(isPharmacyFulfillingCurrentOrder ? ['current'] : [])
+    ...(isCurrentPharmacy ? ['current'] : [])
   ].map((tag) => {
     switch (tag) {
       case t.preferred:

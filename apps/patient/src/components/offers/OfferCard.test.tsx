@@ -4,13 +4,9 @@ import { OfferCard } from './OfferCard';
 import { OfferBundleDetails } from '../../utils/models';
 
 vi.mock('./OfferInfo', () => ({
-  OfferInfo: ({
-    isPharmacyFulfillingCurrentOrder
-  }: {
-    isPharmacyFulfillingCurrentOrder?: boolean;
-  }) => (
+  OfferInfo: ({ isCurrentPharmacy }: { isCurrentPharmacy?: boolean }) => (
     <div data-testid="offer-info">
-      {isPharmacyFulfillingCurrentOrder ? (
+      {isCurrentPharmacy ? (
         <span data-testid="pharmacy-info-current-pharmacy">Current Pharmacy</span>
       ) : null}
     </div>
