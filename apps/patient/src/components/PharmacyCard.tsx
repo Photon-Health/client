@@ -55,7 +55,9 @@ export const PharmacyCard = memo(function PharmacyCard({
 
   const card = (
     <Card
-      {...borderStyle}
+      bgColor={borderStyle.bgColor}
+      borderWidth={borderStyle.borderWidth}
+      borderColor={borderStyle.borderColor}
       shadow={'none'}
       borderRadius="lg"
       onClick={() => isSelectable && onSelect && onSelect()}
@@ -110,7 +112,7 @@ export const PharmacyCard = memo(function PharmacyCard({
   );
 
   return isAutoroutedPharmacy ? (
-    <PharmacyCardSentHereFrame>{card}</PharmacyCardSentHereFrame>
+    <PharmacyCardSentHereFrame selected={isSelected}>{card}</PharmacyCardSentHereFrame>
   ) : (
     card
   );

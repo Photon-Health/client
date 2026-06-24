@@ -1,11 +1,17 @@
-import { HStack, Icon, Text } from '@chakra-ui/react';
+import { HStack, Icon, Text, useTheme } from '@chakra-ui/react';
 import { FiCheck } from 'react-icons/fi';
+import { getBrandContrastTextColor } from '../configs/theme';
 
 type SentHereBadgeProps = {
   top?: number;
+  selected?: boolean;
 };
 
-export const SentHereBadge = ({ top = 0 }: SentHereBadgeProps) => {
+export const SentHereBadge = ({ top = 0, selected = false }: SentHereBadgeProps) => {
+  const theme = useTheme();
+  const bgColor = selected ? 'brand.500' : 'blue.500';
+  const textColor = selected ? getBrandContrastTextColor(theme.colors.brand[500]) : 'white';
+
   return (
     <HStack
       position="absolute"
@@ -13,8 +19,8 @@ export const SentHereBadge = ({ top = 0 }: SentHereBadgeProps) => {
       left={4}
       transform="translateY(-50%)"
       zIndex={1}
-      bgColor="blue.500"
-      color="white"
+      bgColor={bgColor}
+      color={textColor}
       borderRadius="full"
       px={3}
       py={1}

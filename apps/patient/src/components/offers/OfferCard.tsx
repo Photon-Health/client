@@ -36,7 +36,10 @@ export const OfferCard = ({
 
   const card = (
     <Card
-      {...borderStyle}
+      bgColor={borderStyle.bgColor}
+      border="2px solid"
+      borderWidth={borderStyle.borderWidth}
+      borderColor={borderStyle.borderColor}
       borderRadius="lg"
       shadow={'none'}
       onClick={() => isSelectable && handleSelect(offer.pharmacy.id, offer)}
@@ -56,7 +59,7 @@ export const OfferCard = ({
   );
 
   return isAutoroutedPharmacy ? (
-    <PharmacyCardSentHereFrame>{card}</PharmacyCardSentHereFrame>
+    <PharmacyCardSentHereFrame selected={selected}>{card}</PharmacyCardSentHereFrame>
   ) : (
     card
   );
