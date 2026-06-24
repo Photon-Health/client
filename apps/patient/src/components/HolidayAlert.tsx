@@ -12,7 +12,8 @@ const holidays = [
   '2025-12-31', // New Years Eve
   '2025-06-19', // Juneteenth
   '2026-01-01', // New Years Day
-  '2026-05-25' // Memorial Day
+  '2026-05-25', // Memorial Day
+  '2026-07-04' // July 4
 ];
 
 function showHolidayDisclaimer() {
