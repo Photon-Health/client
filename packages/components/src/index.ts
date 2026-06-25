@@ -48,11 +48,7 @@ import Table from './particles/Table';
 import Text from './particles/Text';
 import Textarea from './particles/Textarea';
 import Toaster from './particles/Toaster';
-import {
-  ScreeningAlertAcknowledgementDialog,
-  ScreeningAlerts,
-  ScreeningAlertType
-} from './systems/ScreeningAlerts';
+import { ScreeningAlertAcknowledgementDialog, ScreeningAlerts } from './systems/ScreeningAlerts';
 import {
   isValidPrescriptionRoutingConstraint,
   RoutingConstraint
@@ -70,6 +66,11 @@ import { PhotonContext, usePhoton } from './context';
 import { PhotonClientStore } from './store';
 import { CoverageOption, PrescribeProvider, usePrescribe } from './systems/PrescribeProvider';
 import { SupervisorPrefill, SupervisorProvider, useSupervisor } from './systems/SupervisorProvider';
+import {
+  DiagnosisCodesPrefill,
+  PrescriptionScreeningProvider,
+  usePrescriptionScreening
+} from './systems/PrescriptionScreeningProvider';
 
 import { GoogleServiceProvider, useGoogleService } from './systems/GoogleServiceProvider';
 
@@ -162,18 +163,20 @@ export {
   npiRegex,
   zipCodeRegex,
   addressSchema,
-  AddressForm
+  AddressForm,
+  PrescriptionScreeningProvider,
+  usePrescriptionScreening
 };
 
 // Export types
 export type {
   ParsedAddress,
   PharmacyOption,
-  ScreeningAlertType,
   RoutingConstraint,
   TemplateOverrides,
   PrescriptionFormData,
   CoverageOption,
   SupervisorPrefill,
-  TryCreatePrescriptionTemplateOptions
+  TryCreatePrescriptionTemplateOptions,
+  DiagnosisCodesPrefill
 };

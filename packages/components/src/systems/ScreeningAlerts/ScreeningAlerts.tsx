@@ -1,5 +1,6 @@
 import { For, Show } from 'solid-js';
-import { ScreeningAlert, ScreeningAlertType } from './ScreeningAlert';
+import { ScreeningAlert } from './ScreeningAlert';
+import { PrescriptionScreeningAlert } from '@photonhealth/sdk/dist/clinical-api/types';
 
 /**
  * This component represents multiple alerts for a given entity.
@@ -8,7 +9,7 @@ import { ScreeningAlert, ScreeningAlertType } from './ScreeningAlert';
  * and as a result filters out any information that is made superfluous by nature of the relationship.
  */
 export const ScreeningAlerts = (props: {
-  screeningAlerts: ScreeningAlertType[];
+  screeningAlerts: PrescriptionScreeningAlert[];
   owningId?: string;
 }) => {
   return (
