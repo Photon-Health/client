@@ -854,10 +854,11 @@ describe('Pharmacy page', () => {
     }, 15_000);
 
     test('Submitting alternate pharmacy clears localStorage confirmation and calls rerouteOrder', async () => {
-      markAutoroutedPharmacyConfirmed('ord_testId777');
-
       renderApp();
       await navigateToPharmacyScreen();
+
+      markAutoroutedPharmacyConfirmed('ord_testId777');
+      expect(hasConfirmedAutoroutedPharmacy('ord_testId777')).toBe(true);
 
       await userEvent.click(await screen.findByText(testAlternatePharmacy.name));
       await userEvent.click(await screen.findByText(text.selectPharmacy));
