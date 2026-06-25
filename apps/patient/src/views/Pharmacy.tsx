@@ -125,7 +125,7 @@ export const Pharmacy = () => {
   // search params
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const isReroute = searchParams.get('reroute');
+  const isReroute = (!!order?.isReroutable && !!order?.pharmacy?.id) || searchParams.get('reroute');
   const openNow = searchParams.get('openNow');
   const phone = searchParams.get('phone');
 
