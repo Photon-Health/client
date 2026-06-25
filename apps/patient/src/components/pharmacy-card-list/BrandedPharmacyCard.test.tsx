@@ -10,7 +10,7 @@ vi.mock('../PharmacyInfo', () => ({
 }));
 
 describe('BrandedPharmacyCard', () => {
-  const amazonPharmacyId = import.meta.env.VITE_AMAZON_PHARMACY_ID as string;
+  const amazonPharmacyId = 'phr_demoAmazon';
 
   test('BrandedPharmacyCard does not call handleSelect when current pharmacy is not autorouted', () => {
     const handleSelect = vi.fn();
