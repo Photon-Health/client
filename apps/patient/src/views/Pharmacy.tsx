@@ -671,12 +671,8 @@ export const Pharmacy = () => {
     setSelectedId(pharmacyId);
     setShowFooter(true);
 
-    if (order) {
-      if (pharmacyId === autoroutedPharmacyId) {
-        markAutoroutedPharmacyConfirmed(order.id);
-      } else {
-        clearAutoroutedPharmacyConfirmation(order.id);
-      }
+    if (order && pharmacyId !== autoroutedPharmacyId) {
+      clearAutoroutedPharmacyConfirmation(order.id);
     }
 
     // because offers aren't actually pharmacies
@@ -728,6 +724,18 @@ export const Pharmacy = () => {
     }
   };
 
+  const persistAutoroutedPharmacyConfirmation = (pharmacyId: string) => {
+    if (!order) {
+      return;
+    }
+
+    if (pharmacyId === autoroutedPharmacyId) {
+      markAutoroutedPharmacyConfirmed(order.id);
+    } else {
+      clearAutoroutedPharmacyConfirmation(order.id);
+    }
+  };
+
   const handleSubmit = async (
     selectedPharmacy: EnrichedPharmacy,
     analyticsDetails: {
@@ -741,6 +749,8 @@ export const Pharmacy = () => {
     }
     setSubmitting(true);
     const { selectedFrom = 'Main List', buttonText } = analyticsDetails;
+
+    persistAutoroutedPharmacyConfirmation(selectedPharmacy.id);
 
     const selectedOffer = filteredOffers?.find((o) => o.pharmacy.id === selectedPharmacy.id);
     const isMailOrder = isMailOrderPharmacy(selectedPharmacy);
@@ -931,6 +941,8 @@ export const Pharmacy = () => {
   };
 
   const handleDemoSubmit = async (selectedPharmacy: EnrichedPharmacy) => {
+    persistAutoroutedPharmacyConfirmation(selectedPharmacy.id);
+
     await wait(1000);
     setSuccessfullySubmitted(true);
     await wait(1000);
