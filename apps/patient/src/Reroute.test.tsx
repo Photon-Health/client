@@ -12,6 +12,10 @@ import {
 import { routeElements } from './Routes';
 import userEvent from '@testing-library/user-event';
 import { text } from './utils/text';
+import {
+  hasConfirmedAutoroutedPharmacy,
+  markAutoroutedPharmacyConfirmed
+} from './utils/autoroutedPharmacyConfirmationStorage';
 
 const mockToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
@@ -172,9 +176,143 @@ describe('Rerouting', () => {
   }, 15_000);
 });
 
-const renderApp = () => {
+describe('Autorouted pharmacy confirmation', () => {
+  const testAutoroutedPharmacy = generatePharmacy({
+    id: generateId('phr_'),
+    name: 'Auto-Routed Pharmacy'
+  });
+  const testAlternatePharmacy = generatePharmacy({
+    id: generateId('phr_'),
+    name: 'Alternate Pharmacy'
+  });
+
+  const createAutoroutedOrder = () => {
+    const order = generateOrder({
+      id: 'ord_testId777',
+      state: 'PLACED',
+      patient: generatePatient({ name: { full: 'Jane Doe' } }),
+      fills: [generateFill('test-treatment')],
+      fulfillments: [generateFulfillment({ state: 'PROCESSING' })],
+      pharmacy: testAutoroutedPharmacy,
+      isReroutable: true,
+      metadata: {
+        routingHistory: [{ selector: 'AUTO' }]
+      }
+    });
+    order.organization.settings = {
+      brandColor: '#af349d',
+      patientUx: {
+        enablePatientRerouting: true
+      }
+    };
+    return order;
+  };
+
+  beforeEach(async () => {
+    localStorage.clear();
+
+    const { getPharmaciesByLocation, setOrderPharmacy, getOrder, rerouteOrder } = await import(
+      './api'
+    );
+
+    vi.mocked(getOrder).mockResolvedValue(createAutoroutedOrder());
+
+    vi.mocked(getPharmaciesByLocation).mockResolvedValue({
+      pharmaciesByLocation: [testAutoroutedPharmacy, testAlternatePharmacy]
+    });
+
+    vi.mocked(setOrderPharmacy).mockResolvedValue(true);
+    vi.mocked(rerouteOrder).mockResolvedValue(true);
+
+    const { fetchOfferBundles } = await import('./views/pharmacy.utils');
+    vi.mocked(fetchOfferBundles).mockResolvedValue([]);
+  });
+
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  test('Auto-routed reroutable order redirects from status to pharmacy page on load', async () => {
+    const { memoryRouter } = renderApp();
+
+    await waitFor(() => {
+      expect(memoryRouter.state.location.pathname).toBe('/pharmacy');
+    });
+
+    expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
+  });
+
+  test('Auto-routed pharmacy shows sent here badge instead of current pharmacy tag', async () => {
+    renderApp();
+
+    expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
+    expect(await screen.findByTestId('pharmacy-sent-here-badge')).toBeInTheDocument();
+    expect(screen.getByText('Sent here')).toBeInTheDocument();
+
+    const pharmacyInfos = await screen.findAllByTestId('pharmacy-info');
+    for (const pharmacyInfo of pharmacyInfos) {
+      const pharmacyName = pharmacyInfo.querySelector(`[data-testid="pharmacy-info-name"]`);
+      const currentPharmacyTag = pharmacyInfo.querySelector(
+        `[data-testid="pharmacy-info-current-pharmacy"]`
+      );
+      if (pharmacyName?.textContent?.includes(testAutoroutedPharmacy.name)) {
+        expect(currentPharmacyTag).toBeNull();
+      }
+    }
+  });
+
+  test('Confirming auto-routed pharmacy stores confirmation in localStorage and navigates to status', async () => {
+    const { rerouteOrder } = await import('./api');
+
+    renderApp();
+
+    expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
+
+    await userEvent.click(await screen.findByText(testAutoroutedPharmacy.name));
+    await userEvent.click(await screen.findByText(text.selectPharmacy));
+
+    await waitFor(() => screen.findByText(text.thankYou), { timeout: 3000 });
+    await waitFor(() => screen.findByText(/preparing order/i), { timeout: 3000 });
+
+    expect(hasConfirmedAutoroutedPharmacy('ord_testId777')).toBe(true);
+    expect(vi.mocked(rerouteOrder)).toHaveBeenCalledWith(
+      'ord_testId777',
+      testAutoroutedPharmacy.id,
+      expect.anything(),
+      expect.anything()
+    );
+  }, 15_000);
+
+  test('Auto-routed order with confirmed pharmacy stays on status page on load', async () => {
+    markAutoroutedPharmacyConfirmed('ord_testId777');
+
+    const { memoryRouter } = renderApp();
+
+    await waitFor(() => {
+      expect(memoryRouter.state.location.pathname).toBe('/status');
+    });
+
+    expect(await screen.findByText(/preparing order/i)).toBeInTheDocument();
+    expect(screen.queryByTestId('pharmacy-sent-here-badge')).not.toBeInTheDocument();
+  });
+
+  test('Selecting a pharmacy other than auto-routed clears localStorage confirmation', async () => {
+    renderApp();
+
+    expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
+
+    markAutoroutedPharmacyConfirmed('ord_testId777');
+    expect(hasConfirmedAutoroutedPharmacy('ord_testId777')).toBe(true);
+
+    await userEvent.click(await screen.findByText(testAlternatePharmacy.name));
+
+    expect(hasConfirmedAutoroutedPharmacy('ord_testId777')).toBe(false);
+  });
+});
+
+const renderApp = (initialPath = `/status?orderId=ord_testId777&token=${mockToken}`) => {
   const memoryRouter = createMemoryRouter(createRoutesFromElements(routeElements), {
-    initialEntries: [`/status?orderId=ord_testId777&token=${mockToken}`]
+    initialEntries: [initialPath]
   });
 
   return { render: render(<RouterProvider router={memoryRouter} />), memoryRouter };
