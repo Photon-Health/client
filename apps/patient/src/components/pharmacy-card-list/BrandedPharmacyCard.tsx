@@ -11,11 +11,11 @@ import novocareLogo from '../../assets/novo_circle.png';
 import capsulePharmacyIdLookup from '../../data/capsulePharmacyIds.json';
 import { PharmacyInfo } from '../PharmacyInfo';
 import { BrandedOptionOverrides } from './BrandedOptions';
-import { PharmacyCardSentHereFrame } from '../PharmacyCardSentHereFrame';
+import { PharmacyCardSentHereFrame } from '../pharmacy-card/sent-here/PharmacyCardSentHereFrame';
 import {
   getPharmacyCardBorderStyle,
   isPharmacyCardSelectable
-} from '../pharmacyCardSentHereStyles';
+} from '../pharmacy-card/sent-here/pharmacyCardSentHereStyles';
 
 interface Props {
   pharmacyId: string;

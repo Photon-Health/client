@@ -1,6 +1,6 @@
 import { HStack, Icon, Text, useTheme } from '@chakra-ui/react';
 import { FiCheck } from 'react-icons/fi';
-import { getBrandContrastTextColor } from '../configs/theme';
+import { getBrandContrastTextColor } from '../../../configs/theme';
 
 type SentHereBadgeProps = {
   top?: number;

@@ -2,11 +2,11 @@ import { Card, CardBody } from '@chakra-ui/react';
 
 import { OfferInfo } from './OfferInfo';
 import { OfferBundleDetails } from '../../utils/models';
-import { PharmacyCardSentHereFrame } from '../PharmacyCardSentHereFrame';
+import { PharmacyCardSentHereFrame } from '../pharmacy-card/sent-here/PharmacyCardSentHereFrame';
 import {
   getPharmacyCardBorderStyle,
   isPharmacyCardSelectable
-} from '../pharmacyCardSentHereStyles';
+} from '../pharmacy-card/sent-here/pharmacyCardSentHereStyles';
 
 interface Props {
   offer: OfferBundleDetails;

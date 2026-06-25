@@ -1,7 +1,7 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { render, screen } from '@testing-library/react';
 import { SentHereBadge } from './SentHereBadge';
-import theme from '../configs/theme';
+import theme from '../../../configs/theme';
 
 test('SentHereBadge renders sent here label', () => {
   render(

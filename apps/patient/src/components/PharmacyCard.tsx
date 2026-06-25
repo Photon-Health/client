@@ -6,8 +6,11 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { PharmacyInfo } from './PharmacyInfo';
-import { PharmacyCardSentHereFrame } from './PharmacyCardSentHereFrame';
-import { getPharmacyCardBorderStyle, isPharmacyCardSelectable } from './pharmacyCardSentHereStyles';
+import { PharmacyCardSentHereFrame } from './pharmacy-card/sent-here/PharmacyCardSentHereFrame';
+import {
+  getPharmacyCardBorderStyle,
+  isPharmacyCardSelectable
+} from './pharmacy-card/sent-here/pharmacyCardSentHereStyles';
 
 dayjs.extend(customParseFormat);
 
