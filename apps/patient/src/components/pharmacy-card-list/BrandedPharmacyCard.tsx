@@ -11,9 +11,15 @@ import novocareLogo from '../../assets/novo_circle.png';
 import capsulePharmacyIdLookup from '../../data/capsulePharmacyIds.json';
 import { PharmacyInfo } from '../PharmacyInfo';
 import { BrandedOptionOverrides } from './BrandedOptions';
+import { PharmacyCardSentHereFrame } from '../pharmacy-card/sent-here/PharmacyCardSentHereFrame';
+import {
+  getPharmacyCardBorderStyle,
+  isPharmacyCardSelectable
+} from '../pharmacy-card/sent-here/pharmacyCardSentHereStyles';
 
 interface Props {
   pharmacyId: string;
+  isAutoroutedPharmacy: boolean;
   isPharmacyFulfillingCurrentOrder: boolean;
   selected: boolean;
   handleSelect: (id: string) => void;
@@ -72,6 +78,7 @@ export const BrandedPharmacyCard = ({
   pharmacyId,
   selected,
   handleSelect,
+  isAutoroutedPharmacy,
   isPharmacyFulfillingCurrentOrder,
   brandedOptionOverrides
 }: Props) => {
@@ -79,34 +86,39 @@ export const BrandedPharmacyCard = ({
   if (!brand) return null;
 
   const pharmacy = { id: pharmacyId, name: brand.name, logo: brand.logo };
+  const borderStyle = getPharmacyCardBorderStyle({
+    isAutoroutedPharmacy,
+    isPharmacyFulfillingCurrentOrder,
+    selected
+  });
+  const isSelectable = isPharmacyCardSelectable({
+    isAutoroutedPharmacy,
+    isPharmacyFulfillingCurrentOrder
+  });
 
-  return (
+  const card = (
     <Card
-      // if the pharmacy is fulfilling the current order
-      // we should not be able to select it again
-      bgColor={isPharmacyFulfillingCurrentOrder ? 'gray.200' : 'white'}
+      bgColor={borderStyle.bgColor}
       border="2px solid"
-      borderWidth={selected ? '2px' : '1px'}
-      borderColor={
-        selected ? 'brand.500' : isPharmacyFulfillingCurrentOrder ? 'gray.300' : 'gray.200'
-      }
+      borderWidth={borderStyle.borderWidth}
+      borderColor={borderStyle.borderColor}
       borderRadius="lg"
       shadow={'none'}
-      onClick={() => handleSelect(pharmacyId)}
+      onClick={() => isSelectable && handleSelect(pharmacyId)}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (isSelectable && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
           handleSelect(pharmacyId);
         }
       }}
-      cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
-      pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
-      opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}
+      cursor={isSelectable ? 'pointer' : undefined}
+      pointerEvents={isSelectable ? undefined : 'none'}
+      opacity={isSelectable ? undefined : 0.7}
       role="radio"
       aria-checked={selected}
       aria-label={brand.name}
-      aria-disabled={isPharmacyFulfillingCurrentOrder}
-      tabIndex={isPharmacyFulfillingCurrentOrder ? -1 : 0}
+      aria-disabled={!isSelectable}
+      tabIndex={isSelectable ? 0 : -1}
     >
       <CardBody p={3}>
         <PharmacyInfo
@@ -120,5 +132,11 @@ export const BrandedPharmacyCard = ({
         />
       </CardBody>
     </Card>
+  );
+
+  return isAutoroutedPharmacy ? (
+    <PharmacyCardSentHereFrame selected={selected}>{card}</PharmacyCardSentHereFrame>
+  ) : (
+    card
   );
 };
