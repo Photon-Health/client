@@ -1,9 +1,12 @@
 import { extendTheme } from '@chakra-ui/react';
 import tinycolor from 'tinycolor2';
 
+export const getBrandContrastTextColor = (accentColor: string): 'gray.800' | 'white' =>
+  tinycolor(accentColor).isLight() ? 'gray.800' : 'white';
+
 function generateChakraTheme({ accentColor = '#3182ce' }: { accentColor?: string } = {}) {
   const color = tinycolor(accentColor);
-  const textColor = color.isLight() ? 'gray.800' : 'white';
+  const textColor = getBrandContrastTextColor(accentColor);
   const linkColor = '#4299e1'; // Chakra blue.400
 
   const colors = {

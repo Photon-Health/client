@@ -6,16 +6,29 @@ import { afterEach, beforeEach, describe, expect, MockedFunction, vi } from 'vit
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import {
   generateFill,
+  generateFulfillment,
+  generateId,
   generateOrder,
   generatePatient,
   generatePharmacy
 } from '../test-utils/generators';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
-import { getOfferBundles, getOrder, getPharmaciesByLocation, setOrderPharmacy } from '../api';
+import {
+  getOfferBundles,
+  getOrder,
+  getPharmaciesByLocation,
+  rerouteOrder,
+  setOrderPharmacy
+} from '../api';
 import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
 import { FulfillmentType } from '../__generated__/graphql';
 import { OfferBundleDetails } from '../utils/models';
+import {
+  hasConfirmedAutoroutedPharmacy,
+  markAutoroutedPharmacyConfirmed
+} from '../utils/autoroutedPharmacyConfirmationStorage';
+import { text } from '../utils/text';
 
 // Mock the settings and pharmacy utils before any imports
 vi.mock('@client/settings', () => ({
@@ -79,10 +92,7 @@ vi.mock('../components', async () => {
     InsuranceModal: () => <div data-testid="insurance-modal">Insurance Modal</div>,
     PoweredBy: () => <div data-testid="powered-by">Powered By</div>,
     Nav: () => <div>Nav</div>,
-    PrescriptionsList: () => <div>PrescriptionsList</div>,
-    PharmacyInfo: ({ pharmacy }: { pharmacy?: { name?: string } }) => (
-      <div data-testid="pharmacy-info">{pharmacy?.name}</div>
-    )
+    PrescriptionsList: () => <div>PrescriptionsList</div>
   };
 });
 
@@ -747,6 +757,125 @@ describe('Pharmacy page', () => {
     await userEvent.click(placeOrderButton);
     await waitFor(() => screen.findByText(/Order placed/i), { timeout: 5_000 });
   }, 10_000);
+
+  describe('Autorouted pharmacy confirmation', () => {
+    const testAutoroutedPharmacy = generatePharmacy({
+      id: generateId('phr_'),
+      name: 'Auto-Routed Pharmacy'
+    });
+    const testAlternatePharmacy = generatePharmacy({
+      id: generateId('phr_'),
+      name: 'Alternate Pharmacy'
+    });
+
+    const createAutoroutedOrder = () =>
+      generateOrder({
+        id: 'ord_testId777',
+        state: 'PLACED',
+        patient: generatePatient({ name: { full: 'Jane Doe' } }),
+        fills: [generateFill('test-treatment')],
+        fulfillments: [generateFulfillment({ state: 'PROCESSING' })],
+        pharmacy: testAutoroutedPharmacy,
+        isReroutable: true,
+        address: {
+          street1: '123 Main St',
+          city: 'New York',
+          state: 'NY',
+          postalCode: '10001',
+          country: 'US'
+        },
+        metadata: {
+          routingHistory: [{ selector: 'AUTO' }]
+        }
+      });
+
+    beforeEach(async () => {
+      localStorage.clear();
+
+      const { getOrder, getPharmaciesByLocation, setOrderPharmacy, rerouteOrder } = await import(
+        '../api'
+      );
+
+      vi.mocked(getOrder).mockResolvedValue(createAutoroutedOrder());
+      vi.mocked(getPharmaciesByLocation).mockResolvedValue({
+        pharmaciesByLocation: [testAutoroutedPharmacy, testAlternatePharmacy]
+      });
+      vi.mocked(setOrderPharmacy).mockResolvedValue(true);
+      vi.mocked(rerouteOrder).mockResolvedValue(true);
+
+      const { fetchOfferBundles, getPharmacy } = await import('./pharmacy.utils');
+      vi.mocked(fetchOfferBundles).mockResolvedValue([]);
+      vi.mocked(getPharmacy).mockReturnValue({
+        type: 'PICK_UP',
+        selectedPharmacy: testAutoroutedPharmacy
+      });
+    });
+
+    afterEach(() => {
+      localStorage.clear();
+    });
+
+    test('Auto-routed pharmacy shows sent here badge instead of current pharmacy tag', async () => {
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      expect(await screen.findByTestId('pharmacy-sent-here-badge')).toBeInTheDocument();
+
+      const pharmacyInfos = await screen.findAllByTestId('pharmacy-info');
+      for (const pharmacyInfo of pharmacyInfos) {
+        const pharmacyName = pharmacyInfo.querySelector(`[data-testid="pharmacy-info-name"]`);
+        const currentPharmacyTag = pharmacyInfo.querySelector(
+          `[data-testid="pharmacy-info-current-pharmacy"]`
+        );
+        if (pharmacyName?.textContent?.includes(testAutoroutedPharmacy.name)) {
+          expect(currentPharmacyTag).toBeNull();
+        }
+      }
+    });
+
+    test('Submitting auto-routed pharmacy stores confirmation in localStorage and calls rerouteOrder', async () => {
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      await userEvent.click(await screen.findByText(testAutoroutedPharmacy.name));
+      await userEvent.click(await screen.findByText(text.selectPharmacy));
+
+      await waitFor(() => screen.findByText(text.thankYou), { timeout: 3000 });
+      await waitFor(() => screen.findByText(/preparing order/i), { timeout: 3000 });
+
+      expect(hasConfirmedAutoroutedPharmacy('ord_testId777')).toBe(true);
+      expect(vi.mocked(rerouteOrder)).toHaveBeenCalledWith(
+        'ord_testId777',
+        testAutoroutedPharmacy.id,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(vi.mocked(setOrderPharmacy)).not.toHaveBeenCalled();
+    }, 15_000);
+
+    test('Submitting alternate pharmacy clears localStorage confirmation and calls rerouteOrder', async () => {
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      markAutoroutedPharmacyConfirmed('ord_testId777');
+      expect(hasConfirmedAutoroutedPharmacy('ord_testId777')).toBe(true);
+
+      await userEvent.click(await screen.findByText(testAlternatePharmacy.name));
+      await userEvent.click(await screen.findByText(text.selectPharmacy));
+
+      await waitFor(() => screen.findByText(text.thankYou), { timeout: 3000 });
+      await waitFor(() => screen.findByText(/preparing order/i), { timeout: 3000 });
+
+      expect(hasConfirmedAutoroutedPharmacy('ord_testId777')).toBe(false);
+      expect(vi.mocked(rerouteOrder)).toHaveBeenCalledWith(
+        'ord_testId777',
+        testAlternatePharmacy.id,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(vi.mocked(setOrderPharmacy)).not.toHaveBeenCalled();
+    }, 15_000);
+  });
 });
 
 const renderApp = () => {
