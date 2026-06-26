@@ -9,7 +9,8 @@ interface Props {
   options: string[];
   location: string;
   selectedId: string;
-  fulfillingPharmacyId?: string;
+  autoroutedPharmacyId?: string;
+  currentPharmacyId?: string;
   brandedOptionOverrides: BrandedOptionOverrides;
   handleSelect: (id: string) => void;
   shouldTrackOfferImpressionsAndSelections: boolean;
@@ -26,7 +27,8 @@ export const BrandedOptions = ({
   location,
   selectedId,
   handleSelect,
-  fulfillingPharmacyId,
+  autoroutedPharmacyId,
+  currentPharmacyId,
   brandedOptionOverrides,
   shouldTrackOfferImpressionsAndSelections,
   numberOfOffers = 0
@@ -50,7 +52,8 @@ export const BrandedOptions = ({
           >
             <BrandedPharmacyCard
               pharmacyId={id}
-              isPharmacyFulfillingCurrentOrder={fulfillingPharmacyId === id}
+              isAutoroutedPharmacy={autoroutedPharmacyId === id}
+              isPharmacyFulfillingCurrentOrder={currentPharmacyId === id}
               selected={selectedId === id}
               handleSelect={handleSelect}
               brandedOptionOverrides={brandedOptionOverrides}

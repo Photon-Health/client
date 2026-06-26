@@ -2,9 +2,15 @@ import { Card, CardBody } from '@chakra-ui/react';
 
 import { OfferInfo } from './OfferInfo';
 import { OfferBundleDetails } from '../../utils/models';
+import { PharmacyCardSentHereFrame } from '../pharmacy-card/sent-here/PharmacyCardSentHereFrame';
+import {
+  getPharmacyCardBorderStyle,
+  isPharmacyCardSelectable
+} from '../pharmacy-card/sent-here/pharmacyCardSentHereStyles';
 
 interface Props {
   offer: OfferBundleDetails;
+  isAutoroutedPharmacy: boolean;
   isPharmacyFulfillingCurrentOrder: boolean;
   selected: boolean;
   isPreferred: boolean;
@@ -14,25 +20,32 @@ export const OfferCard = ({
   offer,
   selected,
   handleSelect,
+  isAutoroutedPharmacy,
   isPharmacyFulfillingCurrentOrder,
   isPreferred
 }: Props) => {
-  return (
+  const borderStyle = getPharmacyCardBorderStyle({
+    isAutoroutedPharmacy,
+    isPharmacyFulfillingCurrentOrder,
+    selected
+  });
+  const isSelectable = isPharmacyCardSelectable({
+    isAutoroutedPharmacy,
+    isPharmacyFulfillingCurrentOrder
+  });
+
+  const card = (
     <Card
-      // if the pharmacy is fulfilling the current order
-      // we should not be able to select it again
-      bgColor={isPharmacyFulfillingCurrentOrder ? 'gray.200' : 'white'}
+      bgColor={borderStyle.bgColor}
       border="2px solid"
-      borderWidth={selected ? '2px' : '1px'}
-      borderColor={
-        selected ? 'brand.500' : isPharmacyFulfillingCurrentOrder ? 'gray.300' : 'gray.200'
-      }
+      borderWidth={borderStyle.borderWidth}
+      borderColor={borderStyle.borderColor}
       borderRadius="lg"
       shadow={'none'}
-      onClick={() => handleSelect(offer.pharmacy.id, offer)}
-      cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
-      pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
-      opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}
+      onClick={() => isSelectable && handleSelect(offer.pharmacy.id, offer)}
+      cursor={isSelectable ? 'pointer' : undefined}
+      pointerEvents={isSelectable ? undefined : 'none'}
+      opacity={isSelectable ? undefined : 0.7}
     >
       <CardBody p={3}>
         <OfferInfo
@@ -43,5 +56,11 @@ export const OfferCard = ({
         />
       </CardBody>
     </Card>
+  );
+
+  return isAutoroutedPharmacy ? (
+    <PharmacyCardSentHereFrame selected={selected}>{card}</PharmacyCardSentHereFrame>
+  ) : (
+    card
   );
 };
