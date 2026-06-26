@@ -3,7 +3,7 @@ import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
-import { ScreeningAlertsByEntity } from './ScreeningAlertsByEntity';
+import { ScreeningAlertsByEntity } from './ScreeningAlertsByPrescription';
 import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import { PrescriptionScreeningAlert } from '@photonhealth/sdk/dist/clinical-api/types';
 
