@@ -62,6 +62,11 @@ import { getOfferType } from '../utils/offers';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 import { MarketplaceSummary } from '../components/marketplace/summary/MarketplaceSummary';
 import { LocationSelection } from '../components/marketplace/summary/LocationSelection';
+import {
+  clearAutoroutedPharmacyConfirmation,
+  markAutoroutedPharmacyConfirmed
+} from '../utils/autoroutedPharmacyConfirmationStorage';
+import { hasSingleAutoRouteWithNoReroutes } from '../utils/getOrderFetchRedirectPath';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -120,7 +125,7 @@ export const Pharmacy = () => {
   // search params
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const isReroute = searchParams.get('reroute');
+  const isReroute = (!!order?.isReroutable && !!order?.pharmacy?.id) || searchParams.get('reroute');
   const openNow = searchParams.get('openNow');
   const phone = searchParams.get('phone');
 
@@ -167,6 +172,14 @@ export const Pharmacy = () => {
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
   const isLoading = loadingLocation || loadingPharmacies;
   const orderIsMultiRx = flattenedFills.length > 1;
+  // sole auto route — "sent here" card; selecting it persists confirmation in local storage
+  const autoroutedPharmacyId =
+    order && hasSingleAutoRouteWithNoReroutes(order) ? order.pharmacy?.id : undefined;
+  // order.pharmacy when not autorouted — grey card + "current pharmacy" tag; unrelated to selected
+  const currentPharmacyId =
+    order?.pharmacy?.id && order.pharmacy.id !== autoroutedPharmacyId
+      ? order.pharmacy.id
+      : undefined;
 
   // pricing
   const shouldTrackOfferImpressionsAndSelections = enablePrice && !isDemo;
@@ -658,6 +671,10 @@ export const Pharmacy = () => {
     setSelectedId(pharmacyId);
     setShowFooter(true);
 
+    if (order && pharmacyId !== autoroutedPharmacyId) {
+      clearAutoroutedPharmacyConfirmation(order.id);
+    }
+
     // because offers aren't actually pharmacies
     // we'll transform them into things that resemble pharamcy objects
     const pharmaciesFromOffers = (filteredOffers || []).map((o) => ({
@@ -707,6 +724,18 @@ export const Pharmacy = () => {
     }
   };
 
+  const persistAutoroutedPharmacyConfirmation = (pharmacyId: string) => {
+    if (!order) {
+      return;
+    }
+
+    if (pharmacyId === autoroutedPharmacyId) {
+      markAutoroutedPharmacyConfirmed(order.id);
+    } else {
+      clearAutoroutedPharmacyConfirmation(order.id);
+    }
+  };
+
   const handleSubmit = async (
     selectedPharmacy: EnrichedPharmacy,
     analyticsDetails: {
@@ -720,6 +749,8 @@ export const Pharmacy = () => {
     }
     setSubmitting(true);
     const { selectedFrom = 'Main List', buttonText } = analyticsDetails;
+
+    persistAutoroutedPharmacyConfirmation(selectedPharmacy.id);
 
     const selectedOffer = filteredOffers?.find((o) => o.pharmacy.id === selectedPharmacy.id);
     const isMailOrder = isMailOrderPharmacy(selectedPharmacy);
@@ -910,6 +941,8 @@ export const Pharmacy = () => {
   };
 
   const handleDemoSubmit = async (selectedPharmacy: EnrichedPharmacy) => {
+    persistAutoroutedPharmacyConfirmation(selectedPharmacy.id);
+
     await wait(1000);
     setSuccessfullySubmitted(true);
     await wait(1000);
@@ -1129,6 +1162,8 @@ export const Pharmacy = () => {
                       }
                       selectedPharmacyId={selectedId}
                       preferredPharmacyId={effectivePreferredPharmacyId}
+                      autoroutedPharmacyId={autoroutedPharmacyId}
+                      currentPharmacyId={currentPharmacyId}
                       handleSelect={handleSelect}
                     />
                   )}
@@ -1138,7 +1173,8 @@ export const Pharmacy = () => {
                       location={patientLocation}
                       selectedId={selectedId}
                       handleSelect={handleSelect}
-                      fulfillingPharmacyId={order.pharmacy?.id}
+                      autoroutedPharmacyId={autoroutedPharmacyId}
+                      currentPharmacyId={currentPharmacyId}
                       brandedOptionOverrides={brandedOptionsOverride ?? {}}
                       shouldTrackOfferImpressionsAndSelections={
                         shouldTrackOfferImpressionsAndSelections
@@ -1187,7 +1223,8 @@ export const Pharmacy = () => {
                   setEnableOpenNow={setEnableOpenNow}
                   setEnable24Hr={setEnable24Hr}
                   showFilters={false}
-                  currentPharmacyId={order.pharmacy?.id}
+                  autoroutedPharmacyId={autoroutedPharmacyId}
+                  currentPharmacyId={currentPharmacyId}
                   setCouponModalOpen={setCouponModalOpen}
                   numberOfBrandedOptions={brandedOptions.length}
                   shouldTrackOfferImpressionsAndSelections={

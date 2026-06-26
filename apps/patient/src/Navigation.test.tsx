@@ -12,6 +12,7 @@ import {
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
 import { FEATURE_FLAG_DEFAULTS } from './configs/featureFlags';
+import { markAutoroutedPharmacyConfirmed } from './utils/autoroutedPharmacyConfirmationStorage';
 
 const mockToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
@@ -77,8 +78,7 @@ vi.mock('./components', async () => {
     InsuranceModal: () => <div data-testid="insurance-modal">Insurance Modal</div>,
     PoweredBy: () => <div data-testid="powered-by">Powered By</div>,
     Nav: () => <div>Nav</div>,
-    PrescriptionsList: () => <div>PrescriptionsList</div>,
-    PharmacyInfo: () => <div data-testid="pharmacy-info">Pharmacy Info</div>
+    PrescriptionsList: () => <div>PrescriptionsList</div>
   };
 });
 
@@ -90,15 +90,6 @@ describe('App', () => {
     fills: [generateFill('test-treatment')],
     fulfillments: [generateFulfillment({ state: 'PROCESSING' })]
   });
-
-  const resetFeatureFlagMocks = () => {
-    mockPatientAnalytics.getFlagValue.mockImplementation(async (flagName: string) => {
-      return FEATURE_FLAG_DEFAULTS[flagName as keyof typeof FEATURE_FLAG_DEFAULTS];
-    });
-    mockPatientAnalytics.getFlagValueSync.mockImplementation((flagName: string) => {
-      return FEATURE_FLAG_DEFAULTS[flagName as keyof typeof FEATURE_FLAG_DEFAULTS];
-    });
-  };
 
   beforeEach(() => {
     resetFeatureFlagMocks();
@@ -224,7 +215,99 @@ describe('App', () => {
   });
 });
 
-const renderApp = (order: Partial<OrderContextType> = {}) => {
+const resetFeatureFlagMocks = () => {
+  mockPatientAnalytics.getFlagValue.mockImplementation(async (flagName: string) => {
+    return FEATURE_FLAG_DEFAULTS[flagName as keyof typeof FEATURE_FLAG_DEFAULTS];
+  });
+  mockPatientAnalytics.getFlagValueSync.mockImplementation((flagName: string) => {
+    return FEATURE_FLAG_DEFAULTS[flagName as keyof typeof FEATURE_FLAG_DEFAULTS];
+  });
+};
+
+describe('Autorouted order redirects', () => {
+  const assignedPharmacy = generatePharmacy({ id: 'phr_assigned', name: 'Assigned Pharmacy' });
+
+  const createAutoroutedOrder = () =>
+    generateOrder({
+      id: 'ord_testId777',
+      state: 'PLACED',
+      patient: generatePatient({ name: { full: 'Jane Doe' } }),
+      fills: [generateFill('test-treatment')],
+      fulfillments: [generateFulfillment({ state: 'PROCESSING' })],
+      pharmacy: assignedPharmacy,
+      isReroutable: true,
+      metadata: {
+        routingHistory: [{ selector: 'AUTO' }]
+      }
+    });
+
+  const createPatientSelectedOrder = () =>
+    generateOrder({
+      id: 'ord_testId777',
+      state: 'PLACED',
+      patient: generatePatient({ name: { full: 'Jane Doe' } }),
+      fills: [generateFill('test-treatment')],
+      fulfillments: [generateFulfillment({ state: 'PROCESSING' })],
+      pharmacy: assignedPharmacy,
+      isReroutable: true,
+      metadata: {
+        routingHistory: [{ selector: 'PATIENT' }]
+      }
+    });
+
+  beforeEach(() => {
+    localStorage.clear();
+    resetFeatureFlagMocks();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  test('Auto-routed reroutable order with pharmacy lands on pharmacy page', async () => {
+    const { getOrder } = await import('./api');
+    vi.mocked(getOrder).mockResolvedValue(createAutoroutedOrder());
+
+    const { memoryRouter } = renderApp();
+
+    await waitFor(() => {
+      expect(memoryRouter.state.location.pathname).toBe('/pharmacy');
+    });
+
+    expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
+  });
+
+  test('Auto-routed order with confirmed pharmacy lands on status page', async () => {
+    markAutoroutedPharmacyConfirmed('ord_testId777');
+
+    const { getOrder } = await import('./api');
+    vi.mocked(getOrder).mockResolvedValue(createAutoroutedOrder());
+
+    const { memoryRouter } = renderApp();
+
+    await waitFor(() => {
+      expect(memoryRouter.state.location.pathname).toBe('/status');
+    });
+
+    expect(await screen.findByText(/preparing order/i)).toBeInTheDocument();
+  });
+
+  test('Patient-selected order with pharmacy lands on status page', async () => {
+    const { getOrder } = await import('./api');
+    vi.mocked(getOrder).mockResolvedValue(createPatientSelectedOrder());
+
+    const { memoryRouter } = renderApp();
+
+    await waitFor(() => {
+      expect(memoryRouter.state.location.pathname).toBe('/status');
+    });
+
+    expect(await screen.findByText(/preparing order/i)).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Choose a Pharmacy' })).not.toBeInTheDocument();
+  });
+});
+
+const renderApp = (_order: Partial<OrderContextType> = {}) => {
   const memoryRouter = createMemoryRouter(createRoutesFromElements(routeElements), {
     initialEntries: [`/?orderId=ord_testId777&token=${mockToken}`]
   });

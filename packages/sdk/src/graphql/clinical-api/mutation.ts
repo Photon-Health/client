@@ -5,8 +5,8 @@ export const CreateSupervisorMutation = graphql(`
     $firstName: String!
     $lastName: String!
     $npi: String!
-    $phone: PhoneNumber
-    $address: AddressInput
+    $phone: PhoneNumber!
+    $address: AddressInput!
   ) {
     createSupervisor(
       input: {
