@@ -84,7 +84,7 @@ function Dialog(props: DialogProps) {
                 'items-center': merged.position === 'center'
               })}
             >
-              <div class={panelClasses()}>
+              <div role="dialog" class={panelClasses()}>
                 <Show when={merged?.onClose}>
                   <div class="absolute right-0 top-0 pr-4 pt-4 sm:pr-6 sm:pt-6 sm:block">
                     <button
