@@ -71,7 +71,14 @@ const Title = (props: {
   owningId?: string;
   screeningAlert: PrescriptionScreeningAlert;
 }): JSXElement => {
-  const entities = () => filterOutOwningId(props.screeningAlert.involvedEntities, props.owningId);
+  const entities = () => [
+    ...new Map(
+      filterOutOwningId(props.screeningAlert.involvedEntities, props.owningId).map((entity) => [
+        entity.name,
+        entity
+      ])
+    ).values()
+  ];
 
   return (
     <>
