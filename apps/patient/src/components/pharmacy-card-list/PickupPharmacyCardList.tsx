@@ -26,6 +26,7 @@ interface PickupPharmacyCardListProps {
   setEnable24Hr: (is24Hr: boolean) => void;
   showFilters: boolean;
   location: string;
+  autoroutedPharmacyId?: string;
   currentPharmacyId?: string;
   setCouponModalOpen: (isOpen: boolean) => void;
   numberOfBrandedOptions: number;
@@ -48,6 +49,7 @@ export const PickupPharmacyCardList = ({
   setEnableOpenNow,
   setEnable24Hr,
   showFilters = true,
+  autoroutedPharmacyId,
   currentPharmacyId,
   numberOfBrandedOptions = 0,
   shouldTrackOfferImpressionsAndSelections,
@@ -92,6 +94,7 @@ export const PickupPharmacyCardList = ({
                 onSetPreferred={() => handleSetPreferred(pharmacy.id)}
                 selectable={true}
                 showPrice={showPrice}
+                isAutoroutedPharmacy={pharmacy.id === autoroutedPharmacyId}
                 isCurrentPharmacy={pharmacy.id === currentPharmacyId}
               />
             </OfferImpressionTracker>
