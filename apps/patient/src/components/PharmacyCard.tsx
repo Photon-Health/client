@@ -6,6 +6,11 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { PharmacyInfo } from './PharmacyInfo';
+import { PharmacyCardSentHereFrame } from './pharmacy-card/sent-here/PharmacyCardSentHereFrame';
+import {
+  getPharmacyCardBorderStyle,
+  isPharmacyCardSelectable
+} from './pharmacy-card/sent-here/pharmacyCardSentHereStyles';
 
 dayjs.extend(customParseFormat);
 
@@ -19,6 +24,7 @@ interface PharmacyCardProps {
   selectable?: boolean;
   showDetails?: boolean;
   showPrice?: boolean;
+  isAutoroutedPharmacy?: boolean;
   isCurrentPharmacy?: boolean;
 }
 
@@ -32,32 +38,46 @@ export const PharmacyCard = memo(function PharmacyCard({
   selectable = false,
   showDetails = true,
   showPrice = false,
+  isAutoroutedPharmacy = false,
   isCurrentPharmacy = false
 }: PharmacyCardProps) {
   if (!pharmacy) return null;
 
-  return (
+  const isSelected = selected && !!onSelect;
+  const borderStyle = getPharmacyCardBorderStyle({
+    isAutoroutedPharmacy,
+    isPharmacyFulfillingCurrentOrder: isCurrentPharmacy,
+    selected: isSelected
+  });
+  const isSelectable =
+    selectable &&
+    isPharmacyCardSelectable({
+      isAutoroutedPharmacy,
+      isPharmacyFulfillingCurrentOrder: isCurrentPharmacy
+    });
+
+  const card = (
     <Card
-      bgColor={isCurrentPharmacy ? 'gray.200' : 'white'}
-      borderWidth={selected ? '2px' : '1px'}
-      borderColor={selected && onSelect ? 'brand.500' : isCurrentPharmacy ? 'gray.300' : 'gray.200'}
+      bgColor={borderStyle.bgColor}
+      borderWidth={borderStyle.borderWidth}
+      borderColor={borderStyle.borderColor}
       shadow={'none'}
       borderRadius="lg"
-      onClick={() => onSelect && onSelect()}
+      onClick={() => isSelectable && onSelect && onSelect()}
       onKeyDown={(e) => {
-        if ((e.key === 'Enter' || e.key === ' ') && onSelect) {
+        if (isSelectable && (e.key === 'Enter' || e.key === ' ') && onSelect) {
           e.preventDefault();
           onSelect();
         }
       }}
-      cursor={selectable ? 'pointer' : undefined}
-      pointerEvents={isCurrentPharmacy ? 'none' : undefined}
-      opacity={isCurrentPharmacy ? 0.7 : undefined}
+      cursor={isSelectable ? 'pointer' : undefined}
+      pointerEvents={isSelectable ? undefined : 'none'}
+      opacity={isSelectable ? undefined : 0.7}
       role="radio"
       aria-checked={selected}
       aria-label={pharmacy.name}
-      aria-disabled={isCurrentPharmacy}
-      tabIndex={isCurrentPharmacy ? -1 : 0}
+      aria-disabled={selectable && !isSelectable ? true : undefined}
+      tabIndex={isSelectable ? 0 : -1}
     >
       <CardBody p={3}>
         <PharmacyInfo
@@ -92,5 +112,11 @@ export const PharmacyCard = memo(function PharmacyCard({
         </Collapse>
       ) : null}
     </Card>
+  );
+
+  return isAutoroutedPharmacy ? (
+    <PharmacyCardSentHereFrame selected={isSelected}>{card}</PharmacyCardSentHereFrame>
+  ) : (
+    card
   );
 });
