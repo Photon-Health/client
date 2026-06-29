@@ -146,6 +146,7 @@ export const GET_ORDER = gql`
       }
       fills {
         id
+        state
         treatment {
           ... on Medication {
             id
