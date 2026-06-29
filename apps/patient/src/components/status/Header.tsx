@@ -80,6 +80,8 @@ function headerText(props: OrderStatusHeaderProps) {
       return 'Order delivered';
     case 'SHIPPED':
       return 'Order in transit';
+    case 'CANCELED':
+      return 'Order canceled';
     default: {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _: never = status;

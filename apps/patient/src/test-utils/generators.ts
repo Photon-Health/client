@@ -71,6 +71,7 @@ export const generateFill = (treatmentName: string): Order['fills'][number] => {
   fillIdCounter += 1;
   return {
     id: `fil_testIdDefault_${fillIdCounter}`,
+    state: 'SENT',
     treatment: {
       id: `med_testIdDefault_${fillIdCounter}`,
       name: treatmentName
@@ -120,6 +121,7 @@ export const generatePrescription = (): Prescription => ({
 
 export const generateFlattenedFill = (override: Partial<FillWithCount>): FillWithCount => ({
   id: `fil_testIdDefault`,
+  state: 'SENT',
   count: 1,
   treatment: generateTreatment(),
   ...override

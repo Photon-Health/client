@@ -19,6 +19,7 @@ export const demoOrder: Order = {
   fills: [
     {
       id: 'fil_01H91JWEAPK8ZHF0H35JE59RQY',
+      state: 'SENT',
       prescription: {
         daysSupply: 10,
         dispenseUnit: 'ML',
@@ -36,6 +37,7 @@ export const demoOrder: Order = {
     },
     {
       id: 'fil_01sH91JWEAPK8ZHF0H35sfwe3JE59RQY',
+      state: 'SENT',
       prescription: {
         daysSupply: 2,
         dispenseUnit: 'tablets',
