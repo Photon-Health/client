@@ -41,3 +41,31 @@ test('hasConfirmedAutoroutedPharmacy returns false when localStorage throws', ()
 
   expect(hasConfirmedAutoroutedPharmacy(orderId)).toBe(false);
 });
+
+test('markAutoroutedPharmacyConfirmed does not throw when localStorage throws', () => {
+  vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    throw new Error('localStorage unavailable');
+  });
+
+  expect(() => markAutoroutedPharmacyConfirmed(orderId)).not.toThrow();
+});
+
+test('markAutoroutedPharmacyConfirmed leaves confirmation false when localStorage throws', () => {
+  vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    throw new Error('localStorage unavailable');
+  });
+
+  markAutoroutedPharmacyConfirmed(orderId);
+
+  expect(hasConfirmedAutoroutedPharmacy(orderId)).toBe(false);
+});
+
+test('clearAutoroutedPharmacyConfirmation does not throw when localStorage throws', () => {
+  markAutoroutedPharmacyConfirmed(orderId);
+
+  vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {
+    throw new Error('localStorage unavailable');
+  });
+
+  expect(() => clearAutoroutedPharmacyConfirmation(orderId)).not.toThrow();
+});

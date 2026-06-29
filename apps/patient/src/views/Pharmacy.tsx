@@ -736,6 +736,20 @@ export const Pharmacy = () => {
     }
   };
 
+  const isConfirmingAutoroutedPharmacy = (pharmacyId: string) =>
+    !!autoroutedPharmacyId && pharmacyId === autoroutedPharmacyId;
+
+  const completeAutoroutedPharmacyConfirmation = async () => {
+    await wait(1000);
+    setSuccessfullySubmitted(true);
+    await wait(1000);
+    setShowFooter(false);
+    setSubmitting(false);
+
+    const query = queryString.stringify({ orderId: order!.id, token });
+    navigate(`/status?${query}`);
+  };
+
   const handleSubmit = async (
     selectedPharmacy: EnrichedPharmacy,
     analyticsDetails: {
@@ -768,6 +782,11 @@ export const Pharmacy = () => {
 
     if (isDemo) {
       await handleDemoSubmit(selectedPharmacy);
+      return;
+    }
+
+    if (isConfirmingAutoroutedPharmacy(selectedPharmacy.id)) {
+      await completeAutoroutedPharmacyConfirmation();
       return;
     }
 
@@ -942,6 +961,18 @@ export const Pharmacy = () => {
 
   const handleDemoSubmit = async (selectedPharmacy: EnrichedPharmacy) => {
     persistAutoroutedPharmacyConfirmation(selectedPharmacy.id);
+
+    if (isConfirmingAutoroutedPharmacy(selectedPharmacy.id)) {
+      await wait(1000);
+      setSuccessfullySubmitted(true);
+      await wait(1000);
+      setShowFooter(false);
+      setSubmitting(false);
+
+      const query = queryString.stringify({ demo: true, phone });
+      navigate(`/status?${query}`);
+      return;
+    }
 
     await wait(1000);
     setSuccessfullySubmitted(true);
