@@ -122,7 +122,7 @@
     "nanostores": "^0.7.4",
     "query-string": "^9.0.0",
     "react": "18.3.1",
-    "react-confirm": "^0.2.3",
+    "react-confirm": "^0.5.0",
     "react-dom": "18.3.1",
     "react-ga4": "^2.1.0",
     "react-icons": "^5.4.0",
