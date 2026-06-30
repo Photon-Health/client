@@ -12,7 +12,11 @@ import {
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
 import { FEATURE_FLAG_DEFAULTS } from './configs/featureFlags';
-import { markAutoroutedPharmacyConfirmed } from './utils/autoroutedPharmacyConfirmationStorage';
+import {
+  hasConfirmedAutoroutedPharmacy,
+  markAutoroutedPharmacyConfirmed
+} from './utils/autoroutedPharmacyConfirmationStorage';
+import { text } from './utils/text';
 
 const mockToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
@@ -305,6 +309,63 @@ describe('Autorouted order redirects', () => {
     expect(await screen.findByText(/preparing order/i)).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Choose a Pharmacy' })).not.toBeInTheDocument();
   });
+
+  test('Auto-routed order that is not reroutable lands on status page', async () => {
+    const { getOrder } = await import('./api');
+    vi.mocked(getOrder).mockResolvedValue({
+      ...createAutoroutedOrder(),
+      isReroutable: false
+    });
+
+    const { memoryRouter } = renderApp();
+
+    await waitFor(() => {
+      expect(memoryRouter.state.location.pathname).toBe('/status');
+    });
+
+    expect(await screen.findByText(/preparing order/i)).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Choose a Pharmacy' })).not.toBeInTheDocument();
+  });
+
+  test('Confirming auto-routed pharmacy navigates to status without calling rerouteOrder', async () => {
+    const { getOrder, getPharmaciesByLocation, rerouteOrder } = await import('./api');
+    const autoroutedOrder = {
+      ...createAutoroutedOrder(),
+      address: {
+        street1: '123 Main St',
+        city: 'New York',
+        state: 'NY',
+        postalCode: '10001',
+        country: 'US'
+      }
+    };
+
+    vi.mocked(getOrder).mockResolvedValue(autoroutedOrder);
+    vi.mocked(getPharmaciesByLocation).mockResolvedValue({
+      pharmaciesByLocation: [assignedPharmacy]
+    });
+    vi.mocked(rerouteOrder).mockResolvedValue(true);
+
+    const { memoryRouter } = renderApp();
+
+    await waitFor(() => {
+      expect(memoryRouter.state.location.pathname).toBe('/pharmacy');
+    });
+
+    await userEvent.click(await screen.findByText(assignedPharmacy.name));
+    await userEvent.click(await screen.findByText(text.selectPharmacy));
+
+    await waitFor(() => screen.findByText(text.thankYou), { timeout: 3000 });
+    await waitFor(
+      () => {
+        expect(memoryRouter.state.location.pathname).toBe('/status');
+      },
+      { timeout: 5000 }
+    );
+
+    expect(hasConfirmedAutoroutedPharmacy('ord_testId777')).toBe(true);
+    expect(vi.mocked(rerouteOrder)).not.toHaveBeenCalled();
+  }, 15_000);
 });
 
 const renderApp = (_order: Partial<OrderContextType> = {}) => {

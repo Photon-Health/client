@@ -14,6 +14,26 @@ test('hasSingleAutoRouteWithNoReroutes is true for sole AUTO routing history ent
   expect(hasSingleAutoRouteWithNoReroutes(order)).toBe(true);
 });
 
+test('hasSingleAutoRouteWithNoReroutes is false when routing history is empty', () => {
+  const order = generateOrder({
+    metadata: {
+      routingHistory: []
+    }
+  });
+
+  expect(hasSingleAutoRouteWithNoReroutes(order)).toBe(false);
+});
+
+test('hasSingleAutoRouteWithNoReroutes is false when routing history selector is PATIENT', () => {
+  const order = generateOrder({
+    metadata: {
+      routingHistory: [{ selector: 'PATIENT' }]
+    }
+  });
+
+  expect(hasSingleAutoRouteWithNoReroutes(order)).toBe(false);
+});
+
 test('hasSingleAutoRouteWithNoReroutes is false when routing history has multiple entries', () => {
   const order = generateOrder({
     metadata: {

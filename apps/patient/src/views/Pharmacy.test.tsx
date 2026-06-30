@@ -789,6 +789,32 @@ describe('Pharmacy page', () => {
         }
       });
 
+    const createReroutedAfterAutoOrder = () => {
+      const order = createAutoroutedOrder();
+
+      return {
+        ...order,
+        metadata: {
+          routingHistory: [{ selector: 'AUTO' }, { selector: 'PATIENT' }]
+        },
+        exceptions: [{ exceptionType: 'ORDER_ERROR' }],
+        organization: {
+          ...order.organization,
+          settings: {
+            ...order.organization.settings,
+            patientUx: {
+              enablePatientRerouting: true
+            }
+          }
+        }
+      };
+    };
+
+    const navigateToPharmacyViaReroute = async () => {
+      await userEvent.click(await screen.findByText(/change pharmacy/i));
+      expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
+    };
+
     beforeEach(async () => {
       localStorage.clear();
 
@@ -833,7 +859,7 @@ describe('Pharmacy page', () => {
       }
     });
 
-    test('Submitting auto-routed pharmacy stores confirmation in localStorage and calls rerouteOrder', async () => {
+    test('Submitting auto-routed pharmacy stores confirmation in localStorage without calling rerouteOrder', async () => {
       renderApp();
       await navigateToPharmacyScreen();
 
@@ -844,12 +870,7 @@ describe('Pharmacy page', () => {
       await waitFor(() => screen.findByText(/preparing order/i), { timeout: 3000 });
 
       expect(hasConfirmedAutoroutedPharmacy('ord_testId777')).toBe(true);
-      expect(vi.mocked(rerouteOrder)).toHaveBeenCalledWith(
-        'ord_testId777',
-        testAutoroutedPharmacy.id,
-        expect.anything(),
-        expect.anything()
-      );
+      expect(vi.mocked(rerouteOrder)).not.toHaveBeenCalled();
       expect(vi.mocked(setOrderPharmacy)).not.toHaveBeenCalled();
     }, 15_000);
 
@@ -867,6 +888,73 @@ describe('Pharmacy page', () => {
       await waitFor(() => screen.findByText(/preparing order/i), { timeout: 3000 });
 
       expect(hasConfirmedAutoroutedPharmacy('ord_testId777')).toBe(false);
+      expect(vi.mocked(rerouteOrder)).toHaveBeenCalledWith(
+        'ord_testId777',
+        testAlternatePharmacy.id,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(vi.mocked(setOrderPharmacy)).not.toHaveBeenCalled();
+    }, 15_000);
+
+    test('Selecting alternate pharmacy clears stored autorouted confirmation before submit', async () => {
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      markAutoroutedPharmacyConfirmed('ord_testId777');
+
+      await userEvent.click(await screen.findByText(testAlternatePharmacy.name));
+
+      expect(hasConfirmedAutoroutedPharmacy('ord_testId777')).toBe(false);
+      expect(vi.mocked(rerouteOrder)).not.toHaveBeenCalled();
+      expect(vi.mocked(setOrderPharmacy)).not.toHaveBeenCalled();
+    });
+
+    test('Confirming auto-routed pharmacy navigates to status page', async () => {
+      const { memoryRouter } = renderApp();
+      await navigateToPharmacyScreen();
+
+      await userEvent.click(await screen.findByText(testAutoroutedPharmacy.name));
+      await userEvent.click(await screen.findByText(text.selectPharmacy));
+
+      await waitFor(() => screen.findByText(text.thankYou), { timeout: 3000 });
+
+      await waitFor(() => {
+        expect(memoryRouter.state.location.pathname).toBe('/status');
+      });
+    }, 15_000);
+
+    test('Order with prior patient reroute shows current pharmacy tag instead of sent here badge', async () => {
+      const { getOrder } = await import('../api');
+      vi.mocked(getOrder).mockResolvedValue(createReroutedAfterAutoOrder());
+
+      renderApp();
+      await navigateToPharmacyViaReroute();
+
+      expect(screen.queryByTestId('pharmacy-sent-here-badge')).not.toBeInTheDocument();
+
+      const pharmacyInfos = await screen.findAllByTestId('pharmacy-info');
+      const autoroutedPharmacyInfo = pharmacyInfos.find((pharmacyInfo) =>
+        pharmacyInfo.textContent?.includes(testAutoroutedPharmacy.name)
+      );
+
+      expect(
+        autoroutedPharmacyInfo?.querySelector('[data-testid="pharmacy-info-current-pharmacy"]')
+      ).toBeInTheDocument();
+    });
+
+    test('Submitting alternate pharmacy on order with reroute history calls rerouteOrder', async () => {
+      const { getOrder } = await import('../api');
+      vi.mocked(getOrder).mockResolvedValue(createReroutedAfterAutoOrder());
+
+      renderApp();
+      await navigateToPharmacyViaReroute();
+
+      await userEvent.click(await screen.findByText(testAlternatePharmacy.name));
+      await userEvent.click(await screen.findByText(text.selectPharmacy));
+
+      await waitFor(() => screen.findByText(text.thankYou), { timeout: 3000 });
+
       expect(vi.mocked(rerouteOrder)).toHaveBeenCalledWith(
         'ord_testId777',
         testAlternatePharmacy.id,
