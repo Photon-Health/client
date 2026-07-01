@@ -42,6 +42,7 @@ export const getOrderFetchRedirectPath = (
   if (order.pharmacy?.id) {
     const shouldConfirmAutoRoutedPharmacy =
       (hasSingleAutoRouteWithNoReroutes(order) || hasSingleProviderRouteWithNoReroutes(order)) &&
+      // When Mail-In is pre-chosen the Market Place UI is really confusing
       !isOrderMailIn(order) &&
       // We don't want to show the marketplace for Compound Treatments
       !isForCompoundMed(order) &&
