@@ -8,14 +8,14 @@ export const hasSingleAutoRouteWithNoReroutes = (order: Order): boolean => {
   return routingHistory.length === 1 && routingHistory[0]?.selector === 'AUTO';
 };
 
-const hasSingleProviderRouteWithNoReroutes = (order: Order): boolean => {
+export const hasSingleProviderRouteWithNoReroutes = (order: Order): boolean => {
   const routingHistory = order.metadata?.routingHistory ?? [];
   return routingHistory.length === 1 && routingHistory[0]?.selector === 'PROVIDER';
 };
 
 // We don't want to redirect to the Marketplace immediately for Mail-In Pharmacies
 // For now it's just a confusing experience, once we redesign the experience we should remove this.
-const isOrderMailIn = (order: Order): boolean => {
+export const isOrderMailIn = (order: Order): boolean => {
   return (
     order.pharmacy?.fulfillmentTypes?.every(
       (fulfillmentType) => fulfillmentType === FulfillmentType.MailOrder
