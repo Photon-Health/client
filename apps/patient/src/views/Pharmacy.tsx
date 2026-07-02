@@ -695,7 +695,8 @@ export const Pharmacy = () => {
       pharmacyRank: allPharmacies.findIndex((p) => p.id === pharmacyId) + 1,
       isReroute: !!isReroute,
       enablePrice: enablePrice,
-      hasPrice: selectedPharmacy?.price !== undefined
+      hasPrice: selectedPharmacy?.price !== undefined,
+      isPreferred: pharmacyId === effectivePreferredPharmacyId
     });
   };
 
