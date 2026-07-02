@@ -696,7 +696,8 @@ export const Pharmacy = () => {
       isReroute: !!isReroute,
       enablePrice: enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined,
-      isPreferred: pharmacyId === effectivePreferredPharmacyId
+      isPreferred: pharmacyId === effectivePreferredPharmacyId,
+      isConfirmation: pharmacyId === currentPharmacyId
     });
   };
 
