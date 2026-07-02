@@ -66,7 +66,10 @@ import {
   clearAutoroutedPharmacyConfirmation,
   markAutoroutedPharmacyConfirmed
 } from '../utils/autoroutedPharmacyConfirmationStorage';
-import { hasSingleAutoRouteWithNoReroutes } from '../utils/getOrderFetchRedirectPath';
+import {
+  hasSingleAutoRouteWithNoReroutes,
+  hasSingleProviderRouteWithNoReroutes
+} from '../utils/getOrderFetchRedirectPath';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -174,8 +177,12 @@ export const Pharmacy = () => {
   const orderIsMultiRx = flattenedFills.length > 1;
   // sole auto route — "sent here" card; selecting it persists confirmation in local storage
   const autoroutedPharmacyId =
-    order && hasSingleAutoRouteWithNoReroutes(order) ? order.pharmacy?.id : undefined;
+    order &&
+    (hasSingleAutoRouteWithNoReroutes(order) || hasSingleProviderRouteWithNoReroutes(order))
+      ? order.pharmacy?.id
+      : undefined;
   // order.pharmacy when not autorouted — grey card + "current pharmacy" tag; unrelated to selected
+  // TODO: Why does this value check for autoroutedPharmacyId?
   const currentPharmacyId =
     order?.pharmacy?.id && order.pharmacy.id !== autoroutedPharmacyId
       ? order.pharmacy.id
@@ -697,7 +704,7 @@ export const Pharmacy = () => {
       enablePrice: enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined,
       isPreferred: pharmacyId === effectivePreferredPharmacyId,
-      isConfirmation: pharmacyId === currentPharmacyId
+      isConfirmation: pharmacyId === order.pharmacy?.id
     });
   };
 
