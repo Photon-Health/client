@@ -787,6 +787,16 @@ export const Pharmacy = () => {
       pharmacyName: selectedPharmacy?.name,
       isReroute: isReroute,
       isMailOrder,
+      isPreferred: selectedPharmacy.id === effectivePreferredPharmacyId,
+      isConfirmation,
+      isConfirmingMailOrder:
+        isConfirmation && selectedPharmacy
+          ? isPharmacyFulfillmentType(selectedPharmacy, 'MAIL_ORDER')
+          : false,
+      isConfirmingLocalPickup:
+        isConfirmation && selectedPharmacy
+          ? isPharmacyFulfillmentType(selectedPharmacy, 'PICK_UP')
+          : false,
       enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined,
       price: selectedPharmacy?.price || selectedOffer?.costAmount,
