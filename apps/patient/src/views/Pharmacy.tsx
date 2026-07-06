@@ -104,7 +104,7 @@ function FulfillmentTypeTabBar() {
 }
 
 /** Which action is the patient taking when they submit their pharmacy selection? */
-enum RoutingOperation {
+enum RoutingAction {
   /** Patient selects a new pharmacy for an order that already has one */
   Reroute = 'reroute',
   /** Patient selects a new pharmacy for an order that doesn't have one */
@@ -113,7 +113,7 @@ enum RoutingOperation {
   Confirmation = 'confirmation'
 }
 
-function getRoutingOperation({
+function getRoutingAction({
   order,
   selectedId,
   searchParams
@@ -121,16 +121,16 @@ function getRoutingOperation({
   order: Order;
   selectedId: string;
   searchParams: URLSearchParams;
-}): RoutingOperation {
+}): RoutingAction {
   if (selectedId === order.pharmacy?.id) {
-    return RoutingOperation.Confirmation;
+    return RoutingAction.Confirmation;
   }
 
   if (!!order.pharmacy?.id || !!searchParams.get('reroute')) {
-    return RoutingOperation.Reroute;
+    return RoutingAction.Reroute;
   }
 
-  return RoutingOperation.Route;
+  return RoutingAction.Route;
 }
 
 export const Pharmacy = () => {
@@ -187,8 +187,7 @@ export const Pharmacy = () => {
 
   // selected pharmacy
   const [selectedId, setSelectedId] = useState<string>('');
-  // Patient is able to select the existing order pharmacy to "confirm" it
-  const routingOperation = getRoutingOperation({ order, selectedId, searchParams });
+  const routingAction = getRoutingAction({ order, selectedId, searchParams });
   // pharmacy is considered autorouted if the patient did not actively choose it
   // - show "sent here" card styling
   // - selecting it persists confirmation in local storage
@@ -725,29 +724,20 @@ export const Pharmacy = () => {
     const selectedPharmacy = [...allPharmacies, ...pharmaciesFromOffers].find(
       (p) => p.id === pharmacyId
     );
-    // Calculate routingOperation locally since
+    // Calculate routingAction locally since
     // setSelectedId state update will not have registered yet
-    const routingOperation = getRoutingOperation({
+    const routingAction = getRoutingAction({
       order: order,
       selectedId: pharmacyId,
       searchParams
     });
-    const isConfirmation = routingOperation === RoutingOperation.Confirmation;
     patientAnalytics.track('Pharmacy Selected', order, {
       pharmacyId: pharmacyId,
       pharmacyName: selectedPharmacy?.name,
       pharmacyRank: allPharmacies.findIndex((p) => p.id === pharmacyId) + 1,
-      isReroute: routingOperation === RoutingOperation.Reroute,
       isPreferred: pharmacyId === effectivePreferredPharmacyId,
-      isConfirmation,
-      isConfirmingMailOrder:
-        isConfirmation && selectedPharmacy
-          ? isPharmacyFulfillmentType(selectedPharmacy, 'MAIL_ORDER')
-          : false,
-      isConfirmingLocalPickup:
-        isConfirmation && selectedPharmacy
-          ? isPharmacyFulfillmentType(selectedPharmacy, 'PICK_UP')
-          : false,
+      routingAction,
+      fulfillmentType: selectedPharmacy?.fulfillmentTypes?.[0],
       enablePrice: enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined
     });
@@ -807,28 +797,17 @@ export const Pharmacy = () => {
     persistAutoroutedPharmacyConfirmation(selectedPharmacy.id);
 
     const selectedOffer = filteredOffers?.find((o) => o.pharmacy.id === selectedPharmacy.id);
-    const isMailOrder = isPharmacyFulfillmentType(selectedPharmacy, 'MAIL_ORDER');
 
-    const isConfirmation = routingOperation === RoutingOperation.Confirmation;
     patientAnalytics.track('Pharmacy Selection Submitted', order, {
       pharmacyId: selectedPharmacy.id,
-      pharmacyName: selectedPharmacy?.name,
-      isReroute: routingOperation === RoutingOperation.Reroute,
-      isMailOrder,
+      pharmacyName: selectedPharmacy.name,
       isPreferred: selectedPharmacy.id === effectivePreferredPharmacyId,
-      isConfirmation,
-      isConfirmingMailOrder:
-        isConfirmation && selectedPharmacy
-          ? isPharmacyFulfillmentType(selectedPharmacy, 'MAIL_ORDER')
-          : false,
-      isConfirmingLocalPickup:
-        isConfirmation && selectedPharmacy
-          ? isPharmacyFulfillmentType(selectedPharmacy, 'PICK_UP')
-          : false,
+      routingAction,
+      fulfillmentType: selectedPharmacy.fulfillmentTypes?.[0],
       enablePrice,
-      hasPrice: selectedPharmacy?.price !== undefined,
-      price: selectedPharmacy?.price || selectedOffer?.costAmount,
-      retailPrice: selectedPharmacy?.retailPrice || selectedOffer?.retailAmount
+      hasPrice: selectedPharmacy.price !== undefined,
+      price: selectedPharmacy.price || selectedOffer?.costAmount,
+      retailPrice: selectedPharmacy.retailPrice || selectedOffer?.retailAmount
     });
 
     if (isDemo) {
@@ -865,7 +844,7 @@ export const Pharmacy = () => {
     });
 
     // If the patient is simply confirming, navigate back to the status page
-    if (routingOperation === RoutingOperation.Confirmation) {
+    if (routingAction === RoutingAction.Confirmation) {
       setSubmitting(false);
       setSuccessfullySubmitted(true);
       const query = queryString.stringify({
@@ -881,11 +860,11 @@ export const Pharmacy = () => {
     const showSubmitWarning = () =>
       toast({
         title:
-          routingOperation === RoutingOperation.Reroute
+          routingAction === RoutingAction.Reroute
             ? 'Unable to change pharmacies'
             : 'Unable to submit pharmacy selection',
         description:
-          routingOperation === RoutingOperation.Reroute
+          routingAction === RoutingAction.Reroute
             ? 'Your order is already being processed. Text us if you need it sent to a different pharmacy.'
             : 'Please refresh and try again',
         ...TOAST_CONFIG.WARNING
@@ -893,7 +872,7 @@ export const Pharmacy = () => {
 
     try {
       const result =
-        routingOperation === RoutingOperation.Reroute
+        routingAction === RoutingAction.Reroute
           ? await rerouteOrder(order.id, selectedPharmacy.id, enablePrice, reason)
           : await setOrderPharmacy(
               order.id,
@@ -922,7 +901,7 @@ export const Pharmacy = () => {
                 };
                 setOrder({
                   ...updatedOrder,
-                  isReroutable: routingOperation === RoutingOperation.Route,
+                  isReroutable: routingAction === RoutingAction.Route,
                   exceptions: updatedOrder.exceptions.map((exception) => ({
                     ...exception,
                     resolvedAt: new Date().toISOString()
@@ -949,7 +928,7 @@ export const Pharmacy = () => {
     } catch (_error: any) {
       showSubmitWarning();
       setSubmitting(false);
-      if (routingOperation === RoutingOperation.Reroute) {
+      if (routingAction === RoutingAction.Reroute) {
         setOrder({ ...order, isReroutable: false });
         const query = queryString.stringify({
           orderId: order.id,
