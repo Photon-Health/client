@@ -709,11 +709,11 @@ export const Pharmacy = () => {
       hasPrice: selectedPharmacy?.price !== undefined,
       isPreferred: pharmacyId === effectivePreferredPharmacyId,
       isConfirmation,
-      isMailOrder:
+      isConfirmingMailOrder:
         isConfirmation && selectedPharmacy
           ? isPharmacyFulfillmentType(selectedPharmacy, 'MAIL_ORDER')
           : false,
-      isLocalPickup:
+      isConfirmingLocalPickup:
         isConfirmation && selectedPharmacy
           ? isPharmacyFulfillmentType(selectedPharmacy, 'PICK_UP')
           : false
