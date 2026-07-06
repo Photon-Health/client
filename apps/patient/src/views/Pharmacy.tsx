@@ -131,7 +131,6 @@ export const Pharmacy = () => {
   // search params
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const isReroute = (!!order?.isReroutable && !!order?.pharmacy?.id) || searchParams.get('reroute');
   const openNow = searchParams.get('openNow');
   const phone = searchParams.get('phone');
 
@@ -158,6 +157,11 @@ export const Pharmacy = () => {
 
   // selection state
   const [selectedId, setSelectedId] = useState<string>('');
+  // Patient is able to select the existing order pharmacy to "confirm" it
+  const isConfirmation = selectedId === order.pharmacy?.id;
+  const isReroute =
+    (!!order?.isReroutable && !!order?.pharmacy?.id && !isConfirmation) ||
+    !!searchParams.get('reroute');
 
   // Submitting state
   const [submitting, setSubmitting] = useState<boolean>(false);
@@ -699,14 +703,14 @@ export const Pharmacy = () => {
     const selectedPharmacy = [...allPharmacies, ...pharmaciesFromOffers].find(
       (p) => p.id === pharmacyId
     );
+    // Calculate isConfirmation locally since
+    // setSelectedId state update will not have registered yet
     const isConfirmation = pharmacyId === order.pharmacy?.id;
     patientAnalytics.track('Pharmacy Selected', order, {
       pharmacyId: pharmacyId,
       pharmacyName: selectedPharmacy?.name,
       pharmacyRank: allPharmacies.findIndex((p) => p.id === pharmacyId) + 1,
-      isReroute: !!isReroute,
-      enablePrice: enablePrice,
-      hasPrice: selectedPharmacy?.price !== undefined,
+      isReroute: isReroute && !isConfirmation,
       isPreferred: pharmacyId === effectivePreferredPharmacyId,
       isConfirmation,
       isConfirmingMailOrder:
@@ -716,7 +720,9 @@ export const Pharmacy = () => {
       isConfirmingLocalPickup:
         isConfirmation && selectedPharmacy
           ? isPharmacyFulfillmentType(selectedPharmacy, 'PICK_UP')
-          : false
+          : false,
+      enablePrice: enablePrice,
+      hasPrice: selectedPharmacy?.price !== undefined
     });
   };
 
@@ -779,7 +785,7 @@ export const Pharmacy = () => {
     patientAnalytics.track('Pharmacy Selection Submitted', order, {
       pharmacyId: selectedPharmacy.id,
       pharmacyName: selectedPharmacy?.name,
-      isReroute: !!isReroute,
+      isReroute: isReroute,
       isMailOrder,
       enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined,
