@@ -75,8 +75,11 @@ const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
 const WALGREENS_PHARMACY_RADIUS = 15; // miles
 
-function isMailOrderPharmacy(pharmacy: EnrichedPharmacy): boolean {
-  return !!pharmacy.fulfillmentTypes?.includes('MAIL_ORDER');
+function isPharmacyFulfillmentType(
+  pharmacy: EnrichedPharmacy,
+  fulfillmentType: FulfillmentType
+): boolean {
+  return !!pharmacy.fulfillmentTypes?.includes(fulfillmentType);
 }
 
 function FulfillmentTypeTabBar() {
@@ -696,6 +699,7 @@ export const Pharmacy = () => {
     const selectedPharmacy = [...allPharmacies, ...pharmaciesFromOffers].find(
       (p) => p.id === pharmacyId
     );
+    const isConfirmation = pharmacyId === order.pharmacy?.id;
     patientAnalytics.track('Pharmacy Selected', order, {
       pharmacyId: pharmacyId,
       pharmacyName: selectedPharmacy?.name,
@@ -704,7 +708,15 @@ export const Pharmacy = () => {
       enablePrice: enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined,
       isPreferred: pharmacyId === effectivePreferredPharmacyId,
-      isConfirmation: pharmacyId === order.pharmacy?.id
+      isConfirmation,
+      isMailOrder:
+        isConfirmation && selectedPharmacy
+          ? isPharmacyFulfillmentType(selectedPharmacy, 'MAIL_ORDER')
+          : false,
+      isLocalPickup:
+        isConfirmation && selectedPharmacy
+          ? isPharmacyFulfillmentType(selectedPharmacy, 'PICK_UP')
+          : false
     });
   };
 
@@ -762,7 +774,7 @@ export const Pharmacy = () => {
     persistAutoroutedPharmacyConfirmation(selectedPharmacy.id);
 
     const selectedOffer = filteredOffers?.find((o) => o.pharmacy.id === selectedPharmacy.id);
-    const isMailOrder = isMailOrderPharmacy(selectedPharmacy);
+    const isMailOrder = isPharmacyFulfillmentType(selectedPharmacy, 'MAIL_ORDER');
 
     patientAnalytics.track('Pharmacy Selection Submitted', order, {
       pharmacyId: selectedPharmacy.id,
@@ -967,7 +979,7 @@ export const Pharmacy = () => {
       selectedPharmacy.address ? formatAddress(selectedPharmacy.address) : undefined
     );
 
-    if (isMailOrderPharmacy(selectedPharmacy)) {
+    if (isPharmacyFulfillmentType(selectedPharmacy, 'MAIL_ORDER')) {
       const query = queryString.stringify({ demo: true, phone });
       navigate(`/status?${query}`);
     } else {
