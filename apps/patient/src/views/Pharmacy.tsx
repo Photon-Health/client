@@ -75,13 +75,6 @@ const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
 const WALGREENS_PHARMACY_RADIUS = 15; // miles
 
-function isPharmacyFulfillmentType(
-  pharmacy: EnrichedPharmacy,
-  fulfillmentType: FulfillmentType
-): boolean {
-  return !!pharmacy.fulfillmentTypes?.includes(fulfillmentType);
-}
-
 function FulfillmentTypeTabBar() {
   // TODO: eventually we'll have more than one selectable fulfillment type in this bar (mail order)
   // for now, we'll just show the pickup tab bar
@@ -1007,13 +1000,8 @@ export const Pharmacy = () => {
       selectedPharmacy.address ? formatAddress(selectedPharmacy.address) : undefined
     );
 
-    if (isPharmacyFulfillmentType(selectedPharmacy, 'MAIL_ORDER')) {
-      const query = queryString.stringify({ demo: true, phone });
-      navigate(`/status?${query}`);
-    } else {
-      const query = queryString.stringify({ demo: true, phone });
-      navigate(`/readyBy?${query}`);
-    }
+    const query = queryString.stringify({ demo: true, phone });
+    navigate(`/status?${query}`);
 
     setSubmitting(false);
   };
