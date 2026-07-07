@@ -196,6 +196,10 @@ export const Main = () => {
       try {
         const result = await getOrder(orderId!);
         if (result) {
+          result.fills = result.fills.filter((fill) => fill.state !== 'CANCELED');
+          result.fulfillments = result.fulfillments.filter(
+            (fulfillment) => fulfillment.state !== 'CANCELED'
+          );
           setOrderDataLocally(result, currentPharmacy);
 
           if (options.triggerNavigationAfterFetch) {
