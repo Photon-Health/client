@@ -1,3 +1,4 @@
+import { FulfillmentType } from 'packages/sdk/src/types';
 import { Order } from './models';
 
 export type OrderFetchRedirectPath = '/canceled' | '/pharmacy' | '/status' | '/review';
@@ -5,6 +6,25 @@ export type OrderFetchRedirectPath = '/canceled' | '/pharmacy' | '/status' | '/r
 export const hasSingleAutoRouteWithNoReroutes = (order: Order): boolean => {
   const routingHistory = order.metadata?.routingHistory ?? [];
   return routingHistory.length === 1 && routingHistory[0]?.selector === 'AUTO';
+};
+
+export const hasSingleProviderRouteWithNoReroutes = (order: Order): boolean => {
+  const routingHistory = order.metadata?.routingHistory ?? [];
+  return routingHistory.length === 1 && routingHistory[0]?.selector === 'PROVIDER';
+};
+
+// We don't want to redirect to the Marketplace immediately for Mail-In Pharmacies
+// For now it's just a confusing experience, once we redesign the experience we should remove this.
+export const isOrderMailIn = (order: Order): boolean => {
+  return (
+    order.pharmacy?.fulfillmentTypes?.every(
+      (fulfillmentType) => fulfillmentType === FulfillmentType.MailOrder
+    ) ?? false
+  );
+};
+
+const isForCompoundMed = (order: Order): boolean => {
+  return order.fills.some((f) => f.treatment.__typename === 'Compound');
 };
 
 type OrderFetchRedirectOptions = {
@@ -21,7 +41,11 @@ export const getOrderFetchRedirectPath = (
 
   if (order.pharmacy?.id) {
     const shouldConfirmAutoRoutedPharmacy =
-      hasSingleAutoRouteWithNoReroutes(order) &&
+      (hasSingleAutoRouteWithNoReroutes(order) || hasSingleProviderRouteWithNoReroutes(order)) &&
+      // When Mail-In is pre-chosen the Market Place UI is really confusing
+      !isOrderMailIn(order) &&
+      // We don't want to show the marketplace for Compound Treatments
+      !isForCompoundMed(order) &&
       order.isReroutable &&
       !options.hasConfirmedAutoroutedPharmacy;
     return shouldConfirmAutoRoutedPharmacy ? '/pharmacy' : '/status';
