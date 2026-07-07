@@ -14,13 +14,7 @@ import {
 } from '../test-utils/generators';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
-import {
-  getOfferBundles,
-  getOrder,
-  getPharmaciesByLocation,
-  rerouteOrder,
-  setOrderPharmacy
-} from '../api';
+import { getOrder, getPharmaciesByLocation, rerouteOrder, setOrderPharmacy } from '../api';
 import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
 import { FulfillmentType } from '../__generated__/graphql';
 import { OfferBundleDetails } from '../utils/models';
@@ -122,8 +116,6 @@ describe('Pharmacy page', () => {
     let fetchOfferBundlesMock: MockedFunction<typeof fetchOfferBundles>;
     let getPharmacyMock: MockedFunction<typeof getPharmacy>;
     let getOrderMock: MockedFunction<typeof getOrder>;
-    let getPharmaciesByLocationMock: MockedFunction<typeof getPharmaciesByLocation>;
-    let setOrderPharmacyMock: MockedFunction<typeof setOrderPharmacy>;
 
     const mockOfferBundles: OfferBundleDetails[] = [
       {
@@ -169,8 +161,6 @@ describe('Pharmacy page', () => {
       });
 
       getOrderMock = vi.mocked(getOrder);
-      getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
-      setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
     });
     test('shows offers when they are available and price is enabled', async () => {
       const singlePrescriptionOrder = generateOrder({
@@ -833,23 +823,28 @@ describe('Pharmacy page', () => {
       }
     });
 
-    test('Submitting auto-routed pharmacy stores confirmation in localStorage and calls rerouteOrder', async () => {
+    test('Submitting auto-routed pharmacy stores confirmation in localStorage', async () => {
       renderApp();
       await navigateToPharmacyScreen();
 
       await userEvent.click(await screen.findByText(testAutoroutedPharmacy.name));
       await userEvent.click(await screen.findByText(text.selectPharmacy));
 
-      await waitFor(() => screen.findByText(text.thankYou), { timeout: 3000 });
       await waitFor(() => screen.findByText(/preparing order/i), { timeout: 3000 });
 
       expect(hasConfirmedAutoroutedPharmacy('ord_testId777')).toBe(true);
-      expect(vi.mocked(rerouteOrder)).toHaveBeenCalledWith(
-        'ord_testId777',
-        testAutoroutedPharmacy.id,
-        expect.anything(),
-        expect.anything()
-      );
+    }, 15_000);
+
+    test('Submitting auto-routed pharmacy navigates to status page without routing or rerouting order', async () => {
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      await userEvent.click(await screen.findByText(testAutoroutedPharmacy.name));
+      await userEvent.click(await screen.findByText(text.selectPharmacy));
+
+      await waitFor(() => screen.findByText(/preparing order/i), { timeout: 3000 });
+
+      expect(vi.mocked(rerouteOrder)).not.toHaveBeenCalled();
       expect(vi.mocked(setOrderPharmacy)).not.toHaveBeenCalled();
     }, 15_000);
 

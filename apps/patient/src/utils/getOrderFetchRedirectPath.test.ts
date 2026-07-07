@@ -1,8 +1,26 @@
+import { FulfillmentType } from 'packages/sdk/src/types';
 import { generateOrder, generatePatient, generatePharmacy } from '../test-utils/generators';
 import {
   getOrderFetchRedirectPath,
-  hasSingleAutoRouteWithNoReroutes
+  hasSingleAutoRouteWithNoReroutes,
+  hasSingleProviderRouteWithNoReroutes
 } from './getOrderFetchRedirectPath';
+import { Fill } from './models';
+
+describe('When the order routing history has multiple entries', () => {
+  const order = generateOrder({
+    metadata: {
+      routingHistory: [{ selector: 'AUTO' }, { selector: 'PATIENT' }]
+    }
+  });
+  test('hasSingleAutoRouteWithNoReroutes is false', () => {
+    expect(hasSingleAutoRouteWithNoReroutes(order)).toBe(false);
+  });
+
+  test('hasSingleProviderRouteWithNoReroutes is false', () => {
+    expect(hasSingleProviderRouteWithNoReroutes(order)).toBe(false);
+  });
+});
 
 test('hasSingleAutoRouteWithNoReroutes is true for sole AUTO routing history entry', () => {
   const order = generateOrder({
@@ -14,14 +32,14 @@ test('hasSingleAutoRouteWithNoReroutes is true for sole AUTO routing history ent
   expect(hasSingleAutoRouteWithNoReroutes(order)).toBe(true);
 });
 
-test('hasSingleAutoRouteWithNoReroutes is false when routing history has multiple entries', () => {
+test('hasSingleProviderRouteWithNoReroutes is true for sole PROVIDER routing history entry', () => {
   const order = generateOrder({
     metadata: {
-      routingHistory: [{ selector: 'AUTO' }, { selector: 'PATIENT' }]
+      routingHistory: [{ selector: 'PROVIDER' }]
     }
   });
 
-  expect(hasSingleAutoRouteWithNoReroutes(order)).toBe(false);
+  expect(hasSingleProviderRouteWithNoReroutes(order)).toBe(true);
 });
 
 test('getOrderFetchRedirectPath returns /canceled when order state is CANCELED', () => {
@@ -39,6 +57,54 @@ test('getOrderFetchRedirectPath returns /pharmacy when pharmacy was auto-routed 
   });
 
   expect(getOrderFetchRedirectPath(order)).toBe('/pharmacy');
+});
+
+test('getOrderFetchRedirectPath returns /pharmacy when pharmacy was provider-routed and reroutable', () => {
+  const order = generateOrder({
+    state: 'ROUTING',
+    isReroutable: true,
+    pharmacy: generatePharmacy({ id: 'phr_auto' }),
+    metadata: {
+      routingHistory: [{ selector: 'PROVIDER' }]
+    }
+  });
+
+  expect(getOrderFetchRedirectPath(order)).toBe('/pharmacy');
+});
+
+test('getOrderFetchRedirectPath returns /status when pharmacy was provider-routed and reroutable, but has a Mail-In Pharmacy', () => {
+  const order = generateOrder({
+    state: 'ROUTING',
+    isReroutable: true,
+    pharmacy: generatePharmacy({ id: 'phr_auto', fulfillmentTypes: [FulfillmentType.MailOrder] }),
+    metadata: {
+      routingHistory: [{ selector: 'PROVIDER' }]
+    }
+  });
+
+  expect(getOrderFetchRedirectPath(order)).toBe('/status');
+});
+
+test('getOrderFetchRedirectPath returns /status when pharmacy was provider-routed and reroutable, but has a Compound Treatment', () => {
+  const order = generateOrder({
+    state: 'ROUTING',
+    isReroutable: true,
+    pharmacy: generatePharmacy({ id: 'phr_auto' }),
+    fills: [
+      {
+        treatment: {
+          __typename: 'Compound',
+          name: 'Compound Treatment',
+          id: 'cmd_1234'
+        }
+      } as Fill
+    ],
+    metadata: {
+      routingHistory: [{ selector: 'PROVIDER' }]
+    }
+  });
+
+  expect(getOrderFetchRedirectPath(order)).toBe('/status');
 });
 
 test('getOrderFetchRedirectPath returns /status when auto-routed pharmacy was confirmed locally', () => {
