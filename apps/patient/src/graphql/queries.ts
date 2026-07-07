@@ -55,6 +55,7 @@ export const GET_ORDER = gql`
           pharmacy {
             id
             name
+            fulfillmentTypes
           }
           selector
           createdAt
