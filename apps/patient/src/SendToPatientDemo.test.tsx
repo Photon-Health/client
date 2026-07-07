@@ -58,11 +58,11 @@ describe('Send To Patient Demo', () => {
     expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
     expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
-    expect(screen.getByText('Home Delivery')).toBeInTheDocument();
-    await userEvent.click(screen.getByText('See all mail orders'));
+    expect(screen.getByText('Delivery')).toBeInTheDocument();
 
+    await userEvent.click(screen.getByText('Delivery'));
     await userEvent.click(screen.getByText('Capsule Pharmacy'));
-    await userEvent.click(screen.getByText('Place Order'));
+    await userEvent.click(screen.getByText('Select pharmacy'));
 
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
 

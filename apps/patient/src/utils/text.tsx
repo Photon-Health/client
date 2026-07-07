@@ -34,7 +34,7 @@ export const text = {
   changePharmacy: 'Change pharmacy',
   daysSupply: 'Days supply',
   delivered: 'Delivered',
-  delivery: 'Home Delivery',
+  delivery: 'Delivery',
   directions: 'Get directions',
   dismiss: 'Dismiss',
   enterLoc: 'Enter a zipcode or address',

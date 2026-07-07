@@ -5,16 +5,23 @@ export type MailOrderSelectListProps = {
   options: MailOrderPharmacyOption[];
   onSelect: (val: MailOrderPharmacyOption) => unknown;
   selectedId?: string;
+  autoroutedPharmacyId?: string;
 };
 
-export function MailOrderSelectList({ options, onSelect, selectedId }: MailOrderSelectListProps) {
+export function MailOrderSelectList({
+  options,
+  onSelect,
+  selectedId,
+  autoroutedPharmacyId
+}: MailOrderSelectListProps) {
   return (
-    <VStack w="full">
+    <VStack w="full" align="stretch">
       {options?.map((option) => (
         <MailOrderSelectCard
           {...option}
           key={option.id}
           selected={selectedId === option.id}
+          isAutoroutedPharmacy={!!autoroutedPharmacyId && option.id === autoroutedPharmacyId} // show special styling and "Sent here"
           onClick={onSelect}
         />
       ))}
