@@ -126,15 +126,6 @@ function getRoutingAction({
   return RoutingAction.Route;
 }
 
-const getInitialProviderRoute = (order: Order) => {
-  const routingHistory = order.metadata?.routingHistory ?? [];
-  const initialRoute = routingHistory[0];
-  if (!initialRoute || initialRoute.selector !== 'PROVIDER') {
-    return null;
-  }
-  return initialRoute;
-};
-
 export const Pharmacy = () => {
   const {
     order,
@@ -733,13 +724,13 @@ export const Pharmacy = () => {
       selectedId: pharmacyId,
       searchParams
     });
+
     patientAnalytics.track('Pharmacy Selected', order, {
       pharmacyId: pharmacyId,
       pharmacyName: selectedPharmacy?.name,
       pharmacyRank: allPharmacies.findIndex((p) => p.id === pharmacyId) + 1,
       isPreferred: pharmacyId === effectivePreferredPharmacyId,
       routingAction,
-      providerRouteFulfillmentType: getInitialProviderRoute(order)?.pharmacy?.fulfillmentTypes?.[0],
       enablePrice: enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined
     });
@@ -805,7 +796,6 @@ export const Pharmacy = () => {
       pharmacyName: selectedPharmacy.name,
       isPreferred: selectedPharmacy.id === effectivePreferredPharmacyId,
       routingAction,
-      providerRouteFulfillmentType: getInitialProviderRoute(order)?.pharmacy?.fulfillmentTypes?.[0],
       enablePrice,
       hasPrice: selectedPharmacy.price !== undefined,
       price: selectedPharmacy.price || selectedOffer?.costAmount,
