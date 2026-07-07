@@ -23,15 +23,8 @@ function PharmacyTypeTab({
       borderBottom="2px solid"
       borderColor={selected ? 'blue.500' : 'transparent'}
       role="tab"
-      tabIndex={0}
       aria-selected={selected}
       onClick={onClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick();
-        }
-      }}
     >
       {label}
     </Text>
