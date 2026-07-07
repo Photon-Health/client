@@ -3,7 +3,7 @@ import { afterEach, describe, expect, vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
-import { getOfferBundles, triggerDemoNotification } from './api';
+import { triggerDemoNotification } from './api';
 import { demoPharmacies } from './data/demoPharmacies';
 
 vi.mock('./api', () => ({
@@ -48,11 +48,6 @@ describe('Send To Patient Demo', () => {
     await userEvent.click(screen.getByText('Select pharmacy'));
 
     // wait for 2sec button animations to complete
-    await screen.findByText('When do you need your order ready by?', {}, { timeout: 2100 });
-
-    await userEvent.click(screen.getByText('Urgent'));
-    await userEvent.click(screen.getByText('Next'));
-
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
   }, 10_000);

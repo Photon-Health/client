@@ -19,7 +19,7 @@ import { FixedFooter, LocationModal, PoweredBy } from '../components';
 import { CouponModal } from '../components/coupons';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy, wait } from '../utils/general';
-import { Pharmacy as EnrichedPharmacy, OfferBundleDetails } from '../utils/models';
+import { Pharmacy as EnrichedPharmacy, OfferBundleDetails, Order } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -66,15 +66,14 @@ import {
   clearAutoroutedPharmacyConfirmation,
   markAutoroutedPharmacyConfirmed
 } from '../utils/autoroutedPharmacyConfirmationStorage';
-import { hasSingleAutoRouteWithNoReroutes } from '../utils/getOrderFetchRedirectPath';
+import {
+  hasSingleAutoRouteWithNoReroutes,
+  hasSingleProviderRouteWithNoReroutes
+} from '../utils/getOrderFetchRedirectPath';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
 const WALGREENS_PHARMACY_RADIUS = 15; // miles
-
-function isMailOrderPharmacy(pharmacy: EnrichedPharmacy): boolean {
-  return !!pharmacy.fulfillmentTypes?.includes('MAIL_ORDER');
-}
 
 function FulfillmentTypeTabBar() {
   // TODO: eventually we'll have more than one selectable fulfillment type in this bar (mail order)
@@ -95,6 +94,36 @@ function FulfillmentTypeTabBar() {
       {t.pickUp}
     </Text>
   );
+}
+
+/** Which action is the patient taking when they submit their pharmacy selection? */
+enum RoutingAction {
+  /** Patient selects a new pharmacy for an order that already has one */
+  Reroute = 'reroute',
+  /** Patient selects a new pharmacy for an order that doesn't have one */
+  Route = 'route',
+  /** Patient selects existing pharmacy on order, "confirming" it */
+  Confirmation = 'confirmation'
+}
+
+function getRoutingAction({
+  order,
+  selectedId,
+  searchParams
+}: {
+  order: Order;
+  selectedId: string;
+  searchParams: URLSearchParams;
+}): RoutingAction {
+  if (selectedId === order.pharmacy?.id) {
+    return RoutingAction.Confirmation;
+  }
+
+  if (!!order.pharmacy?.id || !!searchParams.get('reroute')) {
+    return RoutingAction.Reroute;
+  }
+
+  return RoutingAction.Route;
 }
 
 export const Pharmacy = () => {
@@ -125,7 +154,6 @@ export const Pharmacy = () => {
   // search params
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const isReroute = (!!order?.isReroutable && !!order?.pharmacy?.id) || searchParams.get('reroute');
   const openNow = searchParams.get('openNow');
   const phone = searchParams.get('phone');
 
@@ -150,8 +178,23 @@ export const Pharmacy = () => {
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
   const [mailOrderModalOpen, setMailOrderModalOpen] = useState<boolean>(false);
 
-  // selection state
+  // selected pharmacy
   const [selectedId, setSelectedId] = useState<string>('');
+  const routingAction = getRoutingAction({ order, selectedId, searchParams });
+  // pharmacy is considered autorouted if the patient did not actively choose it
+  // - show "sent here" card styling
+  // - selecting it persists confirmation in local storage
+  const autoroutedPharmacyId =
+    order &&
+    (hasSingleAutoRouteWithNoReroutes(order) || hasSingleProviderRouteWithNoReroutes(order))
+      ? order.pharmacy?.id
+      : undefined;
+  // order.pharmacy when not autorouted, unrelated to selectedPharmacy
+  // - show grey card styling + "current pharmacy" tag
+  const currentPharmacyId =
+    order?.pharmacy?.id && order.pharmacy.id !== autoroutedPharmacyId
+      ? order.pharmacy.id
+      : undefined;
 
   // Submitting state
   const [submitting, setSubmitting] = useState<boolean>(false);
@@ -172,14 +215,6 @@ export const Pharmacy = () => {
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
   const isLoading = loadingLocation || loadingPharmacies;
   const orderIsMultiRx = flattenedFills.length > 1;
-  // sole auto route — "sent here" card; selecting it persists confirmation in local storage
-  const autoroutedPharmacyId =
-    order && hasSingleAutoRouteWithNoReroutes(order) ? order.pharmacy?.id : undefined;
-  // order.pharmacy when not autorouted — grey card + "current pharmacy" tag; unrelated to selected
-  const currentPharmacyId =
-    order?.pharmacy?.id && order.pharmacy.id !== autoroutedPharmacyId
-      ? order.pharmacy.id
-      : undefined;
 
   // pricing
   const shouldTrackOfferImpressionsAndSelections = enablePrice && !isDemo;
@@ -324,15 +359,6 @@ export const Pharmacy = () => {
       setFilteredOffers(filteringOffers);
     }
   }, [enablePrice, offers, order, brandedOptionsOverride]);
-
-  const showToastWarning = () =>
-    toast({
-      title: isReroute ? 'Unable to change pharmacies' : 'Unable to submit pharmacy selection',
-      description: isReroute
-        ? 'Your order is already being processed. Text us if you need it sent to a different pharmacy.'
-        : 'Please refresh and try again',
-      ...TOAST_CONFIG.WARNING
-    });
 
   const reset = () => {
     setTopRankedPharmacies([]);
@@ -671,6 +697,8 @@ export const Pharmacy = () => {
     setSelectedId(pharmacyId);
     setShowFooter(true);
 
+    // Clearing this on select as well to capture that
+    // patient is no longer 100% sure about the existing pharmacy
     if (order && pharmacyId !== autoroutedPharmacyId) {
       clearAutoroutedPharmacyConfirmation(order.id);
     }
@@ -689,11 +717,20 @@ export const Pharmacy = () => {
     const selectedPharmacy = [...allPharmacies, ...pharmaciesFromOffers].find(
       (p) => p.id === pharmacyId
     );
+    // Calculate routingAction locally since
+    // setSelectedId state update will not have registered yet
+    const routingAction = getRoutingAction({
+      order: order,
+      selectedId: pharmacyId,
+      searchParams
+    });
+
     patientAnalytics.track('Pharmacy Selected', order, {
       pharmacyId: pharmacyId,
       pharmacyName: selectedPharmacy?.name,
       pharmacyRank: allPharmacies.findIndex((p) => p.id === pharmacyId) + 1,
-      isReroute: !!isReroute,
+      isPreferred: pharmacyId === effectivePreferredPharmacyId,
+      routingAction,
       enablePrice: enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined
     });
@@ -753,17 +790,16 @@ export const Pharmacy = () => {
     persistAutoroutedPharmacyConfirmation(selectedPharmacy.id);
 
     const selectedOffer = filteredOffers?.find((o) => o.pharmacy.id === selectedPharmacy.id);
-    const isMailOrder = isMailOrderPharmacy(selectedPharmacy);
 
     patientAnalytics.track('Pharmacy Selection Submitted', order, {
       pharmacyId: selectedPharmacy.id,
-      pharmacyName: selectedPharmacy?.name,
-      isReroute: !!isReroute,
-      isMailOrder,
+      pharmacyName: selectedPharmacy.name,
+      isPreferred: selectedPharmacy.id === effectivePreferredPharmacyId,
+      routingAction,
       enablePrice,
-      hasPrice: selectedPharmacy?.price !== undefined,
-      price: selectedPharmacy?.price || selectedOffer?.costAmount,
-      retailPrice: selectedPharmacy?.retailPrice || selectedOffer?.retailAmount
+      hasPrice: selectedPharmacy.price !== undefined,
+      price: selectedPharmacy.price || selectedOffer?.costAmount,
+      retailPrice: selectedPharmacy.retailPrice || selectedOffer?.retailAmount
     });
 
     if (isDemo) {
@@ -799,94 +835,99 @@ export const Pharmacy = () => {
       buttonText
     });
 
-    const isSkipReadyBySelectionPageEnabled = patientAnalytics.getFlagValueSync(
-      'remove_ready_by_selection_page'
-    ).skipReadyBySelectionPage;
+    // If the patient is simply confirming, navigate back to the status page
+    if (routingAction === RoutingAction.Confirmation) {
+      setSubmitting(false);
+      setSuccessfullySubmitted(true);
+      const query = queryString.stringify({
+        orderId: order.id,
+        token,
+        type: overrideType
+      });
+      return navigate(`/status?${query}`);
+    }
 
-    // If it's a mail order pharmacy, submit the pharmacy to the order
-    // Otherwise, just navigate to ready by selection
-    if (isMailOrder || isReroute || isSkipReadyBySelectionPageEnabled) {
-      trackSelectedPharmacyRank(selectedPharmacy.id, allPharmaciesIncludingOffers);
+    trackSelectedPharmacyRank(selectedPharmacy.id, allPharmaciesIncludingOffers);
 
-      try {
-        const patientSelectedPrice = enablePrice;
-        const result = isReroute
-          ? await rerouteOrder(order.id, selectedPharmacy.id, patientSelectedPrice, reason)
+    const showSubmitWarning = () =>
+      toast({
+        title:
+          routingAction === RoutingAction.Reroute
+            ? 'Unable to change pharmacies'
+            : 'Unable to submit pharmacy selection',
+        description:
+          routingAction === RoutingAction.Reroute
+            ? 'Your order is already being processed. Text us if you need it sent to a different pharmacy.'
+            : 'Please refresh and try again',
+        ...TOAST_CONFIG.WARNING
+      });
+
+    try {
+      const result =
+        routingAction === RoutingAction.Reroute
+          ? await rerouteOrder(order.id, selectedPharmacy.id, enablePrice, reason)
           : await setOrderPharmacy(
               order.id,
               selectedPharmacy.id,
               order.readyBy ?? undefined,
               order.readyByDay ?? undefined,
               order.readyByTime,
-              patientSelectedPrice
+              enablePrice
             );
 
-        await new Promise<void>((resolve) =>
-          setTimeout(() => {
-            if (result) {
-              setSuccessfullySubmitted(true);
-              setTimeout(async () => {
-                setShowFooter(false);
+      await new Promise<void>((resolve) =>
+        setTimeout(() => {
+          if (result) {
+            setSuccessfullySubmitted(true);
+            setTimeout(async () => {
+              setShowFooter(false);
 
-                // necessary to ensure the order is updated with the new coupon before navigating
-                const updatedOrder = await fetchOrder(overridePharmacy);
+              // necessary to ensure the order is updated with the new coupon before navigating
+              const updatedOrder = await fetchOrder(overridePharmacy);
 
-                if (updatedOrder) {
-                  updatedOrder.fulfillment = {
-                    ...updatedOrder.fulfillment,
-                    type: overrideType as FulfillmentType,
-                    state: updatedOrder.fulfillment?.state ?? 'CREATED'
-                  };
-                  setOrder({
-                    ...updatedOrder,
-                    isReroutable: !isReroute,
-                    exceptions: updatedOrder.exceptions.map((exception) => ({
-                      ...exception,
-                      resolvedAt: new Date().toISOString()
-                    })),
-                    pharmacy: overridePharmacy
-                  });
-                }
-
-                const query = queryString.stringify({
-                  orderId: order.id,
-                  token,
-                  type: overrideType
+              if (updatedOrder) {
+                updatedOrder.fulfillment = {
+                  ...updatedOrder.fulfillment,
+                  type: overrideType as FulfillmentType,
+                  state: updatedOrder.fulfillment?.state ?? 'CREATED'
+                };
+                setOrder({
+                  ...updatedOrder,
+                  isReroutable: routingAction === RoutingAction.Route,
+                  exceptions: updatedOrder.exceptions.map((exception) => ({
+                    ...exception,
+                    resolvedAt: new Date().toISOString()
+                  })),
+                  pharmacy: overridePharmacy
                 });
-                resolve();
-                return navigate(`/status?${query}`);
-              }, 1000);
-            } else {
-              showToastWarning();
-              resolve();
-            }
-          }, 1000)
-        );
-        setSubmitting(false);
-      } catch (_error: any) {
-        showToastWarning();
-        setSubmitting(false);
-        if (isReroute) {
-          setOrder({ ...order, isReroutable: false });
-          const query = queryString.stringify({
-            orderId: order.id,
-            token
-          });
-          return navigate(`/status?${query}`);
-        }
-      }
-    } else {
-      // for non mail order pharmacies, just navigate to ready by selection
-      // Store the selected pharmacy in the order context temporarily
-      const { selectedPharmacy } = getPharmacy(allPharmaciesIncludingOffers, selectedId);
-      setOrder({
-        ...order,
-        pharmacy: selectedPharmacy
-      });
+              }
 
+              const query = queryString.stringify({
+                orderId: order.id,
+                token,
+                type: overrideType
+              });
+              resolve();
+              return navigate(`/status?${query}`);
+            }, 1000);
+          } else {
+            showSubmitWarning();
+            resolve();
+          }
+        }, 1000)
+      );
       setSubmitting(false);
-      const query = queryString.stringify({ orderId: order.id, token });
-      return navigate(`/readyBy?${query}`);
+    } catch (_error: any) {
+      showSubmitWarning();
+      setSubmitting(false);
+      if (routingAction === RoutingAction.Reroute) {
+        setOrder({ ...order, isReroutable: false });
+        const query = queryString.stringify({
+          orderId: order.id,
+          token
+        });
+        return navigate(`/status?${query}`);
+      }
     }
   };
 
@@ -958,13 +999,8 @@ export const Pharmacy = () => {
       selectedPharmacy.address ? formatAddress(selectedPharmacy.address) : undefined
     );
 
-    if (isMailOrderPharmacy(selectedPharmacy)) {
-      const query = queryString.stringify({ demo: true, phone });
-      navigate(`/status?${query}`);
-    } else {
-      const query = queryString.stringify({ demo: true, phone });
-      navigate(`/readyBy?${query}`);
-    }
+    const query = queryString.stringify({ demo: true, phone });
+    navigate(`/status?${query}`);
 
     setSubmitting(false);
   };

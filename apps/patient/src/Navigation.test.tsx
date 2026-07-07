@@ -100,7 +100,7 @@ describe('App', () => {
     resetFeatureFlagMocks();
   });
 
-  test('For Local Pickup Pharmacies: navigate from pharmacy > readyBy > status', async () => {
+  test('For Local Pickup Pharmacies: navigate from pharmacy > status', async () => {
     const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('./api');
     const getOrderMock = vi.mocked(getOrder);
     getOrderMock.mockResolvedValue(testOrder);
@@ -125,25 +125,20 @@ describe('App', () => {
     await expectTotalPageViewAnalyticsCountToBe(1);
     await userEvent.click(screen.getByText('Test Local Pickup Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
-    expect(setOrderPharmacyMock).not.toHaveBeenCalled();
-    expect(await screen.findByText('When do you need your order ready by?')).toBeInTheDocument();
-    await expectTotalPageViewAnalyticsCountToBe(2);
-    await userEvent.click(screen.getByText('Urgent'));
-    await userEvent.click(screen.getByText('Next'));
     expect(setOrderPharmacyMock).toHaveBeenCalledWith(
       'ord_testId777',
       'phr_testId123',
-      'Urgent',
-      'Today',
-      expect.anything(),
+      undefined,
+      undefined,
+      undefined,
       true
     );
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
-    await expectTotalPageViewAnalyticsCountToBe(3);
+    await expectTotalPageViewAnalyticsCountToBe(2);
   }, 10_000);
 
-  test('For Mail Order Pharmacies: skips the readyBy page', async () => {
+  test('For Mail Order Pharmacies: navigate from pharmacy > status', async () => {
     const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('./api');
     const getOrderMock = vi.mocked(getOrder);
     getOrderMock.mockResolvedValue(testOrder);
@@ -165,9 +160,9 @@ describe('App', () => {
     renderApp({ order: testOrder });
 
     expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
+    await expectTotalPageViewAnalyticsCountToBe(1);
     await userEvent.click(screen.getByText('Test Mail Order Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
-    expect(setOrderPharmacyMock).toHaveBeenCalled();
     expect(setOrderPharmacyMock).toHaveBeenCalledWith(
       'ord_testId777',
       'SUPER_TEST_MAIL_ORDER_PHARMACY',
@@ -179,6 +174,7 @@ describe('App', () => {
 
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
+    await expectTotalPageViewAnalyticsCountToBe(2);
   }, 10_000);
 
   test('skips review and lands on pharmacy when patient has address', async () => {
