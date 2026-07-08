@@ -49,7 +49,8 @@ import {
   BenefitsBanner,
   BrandedOptionOverrides,
   BrandedOptions,
-  PickupPharmacyCardList
+  PickupPharmacyCardList,
+  SentPharmacyBanner
 } from '../components/pharmacy-card-list';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
@@ -177,6 +178,8 @@ export const Pharmacy = () => {
   const [activeTab, setActiveTab] = useState<PharmacyTabKey>(
     orderPharmacyIsMailOrder ? 'delivery' : 'pickup'
   );
+
+  const sentPharmacyName = autoroutedPharmacyId ? order?.pharmacy?.name : undefined;
 
   // Captures the tab shown on first load (Page Opened fires once when the order resolves).
   usePageAnalytics({ pageName: 'Pharmacy Select', properties: { activeTab } });
@@ -1210,6 +1213,11 @@ export const Pharmacy = () => {
 
           {activeTab === 'delivery' ? (
             <TabPanel ariaLabel="Select a delivery pharmacy" pb={showFooter ? 32 : 8}>
+              <SentPharmacyBanner
+                sentPharmacyName={sentPharmacyName}
+                sentToMailOrder={orderPharmacyIsMailOrder}
+                activeTab={activeTab}
+              />
               {showBrandedOptions && (
                 <BrandedOptions
                   options={brandedOptions}
@@ -1238,7 +1246,12 @@ export const Pharmacy = () => {
               ) : null}
             </TabPanel>
           ) : (
-            <TabPanel ariaLabel="Select a pharmacy" pb={showFooter ? 32 : 8}>
+            <TabPanel ariaLabel="Select a pickup pharmacy" pb={showFooter ? 32 : 8}>
+              <SentPharmacyBanner
+                sentPharmacyName={sentPharmacyName}
+                sentToMailOrder={orderPharmacyIsMailOrder}
+                activeTab={activeTab}
+              />
               <PickupPharmacyCardList
                 location={patientLocation}
                 pharmacies={pickupPharmacies}
