@@ -1238,6 +1238,10 @@ export const Pharmacy = () => {
                   selectedId={selectedId}
                   autoroutedPharmacyId={autoroutedPharmacyId}
                   onSelect={(option) => handleSelect(option.id)}
+                  shouldTrackOfferImpressionsAndSelections={
+                    shouldTrackOfferImpressionsAndSelections
+                  }
+                  numberOfPrecedingOptions={brandedOptions.length}
                 />
               ) : brandedOptions.length === 0 ? (
                 <Text fontSize="sm" color="gray.600" py={4}>
