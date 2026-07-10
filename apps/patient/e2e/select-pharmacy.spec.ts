@@ -19,9 +19,12 @@ test('displays order status for a freshly created order', async ({ page }) => {
     timeout: 15_000
   });
 
-  const pharmacyListGroup = page.getByRole('radiogroup', { name: /select a pharmacy/i });
+  const pharmacyListGroup = page.getByRole('radiogroup', { name: /select a pickup pharmacy/i });
   const pharmacyCardToSelect = pharmacyListGroup.getByRole('radio').nth(1);
   const selectedPharmacyName = await pharmacyCardToSelect.getAttribute('aria-label');
+  if (selectedPharmacyName == null) {
+    throw new Error('Selected pharmacy radio is missing an aria-label');
+  }
   await pharmacyCardToSelect.click();
   await page.getByRole('button', { name: /select pharmacy/i }).click();
 
