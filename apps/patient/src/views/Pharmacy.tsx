@@ -645,7 +645,7 @@ export const Pharmacy = () => {
         }
       } catch (error: any) {
         toast({ ...TOAST_CONFIG.WARNING, title: 'Unable to get pharmacies' });
-        console.log('Get pharmacies error: ', error);
+        console.error('Get pharmacies error: ', error);
       }
       setLoadingPharmacies(false);
     };
@@ -1186,8 +1186,6 @@ export const Pharmacy = () => {
 
   const showBrandedOptions =
     !isDemo && (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined);
-
-  console.log({ orderRouted, submitting });
 
   return (
     <Box>
