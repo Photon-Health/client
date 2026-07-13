@@ -113,7 +113,7 @@ enum InitialRouteType {
   PatientPending = 'patient-pending',
   /** Sent to patient and patient selected a pharmacy */
   Patient = 'patient',
-  /** System routed to preferred pharmacy */
+  /** Sent to patient, patient made no selection, system routed to preferred pharmacy */
   PreferredPharmacy = 'preferred-pharmacy',
   /** Provider routed to local pickup pharmacy */
   Pickup = 'pickup',
