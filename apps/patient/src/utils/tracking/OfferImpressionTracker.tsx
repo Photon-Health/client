@@ -6,6 +6,14 @@ import { getOfferType } from '../offers';
 import { Prescription } from '../../__generated__/graphql';
 import { usePatientAnalytics } from '../../hooks/usePatientAnalytics';
 
+// this is a set of offer impression keys that have been tracked
+// emptied on page load so as not to track impressions unnecessarily
+const trackedOfferImpressions = new Set<string>();
+
+function getOfferImpressionKey(orderId: string, pharmacyId: string): string {
+  return `${orderId}:${pharmacyId}`;
+}
+
 const OfferImpressionTracker = ({
   children,
   offer = undefined,
@@ -29,6 +37,15 @@ const OfferImpressionTracker = ({
     rootMargin: '-100px',
     onChange: (inView) => {
       if (inView && enabled) {
+        // only wanna track impressions per order/pharmacy per page load
+        // to minimize impressione explosion when swappin between tabs
+        const impressionKey = getOfferImpressionKey(order.id, pharmacy.id);
+        if (trackedOfferImpressions.has(impressionKey)) {
+          return;
+        }
+
+        trackedOfferImpressions.add(impressionKey);
+
         const rxIds = new Set(
           order.fills
             .map((f) => f.prescription)
@@ -42,6 +59,7 @@ const OfferImpressionTracker = ({
         patientAnalytics.track('Offer Impression', order, {
           offerType,
           offerShown: !!price,
+          pharmacyFulfillmentType: pharmacy.fulfillmentTypes?.[0] ?? 'None',
           pharmacy_id: pharmacy.id,
           pharmacy_name: pharmacy.name,
           ordinal_position: ordinalPosition,
