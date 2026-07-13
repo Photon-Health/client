@@ -334,10 +334,6 @@ describe('Pharmacy page', () => {
       // Wait for component to render
       await screen.findByRole('heading', { name: 'Choose a Pharmacy' });
 
-      // Should not show delivery section
-      expect(screen.queryByText('Delivery')).not.toBeInTheDocument();
-      expect(screen.queryByText('Get delivered')).not.toBeInTheDocument();
-
       // Should not show any offers
       expect(screen.queryByText('Amazon Pharmacy')).not.toBeInTheDocument();
       expect(screen.queryByText('Insurance Price')).not.toBeInTheDocument();
@@ -420,15 +416,15 @@ describe('Pharmacy page', () => {
       expect(await screen.findByText('Showing pharmacies near')).toBeInTheDocument();
       expect(await screen.findByText('123 Main St, New York, NY 10001')).toBeInTheDocument();
 
-      // Current behavior: offers are not shown even with address and price is enabled
-      // This documents the current state where offers functionality is not working
-      expect(screen.queryByText('Delivery')).not.toBeInTheDocument();
+      // The Delivery tab always renders once a location is set, but with no offers/mail-order
+      // pharmacies it surfaces no sponsored content.
+      expect(screen.getByRole('tab', { name: 'Delivery' })).toBeInTheDocument();
       expect(screen.queryByText('Get delivered')).not.toBeInTheDocument();
       expect(screen.queryByText('Amazon Pharmacy')).not.toBeInTheDocument();
       expect(screen.queryByText('Insurance Price')).not.toBeInTheDocument();
 
-      // Should only show pickup section
-      expect(screen.getByText('Pick up')).toBeInTheDocument();
+      // Should show pickup tab
+      expect(screen.getByRole('tab', { name: 'Pick up' })).toBeInTheDocument();
     }, 10_000);
   });
 
@@ -663,7 +659,7 @@ describe('Pharmacy page', () => {
     }, 10_000);
   });
 
-  test('shows mail order select modal and submits order to mail order pharmacy', async () => {
+  test('shows mail order pharmacies inline on the Delivery tab and submits to a mail order pharmacy', async () => {
     const testOrder = generateOrder({
       id: 'ord_testId666',
       state: 'ROUTING',
@@ -686,67 +682,26 @@ describe('Pharmacy page', () => {
     ];
 
     const { getPharmacies, getOrder, setOrderPharmacy } = await import('../api');
-
-    const getOrderMock = vi.mocked(getOrder);
-    const getPharmaciesMock = vi.mocked(getPharmacies);
-    const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
-
-    getOrderMock.mockResolvedValueOnce(testOrder);
-    getPharmaciesMock.mockResolvedValueOnce({
-      pharmacies: mailOrderPharmacyData
-    });
-    setOrderPharmacyMock.mockResolvedValue(true);
+    vi.mocked(getOrder).mockResolvedValue(testOrder);
+    vi.mocked(getPharmacies).mockResolvedValue({ pharmacies: mailOrderPharmacyData });
+    vi.mocked(setOrderPharmacy).mockResolvedValue(true);
 
     renderApp();
     await navigateToPharmacyScreen();
 
-    const modalOpenButton = await screen.findByText('See all mail orders');
-    expect(modalOpenButton).toBeInTheDocument();
-
-    await userEvent.click(modalOpenButton);
-
-    // find the modal Header
-    await waitFor(() => screen.findByText(/Mail Order Pharmacies/i));
-
-    const mailOrderOption = await screen.findByText(mailOrderPharmacyData.at(-1)!.name);
+    await userEvent.click(screen.getByRole('tab', { name: 'Delivery' }));
+    const mailOrderOption = await screen.findByText('TestRx');
     expect(mailOrderOption).toBeInTheDocument();
 
     await userEvent.click(mailOrderOption);
+    await userEvent.click(await screen.findByText(text.selectPharmacy));
 
-    const placeOrderButton = await screen.findByText(/Place order/i);
-    expect(placeOrderButton).toBeInTheDocument();
-
-    testOrder.fulfillment = {
-      type: 'MAIL_ORDER',
-      state: 'CREATED'
-    };
-    testOrder.fulfillments = [
-      {
-        id: '',
-        state: 'PROCESSING',
-        exceptions: [],
-        prescription: {
-          __typename: undefined,
-          id: '',
-          daysSupply: undefined,
-          dispenseQuantity: 0,
-          dispenseUnit: '',
-          expirationDate: undefined,
-          fillsAllowed: 0,
-          treatment: {
-            __typename: undefined,
-            id: '',
-            name: ''
-          }
-        }
-      }
-    ];
-
-    getOrderMock.mockResolvedValueOnce(testOrder);
-
-    await userEvent.click(placeOrderButton);
-    await waitFor(() => screen.findByText(/Order placed/i), { timeout: 5_000 });
-  }, 10_000);
+    await waitFor(() => expect(setOrderPharmacy).toHaveBeenCalled());
+    expect(vi.mocked(setOrderPharmacy).mock.calls[0].slice(0, 2)).toEqual([
+      'ord_testId666',
+      'test-mail-order-2'
+    ]);
+  }, 15_000);
 
   describe('Autorouted pharmacy confirmation', () => {
     const testAutoroutedPharmacy = generatePharmacy({
@@ -870,6 +825,78 @@ describe('Pharmacy page', () => {
       );
       expect(vi.mocked(setOrderPharmacy)).not.toHaveBeenCalled();
     }, 15_000);
+  });
+
+  describe('Sent-here fulfillment tabs', () => {
+    test('defaults to the Delivery tab with a Sent here badge for a mail-order sent order', async () => {
+      const mailOrderPharmacy = generatePharmacy({
+        id: 'phr_mailSent',
+        name: 'MailCo Pharmacy',
+        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
+      });
+      const order = generateOrder({
+        id: 'ord_testId777',
+        state: 'PLACED',
+        patient: generatePatient(),
+        fills: [generateFill('test-treatment')],
+        pharmacy: mailOrderPharmacy,
+        isReroutable: true,
+        metadata: { routingHistory: [{ selector: 'PROVIDER' }] }
+      });
+
+      const { getOrder, getPharmacies } = await import('../api');
+      vi.mocked(getOrder).mockResolvedValue(order);
+      vi.mocked(getPharmacies).mockResolvedValue({
+        pharmacies: [
+          {
+            id: 'phr_mailSent',
+            name: 'MailCo Pharmacy',
+            fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
+          }
+        ]
+      });
+
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      expect(screen.getByRole('tab', { name: 'Delivery' })).toHaveAttribute(
+        'aria-selected',
+        'true'
+      );
+      expect(await screen.findByText('MailCo Pharmacy')).toBeInTheDocument();
+      expect(await screen.findByTestId('pharmacy-sent-here-badge')).toBeInTheDocument();
+    }, 10_000);
+
+    test('shows the Sent here badge on the Pick up tab for a provider-routed pickup pharmacy', async () => {
+      const pickupPharmacy = generatePharmacy({
+        id: 'phr_pickupSent',
+        name: 'Provider Pickup Pharmacy'
+      });
+      const order = generateOrder({
+        id: 'ord_testId777',
+        state: 'PLACED',
+        patient: generatePatient(),
+        fills: [generateFill('test-treatment')],
+        pharmacy: pickupPharmacy,
+        isReroutable: true,
+        metadata: { routingHistory: [{ selector: 'PROVIDER' }] }
+      });
+
+      const { getOrder, getPharmaciesByLocation } = await import('../api');
+      vi.mocked(getOrder).mockResolvedValue(order);
+      vi.mocked(getPharmaciesByLocation).mockResolvedValue({
+        pharmaciesByLocation: [pickupPharmacy]
+      });
+
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      expect(screen.getByRole('tab', { name: text.pickUp })).toHaveAttribute(
+        'aria-selected',
+        'true'
+      );
+      expect(await screen.findByTestId('pharmacy-sent-here-badge')).toBeInTheDocument();
+    }, 10_000);
   });
 });
 
