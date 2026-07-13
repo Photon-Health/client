@@ -235,7 +235,8 @@ export const Pharmacy = () => {
 
   // Submitting state
   const [submitting, setSubmitting] = useState<boolean>(false);
-  const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
+  // We want to separately track if the order route request has completed successfully
+  const [orderRouted, setOrderRouted] = useState<boolean>(false);
 
   // Address state
   const [latitude, setLatitude] = useState<number>();
@@ -893,7 +894,7 @@ export const Pharmacy = () => {
     // If the patient is simply confirming, navigate back to the status page
     if (routingAction === RoutingAction.Confirmation) {
       setSubmitting(false);
-      setSuccessfullySubmitted(true);
+      setOrderRouted(true);
       const query = queryString.stringify({
         orderId: order.id,
         token,
@@ -930,48 +931,46 @@ export const Pharmacy = () => {
               enablePrice
             );
 
-      await new Promise<void>((resolve) =>
-        setTimeout(() => {
-          if (result) {
-            setSuccessfullySubmitted(true);
-            setTimeout(async () => {
-              setShowFooter(false);
+      if (result) {
+        // First, disable submit button handler
+        setOrderRouted(true);
 
-              // necessary to ensure the order is updated with the new coupon before navigating
-              const updatedOrder = await fetchOrder(overridePharmacy);
+        // Ensure the order is updated with the new coupon before navigating
+        const updatedOrder = await fetchOrder(overridePharmacy);
+        if (updatedOrder) {
+          updatedOrder.fulfillment = {
+            ...updatedOrder.fulfillment,
+            type: overrideType as FulfillmentType,
+            state: updatedOrder.fulfillment?.state ?? 'CREATED'
+          };
+          setOrder({
+            ...updatedOrder,
+            isReroutable: routingAction === RoutingAction.Route,
+            exceptions: updatedOrder.exceptions.map((exception) => ({
+              ...exception,
+              resolvedAt: new Date().toISOString()
+            })),
+            pharmacy: overridePharmacy
+          });
+        }
 
-              if (updatedOrder) {
-                updatedOrder.fulfillment = {
-                  ...updatedOrder.fulfillment,
-                  type: overrideType as FulfillmentType,
-                  state: updatedOrder.fulfillment?.state ?? 'CREATED'
-                };
-                setOrder({
-                  ...updatedOrder,
-                  isReroutable: routingAction === RoutingAction.Route,
-                  exceptions: updatedOrder.exceptions.map((exception) => ({
-                    ...exception,
-                    resolvedAt: new Date().toISOString()
-                  })),
-                  pharmacy: overridePharmacy
-                });
-              }
+        // Erase button loading state to show submitted state
+        setSubmitting(false);
+        // Let patient see submitted state
+        await wait(1000);
+        // Hide footer
+        setShowFooter(false);
 
-              const query = queryString.stringify({
-                orderId: order.id,
-                token,
-                type: overrideType
-              });
-              resolve();
-              return navigate(`/status?${query}`);
-            }, 1000);
-          } else {
-            showSubmitWarning();
-            resolve();
-          }
-        }, 1000)
-      );
-      setSubmitting(false);
+        const query = queryString.stringify({
+          orderId: order.id,
+          token,
+          type: overrideType
+        });
+        return navigate(`/status?${query}`);
+      } else {
+        showSubmitWarning();
+        setSubmitting(false);
+      }
     } catch (_error: any) {
       showSubmitWarning();
       setSubmitting(false);
@@ -1040,7 +1039,7 @@ export const Pharmacy = () => {
     persistAutoroutedPharmacyConfirmation(selectedPharmacy.id);
 
     await wait(1000);
-    setSuccessfullySubmitted(true);
+    setOrderRouted(true);
     await wait(1000);
 
     setShowFooter(false);
@@ -1349,14 +1348,14 @@ export const Pharmacy = () => {
             size="lg"
             borderRadius="lg"
             w="full"
-            variant={successfullySubmitted ? undefined : 'brand'}
-            colorScheme={successfullySubmitted ? 'green' : undefined}
-            leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
+            variant={orderRouted && !submitting ? undefined : 'brand'}
+            colorScheme={orderRouted && !submitting ? 'green' : undefined}
+            leftIcon={orderRouted && !submitting ? <FiCheck /> : undefined}
             disabled={selectedId == null}
             isDisabled={selectedId == null}
             isLoading={submitting}
             onClick={async () => {
-              if (successfullySubmitted) return;
+              if (orderRouted) return;
 
               // because offers aren't actually pharmacies
               // we'll transform them into things that resemble pharamcy objects
@@ -1391,7 +1390,7 @@ export const Pharmacy = () => {
               });
             }}
           >
-            {successfullySubmitted ? t.thankYou : t.selectPharmacy}
+            {orderRouted ? t.thankYou : t.selectPharmacy}
           </Button>
 
           <PoweredBy />
