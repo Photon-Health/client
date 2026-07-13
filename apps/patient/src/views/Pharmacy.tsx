@@ -4,7 +4,6 @@ import {
   Center,
   CircularProgress,
   Container,
-  Link,
   Text,
   useToast,
   VStack
@@ -50,14 +49,15 @@ import {
   BenefitsBanner,
   BrandedOptionOverrides,
   BrandedOptions,
-  BrandedOptionsHeader,
-  PickupPharmacyCardList
+  PickupPharmacyCardList,
+  SentPharmacyBanner
 } from '../components/pharmacy-card-list';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { OffersList } from '../components/offers/OffersList';
-import { MailOrderSelectModal } from '../components/mail-order-select';
+import { MailOrderSelectList } from '../components/mail-order-select';
 import { MailOrderPharmacyOption } from '../components/mail-order-select/MailOrderSelectCard';
+import { PharmacyTabKey, PharmacyTypeTabBar, TabPanel } from '../components/pharmacy-tabs';
 import { getOfferType } from '../utils/offers';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 import { MarketplaceSummary } from '../components/marketplace/summary/MarketplaceSummary';
@@ -74,27 +74,6 @@ import {
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
 const WALGREENS_PHARMACY_RADIUS = 15; // miles
-
-function FulfillmentTypeTabBar() {
-  // TODO: eventually we'll have more than one selectable fulfillment type in this bar (mail order)
-  // for now, we'll just show the pickup tab bar
-  return (
-    <Text
-      as="span"
-      display="inline-block"
-      fontWeight="semibold"
-      fontSize="md"
-      color="gray.900"
-      pb={3}
-      borderBottom="2px solid"
-      borderColor="blue.500"
-      aria-selected="true"
-      role="tab"
-    >
-      {t.pickUp}
-    </Text>
-  );
-}
 
 /** Which action is the patient taking when they submit their pharmacy selection? */
 enum RoutingAction {
@@ -190,7 +169,6 @@ export const Pharmacy = () => {
   } = useOrderContext();
   // We don't want to collect data on demo activity
   const patientAnalytics = usePatientAnalytics();
-  usePageAnalytics({ pageName: 'Pharmacy Select' });
 
   const mailOrderPharmacies = getOrgMailOrderPharms(order?.organization.id).patient;
   const { enablePatientDeliveryPharmacies, patientFeaturedPharmacyName } =
@@ -227,7 +205,6 @@ export const Pharmacy = () => {
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
-  const [mailOrderModalOpen, setMailOrderModalOpen] = useState<boolean>(false);
 
   // selected pharmacy
   const [selectedId, setSelectedId] = useState<string>('');
@@ -246,6 +223,17 @@ export const Pharmacy = () => {
     order?.pharmacy?.id && order.pharmacy.id !== autoroutedPharmacyId
       ? order.pharmacy.id
       : undefined;
+
+  // default tab is based on order's pharmacy fulfillment type
+  const orderPharmacyIsMailOrder = !!order?.pharmacy?.fulfillmentTypes?.includes('MAIL_ORDER');
+  const [activeTab, setActiveTab] = useState<PharmacyTabKey>(
+    orderPharmacyIsMailOrder ? 'delivery' : 'pickup'
+  );
+
+  const sentPharmacyName = autoroutedPharmacyId ? order?.pharmacy?.name : undefined;
+
+  // Captures the tab shown on first load (Page Opened fires once when the order resolves).
+  usePageAnalytics({ pageName: 'Pharmacy Select', properties: { activeTab } });
 
   // Submitting state
   const [submitting, setSubmitting] = useState<boolean>(false);
@@ -289,7 +277,7 @@ export const Pharmacy = () => {
   // Pharmacy results
   const [topRankedPharmacies, setTopRankedPharmacies] = useState<EnrichedPharmacy[]>([]);
   const [pharmacyResults, setPharmacyResults] = useState<EnrichedPharmacy[]>([]);
-  const allPharmacies = useMemo(() => {
+  const pickupPharmacies = useMemo(() => {
     const topRankedIds = topRankedPharmacies.map((p) => p.id);
     const combined = [
       ...topRankedPharmacies,
@@ -765,9 +753,15 @@ export const Pharmacy = () => {
       retailPrice: o.retailAmount ?? 0
     }));
 
-    const selectedPharmacy = [...allPharmacies, ...pharmaciesFromOffers].find(
-      (p) => p.id === pharmacyId
-    );
+    const selectedPharmacy: EnrichedPharmacy | undefined = [
+      ...pickupPharmacies,
+      ...pharmaciesFromOffers,
+      ...(patientMailOrderOptions ?? [])
+    ].find((p) => p.id === pharmacyId);
+
+    const pickupRankIndex = pickupPharmacies.findIndex((p) => p.id === pharmacyId);
+    const mailOrderRankIndex = inlineMailOrderOptions.findIndex((p) => p.id === pharmacyId);
+    const rankIndex = pickupRankIndex >= 0 ? pickupRankIndex : mailOrderRankIndex;
     // Calculate routingAction locally since
     // setSelectedId state update will not have registered yet
     const routingAction = getRoutingAction({
@@ -778,13 +772,22 @@ export const Pharmacy = () => {
     patientAnalytics.track('Pharmacy Selected', order, {
       pharmacyId: pharmacyId,
       pharmacyName: selectedPharmacy?.name,
-      pharmacyRank: allPharmacies.findIndex((p) => p.id === pharmacyId) + 1,
+      pharmacyRank: rankIndex >= 0 ? rankIndex + 1 : undefined,
       isPreferred: pharmacyId === effectivePreferredPharmacyId,
       routingAction,
       initialRouteType: getInitialRouteType(order),
       enablePrice: enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined
     });
+  };
+
+  const handleTabChange = (tab: PharmacyTabKey) => {
+    if (tab !== activeTab) {
+      patientAnalytics.track('Pharmacy Type Tab Clicked', order, {
+        tabName: tab
+      });
+    }
+    setActiveTab(tab);
   };
 
   const trackSelectedPharmacyRank = (
@@ -870,7 +873,7 @@ export const Pharmacy = () => {
       retailPrice: o.retailAmount ?? 0
     }));
 
-    const allPharmaciesIncludingOffers = [...pharmaciesFromOffers, ...allPharmacies];
+    const allPharmaciesIncludingOffers = [...pharmaciesFromOffers, ...pickupPharmacies];
 
     // TODO: Remove this once we've got all pharmacies marked correctly in the db
     // this historically was overriding pharmaicy type and presentation due to an inept datamodel
@@ -988,7 +991,7 @@ export const Pharmacy = () => {
 
     setSavingPreferred(true);
 
-    const selectedPharmacy = allPharmacies.find((p) => p.id === pharmacyId);
+    const selectedPharmacy = pickupPharmacies.find((p) => p.id === pharmacyId);
 
     patientAnalytics.track('Set Preferred Pharmacy', order, {
       pharmacyId: pharmacyId,
@@ -1112,16 +1115,18 @@ export const Pharmacy = () => {
       extraOfferMetadata.selectedFrom = selectedFrom;
       extraOfferMetadata.buttonText = buttonText;
 
+      const visiblePharmacyList =
+        activeTab === 'delivery'
+          ? [...offersArray, ...brandedOptionObjects, ...inlineMailOrderOptions]
+          : [...offersArray, ...pickupPharmacies];
+
       patientAnalytics.track('Offer Selected', order, {
         ...selectedPharmacy,
         ...extraOfferMetadata,
         pharmacyId: selectedId,
         pharmacyType: selectedOfferPharmacy?.fulfillmentTypes?.[0],
-        // allPharmacies does not included branded options so we must combine them
-        ordinalPosition:
-          [...offersArray, ...brandedOptionObjects, ...allPharmacies].findIndex(
-            (p) => p.id === selectedId
-          ) + 1
+        activeTab,
+        ordinalPosition: visiblePharmacyList.findIndex((p) => p.id === selectedId) + 1
       });
     }
   };
@@ -1165,21 +1170,19 @@ export const Pharmacy = () => {
   ]).filter((id) => !filteredOffers?.map((offer) => offer.pharmacy.id).includes(id));
   // filter out any branded options that are in the offers list
 
-  const showBrandedOptionsHeader =
-    (brandedOptions.length > 0 || (filteredOffers || []).length > 0) && !!patientLocation;
+  const brandedAndOfferIds = new Set<string>([
+    ...brandedOptions,
+    ...(filteredOffers ?? []).map((offer) => offer.pharmacy.id)
+  ]);
+  // The full mail-order list excluding pharmacies already shown as branded options or offers
+  const inlineMailOrderOptions = (patientMailOrderOptions ?? []).filter(
+    (option) => !brandedAndOfferIds.has(option.id)
+  );
 
-  const showOffers =
-    enableCourier ||
-    enableMailOrder ||
-    showBrandedOptionsHeader ||
-    (filteredOffers || []).length > 0;
+  const showOffers = enableCourier || enableMailOrder || (filteredOffers || []).length > 0;
 
   const showBrandedOptions =
-    !isDemo &&
-    (enableCourier ||
-      enableMailOrder ||
-      brandedOptionsOverride !== undefined ||
-      showBrandedOptionsHeader);
+    !isDemo && (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined);
 
   return (
     <Box>
@@ -1190,13 +1193,6 @@ export const Pharmacy = () => {
       </Helmet>
 
       <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
-
-      <MailOrderSelectModal
-        isOpen={mailOrderModalOpen}
-        onClose={() => setMailOrderModalOpen(false)}
-        onConfirm={handleSubmit}
-        options={patientMailOrderOptions}
-      />
 
       <Box bgColor="white" p={4} borderBottom="1px" borderColor="gray.200">
         <Container px={-3}>
@@ -1239,9 +1235,6 @@ export const Pharmacy = () => {
                   role="radiogroup"
                   aria-label="Select a pharmacy"
                 >
-                  {showBrandedOptionsHeader && (
-                    <BrandedOptionsHeader title={t.delivery} description={t.getDelivered} />
-                  )}
                   {showOffers && (
                     <OffersList
                       offers={filteredOffers || []}
@@ -1255,20 +1248,6 @@ export const Pharmacy = () => {
                       handleSelect={handleSelect}
                     />
                   )}
-                  {showBrandedOptions && (
-                    <BrandedOptions
-                      options={brandedOptions}
-                      location={patientLocation}
-                      selectedId={selectedId}
-                      handleSelect={handleSelect}
-                      autoroutedPharmacyId={autoroutedPharmacyId}
-                      currentPharmacyId={currentPharmacyId}
-                      brandedOptionOverrides={brandedOptionsOverride ?? {}}
-                      shouldTrackOfferImpressionsAndSelections={
-                        shouldTrackOfferImpressionsAndSelections
-                      }
-                    />
-                  )}
                 </VStack>
               )}
             </VStack>
@@ -1280,77 +1259,87 @@ export const Pharmacy = () => {
         <>
           <Box bg="white" w="full" borderBottom="1px" borderColor="gray.200" px={4} pt={4} pb={0}>
             <Container px={-3}>
-              <FulfillmentTypeTabBar />
+              <PharmacyTypeTabBar activeTab={activeTab} onTabChange={handleTabChange} />
             </Container>
           </Box>
-          <Box bg="gray.50" w="full" px={4}>
-            <Container px={-3} pb={showFooter ? 32 : 8} pt={4}>
-              <VStack
-                spacing={2}
-                align="stretch"
-                w="full"
-                rowGap="6"
-                role="radiogroup"
-                aria-label="Select a pharmacy"
-              >
-                <PickupPharmacyCardList
+
+          {activeTab === 'delivery' ? (
+            <TabPanel ariaLabel="Select a delivery pharmacy" pb={showFooter ? 32 : 8}>
+              <SentPharmacyBanner
+                sentPharmacyName={sentPharmacyName}
+                sentToMailOrder={orderPharmacyIsMailOrder}
+                activeTab={activeTab}
+              />
+              {showBrandedOptions && (
+                <BrandedOptions
+                  options={brandedOptions}
                   location={patientLocation}
-                  pharmacies={allPharmacies}
-                  preferredPharmacy={effectivePreferredPharmacyId}
-                  savingPreferred={savingPreferred}
                   selectedId={selectedId}
                   handleSelect={handleSelect}
-                  handleShowMore={handleShowMore}
-                  handleSetPreferred={handleSetPreferredPharmacy}
-                  loadingMore={isLoading}
-                  showingAllPharmacies={showingAllPharmacies}
-                  showPrice={isDemo || !orderIsMultiRx}
-                  enableOpenNow={enableOpenNow}
-                  enable24Hr={enable24Hr}
-                  enablePrice={enablePrice}
-                  setEnableOpenNow={setEnableOpenNow}
-                  setEnable24Hr={setEnable24Hr}
-                  showFilters={false}
                   autoroutedPharmacyId={autoroutedPharmacyId}
                   currentPharmacyId={currentPharmacyId}
-                  setCouponModalOpen={setCouponModalOpen}
-                  numberOfBrandedOptions={brandedOptions.length}
+                  brandedOptionOverrides={brandedOptionsOverride ?? {}}
                   shouldTrackOfferImpressionsAndSelections={
                     shouldTrackOfferImpressionsAndSelections
                   }
-                >
-                  <BenefitsBanner
-                    onTooltipClick={() =>
-                      patientAnalytics.track('Benefits Banner Tooltip Clicked', order)
-                    }
-                  />
-                  {patientMailOrderOptions?.length ? (
-                    <Box
-                      w="full"
-                      bg="white"
-                      border="1px solid"
-                      borderColor="gray.200"
-                      borderRadius="lg"
-                      px={4}
-                      py={3}
-                    >
-                      <Text fontSize="sm" color="gray.600">
-                        Don&apos;t see your pharmacy?{' '}
-                        <Link
-                          as="button"
-                          color="blue.500"
-                          fontWeight="semibold"
-                          onClick={() => setMailOrderModalOpen(true)}
-                        >
-                          See all mail orders
-                        </Link>
-                      </Text>
-                    </Box>
-                  ) : null}
-                </PickupPharmacyCardList>
-              </VStack>
-            </Container>
-          </Box>
+                />
+              )}
+              {inlineMailOrderOptions.length > 0 ? (
+                <MailOrderSelectList
+                  options={inlineMailOrderOptions}
+                  selectedId={selectedId}
+                  autoroutedPharmacyId={autoroutedPharmacyId}
+                  onSelect={(option) => handleSelect(option.id)}
+                  shouldTrackOfferImpressionsAndSelections={
+                    shouldTrackOfferImpressionsAndSelections
+                  }
+                  numberOfPrecedingOptions={brandedOptions.length}
+                />
+              ) : brandedOptions.length === 0 ? (
+                <Text fontSize="sm" color="gray.600" py={4}>
+                  No delivery pharmacies available.
+                </Text>
+              ) : null}
+            </TabPanel>
+          ) : (
+            <TabPanel ariaLabel="Select a pickup pharmacy" pb={showFooter ? 32 : 8}>
+              <SentPharmacyBanner
+                sentPharmacyName={sentPharmacyName}
+                sentToMailOrder={orderPharmacyIsMailOrder}
+                activeTab={activeTab}
+              />
+              <PickupPharmacyCardList
+                location={patientLocation}
+                pharmacies={pickupPharmacies}
+                preferredPharmacy={effectivePreferredPharmacyId}
+                savingPreferred={savingPreferred}
+                selectedId={selectedId}
+                handleSelect={handleSelect}
+                handleShowMore={handleShowMore}
+                handleSetPreferred={handleSetPreferredPharmacy}
+                loadingMore={isLoading}
+                showingAllPharmacies={showingAllPharmacies}
+                showPrice={isDemo || !orderIsMultiRx}
+                enableOpenNow={enableOpenNow}
+                enable24Hr={enable24Hr}
+                enablePrice={enablePrice}
+                setEnableOpenNow={setEnableOpenNow}
+                setEnable24Hr={setEnable24Hr}
+                showFilters={false}
+                autoroutedPharmacyId={autoroutedPharmacyId}
+                currentPharmacyId={currentPharmacyId}
+                setCouponModalOpen={setCouponModalOpen}
+                numberOfBrandedOptions={brandedOptions.length}
+                shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
+              >
+                <BenefitsBanner
+                  onTooltipClick={() =>
+                    patientAnalytics.track('Benefits Banner Tooltip Clicked', order)
+                  }
+                />
+              </PickupPharmacyCardList>
+            </TabPanel>
+          )}
         </>
       )}
 
@@ -1380,7 +1369,11 @@ export const Pharmacy = () => {
                 retailPrice: o.retailAmount ?? 0
               }));
 
-              const allPharmaciesIncludingOffers = [...pharmaciesFromOffers, ...allPharmacies];
+              const allPharmaciesIncludingOffers = [
+                ...pharmaciesFromOffers,
+                ...pickupPharmacies,
+                ...(patientMailOrderOptions ?? [])
+              ];
 
               const selectedPharmacy = allPharmaciesIncludingOffers.find(
                 (p) => p.id === selectedId
@@ -1391,7 +1384,9 @@ export const Pharmacy = () => {
               }
 
               await handleSubmit(selectedPharmacy, {
-                selectedFrom: 'Main List',
+                selectedFrom: inlineMailOrderOptions.some((o) => o.id === selectedId)
+                  ? 'Mail Order List'
+                  : 'Main List',
                 buttonText: t.selectPharmacy
               });
             }}

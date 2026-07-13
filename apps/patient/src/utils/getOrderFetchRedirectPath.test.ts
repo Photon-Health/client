@@ -72,7 +72,7 @@ test('getOrderFetchRedirectPath returns /pharmacy when pharmacy was provider-rou
   expect(getOrderFetchRedirectPath(order)).toBe('/pharmacy');
 });
 
-test('getOrderFetchRedirectPath returns /status when pharmacy was provider-routed and reroutable, but has a Mail-In Pharmacy', () => {
+test('getOrderFetchRedirectPath returns /pharmacy when pharmacy was provider-routed to a Mail-In pharmacy and reroutable', () => {
   const order = generateOrder({
     state: 'ROUTING',
     isReroutable: true,
@@ -82,7 +82,22 @@ test('getOrderFetchRedirectPath returns /status when pharmacy was provider-route
     }
   });
 
-  expect(getOrderFetchRedirectPath(order)).toBe('/status');
+  expect(getOrderFetchRedirectPath(order)).toBe('/pharmacy');
+});
+
+test('getOrderFetchRedirectPath returns /status when auto-routed pharmacy was confirmed locally', () => {
+  const order = generateOrder({
+    state: 'ROUTING',
+    isReroutable: true,
+    pharmacy: generatePharmacy({ id: 'phr_auto' }),
+    metadata: {
+      routingHistory: [{ selector: 'AUTO' }]
+    }
+  });
+
+  expect(getOrderFetchRedirectPath(order, { hasConfirmedAutoroutedPharmacy: true })).toBe(
+    '/status'
+  );
 });
 
 test('getOrderFetchRedirectPath returns /status when pharmacy was provider-routed and reroutable, but has a Compound Treatment', () => {
@@ -105,21 +120,6 @@ test('getOrderFetchRedirectPath returns /status when pharmacy was provider-route
   });
 
   expect(getOrderFetchRedirectPath(order)).toBe('/status');
-});
-
-test('getOrderFetchRedirectPath returns /status when auto-routed pharmacy was confirmed locally', () => {
-  const order = generateOrder({
-    state: 'ROUTING',
-    isReroutable: true,
-    pharmacy: generatePharmacy({ id: 'phr_auto' }),
-    metadata: {
-      routingHistory: [{ selector: 'AUTO' }]
-    }
-  });
-
-  expect(getOrderFetchRedirectPath(order, { hasConfirmedAutoroutedPharmacy: true })).toBe(
-    '/status'
-  );
 });
 
 test('getOrderFetchRedirectPath returns /status when pharmacy was auto-routed but not reroutable', () => {
