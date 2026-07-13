@@ -4,6 +4,7 @@ import {
   PharmacySelectionProvider,
   PrescribeEventDispatchProvider,
   PrescribeProvider,
+  PrescriptionOverrides,
   PrescriptionScreeningProvider,
   RecentOrders,
   SupervisorPrefill,
@@ -31,6 +32,8 @@ export interface PrescribeWorkflowComponentProps extends PrescribeProps {
   templateIds?: string;
   templateOverrides?: TemplateOverrides;
   prescriptionIds?: string;
+  prescriptionOverrides?: PrescriptionOverrides;
+  prescriptionExternalId?: string;
   enableCoverageCheck: boolean;
   pharmacyId?: string;
   enableLocalPickup: boolean;
@@ -66,6 +69,8 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
           templateIdsPrefill={props.templateIds?.split(',').map((id) => id.trim()) || []}
           templateOverrides={props.templateOverrides || {}}
           prescriptionIdsPrefill={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
+          prescriptionOverrides={props.prescriptionOverrides || {}}
+          prescriptionExternalId={props.prescriptionExternalId}
           enableCombineAndDuplicate={props.enableCombineAndDuplicate}
           additionalNotes={props.additionalNotes}
           weight={props.weight}
@@ -138,6 +143,8 @@ customElement(
     templateIds: undefined,
     templateOverrides: undefined,
     prescriptionIds: undefined,
+    prescriptionOverrides: undefined,
+    prescriptionExternalId: undefined,
     hideSubmit: false,
     hideTemplates: false,
     hidePatientCard: false,

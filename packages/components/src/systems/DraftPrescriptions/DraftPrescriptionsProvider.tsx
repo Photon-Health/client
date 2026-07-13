@@ -54,23 +54,31 @@ interface DraftPrescriptionProviderProps {
   templateIdsPrefill: string[];
   templateOverrides: TemplateOverrides;
   prescriptionIdsPrefill: string[];
+  prescriptionOverrides: PrescriptionOverrides;
+  prescriptionExternalId?: string;
   enableCombineAndDuplicate: boolean;
   additionalNotes?: string;
   weight?: number;
   weightUnit?: string;
 }
 
+export type PrescriptionOverride = {
+  daysSupply?: number;
+  dispenseAsWritten?: boolean;
+  dispenseQuantity?: number;
+  dispenseUnit?: string;
+  fillsAllowed?: number;
+  instructions?: string;
+  notes?: string;
+  externalId?: string;
+};
+
 export type TemplateOverrides = {
-  [key: string]: {
-    daysSupply?: number;
-    dispenseAsWritten?: boolean;
-    dispenseQuantity?: number;
-    dispenseUnit?: string;
-    fillsAllowed?: number;
-    instructions?: string;
-    notes?: string;
-    externalId?: string;
-  };
+  [templateId: string]: PrescriptionOverride;
+};
+
+export type PrescriptionOverrides = {
+  [prescriptionId: string]: PrescriptionOverride;
 };
 
 export type PrescriptionFormData = {
@@ -158,7 +166,10 @@ const createPrefillPrescriptionsOnApi = async ({
           query: GetPrescription,
           variables: { id: prescriptionId }
         });
-        return transformPrescriptionFormData(data?.prescription, props.patientId);
+        return {
+          ...transformPrescriptionFormData(data?.prescription, props.patientId),
+          ...props.prescriptionOverrides?.[prescriptionId]
+        };
       })
     );
     rxToCreate = rxToCreate.concat(fetchedPrescriptions);
@@ -283,10 +294,22 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
   ): Promise<Prescription> => {
     let createdPrescription: Prescription | null = null;
 
+    const variables = transformPrescriptionFormData(prescriptionFormData, props.patientId);
+    if (
+      props.prescriptionExternalId &&
+      !variables.externalId &&
+      !draftPrescriptions().some((rx) => rx.externalId === props.prescriptionExternalId)
+    ) {
+      // Stamp the host-provided external id on at most one live draft at a time:
+      // drafts that already carry an external id (prefills, edits) keep theirs, and
+      // deleting the stamped draft frees the id for the next prescription.
+      variables.externalId = props.prescriptionExternalId;
+    }
+
     try {
       const res = await client.apollo.mutate({
         mutation: CreatePrescription,
-        variables: transformPrescriptionFormData(prescriptionFormData, props.patientId)
+        variables
       });
       const created = res.data.createPrescription as Prescription;
       createdPrescription = created;
