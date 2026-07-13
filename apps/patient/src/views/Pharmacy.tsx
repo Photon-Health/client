@@ -109,8 +109,6 @@ function getRoutingAction({
 enum InitialRouteType {
   /** System routed to open order pharmacy */
   OpenOrderPharmacy = 'open-order-pharmacy',
-  /** Sent to patient and patient has not yet selected a pharmacy */
-  PatientPending = 'patient-pending',
   /** Sent to patient and patient selected a pharmacy */
   Patient = 'patient',
   /** Sent to patient, patient made no selection, system routed to preferred pharmacy */
@@ -122,14 +120,14 @@ enum InitialRouteType {
 }
 
 /**
- * @returns If null, we should look into why we were not able to determine the initial route.
+ * @returns If null while there is routing history,
+ * we should look into why we were not able to determine the initial route.
  */
 function getInitialRouteType(order: Order): InitialRouteType | null {
   const routingHistory = order.metadata?.routingHistory || [];
   if (!routingHistory.length) {
-    // Empty routing history > order created without pharmacy
-    // > order was sent to patient but patient hasn't routed yet
-    return InitialRouteType.PatientPending;
+    // Empty routing history > order not routed yet
+    return null;
   }
   const initialRoute = _.sortBy(routingHistory, 'createdAt')[0];
   if (!initialRoute?.selector) {
@@ -775,6 +773,7 @@ export const Pharmacy = () => {
       pharmacyRank: rankIndex >= 0 ? rankIndex + 1 : undefined,
       isPreferred: pharmacyId === effectivePreferredPharmacyId,
       routingAction,
+      hasInitialRoute: !!order.metadata?.routingHistory.length,
       initialRouteType: getInitialRouteType(order),
       enablePrice: enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined
@@ -850,6 +849,7 @@ export const Pharmacy = () => {
       pharmacyName: selectedPharmacy.name,
       isPreferred: selectedPharmacy.id === effectivePreferredPharmacyId,
       routingAction,
+      hasInitialRoute: !!order.metadata?.routingHistory.length,
       initialRouteType: getInitialRouteType(order),
       enablePrice,
       hasPrice: selectedPharmacy.price !== undefined,
