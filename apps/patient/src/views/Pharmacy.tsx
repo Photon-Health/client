@@ -105,6 +105,55 @@ function getRoutingAction({
   return RoutingAction.Route;
 }
 
+/** How was the order initially routed? */
+enum InitialRouteType {
+  /** System routed to open order pharmacy */
+  OpenOrderPharmacy = 'open-order-pharmacy',
+  /** Sent to patient and patient selected a pharmacy */
+  Patient = 'patient',
+  /** Sent to patient, patient made no selection, system routed to preferred pharmacy */
+  PreferredPharmacy = 'preferred-pharmacy',
+  /** Provider routed to local pickup pharmacy */
+  Pickup = 'pickup',
+  /** Provider routed to mail order pharmacy */
+  MailOrder = 'mail-order'
+}
+
+/**
+ * @returns If null while there is routing history,
+ * we should look into why we were not able to determine the initial route.
+ */
+function getInitialRouteType(order: Order): InitialRouteType | null {
+  const routingHistory = order.metadata?.routingHistory || [];
+  if (!routingHistory.length) {
+    // Empty routing history > order not routed yet
+    return null;
+  }
+  const initialRoute = _.sortBy(routingHistory, 'createdAt')[0];
+  if (!initialRoute?.selector) {
+    // Selector should always be defined but need this check for type narrowing
+    return null;
+  }
+  switch (initialRoute.selector) {
+    case 'AUTO':
+      return initialRoute.reason === 'SYSTEM_ORDER_ROUTED'
+        ? InitialRouteType.PreferredPharmacy
+        : initialRoute.reason === 'SYSTEM_ROUTED_TO_OPEN_ORDER_PHARMACY'
+        ? InitialRouteType.OpenOrderPharmacy
+        : null;
+    case 'PATIENT':
+      return InitialRouteType.Patient;
+    case 'PROVIDER':
+      return initialRoute.pharmacy?.fulfillmentTypes?.[0] === 'MAIL_ORDER'
+        ? InitialRouteType.MailOrder
+        : initialRoute.pharmacy?.fulfillmentTypes?.[0] === 'PICK_UP'
+        ? InitialRouteType.Pickup
+        : null;
+    default:
+      return null;
+  }
+}
+
 export const Pharmacy = () => {
   const {
     order,
@@ -718,13 +767,14 @@ export const Pharmacy = () => {
       selectedId: pharmacyId,
       searchParams
     });
-
     patientAnalytics.track('Pharmacy Selected', order, {
       pharmacyId: pharmacyId,
       pharmacyName: selectedPharmacy?.name,
       pharmacyRank: rankIndex >= 0 ? rankIndex + 1 : undefined,
       isPreferred: pharmacyId === effectivePreferredPharmacyId,
       routingAction,
+      hasInitialRoute: !!order.metadata?.routingHistory.length,
+      initialRouteType: getInitialRouteType(order),
       enablePrice: enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined
     });
@@ -799,6 +849,8 @@ export const Pharmacy = () => {
       pharmacyName: selectedPharmacy.name,
       isPreferred: selectedPharmacy.id === effectivePreferredPharmacyId,
       routingAction,
+      hasInitialRoute: !!order.metadata?.routingHistory.length,
+      initialRouteType: getInitialRouteType(order),
       enablePrice,
       hasPrice: selectedPharmacy.price !== undefined,
       price: selectedPharmacy.price || selectedOffer?.costAmount,
