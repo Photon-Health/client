@@ -45,7 +45,7 @@ import {
 } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
-import _, { sortBy } from 'lodash';
+import _ from 'lodash';
 import {
   BenefitsBanner,
   BrandedOptionOverrides,
@@ -141,7 +141,7 @@ enum InitialRouteType {
 }
 
 /**
- * Calculate the original fulfillment type that the provider selected in the prescribe element
+ * @returns If null, we should look into why we were not able to determine the initial route
  */
 function getInitialRouteType(order: Order): InitialRouteType | null {
   const routingHistory = order.metadata?.routingHistory || [];
@@ -149,7 +149,7 @@ function getInitialRouteType(order: Order): InitialRouteType | null {
     // Empty routing history > order created without pharmacy > order was sent to patient
     return InitialRouteType.Patient;
   }
-  const initialRoute = sortBy(routingHistory, 'createdAt')[0];
+  const initialRoute = _.sortBy(routingHistory, 'createdAt')[0];
   if (!initialRoute?.selector) {
     // Selector should always be defined but need this check for type narrowing
     return null;
