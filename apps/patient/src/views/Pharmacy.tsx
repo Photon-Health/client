@@ -141,7 +141,7 @@ enum InitialRouteType {
 }
 
 /**
- * @returns If null, we should look into why we were not able to determine the initial route
+ * @returns If null, we should look into why we were not able to determine the initial route.
  */
 function getInitialRouteType(order: Order): InitialRouteType | null {
   const routingHistory = order.metadata?.routingHistory || [];
@@ -778,7 +778,7 @@ export const Pharmacy = () => {
       pharmacyRank: allPharmacies.findIndex((p) => p.id === pharmacyId) + 1,
       isPreferred: pharmacyId === effectivePreferredPharmacyId,
       routingAction,
-      providerRouteType: getInitialRouteType(order),
+      initialRouteType: getInitialRouteType(order),
       enablePrice: enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined
     });
@@ -844,7 +844,7 @@ export const Pharmacy = () => {
       pharmacyName: selectedPharmacy.name,
       isPreferred: selectedPharmacy.id === effectivePreferredPharmacyId,
       routingAction,
-      providerRouteType: getInitialRouteType(order),
+      initialRouteType: getInitialRouteType(order),
       enablePrice,
       hasPrice: selectedPharmacy.price !== undefined,
       price: selectedPharmacy.price || selectedOffer?.costAmount,
