@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 import queryString from 'query-string';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { flushSync } from 'react-dom';
 import ReactGA from 'react-ga4';
 import { Helmet } from 'react-helmet';
 import { FiCheck } from 'react-icons/fi';
@@ -955,11 +956,14 @@ export const Pharmacy = () => {
         }
 
         // Erase button loading state to show submitted state
-        setSubmitting(false);
+        // flushSync forces the state update to happen without batching,
+        // so the patient actually sees the "Thank you!" state before we navigate away
+        flushSync(() => {
+          setSubmitting(false);
+        });
+
         // Let patient see submitted state
         await wait(1000);
-        // Hide footer
-        setShowFooter(false);
 
         const query = queryString.stringify({
           orderId: order.id,
@@ -1183,6 +1187,8 @@ export const Pharmacy = () => {
   const showBrandedOptions =
     !isDemo && (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined);
 
+  console.log({ orderRouted, submitting });
+
   return (
     <Box>
       {!isDemo && <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />}
@@ -1348,9 +1354,9 @@ export const Pharmacy = () => {
             size="lg"
             borderRadius="lg"
             w="full"
-            variant={orderRouted && !submitting ? undefined : 'brand'}
-            colorScheme={orderRouted && !submitting ? 'green' : undefined}
-            leftIcon={orderRouted && !submitting ? <FiCheck /> : undefined}
+            variant={orderRouted ? undefined : 'brand'}
+            colorScheme={orderRouted ? 'green' : undefined}
+            leftIcon={orderRouted ? <FiCheck /> : undefined}
             disabled={selectedId == null}
             isDisabled={selectedId == null}
             isLoading={submitting}
