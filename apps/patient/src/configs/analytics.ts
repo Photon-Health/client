@@ -189,7 +189,8 @@ function mapOrderToContextData(order: Order): ContextData {
       state: order.pharmacy?.address?.state || '',
       country: order.pharmacy?.address?.country || '',
       postalCode: order.pharmacy?.address?.postalCode || ''
-    }
+    },
+    fulfillmentTypes: order.pharmacy?.fulfillmentTypes || []
   };
 
   const contextDataFulfillments: ContextDataFulfillment[] = order.fulfillments.map(
