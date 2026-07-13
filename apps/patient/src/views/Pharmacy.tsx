@@ -45,7 +45,7 @@ import {
 } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
-import _ from 'lodash';
+import _, { sortBy } from 'lodash';
 import {
   BenefitsBanner,
   BrandedOptionOverrides,
@@ -124,6 +124,54 @@ function getRoutingAction({
   }
 
   return RoutingAction.Route;
+}
+
+/** How was the order initially routed? */
+enum InitialRouteType {
+  /** Sent to patient and patient selected a pharmacy */
+  Patient = 'patient',
+  /** Provider routed to local pickup pharmacy */
+  Pickup = 'pickup',
+  /** Provider routed to mail order pharmacy */
+  MailOrder = 'mail-order',
+  /** System routed to preferred pharmacy */
+  PreferredPharmacy = 'preferred-pharmacy',
+  /** System routed to open order pharmacy */
+  OpenOrderPharmacy = 'open-order-pharmacy'
+}
+
+/**
+ * Calculate the original fulfillment type that the provider selected in the prescribe element
+ */
+function getInitialRouteType(order: Order): InitialRouteType | null {
+  const routingHistory = order.metadata?.routingHistory || [];
+  if (!routingHistory.length) {
+    // Empty routing history > order created without pharmacy > order was sent to patient
+    return InitialRouteType.Patient;
+  }
+  const initialRoute = sortBy(routingHistory, 'createdAt')[0];
+  if (!initialRoute?.selector) {
+    // Selector should always be defined but need this check for type narrowing
+    return null;
+  }
+  switch (initialRoute.selector) {
+    case 'AUTO':
+      return initialRoute.reason === 'SYSTEM_ORDER_ROUTED'
+        ? InitialRouteType.PreferredPharmacy
+        : initialRoute.reason === 'SYSTEM_ROUTED_TO_OPEN_ORDER_PHARMACY'
+        ? InitialRouteType.OpenOrderPharmacy
+        : null;
+    case 'PATIENT':
+      return InitialRouteType.Patient;
+    case 'PROVIDER':
+      return initialRoute.pharmacy?.fulfillmentTypes?.[0] === 'MAIL_ORDER'
+        ? InitialRouteType.MailOrder
+        : initialRoute.pharmacy?.fulfillmentTypes?.[0] === 'PICK_UP'
+        ? InitialRouteType.Pickup
+        : null;
+    default:
+      return null;
+  }
 }
 
 export const Pharmacy = () => {
@@ -724,13 +772,13 @@ export const Pharmacy = () => {
       selectedId: pharmacyId,
       searchParams
     });
-
     patientAnalytics.track('Pharmacy Selected', order, {
       pharmacyId: pharmacyId,
       pharmacyName: selectedPharmacy?.name,
       pharmacyRank: allPharmacies.findIndex((p) => p.id === pharmacyId) + 1,
       isPreferred: pharmacyId === effectivePreferredPharmacyId,
       routingAction,
+      providerRouteType: getInitialRouteType(order),
       enablePrice: enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined
     });
@@ -796,6 +844,7 @@ export const Pharmacy = () => {
       pharmacyName: selectedPharmacy.name,
       isPreferred: selectedPharmacy.id === effectivePreferredPharmacyId,
       routingAction,
+      providerRouteType: getInitialRouteType(order),
       enablePrice,
       hasPrice: selectedPharmacy.price !== undefined,
       price: selectedPharmacy.price || selectedOffer?.costAmount,
