@@ -128,16 +128,18 @@ function getRoutingAction({
 
 /** How was the order initially routed? */
 enum InitialRouteType {
+  /** System routed to open order pharmacy */
+  OpenOrderPharmacy = 'open-order-pharmacy',
+  /** Sent to patient and patient has not yet selected a pharmacy */
+  PatientPending = 'patient-pending',
   /** Sent to patient and patient selected a pharmacy */
   Patient = 'patient',
+  /** System routed to preferred pharmacy */
+  PreferredPharmacy = 'preferred-pharmacy',
   /** Provider routed to local pickup pharmacy */
   Pickup = 'pickup',
   /** Provider routed to mail order pharmacy */
-  MailOrder = 'mail-order',
-  /** System routed to preferred pharmacy */
-  PreferredPharmacy = 'preferred-pharmacy',
-  /** System routed to open order pharmacy */
-  OpenOrderPharmacy = 'open-order-pharmacy'
+  MailOrder = 'mail-order'
 }
 
 /**
@@ -146,8 +148,9 @@ enum InitialRouteType {
 function getInitialRouteType(order: Order): InitialRouteType | null {
   const routingHistory = order.metadata?.routingHistory || [];
   if (!routingHistory.length) {
-    // Empty routing history > order created without pharmacy > order was sent to patient
-    return InitialRouteType.Patient;
+    // Empty routing history > order created without pharmacy
+    // > order was sent to patient but patient hasn't routed yet
+    return InitialRouteType.PatientPending;
   }
   const initialRoute = _.sortBy(routingHistory, 'createdAt')[0];
   if (!initialRoute?.selector) {
