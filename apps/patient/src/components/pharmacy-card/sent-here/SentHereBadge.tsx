@@ -18,7 +18,6 @@ export const SentHereBadge = ({ top = 0, selected = false }: SentHereBadgeProps)
       top={top}
       left={4}
       transform="translateY(-50%)"
-      zIndex={1}
       bgColor={bgColor}
       color={textColor}
       borderRadius="full"
