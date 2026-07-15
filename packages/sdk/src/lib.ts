@@ -34,7 +34,7 @@ export type {
   PhotonEmbedAnalyticsEventInput,
   AnalyticsCategory,
   AnalyticsEventMap
-} from './clinicalAnalyticsTypes';
+} from './analytics/clinicalAnalyticsTypes';
 
 const version: string = pkg?.version ?? 'unknown';
 

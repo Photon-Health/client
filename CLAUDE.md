@@ -297,7 +297,7 @@ Analytics applies only to the clinical and patient apps — **not** to `packages
 
 **Prescribe Workflow Analytics (Embed Events):** The prescribe workflow lives in Solid.js web components (`packages/elements`, `packages/components`), which cannot call RudderStack directly (they're published to npm and must not bundle customer-conflicting singletons). Instead, analytics events bubble up as CustomEvents through Shadow DOM to the React clinical app, which forwards them to RudderStack.
 
-*Event categories and types* — defined in `packages/sdk/src/clinicalAnalyticsTypes.ts`:
+*Event categories and types* — defined in `packages/sdk/src/analytics/clinicalAnalyticsTypes.ts`:
 
 | Category | Type | Description |
 |----------|------|-------------|
@@ -327,7 +327,7 @@ This dispatches a `photon-analytics-track-event` CustomEvent (`composed: true, b
 
 | File | Purpose |
 |------|---------|
-| `packages/sdk/src/clinicalAnalyticsTypes.ts` | Event type definitions (`AnalyticsCategory`, `AnalyticsEventMap`, `PageViewEvent`, `CtaClickEvent`, `FieldInteractionEvent`) |
+| `packages/sdk/src/analytics/clinicalAnalyticsTypes.ts` | Event type definitions (`AnalyticsCategory`, `AnalyticsEventMap`, `PageViewEvent`, `CtaClickEvent`, `FieldInteractionEvent`) |
 | `packages/components/src/analytics/dispatchAnalyticsTrackEvent.ts` | Generic dispatch function — creates and fires the CustomEvent |
 | `packages/components/src/analytics/buildFieldSnapshot.ts` | Field snapshot utilities and form field constants |
 | `packages/components/src/systems/PrescribeEventDispatchProvider.tsx` | Solid.js context provider exposing `dispatchAnalyticsTrackEvent` via `usePrescribeEventDispatch()` |
