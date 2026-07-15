@@ -98,6 +98,13 @@ export const clinicalApiUrl: { [key in Env]: string } = {
   photon: 'https://clinical-api.photon.health'
 };
 
+export const analyticsApiUrl: { [key in Env]: string } = {
+  tau: 'http://analytics-api.tau.health:8080',
+  boson: 'https://analytics-api.boson.health',
+  neutron: 'https://analytics-api.neutron.health',
+  photon: 'https://analytics-api.photon.health'
+};
+
 export function getClinicalUrl(uri: string): string | undefined {
   const foundService = Object.keys(clinicalAppUrl).find((service) =>
     uri.toLowerCase().includes(service)
@@ -105,3 +112,12 @@ export function getClinicalUrl(uri: string): string | undefined {
 
   return clinicalAppUrl[foundService || 'photon'];
 }
+
+export type ServicesAuthHeaders = {
+  'x-photon-auth-token': string;
+  'x-photon-auth-token-type': string;
+};
+
+export type LambdasAuthHeaders = {
+  authorization: string;
+};
