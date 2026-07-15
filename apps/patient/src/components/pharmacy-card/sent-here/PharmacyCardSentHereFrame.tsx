@@ -13,8 +13,9 @@ export const PharmacyCardSentHereFrame = ({
 }) => {
   return (
     <Box position="relative" pt={sentHereCardTopOffset}>
-      <SentHereBadge top={sentHereCardTopOffset} selected={selected} />
       {children}
+      {/* Important to render badge after children so it stacks on top */}
+      <SentHereBadge top={sentHereCardTopOffset} selected={selected} />
     </Box>
   );
 };

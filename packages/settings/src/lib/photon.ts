@@ -29,7 +29,8 @@ import {
   TWENTYEIGHT_PARTNER_CARE_FIRST_PHARMACY_ID,
   TWENTYEIGHT_PARTNER_CATTLES_PHARMACY_ID,
   TWENTYEIGHT_PARTNER_MEADOWS_PHARMACY_ID,
-  EPIQ_PHARMACY_ID
+  EPIQ_PHARMACY_ID,
+  GREATMANY_DCA_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -175,7 +176,7 @@ const organizationSettings: {
   },
   // Great Many
   org_gvTsxeeYy97qedaS: {
-    provider: [CUREXA_PHARMACY_ID]
+    provider: [CUREXA_PHARMACY_ID, GREATMANY_DCA_PHARMACY_ID]
   },
   // Measured
   org_pcPnPx5PVamzjS2p: {
