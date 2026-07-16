@@ -2,6 +2,7 @@ import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
 import { Env, PhotonClient } from '@photonhealth/sdk';
 import {
+  AnalyticsEventListener,
   GoogleServiceProvider,
   PhotonClientStore,
   PhotonContext,
@@ -137,7 +138,9 @@ const Component = (props: PhotonClientProps) => {
       <PhotonContext.Provider value={store()}>
         <GoogleServiceProvider>
           <SDKProvider client={sdk}>
-            <slot />
+            <AnalyticsEventListener clientRef={ref}>
+              <slot />
+            </AnalyticsEventListener>
           </SDKProvider>
         </GoogleServiceProvider>
       </PhotonContext.Provider>

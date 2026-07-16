@@ -5,10 +5,7 @@ import type {
 } from '@photonhealth/sdk';
 import type { ApiObject } from '@rudderstack/analytics-js';
 
-function flattenSnapshot(
-  fields: FieldCompletionSnapshot | undefined
-): Record<string, boolean | null> {
-  if (!fields) return {};
+function flattenSnapshot(fields: FieldCompletionSnapshot): Record<string, boolean | null> {
   return Object.fromEntries(
     Object.entries(fields).map(([key, val]) => [
       `snap_${key.replace(/([A-Z])/g, '_$1').toLowerCase()}`,
@@ -29,7 +26,7 @@ export function trackAnalyticsEvent(
 
   // Flatten field completion snapshots (CTA events)
   const payload = { ...rest } as Record<string, unknown>;
-  if ('fields' in payload && payload.fields) {
+  if (payload.fields) {
     const snapshot = flattenSnapshot(payload.fields as FieldCompletionSnapshot);
     delete payload.fields;
     Object.assign(payload, snapshot);
