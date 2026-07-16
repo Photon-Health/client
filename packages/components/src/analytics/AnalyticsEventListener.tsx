@@ -19,6 +19,19 @@ interface ProviderContextData {
   customerName?: string;
 }
 
+interface FieldCompletionSnapshot {
+  [fieldName: string]: { completed: boolean };
+}
+
+function flattenSnapshot(fields: FieldCompletionSnapshot): Record<string, boolean | null> {
+  return Object.fromEntries(
+    Object.entries(fields).map(([key, val]) => [
+      `snap_${key.replace(/([A-Z])/g, '_$1').toLowerCase()}`,
+      val.completed
+    ])
+  );
+}
+
 export const AnalyticsEventListener = (props: {
   clientRef: HTMLDivElement;
   children: JSXElement;
@@ -91,18 +104,3 @@ export const AnalyticsEventListener = (props: {
 
   return <>{props.children}</>;
 };
-
-// TODO: Copied this from client/apps/app/src/instrumentation/analyticsTrackEventListenerUtils.ts
-// just to get things working, do this cleaner later
-interface FieldCompletionSnapshot {
-  [fieldName: string]: { completed: boolean };
-}
-
-function flattenSnapshot(fields: FieldCompletionSnapshot): Record<string, boolean | null> {
-  return Object.fromEntries(
-    Object.entries(fields).map(([key, val]) => [
-      `snap_${key.replace(/([A-Z])/g, '_$1').toLowerCase()}`,
-      val.completed
-    ])
-  );
-}

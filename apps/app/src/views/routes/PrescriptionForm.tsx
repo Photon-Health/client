@@ -6,8 +6,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
-import { trackAnalyticsEvent } from '../../instrumentation/analyticsTrackEventListenerUtils';
-import type { PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
 
 declare global {
   namespace JSX {
@@ -92,14 +90,6 @@ export const PrescriptionForm = () => {
           hasPrefillWeight: !!weight?.trim(),
           weightUnit: weightUnit
         });
-      },
-      listenerOptions
-    );
-
-    ref.current.addEventListener(
-      'photon-analytics-track-event',
-      (e: { detail: PhotonEmbedAnalyticsEventInput }) => {
-        trackAnalyticsEvent(e.detail, providerAnalyticsRef.current.track);
       },
       listenerOptions
     );

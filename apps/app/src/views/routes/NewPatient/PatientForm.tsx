@@ -3,9 +3,6 @@ import { usePhoton } from '@photonhealth/react';
 import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
-import { useProviderAnalytics } from '../../../hooks/useProviderAnalytics';
-import type { PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
-import { trackAnalyticsEvent } from '../../../instrumentation/analyticsTrackEventListenerUtils';
 
 declare global {
   namespace JSX {
@@ -30,7 +27,6 @@ const orgSettingsQuery = graphql(/* GraphQL */ `
 export const PatientForm = () => {
   const ref: MutableRefObject<any> = useRef(null);
   const navigate = useNavigate();
-  const providerAnalytics = useProviderAnalytics();
   const { clinicalClient } = usePhoton();
 
   const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
@@ -43,14 +39,6 @@ export const PatientForm = () => {
     const abortController = new AbortController();
     const { signal: abortControllerSignal } = abortController;
     const listenerOptions = { signal: abortControllerSignal };
-
-    ref.current.addEventListener(
-      'photon-analytics-track-event',
-      (e: CustomEvent<PhotonEmbedAnalyticsEventInput>) => {
-        trackAnalyticsEvent(e.detail, providerAnalytics.track);
-      },
-      listenerOptions
-    );
 
     // this ref.current setter must be after the photon-analytics-track-event so that the data is set properly when the
     // photon-analytics-track-event fires, due to how the solidjs code within the WebComponent executes.
@@ -76,7 +64,7 @@ export const PatientForm = () => {
     );
 
     return () => abortController.abort();
-  }, [navigate, providerAnalytics]);
+  }, [navigate]);
 
   return (
     <div>
