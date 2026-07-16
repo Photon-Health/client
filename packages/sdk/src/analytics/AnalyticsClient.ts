@@ -1,4 +1,4 @@
-import { analyticsApiUrl, Env, getAuthHeaders, getVersionHeaders } from '../utils';
+import { analyticsApiUrl, Env, getAuthHeaders } from '../utils';
 import { ApiObject } from '@rudderstack/analytics-js';
 
 export class AnalyticsClient {
@@ -43,17 +43,14 @@ export class AnalyticsClient {
       ...body,
       properties: {
         ...body.properties,
-        environment: this.env
+        environment: this.env,
+        sdkVersion: this.sdkVersion,
+        elementsVersion: this.elementsVersion
       }
     };
     const headers = {
       'Content-Type': 'application/json',
-      ...getAuthHeaders({ token: this.token, isServices: true }),
-      // TODO: Do we need to send these as headers, can we send them as properties?
-      ...getVersionHeaders({
-        sdkVersion: this.sdkVersion,
-        elementsVersion: this.elementsVersion
-      })
+      ...getAuthHeaders({ token: this.token, isServices: true })
     };
 
     if (this.isNonProduction) {
