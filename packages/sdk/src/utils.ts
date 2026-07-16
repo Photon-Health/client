@@ -113,11 +113,40 @@ export function getClinicalUrl(uri: string): string | undefined {
   return clinicalAppUrl[foundService || 'photon'];
 }
 
-export type ServicesAuthHeaders = {
+type ServicesAuthHeaders = {
   'x-photon-auth-token': string;
   'x-photon-auth-token-type': string;
 };
 
-export type LambdasAuthHeaders = {
+type LambdasAuthHeaders = {
   authorization: string;
+};
+
+export const getAuthHeaders = ({
+  token,
+  isServices
+}: {
+  token?: string;
+  isServices: boolean;
+}): ServicesAuthHeaders | LambdasAuthHeaders | undefined => {
+  if (!token) {
+    // Proceed with no headers to get the 401 from the API
+    return undefined;
+  }
+  return isServices
+    ? { 'x-photon-auth-token': token, 'x-photon-auth-token-type': 'auth0' }
+    : { authorization: token };
+};
+
+export const getVersionHeaders = ({
+  sdkVersion,
+  elementsVersion
+}: {
+  sdkVersion?: string;
+  elementsVersion?: string;
+}) => {
+  return {
+    ...(sdkVersion ? { 'x-photon-sdk-version': sdkVersion } : {}),
+    ...(elementsVersion ? { 'x-photon-elements-version': elementsVersion } : {})
+  };
 };

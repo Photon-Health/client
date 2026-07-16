@@ -14,10 +14,10 @@ import {
   clinicalApiUrl,
   clinicalAppUrl,
   Env as Environment,
+  getAuthHeaders,
   getClinicalUrl,
-  lambdasApiUrl,
-  LambdasAuthHeaders,
-  ServicesAuthHeaders
+  getVersionHeaders,
+  lambdasApiUrl
 } from './utils';
 import pkg from '../package.json';
 import { AnalyticsClient } from './analytics/AnalyticsClient';
@@ -169,27 +169,7 @@ export class PhotonClient {
     this.apolloClinical = this.constructApolloClient({ elementsVersion, isServices: true });
     this.clinical = new ClinicalQueryManager(this.apollo);
     this.management = new ManagementQueryManager(this.apollo);
-    this.analytics = this.constructAnalyticsClient(env);
-  }
-
-  private async getAuthHeaders(
-    isServices: boolean
-  ): Promise<ServicesAuthHeaders | LambdasAuthHeaders | undefined> {
-    let token: string | undefined;
-    try {
-      token = await this.authentication.getAccessToken();
-    } catch {
-      // Session expired or auth unavailable — proceed without token
-      // so the request gets a proper 401 from the API
-    }
-
-    if (!token) {
-      // Proceed with no headers to get the 401 from the API
-      return undefined;
-    }
-    return isServices
-      ? { 'x-photon-auth-token': token, 'x-photon-auth-token-type': 'auth0' }
-      : { authorization: token };
+    this.analytics = this.constructAnalyticsClient({ env, elementsVersion, sdkVersion: version });
   }
 
   private constructApolloClient(
@@ -199,12 +179,19 @@ export class PhotonClient {
   ) {
     const apollo = new ApolloClient({
       link: setContext(async (_, { headers: baseHeaders, ...rest }) => {
-        const authHeaders = await this.getAuthHeaders(isServices);
+        let token: string | undefined;
+        try {
+          token = await this.authentication.getAccessToken();
+        } catch {
+          // Session expired or auth unavailable — proceed without token
+          // so the request gets a proper 401 from the API
+        }
+        const authHeaders = getAuthHeaders({ token, isServices });
+        const versionHeaders = getVersionHeaders({ sdkVersion: version, elementsVersion });
         const headers = {
           ...baseHeaders,
-          'x-photon-sdk-version': version,
-          ...(elementsVersion ? { 'x-photon-elements-version': elementsVersion } : {}),
-          ...authHeaders
+          ...authHeaders,
+          ...versionHeaders
         };
 
         return { headers, ...rest };
@@ -262,9 +249,26 @@ export class PhotonClient {
     return apollo;
   }
 
-  private constructAnalyticsClient(env: Env) {
-    const getAuthHeaders = () => this.getAuthHeaders(true) as Promise<ServicesAuthHeaders>;
-    const client = new AnalyticsClient({ env, getAuthHeaders });
+  private constructAnalyticsClient({
+    env,
+    sdkVersion,
+    elementsVersion
+  }: {
+    env: Env;
+    sdkVersion?: string;
+    elementsVersion?: string;
+  }) {
+    const getToken = async () => {
+      let token: string | undefined;
+      try {
+        token = await this.authentication.getAccessToken();
+      } catch {
+        // Session expired or auth unavailable — proceed without token
+        // so the request gets a proper 401 from the API
+      }
+      return token;
+    };
+    const client = new AnalyticsClient({ env, sdkVersion, elementsVersion, getToken });
     return client;
   }
 
