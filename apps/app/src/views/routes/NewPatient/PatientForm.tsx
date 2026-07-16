@@ -3,6 +3,7 @@ import { usePhoton } from '@photonhealth/react';
 import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
+import { useProviderAnalytics } from 'apps/app/src/hooks/useProviderAnalytics';
 
 declare global {
   namespace JSX {
@@ -28,6 +29,11 @@ export const PatientForm = () => {
   const ref: MutableRefObject<any> = useRef(null);
   const navigate = useNavigate();
   const { clinicalClient } = usePhoton();
+  const { track } = useProviderAnalytics();
+
+  useEffect(() => {
+    track('New Patient Page Viewed');
+  }, []);
 
   const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
   const optionalPatientAddress =

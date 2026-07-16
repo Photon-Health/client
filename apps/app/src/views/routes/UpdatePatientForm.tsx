@@ -3,6 +3,7 @@ import { usePhoton } from '@photonhealth/react';
 import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
+import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 
 declare global {
   namespace JSX {
@@ -30,10 +31,15 @@ export const UpdatePatientForm = () => {
   const navigate = useNavigate();
   const { clinicalClient } = usePhoton();
   const id = params.patientId;
+  const { track } = useProviderAnalytics();
 
   const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
   const optionalPatientAddress =
     data?.organization?.settings?.providerUx?.optionalPatientAddress ?? false;
+
+  useEffect(() => {
+    track('Update Patient Page Viewed');
+  }, []);
 
   useEffect(() => {
     if (!ref.current) return;
