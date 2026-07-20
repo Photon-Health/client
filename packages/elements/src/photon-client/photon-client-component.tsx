@@ -14,7 +14,7 @@ import { hasAuthParams } from '../utils';
 import pkg from '../../package.json';
 import { type User } from '@auth0/auth0-react';
 
-type PhotonClientProps = {
+export type PhotonClientProps = {
   domain?: string;
   audience?: string;
   connection?: string;
@@ -34,7 +34,7 @@ type PhotonClientProps = {
 
 const version = pkg?.version ?? 'unknown';
 
-const Component = (props: PhotonClientProps) => {
+export const PhotonClientComponent = (props: PhotonClientProps) => {
   let ref: any;
 
   const baseRedirectURI = props.redirectUri ? props.redirectUri : window.location.origin;
@@ -249,5 +249,5 @@ customElement(
       parse: true
     }
   },
-  Component
+  PhotonClientComponent
 );
