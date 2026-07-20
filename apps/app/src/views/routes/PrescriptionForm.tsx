@@ -94,13 +94,6 @@ export const PrescriptionForm = () => {
       listenerOptions
     );
 
-    if (patientId && ref.current) {
-      // this ref.current setter must be after the photon-analytics-track-event so that the data is set properly when the
-      // photon-analytics-track-event fires, due to how the solidjs code within the WebComponent executes.
-      // the ref.current data is utilized by photon-analytics-track-event
-      ref.current.patientId = patientId;
-    }
-
     ref.current.addEventListener(
       'photon-prescriptions-created',
       (e: any) => {

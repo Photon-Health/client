@@ -48,12 +48,6 @@ export const UpdatePatientForm = () => {
     const { signal: abortControllerSignal } = abortController;
     const listenerOptions = { signal: abortControllerSignal };
 
-    // these ref.current setters must be after the photon-analytics-track-event so that the data is set properly when the
-    // photon-analytics-track-event fires, due to how the solidjs code within the WebComponent executes
-    // photon-analytics-track-event depends on the `ref.current.open` and `ref.current.patientId` values
-    ref.current.patientId = id;
-    ref.current.open = true;
-
     ref.current.addEventListener(
       'photon-patient-updated',
       (e: any) => {
