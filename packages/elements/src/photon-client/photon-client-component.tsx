@@ -30,6 +30,7 @@ export type PhotonClientProps = {
   env?: Env;
   externalUserId?: string;
   emitUserToken?: boolean;
+  orderWorkflowId?: string | null;
 };
 
 const version = pkg?.version ?? 'unknown';
@@ -138,7 +139,7 @@ export const PhotonClientComponent = (props: PhotonClientProps) => {
       <PhotonContext.Provider value={store()}>
         <GoogleServiceProvider>
           <SDKProvider client={sdk}>
-            <AnalyticsEventListener clientRef={ref}>
+            <AnalyticsEventListener clientRef={ref} orderWorkflowId={props.orderWorkflowId}>
               <slot />
             </AnalyticsEventListener>
           </SDKProvider>
@@ -244,6 +245,13 @@ customElement(
     emitUserToken: {
       attribute: 'emit-user-token',
       value: false,
+      reflect: false,
+      notify: false,
+      parse: true
+    },
+    orderWorkflowId: {
+      attribute: 'order-workflow-id',
+      value: null,
       reflect: false,
       notify: false,
       parse: true

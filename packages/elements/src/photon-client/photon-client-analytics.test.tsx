@@ -44,6 +44,7 @@ afterAll(() => server.close());
 test('sends a photon-analytics-track-event to the analytics API', async () => {
   const analyticsTrackSpy = vi.fn();
   const analyticsContextQuerySpy = vi.fn();
+  const orderWorkflowId = 'test-order-workflow-id';
 
   server.use(
     http.post('http://analytics-api.tau.health:8080/event', async ({ request }) => {
@@ -58,7 +59,7 @@ test('sends a photon-analytics-track-event to the analytics API', async () => {
     })
   );
 
-  const { rootElement } = renderPhotonClient();
+  const { rootElement } = renderPhotonClient({ orderWorkflowId });
 
   // Context needed to build analytics event
   await waitFor(() => {
@@ -95,7 +96,8 @@ test('sends a photon-analytics-track-event to the analytics API', async () => {
         timestamp: expect.any(String),
         environment: 'tau',
         sdkVersion: expect.any(String),
-        elementsVersion: expect.any(String)
+        elementsVersion: expect.any(String),
+        orderWorkflowId
       }
     });
   });

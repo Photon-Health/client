@@ -34,6 +34,7 @@ function flattenSnapshot(fields: FieldCompletionSnapshot): Record<string, boolea
 
 export const AnalyticsEventListener = (props: {
   clientRef: HTMLDivElement;
+  orderWorkflowId?: string | null;
   children: JSXElement;
 }) => {
   const client = usePhotonClient();
@@ -92,7 +93,11 @@ export const AnalyticsEventListener = (props: {
           Object.assign(payload, snapshot);
         }
 
-        const properties: ApiObject = { ...context, ...payload };
+        const properties: ApiObject = {
+          ...context,
+          ...payload,
+          orderWorkflowId: props.orderWorkflowId || null
+        };
         client.analytics.track({ event: name, userId: context.providerId, properties });
       }) as EventListener,
       listenerOptions
