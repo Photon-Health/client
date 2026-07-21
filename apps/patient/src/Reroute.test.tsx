@@ -163,7 +163,10 @@ describe('Rerouting', () => {
     expect(selectPharmacyButton).toBeVisible();
 
     // loads and shows a thank you message
-    await userEvent.click(selectPharmacyButton);
+    // NOTE: intentionally not awaiting here - handleSubmit navigates away as part of its
+    // function body, so awaiting the click would block execution until after navigation
+    // and we'd never observe the intermediate "Thank you!" render.
+    userEvent.click(selectPharmacyButton);
     await waitFor(() => screen.findByText(text.thankYou), { timeout: 3000 });
 
     // returns to the status page with the updated pharmacy and cleared exceptions

@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 import queryString from 'query-string';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { flushSync } from 'react-dom';
 import ReactGA from 'react-ga4';
 import { Helmet } from 'react-helmet';
 import { FiCheck } from 'react-icons/fi';
@@ -235,7 +236,8 @@ export const Pharmacy = () => {
 
   // Submitting state
   const [submitting, setSubmitting] = useState<boolean>(false);
-  const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
+  // We want to separately track if the order route request has completed successfully
+  const [orderRouted, setOrderRouted] = useState<boolean>(false);
 
   // Address state
   const [latitude, setLatitude] = useState<number>();
@@ -643,7 +645,7 @@ export const Pharmacy = () => {
         }
       } catch (error: any) {
         toast({ ...TOAST_CONFIG.WARNING, title: 'Unable to get pharmacies' });
-        console.log('Get pharmacies error: ', error);
+        console.error('Get pharmacies error: ', error);
       }
       setLoadingPharmacies(false);
     };
@@ -893,7 +895,7 @@ export const Pharmacy = () => {
     // If the patient is simply confirming, navigate back to the status page
     if (routingAction === RoutingAction.Confirmation) {
       setSubmitting(false);
-      setSuccessfullySubmitted(true);
+      setOrderRouted(true);
       const query = queryString.stringify({
         orderId: order.id,
         token,
@@ -930,48 +932,49 @@ export const Pharmacy = () => {
               enablePrice
             );
 
-      await new Promise<void>((resolve) =>
-        setTimeout(() => {
-          if (result) {
-            setSuccessfullySubmitted(true);
-            setTimeout(async () => {
-              setShowFooter(false);
+      if (result) {
+        // First, disable submit button handler
+        setOrderRouted(true);
 
-              // necessary to ensure the order is updated with the new coupon before navigating
-              const updatedOrder = await fetchOrder(overridePharmacy);
+        // Ensure the order is updated with the new coupon before navigating
+        const updatedOrder = await fetchOrder(overridePharmacy);
+        if (updatedOrder) {
+          updatedOrder.fulfillment = {
+            ...updatedOrder.fulfillment,
+            type: overrideType as FulfillmentType,
+            state: updatedOrder.fulfillment?.state ?? 'CREATED'
+          };
+          setOrder({
+            ...updatedOrder,
+            isReroutable: routingAction === RoutingAction.Route,
+            exceptions: updatedOrder.exceptions.map((exception) => ({
+              ...exception,
+              resolvedAt: new Date().toISOString()
+            })),
+            pharmacy: overridePharmacy
+          });
+        }
 
-              if (updatedOrder) {
-                updatedOrder.fulfillment = {
-                  ...updatedOrder.fulfillment,
-                  type: overrideType as FulfillmentType,
-                  state: updatedOrder.fulfillment?.state ?? 'CREATED'
-                };
-                setOrder({
-                  ...updatedOrder,
-                  isReroutable: routingAction === RoutingAction.Route,
-                  exceptions: updatedOrder.exceptions.map((exception) => ({
-                    ...exception,
-                    resolvedAt: new Date().toISOString()
-                  })),
-                  pharmacy: overridePharmacy
-                });
-              }
+        // Erase button loading state to show submitted state
+        // flushSync forces the state update to happen without batching,
+        // so the patient actually sees the "Thank you!" state before we navigate away
+        flushSync(() => {
+          setSubmitting(false);
+        });
 
-              const query = queryString.stringify({
-                orderId: order.id,
-                token,
-                type: overrideType
-              });
-              resolve();
-              return navigate(`/status?${query}`);
-            }, 1000);
-          } else {
-            showSubmitWarning();
-            resolve();
-          }
-        }, 1000)
-      );
-      setSubmitting(false);
+        // Let patient see submitted state
+        await wait(1000);
+
+        const query = queryString.stringify({
+          orderId: order.id,
+          token,
+          type: overrideType
+        });
+        return navigate(`/status?${query}`);
+      } else {
+        showSubmitWarning();
+        setSubmitting(false);
+      }
     } catch (_error: any) {
       showSubmitWarning();
       setSubmitting(false);
@@ -1040,7 +1043,7 @@ export const Pharmacy = () => {
     persistAutoroutedPharmacyConfirmation(selectedPharmacy.id);
 
     await wait(1000);
-    setSuccessfullySubmitted(true);
+    setOrderRouted(true);
     await wait(1000);
 
     setShowFooter(false);
@@ -1349,14 +1352,14 @@ export const Pharmacy = () => {
             size="lg"
             borderRadius="lg"
             w="full"
-            variant={successfullySubmitted ? undefined : 'brand'}
-            colorScheme={successfullySubmitted ? 'green' : undefined}
-            leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
+            variant={orderRouted ? undefined : 'brand'}
+            colorScheme={orderRouted ? 'green' : undefined}
+            leftIcon={orderRouted ? <FiCheck /> : undefined}
             disabled={selectedId == null}
             isDisabled={selectedId == null}
             isLoading={submitting}
             onClick={async () => {
-              if (successfullySubmitted) return;
+              if (orderRouted) return;
 
               // because offers aren't actually pharmacies
               // we'll transform them into things that resemble pharamcy objects
@@ -1391,7 +1394,7 @@ export const Pharmacy = () => {
               });
             }}
           >
-            {successfullySubmitted ? t.thankYou : t.selectPharmacy}
+            {orderRouted ? t.thankYou : t.selectPharmacy}
           </Button>
 
           <PoweredBy />
