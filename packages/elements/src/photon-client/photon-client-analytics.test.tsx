@@ -59,7 +59,7 @@ test('sends a photon-analytics-track-event to the analytics API', async () => {
     })
   );
 
-  const { rootElement } = renderPhotonClient({ orderWorkflowId });
+  const { rootElement } = renderPhotonClient({ appAnalyticsProperties: { orderWorkflowId } });
 
   // Context needed to build analytics event
   await waitFor(() => {

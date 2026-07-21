@@ -30,7 +30,8 @@ export type PhotonClientProps = {
   env?: Env;
   externalUserId?: string;
   emitUserToken?: boolean;
-  orderWorkflowId?: string | null;
+  /* Pass extra properties when photon-client is rendered in our web app */
+  appAnalyticsProperties?: Record<string, unknown>;
 };
 
 const version = pkg?.version ?? 'unknown';
@@ -139,7 +140,10 @@ export const PhotonClientComponent = (props: PhotonClientProps) => {
       <PhotonContext.Provider value={store()}>
         <GoogleServiceProvider>
           <SDKProvider client={sdk}>
-            <AnalyticsEventListener clientRef={ref} orderWorkflowId={props.orderWorkflowId}>
+            <AnalyticsEventListener
+              clientRef={ref}
+              appAnalyticsProperties={props.appAnalyticsProperties}
+            >
               <slot />
             </AnalyticsEventListener>
           </SDKProvider>
@@ -249,9 +253,9 @@ customElement(
       notify: false,
       parse: true
     },
-    orderWorkflowId: {
-      attribute: 'order-workflow-id',
-      value: null,
+    appAnalyticsProperties: {
+      attribute: 'app-analytics-properties',
+      value: undefined,
       reflect: false,
       notify: false,
       parse: true
