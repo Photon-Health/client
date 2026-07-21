@@ -42,29 +42,33 @@ export const AnalyticsEventListener = (props: {
   const [contextData, setContextData] = createSignal<ProviderContextData | null>(null);
 
   onMount(async () => {
-    // Fetch me + organization data via GraphQL
-    const { data } = await client.apolloClinical.query({ query: AnalyticsContextQuery });
+    try {
+      const { data } = await client.apolloClinical.query({ query: AnalyticsContextQuery });
 
-    // Build context data from query response
-    const contextData: ProviderContextData = {
-      // User info from me query
-      providerId: data.me.id,
-      providerEmail: data.me.email || undefined,
-      providerName: data.me.name?.full,
-      providerNameFirst: data.me.name?.first,
-      providerNameLast: data.me.name?.last,
-      providerRoles: data.me.roles
-        .map((role) => role.name)
-        .filter((name): name is string => !!name),
-      // Organization info
-      orgId: data.organization?.id,
-      orgName: data.organization?.name,
-      // Customer info
-      customerId: data.organization?.customer?.id,
-      customerName: data.organization?.customer?.name
-    };
+      // Build context data from query response
+      const contextData: ProviderContextData = {
+        // User info from me query
+        providerId: data.me.id,
+        providerEmail: data.me.email || undefined,
+        providerName: data.me.name?.full,
+        providerNameFirst: data.me.name?.first,
+        providerNameLast: data.me.name?.last,
+        providerRoles: data.me.roles
+          .map((role) => role.name)
+          .filter((name): name is string => !!name),
+        // Organization info
+        orgId: data.organization?.id,
+        orgName: data.organization?.name,
+        // Customer info
+        customerId: data.organization?.customer?.id,
+        customerName: data.organization?.customer?.name
+      };
 
-    setContextData(contextData);
+      setContextData(contextData);
+    } catch (e) {
+      // If AnalyticsContextQuery fails, do not throw error but do log
+      console.error('📊 [Analytics: To Analytics API] Error loading analytics context', e);
+    }
   });
 
   createEffect(() => {
@@ -79,8 +83,11 @@ export const AnalyticsEventListener = (props: {
       'photon-analytics-track-event',
       ((e: CustomEvent<PhotonEmbedAnalyticsEventInput>) => {
         const context = contextData();
-        // This should always be defined, need this check for type narrowing
         if (!context) {
+          console.error(
+            '📊 [Analytics: To Analytics API] Skipping event tracking without analytics context',
+            e
+          );
           return;
         }
 
@@ -99,6 +106,7 @@ export const AnalyticsEventListener = (props: {
           ...payload,
           ...props.appAnalyticsProperties
         };
+        // Don't await this method, tracking analytics shouldn't block the JS thread
         client.analytics.track({ event: name, userId: context.providerId, properties });
       }) as EventListener,
       listenerOptions

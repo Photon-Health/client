@@ -64,8 +64,8 @@ export class AnalyticsClient {
         headers: headers
       });
     } catch (e) {
-      // Log error but ultimately okay if this method fails
-      console.error(e);
+      // If request fails, do not throw error but do log
+      console.error('📊 [Analytics: To Analytics API] Error tracking event', e);
     }
   }
 }
