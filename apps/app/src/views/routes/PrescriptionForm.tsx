@@ -76,6 +76,11 @@ export const PrescriptionForm = () => {
     const { signal: abortControllerSignal } = abortController;
     const listenerOptions = { signal: abortControllerSignal };
 
+    if (patientId && ref.current) {
+      // Sets the props on <photon-multirx-form-wrapper>
+      ref.current.patientId = patientId;
+    }
+
     ref.current.addEventListener(
       'photon-signature-attestation-resolved',
       () => {

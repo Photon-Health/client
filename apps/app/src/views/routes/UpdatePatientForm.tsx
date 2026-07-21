@@ -48,6 +48,10 @@ export const UpdatePatientForm = () => {
     const { signal: abortControllerSignal } = abortController;
     const listenerOptions = { signal: abortControllerSignal };
 
+    // Sets the props on <photon-patient-dialog>
+    ref.current.patientId = id;
+    ref.current.open = true;
+
     ref.current.addEventListener(
       'photon-patient-updated',
       (e: any) => {
