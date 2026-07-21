@@ -4,7 +4,7 @@ type CapturedEvent = { event: string; properties: Record<string, unknown> };
 
 const capturedByPage = new WeakMap<Page, CapturedEvent[]>();
 
-function extractEvents(body: any): CapturedEvent[] {
+function extractRudderstackEvents(body: any): CapturedEvent[] {
   const events: CapturedEvent[] = [];
   // Batched format: { batch: [{ type, event, properties }, ...] }
   if (Array.isArray(body?.batch)) {
@@ -21,8 +21,15 @@ function extractEvents(body: any): CapturedEvent[] {
   return events;
 }
 
+function extractAnalyticsApiEvent(body: any): CapturedEvent[] {
+  if (body?.event) {
+    return [{ event: body.event, properties: body.properties ?? {} }];
+  }
+  return [];
+}
+
 /**
- * Intercepts RudderStack network requests via Playwright's route API.
+ * Intercepts RudderStack and analytics API network requests via Playwright's route API.
  * Extracts track events from the request payload and stores them for assertions.
  * Must be called before page.goto().
  */
@@ -33,9 +40,19 @@ export async function setupAnalyticsCapture(page: Page) {
   await page.route(/dataplane\.rudderstack\.com/, (route) => {
     try {
       const body = route.request().postDataJSON();
-      captured.push(...extractEvents(body));
+      captured.push(...extractRudderstackEvents(body));
     } catch {
       // non-JSON request (e.g. OPTIONS, GET for SDK loading) — ignore
+    }
+    route.fulfill({ status: 200, body: '{}' });
+  });
+
+  await page.route(/analytics-api\.(tau|boson|neutron|photon)\.health.*\/event$/, (route) => {
+    try {
+      const body = route.request().postDataJSON();
+      captured.push(...extractAnalyticsApiEvent(body));
+    } catch {
+      // non-JSON request — ignore
     }
     route.fulfill({ status: 200, body: '{}' });
   });
