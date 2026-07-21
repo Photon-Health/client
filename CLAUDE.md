@@ -425,6 +425,8 @@ All new utility functions, views, and components must include tests. Match the t
 - New Solid.js components in `packages/components` → component tests with `@solidjs/testing-library`
 - New React hooks → hook tests with `renderHook`
 
+**Functionality spanning `apps/*` and `packages/*` must be covered by an E2E test.** From the perspective of `apps/app`/`apps/patient` code, everything in `packages/*` (elements, components, sdk, react) should be treated as a black box — the apps only see the public surface (custom element tags/attributes, CustomEvents, exported hooks/functions), not internal implementation. Unit/component tests within a package can mock across that boundary, but they cannot verify that the app and the package actually integrate correctly end-to-end (e.g. a Solid.js element dispatching a `CustomEvent` that the React app listens for, or a prop/attribute the app passes down being consumed correctly). Any change that touches both an app and a package it consumes (e.g. `apps/app` + `packages/elements`, or `packages/elements` + `packages/components`) needs Playwright E2E coverage (`apps/app/e2e/`) in addition to any unit/component tests, rather than relying on mocks to simulate the cross-package contract.
+
 ### Test Conventions
 
 - Keep tests **brief and focused**. For unit tests of pure functions, prefer single-assertion, bite-sized tests. For page-level and integration tests that interact with rendered UI, longer tests with multiple assertions are fine.
