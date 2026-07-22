@@ -72,3 +72,31 @@ export const ScreenDraftedPrescriptionsQuery = graphql(`
     }
   }
 `);
+
+export const AnalyticsContextQuery = graphql(`
+  query AnalyticsContextQuery {
+    me {
+      email
+      id
+      name {
+        first
+        full
+        last
+        middle
+        title
+      }
+      roles {
+        id
+        name
+      }
+    }
+    organization {
+      customer {
+        id
+        name
+      }
+      name
+      id
+    }
+  }
+`);

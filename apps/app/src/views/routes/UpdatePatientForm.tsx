@@ -3,9 +3,7 @@ import { usePhoton } from '@photonhealth/react';
 import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
-import type { PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
-import { trackAnalyticsEvent } from '../../instrumentation/analyticsTrackEventListenerUtils';
 
 declare global {
   namespace JSX {
@@ -31,13 +29,17 @@ export const UpdatePatientForm = () => {
   const ref: MutableRefObject<any> = useRef(null);
   const params = useParams();
   const navigate = useNavigate();
-  const providerAnalytics = useProviderAnalytics();
   const { clinicalClient } = usePhoton();
   const id = params.patientId;
+  const { track } = useProviderAnalytics();
 
   const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
   const optionalPatientAddress =
     data?.organization?.settings?.providerUx?.optionalPatientAddress ?? false;
+
+  useEffect(() => {
+    track('Update Patient Page Viewed');
+  }, []);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -46,17 +48,7 @@ export const UpdatePatientForm = () => {
     const { signal: abortControllerSignal } = abortController;
     const listenerOptions = { signal: abortControllerSignal };
 
-    ref.current.addEventListener(
-      'photon-analytics-track-event',
-      (e: CustomEvent<PhotonEmbedAnalyticsEventInput>) => {
-        trackAnalyticsEvent(e.detail, providerAnalytics.track);
-      },
-      listenerOptions
-    );
-
-    // these ref.current setters must be after the photon-analytics-track-event so that the data is set properly when the
-    // photon-analytics-track-event fires, due to how the solidjs code within the WebComponent executes
-    // photon-analytics-track-event depends on the `ref.current.open` and `ref.current.patientId` values
+    // Sets the props on <photon-patient-dialog>
     ref.current.patientId = id;
     ref.current.open = true;
 
@@ -78,7 +70,7 @@ export const UpdatePatientForm = () => {
     );
 
     return () => abortController.abort();
-  }, [navigate, providerAnalytics, id]);
+  }, [navigate, id]);
 
   return (
     <div>
