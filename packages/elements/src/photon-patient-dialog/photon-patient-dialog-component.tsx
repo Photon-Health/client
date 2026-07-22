@@ -163,18 +163,6 @@ const Component = (props: PatientDialogProps) => {
     ref?.dispatchEvent(event);
   };
 
-  createEffect(() => {
-    if (props.open) {
-      dispatchAnalyticsTrackEvent(
-        'pageViewed',
-        {
-          name: props.patientId ? 'Update Patient Page Viewed' : 'New Patient Page Viewed'
-        },
-        ref
-      );
-    }
-  });
-
   const submitForm = async (didClickCreatePatientAndPrescription = false) => {
     setGlobalError(undefined);
     setIsCreatePrescription(didClickCreatePatientAndPrescription);

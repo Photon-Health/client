@@ -39,6 +39,9 @@ test('user can create patient then add, edit, and delete a draft prescription', 
 
   const patientPageViewEvents = await findByEventName(page, 'New Patient Page Viewed');
   expect(patientPageViewEvents.length).toBeGreaterThan(0);
+
+  // Grab orderWorkflowId to test that it
+  // remains the same throughout one "workflow"
   const orderWorkflowId = patientPageViewEvents[0].properties.orderWorkflowId;
   expect(orderWorkflowId).toBeTruthy();
 
@@ -52,9 +55,13 @@ test('user can create patient then add, edit, and delete a draft prescription', 
     }
   });
   expect(openedEvent.properties.prefillPatientId).toBeTruthy();
-
   // Same orderWorkflowId should carry over from patient form to prescription form
   expect(openedEvent.properties.orderWorkflowId).toBe(orderWorkflowId);
+
+  const providerId = openedEvent.properties.providerId;
+  const orgId = openedEvent.properties.orgId;
+  expect(providerId).toBeTruthy();
+  expect(orgId).toBeTruthy();
 
   // add draft
   await medSearchInput.fill('Amoxicillin');
@@ -74,6 +81,18 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   await page.getByLabel('Patient Instructions (SIG)').fill('test-instructions-text');
   await page.getByLabel('Patient Instructions (SIG)').blur();
   await expectFieldInteraction(page, 'treatment', 1);
+  // Check field interaction properties mapped correctly
+  await expectEventProperties(page, 'Field Interaction', {
+    expectedProperties: {
+      category: 'fieldInteraction',
+      formName: 'add_prescription_form',
+      fieldName: 'treatment',
+      hasValue: true,
+      isOptional: false,
+      orderWorkflowId,
+      pageName: 'New Prescriptions'
+    }
+  });
   await expectFieldInteraction(page, 'dispenseQuantity', 1);
   await expectFieldInteraction(page, 'daysSupply', 1);
   await expectFieldInteraction(page, 'refills', 1);
@@ -84,7 +103,9 @@ test('user can create patient then add, edit, and delete a draft prescription', 
   const firstDraftAdded = draftAddedEvents[0];
   expect(firstDraftAdded?.properties).toEqual(
     expect.objectContaining({
+      category: 'ctaClicked',
       draftPrescriptionSource: 'form',
+      orderWorkflowId,
       snap_treatment: true,
       snap_dispense_unit: true,
       snap_dispense_quantity: true,
@@ -119,9 +140,28 @@ test('user can create patient then add, edit, and delete a draft prescription', 
 
   await page.getByRole('button', { name: 'Send' }).click();
   await page.waitForURL(/\/orders\/ord_/);
+  const orderId = page.url().match(/\/orders\/(ord_[^/?#]+)/)?.[1];
+  expect(orderId).toBeTruthy();
   await expect(page.getByText(/Amoxicillin/i).first()).toBeVisible();
 
   await expectEventCount(page, 'Order Sent', 1);
+  await expectEventProperties(page, 'Order Sent', {
+    expectedProperties: {
+      category: 'ctaClicked',
+      orderWorkflowId: orderWorkflowId,
+      pageName: 'New Prescriptions',
+      providerId: providerId,
+      orgId: orgId,
+      buttonText: 'Send',
+      orderId: orderId,
+      prescriptionCount: 1,
+      fulfillmentType: 'SEND_TO_PATIENT',
+      hasPreferredPharmacy: false,
+      setAsPreferred: false,
+      pharmacyId: null,
+      isCombinedOrder: false
+    }
+  });
 });
 
 function getRandomInt(min, max) {

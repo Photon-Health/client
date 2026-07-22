@@ -14,10 +14,13 @@ import {
   clinicalApiUrl,
   clinicalAppUrl,
   Env as Environment,
+  getAuthHeaders,
   getClinicalUrl,
+  getVersionHeaders,
   lambdasApiUrl
 } from './utils';
 import pkg from '../package.json';
+import { AnalyticsClient } from './analytics/AnalyticsClient';
 
 export type { LoginOptions } from './auth';
 export * as types from './types';
@@ -34,7 +37,7 @@ export type {
   PhotonEmbedAnalyticsEventInput,
   AnalyticsCategory,
   AnalyticsEventMap
-} from './clinicalAnalyticsTypes';
+} from './analytics/clinicalAnalyticsTypes';
 
 const version: string = pkg?.version ?? 'unknown';
 
@@ -108,6 +111,8 @@ export class PhotonClient {
    */
   public apolloClinical: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
 
+  public analytics: AnalyticsClient;
+
   /**
    * Constructs a new PhotonSDK instance
    * @param config - Photon SDK configuration options
@@ -164,6 +169,7 @@ export class PhotonClient {
     this.apolloClinical = this.constructApolloClient({ elementsVersion, isServices: true });
     this.clinical = new ClinicalQueryManager(this.apollo);
     this.management = new ManagementQueryManager(this.apollo);
+    this.analytics = this.constructAnalyticsClient({ env, elementsVersion, sdkVersion: version });
   }
 
   private constructApolloClient(
@@ -180,30 +186,15 @@ export class PhotonClient {
           // Session expired or auth unavailable — proceed without token
           // so the request gets a proper 401 from the API
         }
-
+        const authHeaders = getAuthHeaders({ token, isServices });
+        const versionHeaders = getVersionHeaders({ sdkVersion: version, elementsVersion });
         const headers = {
           ...baseHeaders,
-          'x-photon-sdk-version': version,
-          ...(elementsVersion ? { 'x-photon-elements-version': elementsVersion } : {})
+          ...authHeaders,
+          ...versionHeaders
         };
 
-        if (!token) {
-          return { headers, ...rest };
-        }
-
-        return {
-          ...rest,
-          headers: isServices
-            ? {
-                ...headers,
-                'x-photon-auth-token': token,
-                'x-photon-auth-token-type': 'auth0'
-              }
-            : {
-                ...headers,
-                authorization: token
-              }
-        };
+        return { headers, ...rest };
       }).concat(
         new HttpLink({
           uri: isServices ? this.clinicalApiUri : this.uri
@@ -256,6 +247,29 @@ export class PhotonClient {
       })
     });
     return apollo;
+  }
+
+  private constructAnalyticsClient({
+    env,
+    sdkVersion,
+    elementsVersion
+  }: {
+    env: Env;
+    sdkVersion?: string;
+    elementsVersion?: string;
+  }) {
+    const getToken = async () => {
+      let token: string | undefined;
+      try {
+        token = await this.authentication.getAccessToken();
+      } catch {
+        // Session expired or auth unavailable — proceed without token
+        // so the request gets a proper 401 from the API
+      }
+      return token;
+    };
+    const client = new AnalyticsClient({ env, sdkVersion, elementsVersion, getToken });
+    return client;
   }
 
   /**
