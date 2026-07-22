@@ -105,7 +105,7 @@ test('sends a photon-analytics-track-event to the analytics API', async () => {
 
 test('fails silently when the analytics API request fails', async () => {
   const analyticsContextQuerySpy = vi.fn();
-  const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
   server.use(
     http.post('http://analytics-api.tau.health:8080/event', () => HttpResponse.error()),
@@ -140,8 +140,8 @@ test('fails silently when the analytics API request fails', async () => {
 
   // The failed request is caught and logged rather than thrown/unhandled
   await waitFor(() => {
-    expect(consoleErrorSpy).toHaveBeenCalled();
+    expect(consoleWarnSpy).toHaveBeenCalled();
   });
 
-  consoleErrorSpy.mockRestore();
+  consoleWarnSpy.mockRestore();
 });
