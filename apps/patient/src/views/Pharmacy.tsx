@@ -666,8 +666,7 @@ export const Pharmacy = () => {
     longitude,
     loadPharmacies,
     order?.readyBy,
-    toast,
-    initialLoad
+    toast
   ]);
 
   useEffect(() => {
