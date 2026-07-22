@@ -12,17 +12,13 @@ jobs:
     name: Vitest
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: 22
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
+
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
           cache: 'npm'
       # there was an issue with the rollup binary not being available in the runner https://github.com/npm/cli/issues/4828
       - name: Install Rollup
