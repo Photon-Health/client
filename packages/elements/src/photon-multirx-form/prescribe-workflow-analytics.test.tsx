@@ -3,15 +3,10 @@ import { afterAll, afterEach, beforeAll, expect, test, vi } from 'vitest';
 import { setupServer, type SetupServer } from 'msw/node';
 import { HttpResponse } from 'msw';
 import { PatientStore } from '../stores/patient';
-import {
-  clinicalGql,
-  defaultHandlers,
-  DISPENSE_UNIT,
-  TREATMENT
-} from '@photonhealth/sdk/test-utils';
+import { clinicalGql, defaultHandlers, DISPENSE_UNIT } from '@photonhealth/sdk/test-utils';
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
 import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
-import { stubGoogleMaps } from './test-utils/stub-google-maps';
+import { stubGoogleMaps } from '../test-utils/stub-google-maps';
 
 vi.mock('solid-element', () => ({
   customElement: vi.fn()

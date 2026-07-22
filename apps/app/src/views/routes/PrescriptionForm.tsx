@@ -6,8 +6,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
-import { trackAnalyticsEvent } from '../../instrumentation/analyticsTrackEventListenerUtils';
-import type { PhotonEmbedAnalyticsEventInput } from '@photonhealth/sdk';
 
 declare global {
   namespace JSX {
@@ -78,6 +76,11 @@ export const PrescriptionForm = () => {
     const { signal: abortControllerSignal } = abortController;
     const listenerOptions = { signal: abortControllerSignal };
 
+    if (patientId && ref.current) {
+      // Sets the props on <photon-multirx-form-wrapper>
+      ref.current.patientId = patientId;
+    }
+
     ref.current.addEventListener(
       'photon-signature-attestation-resolved',
       () => {
@@ -95,21 +98,6 @@ export const PrescriptionForm = () => {
       },
       listenerOptions
     );
-
-    ref.current.addEventListener(
-      'photon-analytics-track-event',
-      (e: { detail: PhotonEmbedAnalyticsEventInput }) => {
-        trackAnalyticsEvent(e.detail, providerAnalyticsRef.current.track);
-      },
-      listenerOptions
-    );
-
-    if (patientId && ref.current) {
-      // this ref.current setter must be after the photon-analytics-track-event so that the data is set properly when the
-      // photon-analytics-track-event fires, due to how the solidjs code within the WebComponent executes.
-      // the ref.current data is utilized by photon-analytics-track-event
-      ref.current.patientId = patientId;
-    }
 
     ref.current.addEventListener(
       'photon-prescriptions-created',

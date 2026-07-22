@@ -1,14 +1,13 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { screen, waitFor } from '@testing-library/react';
+import { Route, Routes } from 'react-router-dom';
 import { afterAll, afterEach, beforeAll, expect, test, vi } from 'vitest';
 import { setupServer } from 'msw/node';
 import { graphql, HttpResponse } from 'msw';
-import { PhotonClient } from '@photonhealth/sdk';
 import { defaultHandlers, ORGANIZATION, PROVIDER } from '@photonhealth/sdk/test-utils';
-import { ProviderAnalyticsProvider } from './hooks/useProviderAnalytics';
 import { PrescriptionForm } from './views/routes/PrescriptionForm';
 import { PatientForm } from './views/routes/NewPatient/PatientForm';
 import { OrganizationSettings } from './gql/graphql';
+import { setupHarness } from './test-utils';
 
 const testProviderUxSettings = {
   enablePrescribeToOrder: true,
@@ -28,6 +27,8 @@ const server = setupServer(
   createPrescriptionFormOrgSettingsHandler(testProviderUxSettings)
 );
 
+const { trackSpy, identifySpy, renderWithProviders } = setupHarness();
+
 beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
 
 afterEach(() => {
@@ -37,28 +38,6 @@ afterEach(() => {
 
 afterAll(() => server.close());
 
-// Mocking only what can't go through MSW
-const client = new PhotonClient({ clientId: 'test', env: 'tau' });
-client.authentication.getAccessToken = vi.fn(async () => 'test-token');
-vi.mock('@photonhealth/react', () => ({
-  usePhoton: () => ({
-    isAuthenticated: true,
-    isLoading: false,
-    user: { org_id: 'org_1' },
-    clinicalClient: client.apolloClinical
-  })
-}));
-
-const rudderTrackSpy = vi.fn();
-const rudderIdentifySpy = vi.fn();
-vi.mock('./configs/providerAnalytics', () => ({
-  getProviderAnalytics: () => ({
-    track: rudderTrackSpy,
-    isInitialized: true,
-    identify: rudderIdentifySpy
-  })
-}));
-
 const expectedOrderWorkflowIdRegex =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
@@ -67,14 +46,11 @@ test('New Prescriptions Page Viewed does not fire before Signature Attestation a
 
   // Wait for provider analytics to be ready (identify fires when data loads)
   await waitFor(() => {
-    expect(rudderIdentifySpy).toHaveBeenCalled();
+    expect(identifySpy).toHaveBeenCalled();
   });
 
   // Page view must NOT have fired yet — it should wait for photon-signature-attestation-resolved
-  expect(rudderTrackSpy).not.toHaveBeenCalledWith(
-    'New Prescriptions Page Viewed',
-    expect.anything()
-  );
+  expect(trackSpy).not.toHaveBeenCalledWith('New Prescriptions Page Viewed', expect.anything());
 });
 
 test('New Prescriptions Page Viewed fires after Signature attestation status is resolved, with correct context', async () => {
@@ -86,14 +62,14 @@ test('New Prescriptions Page Viewed fires after Signature attestation status is 
   );
 
   await waitFor(() => {
-    expect(rudderIdentifySpy).toHaveBeenCalledWith(PROVIDER.email, {
+    expect(identifySpy).toHaveBeenCalledWith(PROVIDER.email, {
       email: PROVIDER.email,
       user_id: PROVIDER.id,
       name: PROVIDER.name.full,
       org_id: ORGANIZATION.id,
       customer_id: ORGANIZATION.customer.id
     });
-    expect(rudderTrackSpy).toHaveBeenCalledWith(
+    expect(trackSpy).toHaveBeenCalledWith(
       'New Prescriptions Page Viewed',
       expect.objectContaining({
         orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex),
@@ -108,125 +84,13 @@ test('New Prescriptions Page Viewed fires after Signature attestation status is 
   });
 });
 
-test('Major CTA events from web component reach RudderStack track', async () => {
-  renderApp({ patientId: 'pat_123' });
-
-  const wrapper = await findPrescribeWrapper();
-  wrapper.dispatchEvent(
-    new CustomEvent('photon-analytics-track-event', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        category: 'ctaClicked',
-        name: 'Order Sent',
-        buttonText: 'Send',
-        orderId: 'ord_abc',
-        prescriptionCount: 1,
-        fulfillmentType: 'SEND_TO_PATIENT',
-        hasPreferredPharmacy: false,
-        setAsPreferred: false,
-        pharmacyId: null,
-        isCombinedOrder: false,
-        timestamp: new Date().toISOString()
-      }
-    })
-  );
-
-  await waitFor(() => {
-    expect(rudderTrackSpy).toHaveBeenCalledWith(
-      'Order Sent',
-      expect.objectContaining({
-        category: 'ctaClicked',
-        orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex),
-        pageName: 'New Prescriptions',
-        providerId: PROVIDER.id,
-        orgId: ORGANIZATION.id,
-        buttonText: 'Send',
-        orderId: 'ord_abc',
-        prescriptionCount: 1,
-        fulfillmentType: 'SEND_TO_PATIENT',
-        hasPreferredPharmacy: false,
-        setAsPreferred: false,
-        pharmacyId: null,
-        isCombinedOrder: false
-      })
-    );
-  });
-});
-
-test('CTA events map correctly with orderWorkflowId and category', async () => {
-  renderApp({ patientId: 'pat_123' });
-
-  const wrapper = await findPrescribeWrapper();
-
-  wrapper.dispatchEvent(
-    new CustomEvent('photon-analytics-track-event', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        category: 'ctaClicked',
-        name: 'Draft Prescription Added',
-        draftPrescriptionSource: 'form',
-        timestamp: new Date().toISOString()
-      }
-    })
-  );
-
-  await waitFor(() => {
-    expect(rudderTrackSpy).toHaveBeenCalledWith(
-      'Draft Prescription Added',
-      expect.objectContaining({
-        category: 'ctaClicked',
-        draftPrescriptionSource: 'form',
-        orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex)
-      })
-    );
-  });
-});
-
-test('Field Interaction CustomEvent maps correctly with enrichment', async () => {
-  renderApp({ patientId: 'pat_123' });
-
-  const wrapper = await findPrescribeWrapper();
-
-  wrapper.dispatchEvent(
-    new CustomEvent('photon-analytics-track-event', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        category: 'fieldInteraction',
-        name: 'Field Interaction',
-        formName: 'add_prescription_form',
-        fieldName: 'dispenseQuantity',
-        hasValue: true,
-        isOptional: false,
-        timestamp: new Date().toISOString()
-      }
-    })
-  );
-
-  await waitFor(() => {
-    expect(rudderTrackSpy).toHaveBeenCalledWith(
-      'Field Interaction',
-      expect.objectContaining({
-        category: 'fieldInteraction',
-        formName: 'add_prescription_form',
-        fieldName: 'dispenseQuantity',
-        hasValue: true,
-        isOptional: false,
-        orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex)
-      })
-    );
-  });
-});
-
 test('orderWorkflowId persists across workflow routes', async () => {
   renderApp({ patientId: 'pat_123' }, '/patients/new');
 
   await simulatePatientPageViewEvent('New Patient Page Viewed');
 
   await waitFor(() => {
-    expect(rudderTrackSpy).toHaveBeenCalledWith(
+    expect(trackSpy).toHaveBeenCalledWith(
       'New Patient Page Viewed',
       expect.objectContaining({
         orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex)
@@ -234,9 +98,11 @@ test('orderWorkflowId persists across workflow routes', async () => {
     );
   });
 
-  const patientPageOrderWorkflowId = rudderTrackSpy.mock.calls.find(
-    (args: unknown[]) => args[0] === 'New Patient Page Viewed'
-  )?.[1]?.orderWorkflowId;
+  const patientPageOrderWorkflowId = (
+    trackSpy.mock.calls.find((args: unknown[]) => args[0] === 'New Patient Page Viewed')?.[1] as
+      | { orderWorkflowId?: string }
+      | undefined
+  )?.orderWorkflowId;
 
   // Simulate "Create and Start Prescription" — navigates to /prescriptions/new
   const patientDialog = await findPatientDialogWrapper();
@@ -255,7 +121,7 @@ test('orderWorkflowId persists across workflow routes', async () => {
   );
 
   await waitFor(() => {
-    expect(rudderTrackSpy).toHaveBeenCalledWith(
+    expect(trackSpy).toHaveBeenCalledWith(
       'New Prescriptions Page Viewed',
       expect.objectContaining({
         orderWorkflowId: expect.stringMatching(expectedOrderWorkflowIdRegex)
@@ -263,9 +129,11 @@ test('orderWorkflowId persists across workflow routes', async () => {
     );
   });
 
-  const prescriptionPageOrderWorkflowId = rudderTrackSpy.mock.calls.find(
-    (args: unknown[]) => args[0] === 'New Prescriptions Page Viewed'
-  )?.[1]?.orderWorkflowId;
+  const prescriptionPageOrderWorkflowId = (
+    trackSpy.mock.calls.find(
+      (args: unknown[]) => args[0] === 'New Prescriptions Page Viewed'
+    )?.[1] as { orderWorkflowId?: string } | undefined
+  )?.orderWorkflowId;
 
   expect(patientPageOrderWorkflowId).toBe(prescriptionPageOrderWorkflowId);
 });
@@ -277,15 +145,12 @@ function renderApp(params: { patientId?: string } = {}, initialPageOverride?: st
   const initialPage = initialPageOverride
     ? initialPageOverride
     : `/prescriptions/new?${search.toString()}`;
-  return render(
-    <MemoryRouter initialEntries={[initialPage]}>
-      <ProviderAnalyticsProvider>
-        <Routes>
-          <Route path="/patients/new" element={<PatientForm />} />
-          <Route path="/prescriptions/new" element={<PrescriptionForm />} />
-        </Routes>
-      </ProviderAnalyticsProvider>
-    </MemoryRouter>
+  return renderWithProviders(
+    <Routes>
+      <Route path="/patients/new" element={<PatientForm />} />
+      <Route path="/prescriptions/new" element={<PrescriptionForm />} />
+    </Routes>,
+    { initialEntries: [initialPage] }
   );
 }
 

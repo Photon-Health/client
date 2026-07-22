@@ -78,6 +78,12 @@ interface ProviderAnalyticsContextValue {
    * Whether analytics is ready (user is authenticated and data loaded)
    */
   isReady: boolean;
+
+  /**
+   * Pass extra properties to AnalyticsEventListener in photon-client
+   * when it is rendered in our web app
+   * */
+  appAnalyticsProperties: Record<string, unknown>;
 }
 
 const ProviderAnalyticsContext = createContext<ProviderAnalyticsContextValue | null>(null);
@@ -168,14 +174,15 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
     [contextData, pageName]
   );
 
-  const value: ProviderAnalyticsContextValue = useMemo(
-    () => ({
-      track,
-      contextData,
-      isReady: isAuthenticated && !isLoading && !queryLoading && !!data
-    }),
-    [track, contextData, isAuthenticated, isLoading, queryLoading, data]
-  );
+  const value: ProviderAnalyticsContextValue = {
+    track,
+    contextData,
+    isReady: isAuthenticated && !isLoading && !queryLoading && !!data,
+    appAnalyticsProperties: {
+      orderWorkflowId: orderWorkflowIdRef.current,
+      pageName: pageName
+    }
+  };
 
   return (
     <ProviderAnalyticsContext.Provider value={value}>{children}</ProviderAnalyticsContext.Provider>

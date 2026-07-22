@@ -98,6 +98,13 @@ export const clinicalApiUrl: { [key in Env]: string } = {
   photon: 'https://clinical-api.photon.health'
 };
 
+export const analyticsApiUrl: { [key in Env]: string } = {
+  tau: 'http://analytics-api.tau.health:8080',
+  boson: 'https://analytics-api.boson.health',
+  neutron: 'https://analytics-api.neutron.health',
+  photon: 'https://analytics-api.photon.health'
+};
+
 export function getClinicalUrl(uri: string): string | undefined {
   const foundService = Object.keys(clinicalAppUrl).find((service) =>
     uri.toLowerCase().includes(service)
@@ -105,3 +112,41 @@ export function getClinicalUrl(uri: string): string | undefined {
 
   return clinicalAppUrl[foundService || 'photon'];
 }
+
+type ServicesAuthHeaders = {
+  'x-photon-auth-token': string;
+  'x-photon-auth-token-type': string;
+};
+
+type LambdasAuthHeaders = {
+  authorization: string;
+};
+
+export const getAuthHeaders = ({
+  token,
+  isServices
+}: {
+  token?: string;
+  isServices: boolean;
+}): ServicesAuthHeaders | LambdasAuthHeaders | undefined => {
+  if (!token) {
+    // Proceed with no headers to get the 401 from the API
+    return undefined;
+  }
+  return isServices
+    ? { 'x-photon-auth-token': token, 'x-photon-auth-token-type': 'auth0' }
+    : { authorization: token };
+};
+
+export const getVersionHeaders = ({
+  sdkVersion,
+  elementsVersion
+}: {
+  sdkVersion?: string;
+  elementsVersion?: string;
+}) => {
+  return {
+    ...(sdkVersion ? { 'x-photon-sdk-version': sdkVersion } : {}),
+    ...(elementsVersion ? { 'x-photon-elements-version': elementsVersion } : {})
+  };
+};
