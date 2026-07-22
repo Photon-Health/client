@@ -57,7 +57,7 @@ jobs:
       options: --user 1001
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ inputs.sha }}
 
@@ -84,10 +84,10 @@ jobs:
             const scripts = require('./.github/scripts/add-e2e-test-checks.js')
             return await scripts.createCheck({github, context, core})
 
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
         with:
-          node-version: 20.x
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies

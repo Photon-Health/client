@@ -13,14 +13,14 @@ jobs:
     name: Bump Photon
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v5
       - uses: tibdex/github-app-token@v1
         id: generate-token
         with:
           app_id: ${{ secrets.CPR_APP_ID }}
           private_key: ${{ secrets.CPR_APP_SECRET }}
       - name: checkout photon
-        uses: actions/checkout@v1
+        uses: actions/checkout@v5
         with:
           ref: photon
       - name: merge
