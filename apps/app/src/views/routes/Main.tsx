@@ -8,6 +8,7 @@ import { auth0Config } from '../../configs/auth';
 import useQueryParams from '../../hooks/useQueryParams';
 import { Env } from '@photonhealth/sdk';
 import { useWelcomeToast } from '../../hooks/useWelcomeToast';
+import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 
 declare global {
   namespace JSX {
@@ -25,6 +26,7 @@ export const Main = () => {
   const { user, isAuthenticated, isLoading, error } = usePhoton();
   const location = useLocation();
   const navigate = useNavigate();
+  const { appAnalyticsProperties } = useProviderAnalytics();
 
   useWelcomeToast();
 
@@ -75,6 +77,7 @@ export const Main = () => {
           uri={import.meta.env.VITE_GRAPHQL_URI as string}
           auto-login="false"
           env={import.meta.env.VITE_ENV_NAME as Env}
+          app-analytics-properties={JSON.stringify(appAnalyticsProperties)}
         >
           <Nav />
           <Box as="main" marginTop="16">
