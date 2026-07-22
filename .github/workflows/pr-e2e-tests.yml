@@ -84,8 +84,8 @@ jobs:
             const scripts = require('./.github/scripts/add-e2e-test-checks.js')
             return await scripts.createCheck({github, context, core})
 
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: 'npm'
