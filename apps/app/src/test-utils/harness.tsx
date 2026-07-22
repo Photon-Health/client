@@ -72,7 +72,7 @@ export function setupHarness(...initialHandlers: RequestHandler[]) {
  * `MemoryRouter` history when the rendered tree includes route-aware
  * components (e.g. a `<Routes>` block with `:param`s).
  */
-export function renderWithProviders(
+function renderWithProviders(
   ui: ReactNode,
   { initialEntries }: { initialEntries?: string[] } = {}
 ) {

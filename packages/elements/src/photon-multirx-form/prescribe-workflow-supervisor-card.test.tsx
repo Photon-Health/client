@@ -12,7 +12,7 @@ import {
   generatePatient,
   generateSupervisorPrefill
 } from './test-utils/generators';
-import { stubGoogleMaps } from './test-utils/stub-google-maps';
+import { stubGoogleMaps } from '../test-utils/stub-google-maps';
 
 vi.mock('solid-element', () => ({
   customElement: vi.fn()
