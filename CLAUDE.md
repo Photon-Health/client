@@ -277,7 +277,9 @@ declare global {
 
 ### Analytics
 
-Analytics applies only to the clinical and patient apps — **not** to `packages/elements` published to npm. Adding analytics to elements is not feasible because it can conflict with customer web applications (e.g. Datadog RUM uses a singleton pattern). Both apps use **RudderStack** for product analytics and **Datadog RUM** for monitoring/session replay. The two systems serve different purposes and are set up differently per app.
+The clinical and patient apps use **RudderStack** and **Mixpanel** for product analytics and **Datadog RUM** for monitoring/session replay. Datadog RUM specifically cannot be used from `packages/elements` (published to npm) because its singleton pattern would conflict with a customer's own Datadog instance — so RUM stays host-app-only. The two systems serve different purposes and are set up differently per app.
+
+`packages/elements`/`packages/components` do send analytics of their own via a separate path — see **Elements/Components** below. 
 
 #### Clinical App (`apps/app`)
 
@@ -295,9 +297,33 @@ Analytics applies only to the clinical and patient apps — **not** to `packages
 
 **Datadog RUM:** Initialized in `src/instrumentation/index.ts` via `initializeInstrumentation()`. User context (org, email) is set via `setInstrumentationUserContext()` which is called automatically by `ProviderAnalyticsProvider` when the user authenticates.
 
-**Prescribe Workflow Analytics (Embed Events):** The prescribe workflow lives in Solid.js web components (`packages/elements`, `packages/components`), which cannot call RudderStack directly (they're published to npm and must not bundle customer-conflicting singletons). Instead, analytics events bubble up as CustomEvents through Shadow DOM to the React clinical app, which forwards them to RudderStack.
+**Prescribe Workflow Analytics (Embed Events):** The prescribe workflow lives in Solid.js web components (`packages/elements`, `packages/components`) and cannot call RudderStack directly — see **Elements/Components** below for the event schema, dispatch mechanism, and listener.
 
-*Event categories and types* — defined in `packages/sdk/src/clinicalAnalyticsTypes.ts`:
+#### Patient App (`apps/patient`)
+
+**RudderStack:** Uses a singleton `patientAnalytics` instance exported from `src/configs/analytics.ts`.
+
+- `PatientAnalytics` class provides three methods:
+  - `page(category, name?, properties?)` — track page views
+  - `track(eventName, order, properties?)` — track events; automatically maps the `Order` object into rich context data (patient, org, pharmacy, fulfillments, medications, discount cards)
+  - `identify({ userId, address, orgId, orgName })` — identify user and group by org
+- For page tracking, use the `usePageAnalytics` hook (`src/hooks/usePageAnalytics.ts`):
+  ```tsx
+  usePageAnalytics({ pageName: "Patient's Ready By Time" });
+  ```
+  This calls `patientAnalytics.page()` once on mount with order context auto-included.
+- For event tracking, import the singleton directly:
+  ```tsx
+  import { patientAnalytics } from '../configs/analytics';
+  patientAnalytics.track('Pharmacy Selected', order, { pharmacyId });
+  ```
+- The `order` parameter is required for `track()` — it enriches every event with patient, org, pharmacy, and medication data via `mapOrderToContextData()`
+
+#### Elements/Components (`packages/elements`, `packages/components`)
+
+The prescribe workflow lives in Solid.js web components (`packages/elements`, `packages/components`), which cannot call RudderStack directly (they're published to npm and must not bundle customer-conflicting singletons). Instead, analytics events bubble up as CustomEvents through Shadow DOM to `AnalyticsEventListener`, which forwards them to a Photon-owned analytics API instead.
+
+*Event categories and types* — defined in `packages/sdk/src/analytics/clinicalAnalyticsTypes.ts`:
 
 | Category | Type | Description |
 |----------|------|-------------|
@@ -319,7 +345,9 @@ dispatchAnalyticsTrackEvent('pageViewed', { name: 'New Prescriptions Page Viewed
 ```
 This dispatches a `photon-analytics-track-event` CustomEvent (`composed: true, bubbles: true`) with `detail: { ...event, category, timestamp }`.
 
-*Listener side* — React form components (`PatientForm`, `UpdatePatientForm`, `PrescriptionForm` in `apps/app/src/views/routes/`) listen on the element ref via `addEventListener('photon-analytics-track-event', ...)`. The handler calls `trackAnalyticsEvent()` (`src/instrumentation/analyticsTrackEventListenerUtils.ts`) which extracts the `name` field as the RudderStack event name and flattens any field snapshot properties with a `snap_` prefix (e.g. `{ firstName: { completed: true } }` → `{ snap_first_name: true }`).
+*Listener side* — `AnalyticsEventListener` (`packages/components/src/analytics/AnalyticsEventListener.tsx`) listens for `photon-analytics-track-event`, attached to the ref div that `PhotonClientComponent` (`packages/elements/src/photon-client/photon-client-component.tsx`) returns and passes down as `clientRef`. It extracts the `name` field as the event name and flattens any field snapshot properties with a `snap_` prefix (e.g. `{ firstName: { completed: true } }` → `{ snap_first_name: true }`), then calls `client.analytics.track({ event: name, userId, properties })`. It only forwards events once provider/org context has loaded — it fires an async `AnalyticsContextQuery` (`me` + `organization`) in `onMount` and silently drops any event dispatched before that resolves.
+
+`client.analytics` is `AnalyticsClient` (`packages/sdk/src/analytics/AnalyticsClient.ts`) — `track({ event, userId, properties })` POSTs to `${analyticsApiUrl[env]}/event` with SDK/elements version and auth headers attached. Instantiated per `PhotonClient` instance as `sdk.analytics` (see `constructAnalyticsClient` in `packages/sdk/src/lib.ts`). Per-environment base URLs live in `analyticsApiUrl` (`packages/sdk/src/utils.ts`): `tau` → `http://analytics-api.tau.health:8080`, plus `boson`/`neutron`/`photon` variants.
 
 *Field snapshots* — `buildFieldSnapshot()` and `buildPrescriptionSnapshot()` (`packages/components/src/analytics/buildFieldSnapshot.ts`) capture form completeness state. `PATIENT_FORM_FIELDS` and `DRAFT_PRESCRIPTION_FORM_FIELDS` define which fields are tracked. These snapshots are included in CTA click events (e.g. "Patient Created", "draft prescription added") as the `fields` property.
 
@@ -327,31 +355,12 @@ This dispatches a `photon-analytics-track-event` CustomEvent (`composed: true, b
 
 | File | Purpose |
 |------|---------|
-| `packages/sdk/src/clinicalAnalyticsTypes.ts` | Event type definitions (`AnalyticsCategory`, `AnalyticsEventMap`, `PageViewEvent`, `CtaClickEvent`, `FieldInteractionEvent`) |
+| `packages/sdk/src/analytics/clinicalAnalyticsTypes.ts` | Event type definitions (`AnalyticsCategory`, `AnalyticsEventMap`, `PageViewEvent`, `CtaClickEvent`, `FieldInteractionEvent`) |
 | `packages/components/src/analytics/dispatchAnalyticsTrackEvent.ts` | Generic dispatch function — creates and fires the CustomEvent |
 | `packages/components/src/analytics/buildFieldSnapshot.ts` | Field snapshot utilities and form field constants |
 | `packages/components/src/systems/PrescribeEventDispatchProvider.tsx` | Solid.js context provider exposing `dispatchAnalyticsTrackEvent` via `usePrescribeEventDispatch()` |
-| `apps/app/src/instrumentation/analyticsTrackEventListenerUtils.ts` | Listener-side event-to-RudderStack mapping and field snapshot flattening |
-
-#### Patient App (`apps/patient`)
-
-**RudderStack:** Uses a singleton `patientAnalytics` instance exported from `src/configs/analytics.ts`.
-
-- `PatientAnalytics` class provides three methods:
-  - `page(category, name?, properties?)` — track page views
-  - `track(eventName, order, properties?)` — track events; automatically maps the `Order` object into rich context data (patient, org, pharmacy, fulfillments, medications, discount cards)
-  - `identify({ userId, address, orgId, orgName })` — identify user and group by org
-- For page tracking, use the `usePageAnalytics` hook (`src/hooks/usePageAnalytics.ts`):
-  ```tsx
-  usePageAnalytics({ pageName: "Patient's Ready By Time" });
-  ```
-  This calls `patientAnalytics.page()` once on mount with order context auto-included.
-- For event tracking, import the singleton directly:
-  ```tsx
-  import { patientAnalytics } from '../configs/analytics';
-  patientAnalytics.track('Pharmacy Selected', order, { pharmacyId });
-  ```
-- The `order` parameter is required for `track()` — it enriches every event with patient, org, pharmacy, and medication data via `mapOrderToContextData()`
+| `packages/components/src/analytics/AnalyticsEventListener.tsx` | Listener side — field snapshot flattening and forwarding to `AnalyticsClient` |
+| `packages/sdk/src/analytics/AnalyticsClient.ts` | POSTs the event to the analytics API |
 
 ## Known Tech Debt
 
@@ -415,6 +424,8 @@ All new utility functions, views, and components must include tests. Match the t
 - New clinical app views → React Testing Library tests with MSW for API mocking, following the same patterns as patient app tests. Also expand Playwright E2E coverage for critical user flows.
 - New Solid.js components in `packages/components` → component tests with `@solidjs/testing-library`
 - New React hooks → hook tests with `renderHook`
+
+**Functionality spanning `apps/*` and `packages/*` must be covered by an E2E test.** From the perspective of `apps/app`/`apps/patient` code, everything in `packages/*` (elements, components, sdk, react) should be treated as a black box — the apps only see the public surface (custom element tags/attributes, CustomEvents, exported hooks/functions), not internal implementation. Unit/component tests within a package can mock across that boundary, but they cannot verify that the app and the package actually integrate correctly end-to-end (e.g. a Solid.js element dispatching a `CustomEvent` that the React app listens for, or a prop/attribute the app passes down being consumed correctly). Any change that touches both an app and a package it consumes (e.g. `apps/app` + `packages/elements`, or `packages/elements` + `packages/components`) needs Playwright E2E coverage (`apps/app/e2e/`) in addition to any unit/component tests, rather than relying on mocks to simulate the cross-package contract.
 
 ### Test Conventions
 

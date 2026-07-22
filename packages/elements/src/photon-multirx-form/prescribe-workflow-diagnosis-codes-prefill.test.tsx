@@ -7,7 +7,7 @@ import { clinicalGql, defaultHandlers, lambdasGql } from '@photonhealth/sdk/test
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
 import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
 import { generateDiagnosisCodePrefill, generatePatient } from './test-utils/generators';
-import { stubGoogleMaps } from './test-utils/stub-google-maps';
+import { stubGoogleMaps } from '../test-utils/stub-google-maps';
 import { DiagnosisCode } from '@photonhealth/sdk/dist/clinical-api/types';
 
 vi.mock('solid-element', () => ({

@@ -1,4 +1,4 @@
-import { graphql, HttpResponse } from 'msw';
+import { graphql, HttpResponse, http } from 'msw';
 import { DISPENSE_UNIT, ORGANIZATION, PATIENT, PROVIDER, TREATMENT } from './fixtures';
 
 /**
@@ -11,7 +11,7 @@ import { DISPENSE_UNIT, ORGANIZATION, PATIENT, PROVIDER, TREATMENT } from './fix
 // is used by different endpoints with different responses.
 // Tau env: lambdas shares boson's API URL, clinical uses local tau URL.
 export const lambdasGql = graphql.link('https://api.boson.health/graphql');
-export const clinicalGql = graphql.link('http://clinical-api.tau.health:8080/graphql');
+export const clinicalGql = graphql.link('http://clinical-api.tau.health/graphql');
 
 // ---------------------------------------------------------------------------
 // Clinical API operations (via apolloClinical / services)
@@ -153,4 +153,12 @@ const lambdasHandlers = [
   )
 ];
 
-export const defaultHandlers = [...servicesHandlers, ...lambdasHandlers];
+// ---------------------------------------------------------------------------
+// Analytics API operations (REST)
+// ---------------------------------------------------------------------------
+
+const analyticsApiHandlers = [
+  http.post('http://analytics-api.tau.health:8080/event', () => HttpResponse.json({ status: 'ok' }))
+];
+
+export const defaultHandlers = [...servicesHandlers, ...lambdasHandlers, ...analyticsApiHandlers];

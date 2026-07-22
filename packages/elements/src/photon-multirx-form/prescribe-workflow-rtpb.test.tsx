@@ -8,7 +8,7 @@ import { clinicalGql, defaultHandlers, lambdasGql, TREATMENT } from '@photonheal
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
 import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
 import { generateAddress, generatePatient, generatePharmacy } from './test-utils/generators';
-import { makeGeocodeResult, stubGoogleMaps } from './test-utils/stub-google-maps';
+import { makeGeocodeResult, stubGoogleMaps } from '../test-utils/stub-google-maps';
 
 vi.mock('solid-element', () => ({
   customElement: vi.fn()

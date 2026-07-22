@@ -10,20 +10,10 @@ export type DraftPrescriptionSource = 'form' | 'med_history_refill' | 'prefill';
 // Page View Events — each page gets a unique event name
 // ---------------------------------------------------------------------------
 
-export type PageViewEvent =
-  | { name: 'New Patient Page Viewed' }
-  | { name: 'Update Patient Page Viewed' }
-  | {
-      name: 'New Prescriptions Page Viewed';
-      prefillPatientId: string;
-      prefillPharmacyId: string;
-      hasPrefillPatientExternalId: boolean;
-      hasPrefillTemplateIds: boolean;
-      hasPrefillPrescriptionIds: boolean;
-      hasPrefillWeight: boolean;
-      weightUnit: string;
-    }
-  | { name: 'Signature Attestation Page Viewed'; attestationVersion: string };
+export type PageViewEvent = {
+  name: 'Signature Attestation Page Viewed';
+  attestationVersion: string;
+};
 
 // ---------------------------------------------------------------------------
 // CTA Click Events — each variant has a unique, descriptive name
