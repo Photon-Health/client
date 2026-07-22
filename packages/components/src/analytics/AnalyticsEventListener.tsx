@@ -1,7 +1,8 @@
 import { PhotonEmbedAnalyticsEventInput, AnalyticsContextQuery } from '@photonhealth/sdk';
-import { createEffect, createSignal, JSXElement, onMount } from 'solid-js';
+import { createEffect, createSignal, JSXElement } from 'solid-js';
 import { usePhotonClient } from '../systems/SDKProvider';
 import { ApiObject } from '@rudderstack/analytics-js';
+import { usePhoton } from '../context';
 
 interface ProviderContextData {
   // User info (from me query)
@@ -40,34 +41,44 @@ export const AnalyticsEventListener = (props: {
 }) => {
   const client = usePhotonClient();
   const [contextData, setContextData] = createSignal<ProviderContextData | null>(null);
+  const store = usePhoton();
 
-  onMount(async () => {
-    try {
-      const { data } = await client.apolloClinical.query({ query: AnalyticsContextQuery });
+  createEffect(async () => {
+    // In an embed-only setup, this component renders before the user is authenticated.
+    // Only run the query once user is logged in.
+    if (
+      store.authentication.state.isAuthenticated &&
+      !store.authentication.state.isLoading &&
+      !contextData()
+    ) {
+      try {
+        const { data } = await client.apolloClinical.query({ query: AnalyticsContextQuery });
 
-      // Build context data from query response
-      const contextData: ProviderContextData = {
-        // User info from me query
-        providerId: data.me.id,
-        providerEmail: data.me.email || undefined,
-        providerName: data.me.name?.full,
-        providerNameFirst: data.me.name?.first,
-        providerNameLast: data.me.name?.last,
-        providerRoles: data.me.roles
-          .map((role) => role.name)
-          .filter((name): name is string => !!name),
-        // Organization info
-        orgId: data.organization?.id,
-        orgName: data.organization?.name,
-        // Customer info
-        customerId: data.organization?.customer?.id,
-        customerName: data.organization?.customer?.name
-      };
+        // Build context data from query response
+        const contextData: ProviderContextData = {
+          // User info from me query
+          providerId: data.me.id,
+          providerEmail: data.me.email || undefined,
+          providerName: data.me.name?.full,
+          providerNameFirst: data.me.name?.first,
+          providerNameLast: data.me.name?.last,
+          providerRoles: data.me.roles
+            .map((role) => role.name)
+            .filter((name): name is string => !!name),
+          // Organization info
+          orgId: data.organization?.id,
+          orgName: data.organization?.name,
+          // Customer info
+          customerId: data.organization?.customer?.id,
+          customerName: data.organization?.customer?.name
+        };
 
-      setContextData(contextData);
-    } catch (e) {
-      // If AnalyticsContextQuery fails, do not throw error but do log
-      console.error('📊 [Analytics: To Analytics API] Error loading analytics context', e);
+        setContextData(contextData);
+      } catch {
+        // AnalyticsContextQuery should fail silently
+        // There's also an edge case caused by the double-login scenario where
+        // a rediret cancels the in-flight request, which is acceptable for now
+      }
     }
   });
 
@@ -84,9 +95,8 @@ export const AnalyticsEventListener = (props: {
       ((e: CustomEvent<PhotonEmbedAnalyticsEventInput>) => {
         const context = contextData();
         if (!context) {
-          console.error(
-            '📊 [Analytics: To Analytics API] Skipping event tracking without analytics context',
-            e
+          console.warn(
+            '📊 [Analytics: To Analytics API] Analytics context not defined, skipping tracking'
           );
           return;
         }
