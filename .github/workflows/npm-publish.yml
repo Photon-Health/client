@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - photon
+  # Let's us retry the action if it fails on push to photon
+  workflow_dispatch:
 
 permissions:
   id-token: write # Required for OIDC trusted publishing
