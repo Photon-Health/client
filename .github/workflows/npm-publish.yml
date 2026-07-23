@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - photon
+  # Lets us retry the action if it fails on push to photon
+  workflow_dispatch:
 
 permissions:
   id-token: write # Required for OIDC trusted publishing
@@ -41,47 +43,39 @@ jobs:
       - name: Check for version updates
         id: check
         run: |
-          PACKAGES=""
-          for file in $(git diff --name-only HEAD~1...HEAD | grep '/package.json' | grep 'packages/'); do
-            if git diff HEAD~1...HEAD -- $file | grep '\"version\"'; then
-              PACKAGE_PATH=$(dirname $file)
-              PACKAGES="$PACKAGES $PACKAGE_PATH"
-            fi
-          done
-          echo $PACKAGES
-          echo "::set-output name=packages::$PACKAGES"
+          PACKAGE_VERSION=$(node -p "require('./packages/elements/package.json').version")
+          PUBLISHED_VERSION=$(npm view @photonhealth/elements version)
 
-      - name: Publish changed packages
+          if [ "$PACKAGE_VERSION" == "$PUBLISHED_VERSION" ]; then
+            echo "No version bump ($PACKAGE_VERSION already published)"
+          else
+            echo "Version bump found: $PUBLISHED_VERSION -> $PACKAGE_VERSION"
+            echo "version=$PACKAGE_VERSION" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish changed package
         run: |
-          PACKAGES="${{ steps.check.outputs.packages }}"
-          if [ -z "$PACKAGES" ]
+          PACKAGE_VERSION="${{ steps.check.outputs.version }}"
+          if [ -z "$PACKAGE_VERSION" ]
           then
               echo "No package updates found."
           else
-              echo "Package updates found: $PACKAGES"
-              for PACKAGE in $PACKAGES
-              do
-                  echo "Publishing $PACKAGE..."
+              echo "Publishing packages/elements..."
 
-                  cd $PACKAGE
+              cd packages/elements
 
-                  PACKAGE_VERSION=$(node -p "require('./package.json').version")
-                  PACKAGE_NAME=$(basename $PACKAGE)
-                  PACKAGE_TAG="${PACKAGE_NAME}_v${PACKAGE_VERSION}"
-                  PACKAGE_BODY="TODO FILL OUT RELEASE NOTES for $PACKAGE_NAME v$PACKAGE_VERSION"
+              PACKAGE_TAG="elements_v${PACKAGE_VERSION}"
+              PACKAGE_BODY="TODO FILL OUT RELEASE NOTES for elements v$PACKAGE_VERSION"
 
-                  if [[ $PACKAGE_VERSION == *"rc"* ]]
-                  then
-                    npm publish --tag rc
-                  else
-                    npm publish
-                  fi
+              if [[ $PACKAGE_VERSION == *"rc"* ]]
+              then
+                npm publish --tag rc
+              else
+                npm publish
+              fi
 
-                  echo "Creating GitHub release for $PACKAGE version $PACKAGE_VERSION..."
+              echo "Creating GitHub release for elements version $PACKAGE_VERSION..."
 
-                  git tag -a $PACKAGE_TAG -m "$PACKAGE_BODY"
-                  git push origin $PACKAGE_TAG
-
-                  cd -
-              done
+              git tag -a $PACKAGE_TAG -m "$PACKAGE_BODY"
+              git push origin $PACKAGE_TAG
           fi
