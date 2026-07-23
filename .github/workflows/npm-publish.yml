@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - photon
-  # Let's us retry the action if it fails on push to photon
+  # Lets us retry the action if it fails on push to photon
   workflow_dispatch:
 
 permissions:
