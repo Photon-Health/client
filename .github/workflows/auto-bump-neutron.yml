@@ -17,7 +17,7 @@ jobs:
         uses: actions/create-github-app-token@v3
         id: generate-token
         with:
-          app-id: ${{ secrets.CPR_APP_ID }}
+          client-id: ${{ secrets.CPR_APP_ID }}
           private-key: ${{ secrets.CPR_APP_SECRET }}
       - name: checkout neutron
         uses: actions/checkout@v5
