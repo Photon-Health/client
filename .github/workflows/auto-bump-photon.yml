@@ -13,16 +13,17 @@ jobs:
     name: Bump Photon
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: tibdex/github-app-token@v1
+      - name: Generate token
+        uses: actions/create-github-app-token@v3
         id: generate-token
         with:
-          app_id: ${{ secrets.CPR_APP_ID }}
-          private_key: ${{ secrets.CPR_APP_SECRET }}
+          app-id: ${{ secrets.CPR_APP_ID }}
+          private-key: ${{ secrets.CPR_APP_SECRET }}
       - name: checkout photon
-        uses: actions/checkout@v1
+        uses: actions/checkout@v5
         with:
           ref: photon
+          fetch-depth: 0
       - name: merge
         run: |
           git config user.name 'GitHub'
@@ -30,7 +31,7 @@ jobs:
           git merge origin/neutron
       - name: Create Pull Request
         id: cpr
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ steps.generate-token.outputs.token }}
           base: photon
@@ -38,4 +39,3 @@ jobs:
           title: 'Photon: Merge neutron into photon'
           commit-message: merge
           committer: GitHub <noreply@github.com>
-          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
