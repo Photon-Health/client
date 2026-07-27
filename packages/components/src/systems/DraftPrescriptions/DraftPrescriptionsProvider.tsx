@@ -79,27 +79,16 @@ export type TemplateOverrides = {
 /**
  * A map from a Photon id to the override to apply to the draft created for it.
  * The key's prefix selects the behavior:
- * - `rx_…`  clone that existing prescription, then apply the override. The
- *   override must set at least one field; to clone with no changes, use the
- *   `prescription-ids` attribute instead.
- * - `med_…` create a fresh draft for that medication from the override, which
- *   must supply the fields the API requires to create a prescription
- *   (`dispenseQuantity`, `dispenseUnit`, `fillsAllowed`, `instructions`) — there
- *   is no source prescription to inherit them from.
- * Entries that don't carry a usable override are skipped.
+ * - `rx_…`  clone that existing prescription, then apply the override. To clone
+ *   with no changes, use the `prescription-ids` attribute instead.
+ * - `med_…` create a fresh draft for that medication from the override. There is
+ *   no source prescription to inherit from, so the override must carry the
+ *   prescription's fields; the Photon API validates completeness.
+ * An entry with an empty override is skipped.
  */
 export type DraftPrescriptions = {
   [prescriptionOrMedicationId: string]: PrescriptionOverride;
 };
-
-// Fields the API requires to create a prescription (see MutationCreatePrescriptionArgs).
-// A `med_…` draft has no source prescription, so its override must supply them.
-const REQUIRED_DRAFT_FIELDS: (keyof PrescriptionOverride)[] = [
-  'dispenseQuantity',
-  'dispenseUnit',
-  'fillsAllowed',
-  'instructions'
-];
 
 export type PrescriptionFormData = {
   id?: string;
@@ -200,16 +189,18 @@ const createPrefillPrescriptionsOnApi = async ({
   if (draftEntries.length > 0) {
     const draftInputs = await Promise.all(
       draftEntries.map(async ([id, override]) => {
+        // An empty override creates nothing usable: for `rx_…` it is a plain
+        // clone (use the prescription-ids attribute for that), and a medication
+        // needs the prescription's fields. Skip it; let the Photon API validate
+        // everything else.
+        if (Object.keys(override).length === 0) {
+          console.error(
+            `draft-prescriptions: skipping "${id}" — an override is required; ` +
+              `use the prescription-ids attribute to clone an existing rx unchanged.`
+          );
+          return null;
+        }
         if (id.startsWith('rx_')) {
-          // Cloning an existing rx with no override is exactly what the
-          // prescription-ids attribute does — point callers there instead.
-          if (Object.keys(override).length === 0) {
-            console.error(
-              `draft-prescriptions: skipping "${id}" — an empty override clones with no ` +
-                `changes; use the prescription-ids attribute for that instead.`
-            );
-            return null;
-          }
           const { data } = await client.apollo.query({
             query: GetPrescription,
             variables: { id }
@@ -218,18 +209,6 @@ const createPrefillPrescriptionsOnApi = async ({
             ...transformPrescriptionFormData(data?.prescription, props.patientId),
             ...override
           };
-        }
-        // A medication has no source prescription to inherit from, and the API
-        // rejects an incomplete prescription, so the override must supply the
-        // required fields. Skip (rather than send a doomed request that would
-        // fail the whole batch) any entry that would produce a blank/partial draft.
-        const missingFields = REQUIRED_DRAFT_FIELDS.filter((field) => override[field] == null);
-        if (missingFields.length > 0) {
-          console.error(
-            `draft-prescriptions: skipping "${id}" — creating a draft for a medication ` +
-              `requires ${REQUIRED_DRAFT_FIELDS.join(', ')}; missing ${missingFields.join(', ')}`
-          );
-          return null;
         }
         return {
           ...override,

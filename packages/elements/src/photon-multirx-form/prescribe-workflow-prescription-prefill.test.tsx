@@ -195,7 +195,7 @@ test('draft-prescriptions entries without a usable override are skipped, not cre
         fillsAllowed: 1,
         instructions: 'Take one tablet daily'
       },
-      // medication with no clinical fields → API would reject → skipped
+      // medication with an empty override → skipped
       [BLANK_MEDICATION_ID]: {},
       // rx clone with an empty override → use prescription-ids instead → skipped
       [NO_OVERRIDE_RX_ID]: {}
