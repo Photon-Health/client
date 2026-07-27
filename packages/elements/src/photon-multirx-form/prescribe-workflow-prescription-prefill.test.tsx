@@ -1,12 +1,12 @@
-import { cleanup, screen, waitFor } from '@solidjs/testing-library';
+import { cleanup, waitFor } from '@solidjs/testing-library';
 import { afterAll, afterEach, beforeAll, expect, test, vi } from 'vitest';
 import { setupServer } from 'msw/node';
 import { HttpResponse } from 'msw';
 import { PatientStore } from '../stores/patient';
-import { defaultHandlers, lambdasGql, TREATMENT } from '@photonhealth/sdk/test-utils';
+import { defaultHandlers, lambdasGql } from '@photonhealth/sdk/test-utils';
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
 import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
-import { stubGoogleMaps } from './test-utils/stub-google-maps';
+import { stubGoogleMaps } from '../test-utils/stub-google-maps';
 
 vi.mock('solid-element', () => ({
   customElement: vi.fn()
@@ -35,16 +35,22 @@ afterEach(async () => {
 
 afterAll(() => server.close());
 
+// Photon treatment/medication ids are `med_…` (a prescription's `treatment.id`
+// is a medication id); prescription ids are `rx_…`.
+const SOURCE_MEDICATION_ID = 'med_01ARZ3NDEKTSV4RRFFQ69G5FAV';
+const FRESH_MEDICATION_ID = 'med_01GQ7XZP2N8Y3W4V5T6R7S8U9M';
+const SOURCE_PRESCRIPTION_ID = 'rx_01HQBE3M5V7C9K1N2P4R6T8W0X';
+
 const SOURCE_TREATMENT = {
   __typename: 'Treatment',
-  id: 'trt_source',
+  id: SOURCE_MEDICATION_ID,
   name: 'Lisinopril 10mg tablet',
   codes: {}
 };
 
 const SOURCE_PRESCRIPTION = {
   __typename: 'Prescription',
-  id: 'rx_source_1',
+  id: SOURCE_PRESCRIPTION_ID,
   daysSupply: 30,
   dispenseAsWritten: false,
   dispenseQuantity: 30,
@@ -60,15 +66,22 @@ type PrescriptionInput = {
   treatmentId?: string;
   daysSupply?: number;
   dispenseQuantity?: number;
+  dispenseUnit?: string;
+  fillsAllowed?: number;
   instructions?: string;
   patientId?: string;
 };
 
-function mockPrescriptionPrefillHandlers(capturedPrescriptions: PrescriptionInput[]) {
+// Captures the CreatePrescriptions inputs and echoes back a valid prescription
+// per input. `getPrescriptionCalled` records whether the clone path ran.
+function mockDraftPrefillHandlers(capturedPrescriptions: PrescriptionInput[]) {
+  const state = { getPrescriptionCalled: false };
+
   server.use(
-    lambdasGql.query('GetPrescription', () =>
-      HttpResponse.json({ data: { prescription: SOURCE_PRESCRIPTION } })
-    ),
+    lambdasGql.query('GetPrescription', () => {
+      state.getPrescriptionCalled = true;
+      return HttpResponse.json({ data: { prescription: SOURCE_PRESCRIPTION } });
+    }),
     lambdasGql.mutation('CreatePrescriptions', ({ variables }) => {
       const prescriptions = variables.prescriptions as PrescriptionInput[];
       capturedPrescriptions.push(...prescriptions);
@@ -80,138 +93,129 @@ function mockPrescriptionPrefillHandlers(capturedPrescriptions: PrescriptionInpu
             externalId: p.externalId ?? null,
             dispenseAsWritten: false,
             dispenseQuantity: p.dispenseQuantity ?? 30,
-            dispenseUnit: 'Tablet',
-            fillsAllowed: 2,
+            dispenseUnit: p.dispenseUnit ?? 'Tablet',
+            fillsAllowed: p.fillsAllowed ?? 2,
             daysSupply: p.daysSupply ?? 30,
             instructions: p.instructions ?? SOURCE_PRESCRIPTION.instructions,
             notes: '',
             doNotFillBeforeDate: null,
             diagnoses: [],
-            treatment: SOURCE_TREATMENT
+            treatment: {
+              __typename: 'Treatment',
+              id: p.treatmentId ?? SOURCE_MEDICATION_ID,
+              name: SOURCE_TREATMENT.name,
+              codes: {}
+            }
           }))
         }
       });
     })
   );
+
+  return state;
 }
 
-test('prescriptionOverrides are applied to prescriptions prefilled from prescriptionIds', async () => {
-  const capturedPrescriptions: PrescriptionInput[] = [];
-  mockPrescriptionPrefillHandlers(capturedPrescriptions);
+test('draft-prescriptions rx_ entry clones the source prescription and the override wins', async () => {
+  const captured: PrescriptionInput[] = [];
+  const state = mockDraftPrefillHandlers(captured);
 
   renderPrescribeWorkflow({
-    prescriptionIds: 'rx_source_1',
-    prescriptionOverrides: {
-      rx_source_1: { externalId: 'ext_override_1', daysSupply: 90 }
+    draftPrescriptions: {
+      [SOURCE_PRESCRIPTION_ID]: { externalId: 'ext_override_1', daysSupply: 90 }
     }
   });
 
   await waitFor(
     () => {
-      expect(capturedPrescriptions).toHaveLength(1);
+      expect(captured).toHaveLength(1);
     },
     { timeout: 3000 }
   );
 
-  const [sent] = capturedPrescriptions;
+  const [sent] = captured;
+  // the source prescription is fetched to clone it
+  expect(state.getPrescriptionCalled).toBe(true);
   // overridden fields win
   expect(sent.externalId).toBe('ext_override_1');
   expect(sent.daysSupply).toBe(90);
   // everything else still comes from the source prescription
-  expect(sent.treatmentId).toBe(SOURCE_TREATMENT.id);
+  expect(sent.treatmentId).toBe(SOURCE_MEDICATION_ID);
   expect(sent.dispenseQuantity).toBe(SOURCE_PRESCRIPTION.dispenseQuantity);
   expect(sent.instructions).toBe(SOURCE_PRESCRIPTION.instructions);
 });
 
-test('prescriptionExternalId is stamped on a prescription created from the form', async () => {
-  const capturedPrescriptions: PrescriptionInput[] = [];
+test('draft-prescriptions med_ entry creates a fresh draft with the override applied', async () => {
+  const captured: PrescriptionInput[] = [];
+  const state = mockDraftPrefillHandlers(captured);
 
-  server.use(
-    lambdasGql.mutation('CreatePrescription', ({ variables }) => {
-      capturedPrescriptions.push(variables as PrescriptionInput);
-      return HttpResponse.json({
-        data: {
-          createPrescription: {
-            __typename: 'Prescription',
-            id: 'rx_form_1',
-            externalId: variables.externalId ?? null,
-            treatment: TREATMENT,
-            dispenseQuantity: variables.dispenseQuantity,
-            dispenseUnit: variables.dispenseUnit,
-            fillsAllowed: variables.fillsAllowed,
-            instructions: variables.instructions,
-            state: 'DRAFT'
-          }
-        }
-      });
-    })
-  );
-
-  const { waitForPrescribeForm, addDraftPrescription } = renderPrescribeWorkflow({
-    prescriptionExternalId: 'ext_session_1'
+  renderPrescribeWorkflow({
+    draftPrescriptions: {
+      [FRESH_MEDICATION_ID]: {
+        externalId: 'ext_med_1',
+        daysSupply: 30,
+        dispenseQuantity: 30,
+        dispenseUnit: 'Tablet',
+        fillsAllowed: 1,
+        instructions: 'Take one tablet daily'
+      }
+    }
   });
-
-  await waitForPrescribeForm();
-  await addDraftPrescription();
 
   await waitFor(
     () => {
-      expect(capturedPrescriptions).toHaveLength(1);
+      expect(captured).toHaveLength(1);
     },
     { timeout: 3000 }
   );
 
-  expect(capturedPrescriptions[0].externalId).toBe('ext_session_1');
+  const [sent] = captured;
+  // no source prescription is fetched for a med_ entry
+  expect(state.getPrescriptionCalled).toBe(false);
+  // the fresh draft is seeded with the medication id and the override
+  expect(sent.treatmentId).toBe(FRESH_MEDICATION_ID);
+  expect(sent.externalId).toBe('ext_med_1');
+  expect(sent.daysSupply).toBe(30);
+  expect(sent.instructions).toBe('Take one tablet daily');
 });
 
-test('prescriptionExternalId is not re-used while another draft already carries it', async () => {
-  const capturedPrefill: PrescriptionInput[] = [];
-  const capturedFormCreates: PrescriptionInput[] = [];
+test('draft-prescriptions entries without a usable override are skipped, not created', async () => {
+  const captured: PrescriptionInput[] = [];
+  const state = mockDraftPrefillHandlers(captured);
+  const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+  const BLANK_MEDICATION_ID = 'med_01H0000000000000000BLANK0';
+  const NO_OVERRIDE_RX_ID = 'rx_01H00000000000000000NOOP0';
 
-  mockPrescriptionPrefillHandlers(capturedPrefill);
-  server.use(
-    lambdasGql.mutation('CreatePrescription', ({ variables }) => {
-      capturedFormCreates.push(variables as PrescriptionInput);
-      return HttpResponse.json({
-        data: {
-          createPrescription: {
-            __typename: 'Prescription',
-            id: 'rx_form_2',
-            externalId: variables.externalId ?? null,
-            treatment: TREATMENT,
-            dispenseQuantity: variables.dispenseQuantity,
-            dispenseUnit: variables.dispenseUnit,
-            fillsAllowed: variables.fillsAllowed,
-            instructions: variables.instructions,
-            state: 'DRAFT'
-          }
-        }
-      });
-    })
-  );
-
-  const { user, waitForPrescribeForm, addDraftPrescription } = renderPrescribeWorkflow({
-    prescriptionIds: 'rx_source_1',
-    prescriptionOverrides: { rx_source_1: { externalId: 'ext_once' } },
-    prescriptionExternalId: 'ext_once'
+  renderPrescribeWorkflow({
+    draftPrescriptions: {
+      // complete medication → created
+      [FRESH_MEDICATION_ID]: {
+        externalId: 'ext_ok',
+        dispenseQuantity: 30,
+        dispenseUnit: 'Tablet',
+        fillsAllowed: 1,
+        instructions: 'Take one tablet daily'
+      },
+      // medication with no clinical fields → API would reject → skipped
+      [BLANK_MEDICATION_ID]: {},
+      // rx clone with an empty override → use prescription-ids instead → skipped
+      [NO_OVERRIDE_RX_ID]: {}
+    }
   });
-
-  // wait for the prefilled draft (which carries ext_once) to land in pending order
-  await screen.findByText(SOURCE_TREATMENT.name, {}, { timeout: 3000 });
-
-  // the form is collapsed after a successful prefill — expand it to add another rx
-  await user.click(await screen.findByRole('button', { name: /add another/i }));
-  await waitForPrescribeForm();
-
-  await addDraftPrescription();
 
   await waitFor(
     () => {
-      expect(capturedFormCreates).toHaveLength(1);
+      expect(captured).toHaveLength(1);
     },
     { timeout: 3000 }
   );
 
-  expect(capturedPrefill[0].externalId).toBe('ext_once');
-  expect(capturedFormCreates[0].externalId).toBeUndefined();
+  // only the complete medication reached the API
+  expect(captured[0].treatmentId).toBe(FRESH_MEDICATION_ID);
+  // the empty rx_ override was skipped before any source fetch
+  expect(state.getPrescriptionCalled).toBe(false);
+  // both unusable entries were reported
+  expect(consoleError).toHaveBeenCalledWith(expect.stringContaining(BLANK_MEDICATION_ID));
+  expect(consoleError).toHaveBeenCalledWith(expect.stringContaining(NO_OVERRIDE_RX_ID));
+
+  consoleError.mockRestore();
 });

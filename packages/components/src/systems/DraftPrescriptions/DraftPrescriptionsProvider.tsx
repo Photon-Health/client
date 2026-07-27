@@ -54,8 +54,7 @@ interface DraftPrescriptionProviderProps {
   templateIdsPrefill: string[];
   templateOverrides: TemplateOverrides;
   prescriptionIdsPrefill: string[];
-  prescriptionOverrides: PrescriptionOverrides;
-  prescriptionExternalId?: string;
+  draftPrescriptionsPrefill: DraftPrescriptions;
   enableCombineAndDuplicate: boolean;
   additionalNotes?: string;
   weight?: number;
@@ -77,9 +76,30 @@ export type TemplateOverrides = {
   [templateId: string]: PrescriptionOverride;
 };
 
-export type PrescriptionOverrides = {
-  [prescriptionId: string]: PrescriptionOverride;
+/**
+ * A map from a Photon id to the override to apply to the draft created for it.
+ * The key's prefix selects the behavior:
+ * - `rx_…`  clone that existing prescription, then apply the override. The
+ *   override must set at least one field; to clone with no changes, use the
+ *   `prescription-ids` attribute instead.
+ * - `med_…` create a fresh draft for that medication from the override, which
+ *   must supply the fields the API requires to create a prescription
+ *   (`dispenseQuantity`, `dispenseUnit`, `fillsAllowed`, `instructions`) — there
+ *   is no source prescription to inherit them from.
+ * Entries that don't carry a usable override are skipped.
+ */
+export type DraftPrescriptions = {
+  [prescriptionOrMedicationId: string]: PrescriptionOverride;
 };
+
+// Fields the API requires to create a prescription (see MutationCreatePrescriptionArgs).
+// A `med_…` draft has no source prescription, so its override must supply them.
+const REQUIRED_DRAFT_FIELDS: (keyof PrescriptionOverride)[] = [
+  'dispenseQuantity',
+  'dispenseUnit',
+  'fillsAllowed',
+  'instructions'
+];
 
 export type PrescriptionFormData = {
   id?: string;
@@ -158,7 +178,7 @@ const createPrefillPrescriptionsOnApi = async ({
     rxToCreate = rxToCreate.concat(templatedCreateRxList);
   }
 
-  // Fetch prescriptions if needed
+  // Clone existing prescriptions from prescription-ids
   if (props.prescriptionIdsPrefill.length > 0) {
     const fetchedPrescriptions = await Promise.all(
       props.prescriptionIdsPrefill.map(async (prescriptionId: string) => {
@@ -166,13 +186,59 @@ const createPrefillPrescriptionsOnApi = async ({
           query: GetPrescription,
           variables: { id: prescriptionId }
         });
-        return {
-          ...transformPrescriptionFormData(data?.prescription, props.patientId),
-          ...props.prescriptionOverrides?.[prescriptionId]
-        };
+        return transformPrescriptionFormData(data?.prescription, props.patientId);
       })
     );
     rxToCreate = rxToCreate.concat(fetchedPrescriptions);
+  }
+
+  // Create drafts from the draft-prescriptions map. The key's Photon id prefix
+  // selects the source: `rx_…` clones an existing prescription (its fields are
+  // inherited, the override wins), any other id (`med_…`) creates a fresh draft
+  // for that medication from the override alone.
+  const draftEntries = Object.entries(props.draftPrescriptionsPrefill);
+  if (draftEntries.length > 0) {
+    const draftInputs = await Promise.all(
+      draftEntries.map(async ([id, override]) => {
+        if (id.startsWith('rx_')) {
+          // Cloning an existing rx with no override is exactly what the
+          // prescription-ids attribute does — point callers there instead.
+          if (Object.keys(override).length === 0) {
+            console.error(
+              `draft-prescriptions: skipping "${id}" — an empty override clones with no ` +
+                `changes; use the prescription-ids attribute for that instead.`
+            );
+            return null;
+          }
+          const { data } = await client.apollo.query({
+            query: GetPrescription,
+            variables: { id }
+          });
+          return {
+            ...transformPrescriptionFormData(data?.prescription, props.patientId),
+            ...override
+          };
+        }
+        // A medication has no source prescription to inherit from, and the API
+        // rejects an incomplete prescription, so the override must supply the
+        // required fields. Skip (rather than send a doomed request that would
+        // fail the whole batch) any entry that would produce a blank/partial draft.
+        const missingFields = REQUIRED_DRAFT_FIELDS.filter((field) => override[field] == null);
+        if (missingFields.length > 0) {
+          console.error(
+            `draft-prescriptions: skipping "${id}" — creating a draft for a medication ` +
+              `requires ${REQUIRED_DRAFT_FIELDS.join(', ')}; missing ${missingFields.join(', ')}`
+          );
+          return null;
+        }
+        return {
+          ...override,
+          patientId: props.patientId,
+          treatmentId: id
+        };
+      })
+    );
+    rxToCreate = rxToCreate.concat(draftInputs.filter(Boolean));
   }
 
   if (!rxToCreate.length) {
@@ -209,11 +275,14 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
     return notesPrefill || undefined;
   });
 
-  // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId
+  // Prefill new prescriptions from templateIds, prescriptionIds, or the
+  // draft-prescriptions map once we get a patientId
   createEffect(async () => {
     if (
-      // must have templateIds or prescriptionIds to create prescriptions
-      (props.templateIdsPrefill.length > 0 || props.prescriptionIdsPrefill.length > 0) &&
+      // must have something to prefill from to create prescriptions
+      (props.templateIdsPrefill.length > 0 ||
+        props.prescriptionIdsPrefill.length > 0 ||
+        Object.keys(props.draftPrescriptionsPrefill).length > 0) &&
       // must have a patientId
       !!props.patientId &&
       // must not have created prescriptions yet
@@ -294,22 +363,10 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
   ): Promise<Prescription> => {
     let createdPrescription: Prescription | null = null;
 
-    const variables = transformPrescriptionFormData(prescriptionFormData, props.patientId);
-    if (
-      props.prescriptionExternalId &&
-      !variables.externalId &&
-      !draftPrescriptions().some((rx) => rx.externalId === props.prescriptionExternalId)
-    ) {
-      // Stamp the host-provided external id on at most one live draft at a time:
-      // drafts that already carry an external id (prefills, edits) keep theirs, and
-      // deleting the stamped draft frees the id for the next prescription.
-      variables.externalId = props.prescriptionExternalId;
-    }
-
     try {
       const res = await client.apollo.mutate({
         mutation: CreatePrescription,
-        variables
+        variables: transformPrescriptionFormData(prescriptionFormData, props.patientId)
       });
       const created = res.data.createPrescription as Prescription;
       createdPrescription = created;
