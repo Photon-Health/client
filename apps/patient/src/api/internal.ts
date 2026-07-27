@@ -22,9 +22,15 @@ export const getOfferBundles = async (orderId: string) => {
   return response.offerBundles;
 };
 
-export const getFaqs = async (orderId: string) => {
-  const response = await graphQLClient.GetFaqs({ orderId });
-  return response.faqs;
+export const getPatientCopy = async (orderId: string) => {
+  const {
+    patientCopy: { faqs, copy }
+  } = await graphQLClient.GetPatientCopy({ orderId });
+  const copyRecord: Record<string, string> = {};
+  for (const { key, value } of copy) {
+    copyRecord[key] = value;
+  }
+  return { faqs, copy: copyRecord };
 };
 
 export const getPharmaciesByLocation = async ({

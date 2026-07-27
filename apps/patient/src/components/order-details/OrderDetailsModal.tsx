@@ -29,21 +29,16 @@ export interface PrescriptionData {
 
 export interface OrderDetailsProps {
   pharmacyName: string;
-  pharmacyId?: string;
   pharmacyLogo?: string;
   prescriptions: PrescriptionData[];
   fulfillmentState?: PrescriptionFulfillment['state'] | 'DELAYED' | 'FILLING' | 'SHIPPED';
+  nextSteps?: string;
 }
 
 export interface OrderDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
-const NEXT_STEPS_BY_PHARMACY: Record<string, string> = {
-  [import.meta.env.VITE_AMAZON_PHARMACY_ID as string]:
-    'Amazon Pharmacy will text you shortly — no action needed.\n\nNo text? Log in at [amazon.com/pharmacy](https://amazon.com/pharmacy) to view your prescription or create an account. Your prescription should show up soon.\n\nStill have trouble? Contact support. You can also switch pharmacies if needed.'
-};
 
 const Row = ({ k, value }: { k: string; value: ReactNode }) => {
   return (
@@ -80,7 +75,6 @@ const defaultIcon = (
 );
 
 export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalProps) => {
-  const nextSteps = props.pharmacyId ? NEXT_STEPS_BY_PHARMACY[props.pharmacyId] : undefined;
   const handleClose = () => {
     props.onClose();
   };
@@ -133,14 +127,14 @@ export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalPr
                   <PrescriptionBlock key={`${p.rxName}-${i}`} rx={p} />
                 ))}
               </VStack>
-              {nextSteps &&
+              {props.nextSteps &&
                 (props.fulfillmentState === 'CREATED' || props.fulfillmentState === 'SENT') && (
                   <VStack alignItems="stretch" spacing={2} w="full">
                     <Text fontWeight="bold" fontSize="lg">
                       Next Steps
                     </Text>
                     <Box bgColor="blue.50" borderRadius="xl" p={4}>
-                      <Text whiteSpace="pre-wrap">{renderWithLinks(nextSteps)}</Text>
+                      <Text whiteSpace="pre-wrap">{renderWithLinks(props.nextSteps)}</Text>
                     </Box>
                   </VStack>
                 )}
