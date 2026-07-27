@@ -2,6 +2,7 @@ import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
 import { Env, PhotonClient } from '@photonhealth/sdk';
 import {
+  AnalyticsEventListener,
   GoogleServiceProvider,
   PhotonClientStore,
   PhotonContext,
@@ -13,7 +14,7 @@ import { hasAuthParams } from '../utils';
 import pkg from '../../package.json';
 import { type User } from '@auth0/auth0-react';
 
-type PhotonClientProps = {
+export type PhotonClientProps = {
   domain?: string;
   audience?: string;
   connection?: string;
@@ -29,11 +30,13 @@ type PhotonClientProps = {
   env?: Env;
   externalUserId?: string;
   emitUserToken?: boolean;
+  /* Pass extra properties when photon-client is rendered in our web app */
+  appAnalyticsProperties?: Record<string, unknown>;
 };
 
 const version = pkg?.version ?? 'unknown';
 
-const Component = (props: PhotonClientProps) => {
+export const PhotonClientComponent = (props: PhotonClientProps) => {
   let ref: any;
 
   const baseRedirectURI = props.redirectUri ? props.redirectUri : window.location.origin;
@@ -137,7 +140,12 @@ const Component = (props: PhotonClientProps) => {
       <PhotonContext.Provider value={store()}>
         <GoogleServiceProvider>
           <SDKProvider client={sdk}>
-            <slot />
+            <AnalyticsEventListener
+              clientRef={ref}
+              appAnalyticsProperties={props.appAnalyticsProperties}
+            >
+              <slot />
+            </AnalyticsEventListener>
           </SDKProvider>
         </GoogleServiceProvider>
       </PhotonContext.Provider>
@@ -244,7 +252,14 @@ customElement(
       reflect: false,
       notify: false,
       parse: true
+    },
+    appAnalyticsProperties: {
+      attribute: 'app-analytics-properties',
+      value: undefined,
+      reflect: false,
+      notify: false,
+      parse: true
     }
   },
-  Component
+  PhotonClientComponent
 );

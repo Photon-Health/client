@@ -89,6 +89,7 @@ import { PatientSelect } from './systems/PatientSelect';
 import { validateRealPhoneNumber } from './utils/validateRealPhoneNumber';
 import { npiRegex, zipCodeRegex } from './utils/regex';
 import { addressSchema, AddressForm } from './systems/AddressForm';
+import { AnalyticsEventListener } from './analytics/AnalyticsEventListener';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
 
@@ -166,7 +167,8 @@ export {
   addressSchema,
   AddressForm,
   PrescriptionScreeningProvider,
-  usePrescriptionScreening
+  usePrescriptionScreening,
+  AnalyticsEventListener
 };
 
 // Export types

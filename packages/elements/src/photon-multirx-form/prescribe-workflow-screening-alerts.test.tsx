@@ -7,7 +7,7 @@ import { clinicalGql, defaultHandlers, lambdasGql, TREATMENT } from '@photonheal
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
 import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
 import { generatePatient, generatePrescriptionScreeningAlert } from './test-utils/generators';
-import { stubGoogleMaps } from './test-utils/stub-google-maps';
+import { stubGoogleMaps } from '../test-utils/stub-google-maps';
 import {
   PrescriptionScreeningAlertSeverity,
   PrescriptionScreeningAlertType

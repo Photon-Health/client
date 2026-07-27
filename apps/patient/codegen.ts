@@ -5,7 +5,7 @@ const schemaByEnv: Record<string, string> = {
   boson: 'https://patient-api.boson.health/graphql',
   neutron: 'https://patient-api.neutron.health/graphql',
   photon: 'https://patient-api.photon.health/graphql',
-  tau: 'http://patient-api.tau.health:8080/graphql'
+  tau: 'http://patient-api.tau.health/graphql'
 };
 
 const env = process.env.VITE_ENV_NAME ?? 'photon';
