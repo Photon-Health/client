@@ -3,10 +3,11 @@ import { afterAll, afterEach, beforeAll, expect, test, vi } from 'vitest';
 import { setupServer } from 'msw/node';
 import { HttpResponse } from 'msw';
 import { PatientStore } from '../stores/patient';
-import { defaultHandlers, lambdasGql, TREATMENT } from '@photonhealth/sdk/test-utils';
+import { defaultHandlers, lambdasGql, PRESCRIPTION } from '@photonhealth/sdk/test-utils';
 import { MockMedicationSearchElement } from '../test-utils/mock-medication-search.element';
 import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
 import { stubGoogleMaps } from '../test-utils/stub-google-maps';
+import { PrescriptionInput } from '@photonhealth/sdk/dist/types';
 
 vi.mock('solid-element', () => ({
   customElement: vi.fn()
@@ -35,57 +36,76 @@ afterEach(async () => {
 
 afterAll(() => server.close());
 
-type PrescriptionInput = {
-  templateId?: string;
-  patientId?: string;
-  notes?: string;
-};
-
 test('additionalNotes are merged into prescriptions prefilled from templateIds', async () => {
-  const capturedPrescriptions: PrescriptionInput[] = [];
+  const capturedPrescriptionInputs: PrescriptionInput[] = [];
 
   server.use(
     lambdasGql.mutation('CreatePrescriptions', ({ variables }) => {
       const prescriptions = variables.prescriptions as PrescriptionInput[];
-      capturedPrescriptions.push(...prescriptions);
+      capturedPrescriptionInputs.push(...prescriptions);
       return HttpResponse.json({
         data: {
           createPrescriptions: prescriptions.map((p, i) => ({
-            __typename: 'Prescription',
-            id: `rx_tpl_${i}`,
-            externalId: null,
-            dispenseAsWritten: false,
-            dispenseQuantity: 30,
-            dispenseUnit: 'Tablet',
-            fillsAllowed: 1,
-            daysSupply: 30,
-            instructions: 'Take one daily',
-            notes: p.notes ?? '',
-            doNotFillBeforeDate: null,
-            diagnoses: [],
-            treatment: TREATMENT
+            ...PRESCRIPTION,
+            id: `rx_tpl_${i}`
           }))
         }
       });
     })
   );
 
-  renderPrescribeWorkflow({
+  const { waitForDraftPrescription } = renderPrescribeWorkflow({
     templateIds: 'tpl_1',
     templateOverrides: { tpl_1: { notes: 'Template override note' } },
     additionalNotes: 'Clinical additional note from host app'
   });
 
-  await waitFor(
-    () => {
-      expect(capturedPrescriptions).toHaveLength(1);
-    },
-    { timeout: 3000 }
-  );
+  await waitForDraftPrescription();
 
-  const [sent] = capturedPrescriptions;
+  const [sent] = capturedPrescriptionInputs;
   expect(sent.templateId).toBe('tpl_1');
   // Bug: additionalNotes never reach the CreatePrescriptions mutation for
   // template-prefilled rxs — only templateOverrides notes make it through.
   expect(sent.notes).toContain('Clinical additional note from host app');
+});
+
+test('if prefilling from templateIds fails, render the prescription form', async () => {
+  const capturedPrescriptionInputs: PrescriptionInput[] = [];
+
+  server.use(
+    lambdasGql.mutation('CreatePrescriptions', ({ variables }) => {
+      const prescriptions = variables.prescriptions as PrescriptionInput[];
+      capturedPrescriptionInputs.push(...prescriptions);
+      return HttpResponse.json({
+        data: null,
+        errors: [
+          {
+            path: ['createPrescriptions'],
+            locations: [
+              {
+                line: 2,
+                column: 3
+              }
+            ],
+            message: 'sdfsdfsdfs is not a valid dispense unit'
+          }
+        ]
+      });
+    })
+  );
+
+  const { waitForPrescribeForm } = renderPrescribeWorkflow({
+    templateIds: 'tpl_1',
+    // Invalid dispense unit
+    templateOverrides: { tpl_1: { dispenseUnit: 'asdfsdfsf' } }
+  });
+
+  // Since creating the draft prescription failed,
+  // the prescribe workflow should render with the form expanded
+  await waitForPrescribeForm();
+
+  // Check that the prefill values made it to the mutation
+  const [sent] = capturedPrescriptionInputs;
+  expect(sent.templateId).toBe('tpl_1');
+  expect(sent.dispenseUnit).toBe('asdfsdfsf');
 });
