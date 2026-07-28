@@ -163,12 +163,18 @@ const transformPrefillsToPrescriptionInputs = async ({
       prescriptionIdsPrefill.map(async (prescriptionId: string) => {
         const { data } = await client.apollo.query({
           query: GetPrescription,
-          variables: { id: prescriptionId }
+          variables: { id: prescriptionId },
+          // request should throw if there are any errors
+          // retrieving the prescription
+          errorPolicy: 'none'
         });
-        return mapFormDataToPrescriptionInput(data?.prescription, patientId);
+        if (data?.prescription) {
+          return mapFormDataToPrescriptionInput(data.prescription, patientId);
+        }
+        return null;
       })
     );
-    rxToCreate.push(...fetchedPrescriptions);
+    rxToCreate.push(...fetchedPrescriptions.filter((rx) => !!rx));
   }
 
   return rxToCreate;

@@ -82,32 +82,26 @@ test('prefill a draft prescription from an existing prescriptionId', async () =>
   expect(sent.fillsAllowed).toBe(PRESCRIPTION.fillsAllowed);
 });
 
-test('if prefilling from prescriptionIds fails, render the prescription form', async () => {
-  const capturedPrescriptions: PrescriptionInput[] = [];
+test('if prescriptionId cannot be found, render the prescription form', async () => {
+  let capturedPrescriptionQueryVariables: { id: string } | undefined;
 
   server.use(
-    lambdasGql.query('GetPrescription', () => {
+    lambdasGql.query('GetPrescription', ({ variables }) => {
+      capturedPrescriptionQueryVariables = variables as { id: string };
       return HttpResponse.json({
         data: {
-          prescription: PRESCRIPTION
-        }
-      });
-    }),
-    lambdasGql.mutation('CreatePrescriptions', ({ variables }) => {
-      const prescriptions = variables.prescriptions as PrescriptionInput[];
-      capturedPrescriptions.push(...prescriptions);
-      return HttpResponse.json({
-        data: null,
+          prescription: null
+        },
         errors: [
           {
-            path: ['createPrescriptions'],
+            path: ['prescription'],
             locations: [
               {
                 line: 2,
                 column: 3
               }
             ],
-            message: 'sdfsdfsdfs is not a valid dispense unit'
+            message: 'No prescription found with id tmp_01HHDP9WH6BGC2YBATFQQP79YT'
           }
         ]
       });
@@ -122,7 +116,5 @@ test('if prefilling from prescriptionIds fails, render the prescription form', a
   // the prescribe workflow should render with the form expanded
   await waitForPrescribeForm();
 
-  // Check that the prefill values made it to the mutation
-  const [sent] = capturedPrescriptions;
-  expect(sent.treatmentId).toBe(PRESCRIPTION.treatment.id);
+  expect(capturedPrescriptionQueryVariables?.id).toBe(PRESCRIPTION.id);
 });
