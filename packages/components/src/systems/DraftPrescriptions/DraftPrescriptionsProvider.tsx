@@ -92,7 +92,7 @@ export type PrescriptionFormData = {
   diagnoseCodes: string[];
 };
 
-const transformPrescriptionFormData = (prescription: PrescriptionFormData, patientId: string) => ({
+const mapFormDataToPrescriptionInput = (prescription: PrescriptionFormData, patientId: string) => ({
   externalId: prescription.externalId,
   patientId: patientId,
   treatmentId: prescription.treatment?.id,
@@ -164,7 +164,7 @@ const transformPrefillsToPrescriptionInputs = async ({
           query: GetPrescription,
           variables: { id: prescriptionId }
         });
-        return transformPrescriptionFormData(data?.prescription, patientId);
+        return mapFormDataToPrescriptionInput(data?.prescription, patientId);
       })
     );
     rxToCreate.push(...fetchedPrescriptions);
@@ -298,7 +298,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
     try {
       const res = await client.apollo.mutate({
         mutation: CreatePrescription,
-        variables: transformPrescriptionFormData(prescriptionFormData, props.patientId)
+        variables: mapFormDataToPrescriptionInput(prescriptionFormData, props.patientId)
       });
       const created = res.data.createPrescription as Prescription;
       createdPrescription = created;
@@ -359,7 +359,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
     const res = await client.apollo.mutate({
       mutation: CreatePrescriptionTemplate,
       variables: {
-        ...transformPrescriptionFormData(prescription, props.patientId),
+        ...mapFormDataToPrescriptionInput(prescription, props.patientId),
         catalogId,
         isPrivate: true,
         ...(templateName ? { name: templateName } : {})
