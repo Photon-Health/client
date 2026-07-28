@@ -36,18 +36,27 @@ afterEach(async () => {
 
 afterAll(() => server.close());
 
-test('additionalNotes are merged into prescriptions prefilled from templateIds', async () => {
-  const capturedPrescriptionInputs: PrescriptionInput[] = [];
+test('prefill a draft prescription from an existing prescriptionId', async () => {
+  const capturedPrescriptions: PrescriptionInput[] = [];
+  let capturedPrescriptionQueryVariables: { id: string } | undefined;
 
   server.use(
+    lambdasGql.query('GetPrescription', ({ variables }) => {
+      capturedPrescriptionQueryVariables = variables as { id: string };
+      return HttpResponse.json({
+        data: {
+          prescription: PRESCRIPTION
+        }
+      });
+    }),
     lambdasGql.mutation('CreatePrescriptions', ({ variables }) => {
       const prescriptions = variables.prescriptions as PrescriptionInput[];
-      capturedPrescriptionInputs.push(...prescriptions);
+      capturedPrescriptions.push(...prescriptions);
       return HttpResponse.json({
         data: {
           createPrescriptions: prescriptions.map((p, i) => ({
             ...PRESCRIPTION,
-            id: `rx_tpl_${i}`
+            id: `rx_${i}`
           }))
         }
       });
@@ -55,27 +64,38 @@ test('additionalNotes are merged into prescriptions prefilled from templateIds',
   );
 
   const { waitForDraftPrescription } = renderPrescribeWorkflow({
-    templateIds: 'tpl_1',
-    templateOverrides: { tpl_1: { notes: 'Template override note' } },
-    additionalNotes: 'Clinical additional note from host app'
+    prescriptionIds: PRESCRIPTION.id
   });
 
   await waitForDraftPrescription();
 
-  const [sent] = capturedPrescriptionInputs;
-  expect(sent.templateId).toBe('tpl_1');
-  // Bug: additionalNotes never reach the CreatePrescriptions mutation for
-  // template-prefilled rxs — only templateOverrides notes make it through.
-  expect(sent.notes).toContain('Clinical additional note from host app');
+  expect(capturedPrescriptionQueryVariables?.id).toBe(PRESCRIPTION.id);
+
+  const [sent] = capturedPrescriptions;
+  expect(sent.treatmentId).toBe(PRESCRIPTION.treatment.id);
+  expect(sent.daysSupply).toBe(PRESCRIPTION.daysSupply);
+  expect(sent.dispenseAsWritten).toBe(PRESCRIPTION.dispenseAsWritten);
+  expect(sent.dispenseQuantity).toBe(PRESCRIPTION.dispenseQuantity);
+  expect(sent.dispenseUnit).toBe(PRESCRIPTION.dispenseUnit);
+  expect(sent.instructions).toBe(PRESCRIPTION.instructions);
+  expect(sent.notes).toBe(PRESCRIPTION.notes);
+  expect(sent.fillsAllowed).toBe(PRESCRIPTION.fillsAllowed);
 });
 
-test('if prefilling from templateIds fails, render the prescription form', async () => {
-  const capturedPrescriptionInputs: PrescriptionInput[] = [];
+test('if prefilling from prescriptionIds fails, render the prescription form', async () => {
+  const capturedPrescriptions: PrescriptionInput[] = [];
 
   server.use(
+    lambdasGql.query('GetPrescription', () => {
+      return HttpResponse.json({
+        data: {
+          prescription: PRESCRIPTION
+        }
+      });
+    }),
     lambdasGql.mutation('CreatePrescriptions', ({ variables }) => {
       const prescriptions = variables.prescriptions as PrescriptionInput[];
-      capturedPrescriptionInputs.push(...prescriptions);
+      capturedPrescriptions.push(...prescriptions);
       return HttpResponse.json({
         data: null,
         errors: [
@@ -95,9 +115,7 @@ test('if prefilling from templateIds fails, render the prescription form', async
   );
 
   const { waitForPrescribeForm } = renderPrescribeWorkflow({
-    templateIds: 'tpl_1',
-    // Invalid dispense unit
-    templateOverrides: { tpl_1: { dispenseUnit: 'asdfsdfsf' } }
+    prescriptionIds: PRESCRIPTION.id
   });
 
   // Since creating the draft prescription failed,
@@ -105,7 +123,6 @@ test('if prefilling from templateIds fails, render the prescription form', async
   await waitForPrescribeForm();
 
   // Check that the prefill values made it to the mutation
-  const [sent] = capturedPrescriptionInputs;
-  expect(sent.templateId).toBe('tpl_1');
-  expect(sent.dispenseUnit).toBe('asdfsdfsf');
+  const [sent] = capturedPrescriptions;
+  expect(sent.treatmentId).toBe(PRESCRIPTION.treatment.id);
 });
