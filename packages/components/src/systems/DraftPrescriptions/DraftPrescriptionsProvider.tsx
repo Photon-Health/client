@@ -123,26 +123,32 @@ function isTreatmentInDraftPrescriptions(
 
 const createPrefillPrescriptionsOnApi = async ({
   client,
-  props,
+  patientId,
+  templateIdsPrefill,
+  templateOverrides,
+  prescriptionIdsPrefill,
   rxNotesPrefill
 }: {
   client: PhotonClient;
-  props: DraftPrescriptionProviderProps;
+  patientId: string;
+  templateIdsPrefill: string[];
+  templateOverrides: TemplateOverrides;
+  prescriptionIdsPrefill: string[];
   rxNotesPrefill?: string;
 }) => {
   const rxToCreate: MutationCreatePrescriptionsArgs['prescriptions'] = [];
 
   // Create prescriptions from template ids with a few optional override values
-  if (props.templateIdsPrefill.length > 0) {
-    const dedupedTemplateIds = Array.from(new Set(props.templateIdsPrefill));
+  if (templateIdsPrefill.length > 0) {
+    const dedupedTemplateIds = Array.from(new Set(templateIdsPrefill));
     const templatedCreateRxList = dedupedTemplateIds.map((templateId) => {
-      const templateOverrideNotes = props.templateOverrides?.[templateId]?.notes;
+      const templateOverrideNotes = templateOverrides?.[templateId]?.notes;
       const notes = templateOverrideNotes
         ? `${templateOverrideNotes}\n\n${rxNotesPrefill}`
         : rxNotesPrefill;
       return {
-        ...props.templateOverrides?.[templateId],
-        patientId: props.patientId,
+        ...templateOverrides?.[templateId],
+        patientId: patientId,
         templateId,
         notes
       };
@@ -151,14 +157,14 @@ const createPrefillPrescriptionsOnApi = async ({
   }
 
   // Fetch prescriptions if needed
-  if (props.prescriptionIdsPrefill.length > 0) {
+  if (prescriptionIdsPrefill.length > 0) {
     const fetchedPrescriptions = await Promise.all(
-      props.prescriptionIdsPrefill.map(async (prescriptionId: string) => {
+      prescriptionIdsPrefill.map(async (prescriptionId: string) => {
         const { data } = await client.apollo.query({
           query: GetPrescription,
           variables: { id: prescriptionId }
         });
-        return transformPrescriptionFormData(data?.prescription, props.patientId);
+        return transformPrescriptionFormData(data?.prescription, patientId);
       })
     );
     rxToCreate.push(...fetchedPrescriptions);
@@ -215,7 +221,10 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       try {
         const newRxs = await createPrefillPrescriptionsOnApi({
           client,
-          props,
+          patientId: props.patientId,
+          templateIdsPrefill: props.templateIdsPrefill,
+          templateOverrides: props.templateOverrides,
+          prescriptionIdsPrefill: props.prescriptionIdsPrefill,
           rxNotesPrefill: rxNotesPrefill()
         });
         if (newRxs) {
