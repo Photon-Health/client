@@ -134,7 +134,7 @@ const transformPrefillsToPrescriptionInputs = async ({
   templateIdsPrefill: string[];
   templateOverrides: TemplateOverrides;
   prescriptionIdsPrefill: string[];
-  rxNotesPrefill?: string;
+  rxNotesPrefill: string;
 }) => {
   const rxToCreate: MutationCreatePrescriptionsArgs['prescriptions'] = [];
 
@@ -143,9 +143,10 @@ const transformPrefillsToPrescriptionInputs = async ({
     const dedupedTemplateIds = Array.from(new Set(templateIdsPrefill));
     const templatedCreateRxList = dedupedTemplateIds.map((templateId) => {
       const templateOverrideNotes = templateOverrides?.[templateId]?.notes;
-      const notes = templateOverrideNotes
-        ? `${templateOverrideNotes}\n\n${rxNotesPrefill}`
-        : rxNotesPrefill;
+      const notes = [templateOverrideNotes || '', rxNotesPrefill]
+        .filter((note) => !!note)
+        .join('\n\n');
+
       return {
         ...templateOverrides?.[templateId],
         patientId: patientId,
@@ -188,12 +189,14 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
   );
 
   const rxNotesPrefill = createMemo(() => {
-    let notesPrefill = '';
-    if (props.additionalNotes) notesPrefill = `${props.additionalNotes}\n\n`;
-    if (props.weight)
-      notesPrefill = `${notesPrefill}${formatPatientWeight(props.weight, props.weightUnit)}`;
+    const notesPrefill = [
+      props.additionalNotes || '',
+      props.weight ? formatPatientWeight(props.weight, props.weightUnit) : ''
+    ]
+      .filter((note) => !!note)
+      .join('\n\n');
 
-    return notesPrefill || undefined;
+    return notesPrefill || '';
   });
 
   // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId

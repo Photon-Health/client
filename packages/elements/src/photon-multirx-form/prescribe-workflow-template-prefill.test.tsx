@@ -8,6 +8,7 @@ import { MockMedicationSearchElement } from '../test-utils/mock-medication-searc
 import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
 import { stubGoogleMaps } from '../test-utils/stub-google-maps';
 import { PrescriptionInput } from '@photonhealth/sdk/dist/types';
+import { TemplateOverrides } from '@photonhealth/components';
 
 vi.mock('solid-element', () => ({
   customElement: vi.fn()
@@ -35,6 +36,54 @@ afterEach(async () => {
 });
 
 afterAll(() => server.close());
+
+test('prefill a draft prescription from templateIds with overrides', async () => {
+  const capturedPrescriptionInputs: PrescriptionInput[] = [];
+
+  const overrides: TemplateOverrides['tpl_1'] = {
+    externalId: 'ext_123',
+    dispenseQuantity: 60,
+    dispenseUnit: 'Tablets',
+    dispenseAsWritten: true,
+    fillsAllowed: 3,
+    daysSupply: 30,
+    instructions: 'Take two tablets by mouth twice daily',
+    notes: 'Override note for tpl_1'
+  };
+
+  server.use(
+    lambdasGql.mutation('CreatePrescriptions', ({ variables }) => {
+      const prescriptions = variables.prescriptions as PrescriptionInput[];
+      capturedPrescriptionInputs.push(...prescriptions);
+      return HttpResponse.json({
+        data: {
+          createPrescriptions: prescriptions.map((p, i) => ({
+            ...PRESCRIPTION,
+            id: `rx_tpl_${i}`
+          }))
+        }
+      });
+    })
+  );
+
+  const { waitForDraftPrescription } = renderPrescribeWorkflow({
+    templateIds: 'tpl_1',
+    templateOverrides: { tpl_1: overrides }
+  });
+
+  await waitForDraftPrescription();
+
+  const [sent] = capturedPrescriptionInputs;
+  expect(sent.templateId).toBe('tpl_1');
+  expect(sent.externalId).toBe(overrides.externalId);
+  expect(sent.dispenseQuantity).toBe(overrides.dispenseQuantity);
+  expect(sent.dispenseUnit).toBe(overrides.dispenseUnit);
+  expect(sent.dispenseAsWritten).toBe(overrides.dispenseAsWritten);
+  expect(sent.fillsAllowed).toBe(overrides.fillsAllowed);
+  expect(sent.daysSupply).toBe(overrides.daysSupply);
+  expect(sent.instructions).toBe(overrides.instructions);
+  expect(sent.notes).toBe(overrides.notes);
+});
 
 test('additionalNotes are merged into prescriptions prefilled from templateIds', async () => {
   const capturedPrescriptionInputs: PrescriptionInput[] = [];
