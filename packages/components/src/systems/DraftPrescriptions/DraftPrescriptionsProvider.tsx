@@ -121,7 +121,7 @@ function isTreatmentInDraftPrescriptions(
   return draftedPrescriptions.some((draft) => draft.treatment.id === treatmentId);
 }
 
-const createPrefillPrescriptionsOnApi = async ({
+const transformPrefillsToPrescriptionInputs = async ({
   client,
   patientId,
   templateIdsPrefill,
@@ -170,16 +170,7 @@ const createPrefillPrescriptionsOnApi = async ({
     rxToCreate.push(...fetchedPrescriptions);
   }
 
-  if (!rxToCreate.length) {
-    return;
-  }
-
-  const res = await client.apollo.mutate({
-    mutation: CreatePrescriptions,
-    variables: { prescriptions: rxToCreate }
-  });
-  const newRxs = res.data.createPrescriptions as Prescription[];
-  return newRxs;
+  return rxToCreate;
 };
 
 export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps) => {
@@ -219,7 +210,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       setIsLoadingPrefills(true);
 
       try {
-        const newRxs = await createPrefillPrescriptionsOnApi({
+        const prefillPrescriptionInputs = await transformPrefillsToPrescriptionInputs({
           client,
           patientId: props.patientId,
           templateIdsPrefill: props.templateIdsPrefill,
@@ -227,6 +218,17 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
           prescriptionIdsPrefill: props.prescriptionIdsPrefill,
           rxNotesPrefill: rxNotesPrefill()
         });
+
+        if (!prefillPrescriptionInputs.length) {
+          return;
+        }
+
+        const res = await client.apollo.mutate({
+          mutation: CreatePrescriptions,
+          variables: { prescriptions: prefillPrescriptionInputs }
+        });
+        const newRxs = res.data.createPrescriptions as Prescription[];
+
         if (newRxs) {
           setDraftPrescriptions((prev) => [...prev, ...newRxs]);
           newRxs.forEach((rx) => {
