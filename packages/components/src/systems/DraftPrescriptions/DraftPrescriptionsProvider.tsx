@@ -61,15 +61,15 @@ interface DraftPrescriptionProviderProps {
 }
 
 export type TemplateOverrides = {
-  [key: string]: {
-    daysSupply?: number;
-    dispenseAsWritten?: boolean;
+  [templateId: string]: {
+    externalId?: string;
     dispenseQuantity?: number;
     dispenseUnit?: string;
+    dispenseAsWritten?: boolean;
     fillsAllowed?: number;
+    daysSupply?: number;
     instructions?: string;
     notes?: string;
-    externalId?: string;
   };
 };
 
@@ -130,7 +130,7 @@ const createPrefillPrescriptionsOnApi = async ({
   props: DraftPrescriptionProviderProps;
   rxNotesPrefill?: string;
 }) => {
-  let rxToCreate: MutationCreatePrescriptionsArgs['prescriptions'] = [];
+  const rxToCreate: MutationCreatePrescriptionsArgs['prescriptions'] = [];
 
   // Create prescriptions from template ids with a few optional override values
   if (props.templateIdsPrefill.length > 0) {
@@ -147,7 +147,7 @@ const createPrefillPrescriptionsOnApi = async ({
         notes
       };
     });
-    rxToCreate = rxToCreate.concat(templatedCreateRxList);
+    rxToCreate.push(...templatedCreateRxList);
   }
 
   // Fetch prescriptions if needed
@@ -161,7 +161,7 @@ const createPrefillPrescriptionsOnApi = async ({
         return transformPrescriptionFormData(data?.prescription, props.patientId);
       })
     );
-    rxToCreate = rxToCreate.concat(fetchedPrescriptions);
+    rxToCreate.push(...fetchedPrescriptions);
   }
 
   if (!rxToCreate.length) {
@@ -181,7 +181,8 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
     usePrescribeEventDispatch();
   const [, recentOrdersActions] = useRecentOrders();
   const client = usePhotonClient();
-  const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
+  const [hasCreatedPrefillPrescriptions, setHasCreatedPrefillPrescriptions] =
+    createSignal<boolean>(false);
   const [isLoadingPrefills, setIsLoadingPrefills] = createSignal<boolean>(false);
   const [draftPrescriptions, setDraftPrescriptions] = createSignal<Prescription[]>([]);
 
@@ -206,9 +207,9 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       // must have a patientId
       !!props.patientId &&
       // must not have created prescriptions yet
-      !hasCreatedPrescriptions()
+      !hasCreatedPrefillPrescriptions()
     ) {
-      setHasCreatedPrescriptions(true);
+      setHasCreatedPrefillPrescriptions(true);
       setIsLoadingPrefills(true);
 
       try {
