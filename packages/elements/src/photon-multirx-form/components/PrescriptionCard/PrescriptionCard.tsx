@@ -18,7 +18,6 @@ export const PrescriptionCard = (props: {
   hideAddToTemplates: boolean;
   weight?: number;
   weightUnit?: string;
-  prefillNotes?: string;
   enableOrder: boolean;
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
@@ -96,7 +95,6 @@ export const PrescriptionCard = (props: {
                 store={props.store}
                 weight={props.weight}
                 weightUnit={props.weightUnit}
-                prefillNotes={props.prefillNotes}
                 catalogId={props.catalogId}
                 allowOffCatalogSearch={props.allowOffCatalogSearch}
                 disableList={props.disableList}
