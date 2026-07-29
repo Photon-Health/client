@@ -5,7 +5,7 @@ export const formatPatientWeight = (weight: number, weightUnit = 'lb') =>
  * Ensure we always tack on the prefilled notes
  * even if the original object's notes or override notes are blank.
  * Blank means null, empty, or whitespace-only.
- * @returns an empty string if all provided arguments are null
+ * @returns an empty string if all provided arguments are blank
  */
 export function constructRxNotes(
   original: string | null,
