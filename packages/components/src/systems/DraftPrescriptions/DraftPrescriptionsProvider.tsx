@@ -26,7 +26,7 @@ import {
   UpdatePrescriptionStates
 } from '../../fetch';
 import triggerToast from '../../utils/toastTriggers';
-import { formatPatientWeight } from './utils/formatters';
+import { constructRxNotes, formatPatientWeight } from './utils/formatters';
 
 export type DraftPrescriptionsContextType = {
   // values
@@ -139,18 +139,6 @@ function isTreatmentInDraftPrescriptions(
   draftedPrescriptions: { treatment: { id: string } }[]
 ) {
   return draftedPrescriptions.some((draft) => draft.treatment.id === treatmentId);
-}
-
-/**
- * Ensure we always tack on the prefilled notes
- * even if the original object's notes or override notes are blank
- */
-function constructRxNotes(
-  original: string | null,
-  override: string | null,
-  prefill: string | null
-) {
-  return [override || original || '', prefill].filter((note) => !!note).join('\n\n');
 }
 
 const transformPrefillsToPrescriptionInputs = async ({
