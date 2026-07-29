@@ -23,6 +23,7 @@ import {
   DraftPrescriptionLayout,
   DraftPrescriptionsProvider,
   type PrescriptionFormData,
+  type PrescriptionOverrides,
   type TemplateOverrides,
   type TryCreatePrescriptionTemplateOptions,
   useDraftPrescriptions
@@ -176,6 +177,7 @@ export type {
   PharmacyOption,
   RoutingConstraint,
   TemplateOverrides,
+  PrescriptionOverrides,
   PrescriptionFormData,
   CoverageOption,
   SupervisorPrefill,
