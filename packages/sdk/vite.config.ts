@@ -37,5 +37,11 @@ export default defineConfig({
     },
     target: 'es6',
     minify: false
+  },
+  test: {
+    // jsdom for window.location, which the redirect param handling depends on.
+    environment: 'jsdom',
+    globals: true,
+    include: ['src/**/*.test.ts']
   }
 });
