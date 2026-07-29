@@ -85,7 +85,8 @@ export type PrescriptionOverrides = {
     daysSupply?: number;
     instructions?: string;
     notes?: string;
-    doNotFillBeforeDate?: Date;
+    // ISO string or date string in format ex. 2026-10-02
+    doNotFillBeforeDate?: string;
   };
 };
 
@@ -182,6 +183,7 @@ const transformPrefillsToPrescriptionInputs = async ({
   if (prescriptionIdsPrefill.length > 0) {
     const fetchedPrescriptions = await Promise.all(
       prescriptionIdsPrefill.map(async (prescriptionId: string) => {
+        const overrides = prescriptionOverrides?.[prescriptionId] || {};
         const { data } = await client.apollo.query({
           query: GetPrescription,
           variables: { id: prescriptionId },
@@ -193,14 +195,17 @@ const transformPrefillsToPrescriptionInputs = async ({
           const input = mapFormDataToPrescriptionInput(
             {
               ...data.prescription,
-              ...prescriptionOverrides?.[prescriptionId],
+              ...overrides,
               notes: constructRxNotes(
                 data.prescription.notes || null,
-                prescriptionOverrides?.[prescriptionId]?.notes || null,
+                overrides.notes || null,
                 rxNotesPrefill
-              )
+              ),
+              doNotFillBeforeDate: overrides.doNotFillBeforeDate
+                ? overrides.doNotFillBeforeDate.slice(0, 10)
+                : undefined
             },
-            prescriptionOverrides?.[prescriptionId]?.treatmentId || data.prescription.treatment.id,
+            overrides.treatmentId || data.prescription.treatment.id,
             patientId
           );
           return input;

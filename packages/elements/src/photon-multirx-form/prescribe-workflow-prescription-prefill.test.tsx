@@ -83,7 +83,7 @@ test('prefill a draft prescription from an existing prescriptionId', async () =>
   expect(sent.fillsAllowed).toBe(PRESCRIPTION.fillsAllowed);
 });
 
-test('additonalNotes are merged into draft prescriptions from an existing prescriptionId', async () => {
+test('additionalNotes are merged into draft prescriptions from an existing prescriptionId', async () => {
   const capturedPrescriptions: PrescriptionInput[] = [];
   let capturedPrescriptionQueryVariables: { id: string } | undefined;
 
@@ -138,7 +138,8 @@ test('prefill a draft prescription from an existing prescriptionId with override
     fillsAllowed: 5,
     daysSupply: 60,
     instructions: 'Take two tablets by mouth twice daily',
-    notes: 'Override note for prescription'
+    notes: 'Override note for prescription',
+    doNotFillBeforeDate: new Date('2026-10-02').toISOString()
   };
 
   server.use(
@@ -183,9 +184,10 @@ test('prefill a draft prescription from an existing prescriptionId with override
   expect(sent.daysSupply).toBe(overrides.daysSupply);
   expect(sent.instructions).toBe(overrides.instructions);
   expect(sent.notes).toBe(overrides.notes);
+  expect(sent.doNotFillBeforeDate).toBe('2026-10-02');
 });
 
-test('additonalNotes are merged into draft prescriptions from an existing prescriptionId with overrides', async () => {
+test('additionalNotes are merged into draft prescriptions from an existing prescriptionId with overrides', async () => {
   const capturedPrescriptions: PrescriptionInput[] = [];
   let capturedPrescriptionQueryVariables: { id: string } | undefined;
 
