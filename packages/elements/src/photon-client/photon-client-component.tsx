@@ -91,8 +91,11 @@ export const PhotonClientComponent = (props: PhotonClientProps) => {
   const [store] = createSignal<PhotonClientStore>(client);
 
   const handleRedirect = async () => {
-    await store()?.authentication.handleRedirect();
-    if (props.redirectPath) window.location.replace(props.redirectPath);
+    const exchanged = await store()?.authentication.handleRedirect();
+    // Only honour redirectPath when the exchange actually succeeded. Navigating
+    // after a failed one carried the user onward with no session, and the store
+    // has already surfaced the reason.
+    if (exchanged && props.redirectPath) window.location.replace(props.redirectPath);
   };
 
   const checkSession = async () => {

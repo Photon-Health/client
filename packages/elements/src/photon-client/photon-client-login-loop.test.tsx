@@ -183,6 +183,53 @@ describe('autoLogin', () => {
   });
 });
 
+describe('a poisoned URL from a failed code exchange', () => {
+  // Users hit this with ?photon=true&code=…&state=… stuck in the address bar.
+  // hasAuthParams() stays true, so every load re-ran the same spent exchange
+  // instead of reaching checkSession — and deleting those params by hand was
+  // what unstuck them.
+  const POISONED_SEARCH = '?patientId=pat_1&photon=true&code=spent&state=stale';
+
+  beforeEach(() => {
+    window.history.replaceState(null, '', `/prescribe${POISONED_SEARCH}`);
+    auth0.handleRedirectCallback.mockRejectedValue(new Error('Invalid state'));
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    window.history.replaceState(null, '', '/');
+  });
+
+  test('strips the spent params so the next load can check the session', async () => {
+    renderPhotonClient({ id: CLIENT_ID, autoLogin: true });
+
+    await waitFor(() => {
+      expect(window.location.search).not.toContain('code=');
+    });
+
+    expect(window.location.search).not.toMatch(/state=|photon=/);
+    // The host app's own params are not collateral damage.
+    expect(window.location.search).toContain('patientId=pat_1');
+  });
+
+  test('does not leave the workflow stuck loading', async () => {
+    // isLoading was never cleared on this path, so every consumer gating on it
+    // span forever behind a spinner.
+    const { container } = renderPhotonClient({ id: CLIENT_ID, autoLogin: true });
+
+    await waitFor(() => {
+      expect(window.location.search).not.toContain('code=');
+    });
+
+    // The session behind the failed exchange is fine, so we recover into it
+    // rather than stranding the user.
+    await waitFor(() => {
+      expect(container.querySelector('[role="alert"]')).toBeNull();
+    });
+    expect(auth0.getTokenSilently).toHaveBeenCalled();
+  });
+});
+
 describe('circuit breaker', () => {
   test('surfaces a message instead of adding another redirect', async () => {
     // Stand in for having already looped through several page loads.

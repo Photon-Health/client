@@ -15,7 +15,10 @@ type SdkOverrides = {
   getUser?: ReturnType<typeof vi.fn>;
   getAccessToken?: ReturnType<typeof vi.fn>;
   login?: ReturnType<typeof vi.fn>;
+  handleRedirect?: ReturnType<typeof vi.fn>;
 };
+
+const POISONED_URL = '/prescribe?patientId=pat_1&photon=true&code=spent_code&state=stale_state';
 
 function makeSdk(overrides: SdkOverrides = {}) {
   const sdk = {
@@ -33,7 +36,7 @@ function makeSdk(overrides: SdkOverrides = {}) {
       confirmSessionEstablished: vi.fn(),
       login: overrides.login ?? vi.fn().mockResolvedValue(undefined),
       logout: vi.fn().mockResolvedValue(undefined),
-      handleRedirect: vi.fn().mockResolvedValue({}),
+      handleRedirect: overrides.handleRedirect ?? vi.fn().mockResolvedValue({}),
       checkSession: vi.fn().mockResolvedValue(undefined)
     }
   };
@@ -181,6 +184,96 @@ describe('checkSession — claim-assisted org login', () => {
     await store.authentication.checkSession();
 
     expect(login).not.toHaveBeenCalled();
+  });
+});
+
+describe('handleRedirect — failed code exchange', () => {
+  /** auth0-spa-js throws this when the state has no matching transaction. */
+  const invalidState = () => new Error('Invalid state');
+
+  beforeEach(() => {
+    window.history.replaceState(null, '', POISONED_URL);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  test('settles isLoading so consumers do not spin forever', async () => {
+    const sdk = makeSdk({ handleRedirect: vi.fn().mockRejectedValue(invalidState()) });
+    const store = new PhotonClientStore(sdk, true);
+
+    await store.authentication.handleRedirect();
+
+    expect(store.authentication.state.isLoading).toBe(false);
+  });
+
+  test('clears the redirect params so the failure cannot be replayed', async () => {
+    // Left in place, hasAuthParams() stays true and every subsequent load
+    // re-enters the same failing exchange instead of checking the session.
+    const sdk = makeSdk({ handleRedirect: vi.fn().mockRejectedValue(invalidState()) });
+    const store = new PhotonClientStore(sdk, true);
+
+    await store.authentication.handleRedirect();
+
+    expect(window.location.search).not.toMatch(/code=|state=|photon=/);
+    // The host app's own params survive.
+    expect(window.location.search).toContain('patientId=pat_1');
+  });
+
+  test('recovers when the session is actually fine', async () => {
+    // This is what deleting the params by hand achieved.
+    const sdk = makeSdk({ handleRedirect: vi.fn().mockRejectedValue(invalidState()) });
+    const store = new PhotonClientStore(sdk, true);
+
+    await store.authentication.handleRedirect();
+
+    expect(store.authentication.state.isAuthenticated).toBe(true);
+    expect(store.authentication.state.error).toBeUndefined();
+  });
+
+  test('reports that the exchange did not succeed', async () => {
+    const sdk = makeSdk({ handleRedirect: vi.fn().mockRejectedValue(invalidState()) });
+    const store = new PhotonClientStore(sdk, true);
+
+    await expect(store.authentication.handleRedirect()).resolves.toBe(false);
+  });
+
+  test('settles isLoading on an invalid organization id too', async () => {
+    const sdk = makeSdk({
+      handleRedirect: vi
+        .fn()
+        .mockRejectedValue(new Error('organization must be an organization id'))
+    });
+    const store = new PhotonClientStore(sdk, true);
+
+    await store.authentication.handleRedirect();
+
+    expect(store.authentication.state.isLoading).toBe(false);
+    expect(store.authentication.state.error).toMatch(/organization id/);
+  });
+
+  test('keeps a genuine authorization failure terminal', async () => {
+    // Not something a session re-check should paper over.
+    window.history.replaceState(
+      null,
+      '',
+      `${POISONED_URL}&error_description=is+not+part+of+the+org`
+    );
+    const sdk = makeSdk({ handleRedirect: vi.fn().mockRejectedValue(new Error('Unauthorized')) });
+    const store = new PhotonClientStore(sdk, true);
+
+    await store.authentication.handleRedirect();
+
+    expect(store.authentication.state.error).toBe('User is not authorized');
+    expect(store.authentication.state.isLoading).toBe(false);
+    expect(sdk.authentication.probeSession).not.toHaveBeenCalled();
+  });
+
+  test('a successful exchange reports success and clears the params', async () => {
+    const sdk = makeSdk();
+    const store = new PhotonClientStore(sdk, true);
+
+    await expect(store.authentication.handleRedirect()).resolves.toBe(true);
+
+    expect(window.location.search).not.toMatch(/code=|state=|photon=/);
   });
 });
 

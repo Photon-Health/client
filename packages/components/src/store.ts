@@ -36,17 +36,28 @@ export const SESSION_UNVERIFIABLE_MESSAGE =
 export const ORG_LOGIN_FAILED_MESSAGE =
   'Unable to sign you in to your organization. Please contact support.';
 
+/**
+ * Drops the Auth0 redirect params from the address bar without navigating,
+ * keeping the host app's own query string — some consumers rely on it
+ * surviving a login round trip.
+ *
+ * replaceState rather than pushState: a URL holding a spent authorization code
+ * must not be reachable by pressing Back either, or the failure comes straight
+ * back.
+ */
+const clearAuthParamsFromUrl = (): void => {
+  window.history.replaceState(
+    null,
+    window.document.title,
+    `${window.location.pathname}${stripAuthParams(window.location.search)}`
+  );
+};
+
 const defaultOnRedirectCallback = (appState?: any): void => {
   if (appState?.returnTo) {
     window.location.replace(appState?.returnTo);
   } else {
-    // Drop the Auth0 params, but keep the host app's own query string — some
-    // consumers rely on it surviving a login round trip.
-    window.history.pushState(
-      null,
-      window.document.title,
-      `${window.location.pathname}${stripAuthParams(window.location.search)}`
-    );
+    clearAuthParamsFromUrl();
   }
 };
 
@@ -90,7 +101,8 @@ export class PhotonClientStore {
       error?: string;
       isLoading: boolean;
     };
-    handleRedirect: (url?: string) => Promise<void>;
+    /** Resolves to whether the authorization code exchange actually succeeded. */
+    handleRedirect: (url?: string) => Promise<boolean>;
     checkSession: () => Promise<void>;
     login: (args?: LoginOptions) => Promise<void>;
     logout: (args?: LogoutOptions) => Promise<void>;
@@ -242,7 +254,7 @@ export class PhotonClientStore {
     this.store = store;
     this.authentication = {
       state: store.authentication,
-      handleRedirect: async (url?: string) => {
+      handleRedirect: async (url?: string): Promise<boolean> => {
         try {
           const result = await this.sdk.authentication.handleRedirect(url);
           defaultOnRedirectCallback(result?.appState);
@@ -252,13 +264,23 @@ export class PhotonClientStore {
           } finally {
             this.redirectAppState = undefined;
           }
+          return true;
         } catch (err: any) {
           const urlParams = new URLSearchParams(window.location.search);
           const errorMessage = urlParams.get('error_description');
-          if (err.message.includes('must be an organization id')) {
+
+          // Drop the redirect params whatever went wrong. Leaving them in place
+          // keeps hasAuthParams() true, so every subsequent load re-enters this
+          // same failing exchange rather than falling through to checkSession —
+          // the app can never recover on its own, even when the session is
+          // perfectly good.
+          clearAuthParamsFromUrl();
+
+          if (err?.message?.includes('must be an organization id')) {
             this.setStore('authentication', {
               ...this.store.authentication,
-              error: 'The provided organization id is invalid or does not exist'
+              error: 'The provided organization id is invalid or does not exist',
+              isLoading: false
             });
           } else if (errorMessage?.includes('is not part of the org')) {
             this.setStore('authentication', {
@@ -267,11 +289,17 @@ export class PhotonClientStore {
               isLoading: false
             });
           } else {
+            // Usually a spent or replayed authorization code. The underlying
+            // Auth0 session is often intact, so now the URL is clean, try to
+            // pick it up instead of stranding the user on a dead page.
             this.setStore('authentication', {
               ...this.store.authentication,
-              error: err.message
+              error: err?.message ?? 'Unable to complete sign in',
+              isLoading: false
             });
+            await this.checkSession();
           }
+          return false;
         }
       },
       checkSession: this.checkSession.bind(this),

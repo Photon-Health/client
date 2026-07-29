@@ -346,9 +346,13 @@ export class AuthManager {
    */
   public async handleRedirect(url?: string) {
     try {
-      return this.authentication.handleRedirectCallback(url);
-    } catch (err) {
-      console.error(err);
+      // Must be awaited inside the try. Returning the promise un-awaited meant
+      // a rejected exchange bypassed this catch entirely, so the failure was
+      // never logged here and surfaced only as an opaque rejection upstream.
+      return await this.authentication.handleRedirectCallback(url);
+    } catch (error) {
+      console.error('[PhotonClient]: Failed to complete the Auth0 redirect.', error);
+      throw error;
     }
   }
 
