@@ -92,6 +92,7 @@ const PhotonPharmacySelectComponent = (props: PhotonPharmacySelectProps) => {
             templateIdsPrefill={[]}
             templateOverrides={{}}
             prescriptionIdsPrefill={[]}
+            prescriptionOverrides={{}}
             enableCombineAndDuplicate={false}
           >
             <PharmacySelectionProvider

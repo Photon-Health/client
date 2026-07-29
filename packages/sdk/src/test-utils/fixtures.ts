@@ -75,7 +75,7 @@ export const PRESCRIPTION = {
   fillsAllowed: 3,
   fillsRemaining: 3,
   instructions: 'Take 1 tablet by mouth once daily',
-  notes: null,
+  notes: 'Misc notes',
   state: PrescriptionState.Active,
   writtenAt: '2026-01-01T00:00:00.000Z',
   patient: PATIENT,

@@ -8,6 +8,7 @@ import { MockMedicationSearchElement } from '../test-utils/mock-medication-searc
 import { renderPrescribeWorkflow } from './test-utils/test-element-setup';
 import { stubGoogleMaps } from '../test-utils/stub-google-maps';
 import { PrescriptionInput } from '@photonhealth/sdk/dist/types';
+import { PrescriptionOverrides } from '@photonhealth/components';
 
 vi.mock('solid-element', () => ({
   customElement: vi.fn()
@@ -80,6 +81,153 @@ test('prefill a draft prescription from an existing prescriptionId', async () =>
   expect(sent.instructions).toBe(PRESCRIPTION.instructions);
   expect(sent.notes).toBe(PRESCRIPTION.notes);
   expect(sent.fillsAllowed).toBe(PRESCRIPTION.fillsAllowed);
+});
+
+test('additonalNotes are merged into draft prescriptions from an existing prescriptionId', async () => {
+  const capturedPrescriptions: PrescriptionInput[] = [];
+  let capturedPrescriptionQueryVariables: { id: string } | undefined;
+
+  server.use(
+    lambdasGql.query('GetPrescription', ({ variables }) => {
+      capturedPrescriptionQueryVariables = variables as { id: string };
+      return HttpResponse.json({
+        data: {
+          prescription: PRESCRIPTION
+        }
+      });
+    }),
+    lambdasGql.mutation('CreatePrescriptions', ({ variables }) => {
+      const prescriptions = variables.prescriptions as PrescriptionInput[];
+      capturedPrescriptions.push(...prescriptions);
+      return HttpResponse.json({
+        data: {
+          createPrescriptions: prescriptions.map((p, i) => ({
+            ...PRESCRIPTION,
+            id: `rx_${i}`
+          }))
+        }
+      });
+    })
+  );
+
+  const { waitForDraftPrescription } = renderPrescribeWorkflow({
+    prescriptionIds: PRESCRIPTION.id,
+    additionalNotes: 'Clinical additional note from host app'
+  });
+
+  await waitForDraftPrescription();
+
+  expect(capturedPrescriptionQueryVariables?.id).toBe(PRESCRIPTION.id);
+
+  const [sent] = capturedPrescriptions;
+  expect(sent.notes).toBe(
+    [PRESCRIPTION.notes, 'Clinical additional note from host app'].join('\n\n')
+  );
+});
+
+test('prefill a draft prescription from an existing prescriptionId with overrides', async () => {
+  const capturedPrescriptions: PrescriptionInput[] = [];
+  let capturedPrescriptionQueryVariables: { id: string } | undefined;
+
+  const overrides: PrescriptionOverrides['rx_123'] = {
+    externalId: 'ext_456',
+    treatmentId: 'trt_override',
+    dispenseQuantity: 60,
+    dispenseUnit: 'Tablets',
+    dispenseAsWritten: true,
+    fillsAllowed: 5,
+    daysSupply: 60,
+    instructions: 'Take two tablets by mouth twice daily',
+    notes: 'Override note for prescription'
+  };
+
+  server.use(
+    lambdasGql.query('GetPrescription', ({ variables }) => {
+      capturedPrescriptionQueryVariables = variables as { id: string };
+      return HttpResponse.json({
+        data: {
+          prescription: PRESCRIPTION
+        }
+      });
+    }),
+    lambdasGql.mutation('CreatePrescriptions', ({ variables }) => {
+      const prescriptions = variables.prescriptions as PrescriptionInput[];
+      capturedPrescriptions.push(...prescriptions);
+      return HttpResponse.json({
+        data: {
+          createPrescriptions: prescriptions.map((p, i) => ({
+            ...PRESCRIPTION,
+            id: `rx_${i}`
+          }))
+        }
+      });
+    })
+  );
+
+  const { waitForDraftPrescription } = renderPrescribeWorkflow({
+    prescriptionIds: PRESCRIPTION.id,
+    prescriptionOverrides: { [PRESCRIPTION.id]: overrides }
+  });
+
+  await waitForDraftPrescription();
+
+  expect(capturedPrescriptionQueryVariables?.id).toBe(PRESCRIPTION.id);
+
+  const [sent] = capturedPrescriptions;
+  expect(sent.treatmentId).toBe(overrides.treatmentId);
+  expect(sent.externalId).toBe(overrides.externalId);
+  expect(sent.dispenseQuantity).toBe(overrides.dispenseQuantity);
+  expect(sent.dispenseUnit).toBe(overrides.dispenseUnit);
+  expect(sent.dispenseAsWritten).toBe(overrides.dispenseAsWritten);
+  expect(sent.fillsAllowed).toBe(overrides.fillsAllowed);
+  expect(sent.daysSupply).toBe(overrides.daysSupply);
+  expect(sent.instructions).toBe(overrides.instructions);
+  expect(sent.notes).toBe(overrides.notes);
+});
+
+test('additonalNotes are merged into draft prescriptions from an existing prescriptionId with overrides', async () => {
+  const capturedPrescriptions: PrescriptionInput[] = [];
+  let capturedPrescriptionQueryVariables: { id: string } | undefined;
+
+  const overrides: PrescriptionOverrides['rx_123'] = {
+    notes: 'Override note for prescription'
+  };
+
+  server.use(
+    lambdasGql.query('GetPrescription', ({ variables }) => {
+      capturedPrescriptionQueryVariables = variables as { id: string };
+      return HttpResponse.json({
+        data: {
+          prescription: PRESCRIPTION
+        }
+      });
+    }),
+    lambdasGql.mutation('CreatePrescriptions', ({ variables }) => {
+      const prescriptions = variables.prescriptions as PrescriptionInput[];
+      capturedPrescriptions.push(...prescriptions);
+      return HttpResponse.json({
+        data: {
+          createPrescriptions: prescriptions.map((p, i) => ({
+            ...PRESCRIPTION,
+            id: `rx_${i}`
+          }))
+        }
+      });
+    })
+  );
+
+  const { waitForDraftPrescription } = renderPrescribeWorkflow({
+    prescriptionIds: PRESCRIPTION.id,
+    prescriptionOverrides: { [PRESCRIPTION.id]: overrides },
+    additionalNotes: 'Clinical additional note from host app'
+  });
+
+  await waitForDraftPrescription();
+
+  expect(capturedPrescriptionQueryVariables?.id).toBe(PRESCRIPTION.id);
+
+  const [sent] = capturedPrescriptions;
+  expect(sent.notes).toBe([overrides.notes, 'Clinical additional note from host app'].join('\n\n'));
 });
 
 test('if prescriptionId cannot be found, render the prescription form', async () => {

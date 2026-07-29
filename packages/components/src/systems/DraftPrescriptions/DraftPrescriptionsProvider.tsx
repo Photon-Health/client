@@ -54,6 +54,7 @@ interface DraftPrescriptionProviderProps {
   templateIdsPrefill: string[];
   templateOverrides: TemplateOverrides;
   prescriptionIdsPrefill: string[];
+  prescriptionOverrides: PrescriptionOverrides;
   enableCombineAndDuplicate: boolean;
   additionalNotes?: string;
   weight?: number;
@@ -70,6 +71,21 @@ export type TemplateOverrides = {
     daysSupply?: number;
     instructions?: string;
     notes?: string;
+  };
+};
+
+export type PrescriptionOverrides = {
+  [prescriptionId: string]: {
+    externalId?: string;
+    treatmentId?: string;
+    dispenseQuantity?: number;
+    dispenseUnit?: string;
+    dispenseAsWritten?: boolean;
+    fillsAllowed?: number;
+    daysSupply?: number;
+    instructions?: string;
+    notes?: string;
+    doNotFillBeforeDate?: Date;
   };
 };
 
@@ -92,10 +108,14 @@ export type PrescriptionFormData = {
   diagnoseCodes: string[];
 };
 
-const mapFormDataToPrescriptionInput = (prescription: PrescriptionFormData, patientId: string) => ({
+const mapFormDataToPrescriptionInput = (
+  prescription: PrescriptionFormData,
+  treatmentId: string,
+  patientId: string
+) => ({
   externalId: prescription.externalId,
   patientId: patientId,
-  treatmentId: prescription.treatment?.id,
+  treatmentId: treatmentId,
   dispenseAsWritten: prescription.dispenseAsWritten,
   dispenseQuantity: prescription.dispenseQuantity,
   dispenseUnit: prescription.dispenseUnit,
@@ -121,12 +141,25 @@ function isTreatmentInDraftPrescriptions(
   return draftedPrescriptions.some((draft) => draft.treatment.id === treatmentId);
 }
 
+/**
+ * Ensure we always tack on the prefilled notes
+ * even if the original object's notes or override notes are blank
+ */
+function constructRxNotes(
+  original: string | null,
+  override: string | null,
+  prefill: string | null
+) {
+  return [override || original || '', prefill].filter((note) => !!note).join('\n\n');
+}
+
 const transformPrefillsToPrescriptionInputs = async ({
   client,
   patientId,
   templateIdsPrefill,
   templateOverrides,
   prescriptionIdsPrefill,
+  prescriptionOverrides,
   rxNotesPrefill
 }: {
   client: PhotonClient;
@@ -134,6 +167,7 @@ const transformPrefillsToPrescriptionInputs = async ({
   templateIdsPrefill: string[];
   templateOverrides: TemplateOverrides;
   prescriptionIdsPrefill: string[];
+  prescriptionOverrides: PrescriptionOverrides;
   rxNotesPrefill: string;
 }) => {
   const rxToCreate: MutationCreatePrescriptionsArgs['prescriptions'] = [];
@@ -142,16 +176,15 @@ const transformPrefillsToPrescriptionInputs = async ({
   if (templateIdsPrefill.length > 0) {
     const dedupedTemplateIds = Array.from(new Set(templateIdsPrefill));
     const templatedCreateRxList = dedupedTemplateIds.map((templateId) => {
-      const templateOverrideNotes = templateOverrides?.[templateId]?.notes;
-      const notes = [templateOverrideNotes || '', rxNotesPrefill]
-        .filter((note) => !!note)
-        .join('\n\n');
-
       return {
         ...templateOverrides?.[templateId],
         patientId: patientId,
         templateId,
-        notes
+        notes: constructRxNotes(
+          null,
+          templateOverrides?.[templateId]?.notes || null,
+          rxNotesPrefill
+        )
       };
     });
     rxToCreate.push(...templatedCreateRxList);
@@ -169,7 +202,20 @@ const transformPrefillsToPrescriptionInputs = async ({
           errorPolicy: 'none'
         });
         if (data?.prescription) {
-          return mapFormDataToPrescriptionInput(data.prescription, patientId);
+          const input = mapFormDataToPrescriptionInput(
+            {
+              ...data.prescription,
+              ...prescriptionOverrides?.[prescriptionId],
+              notes: constructRxNotes(
+                data.prescription.notes || null,
+                prescriptionOverrides?.[prescriptionId]?.notes || null,
+                rxNotesPrefill
+              )
+            },
+            prescriptionOverrides?.[prescriptionId]?.treatmentId || data.prescription.treatment.id,
+            patientId
+          );
+          return input;
         }
         return null;
       })
@@ -225,6 +271,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
           templateIdsPrefill: props.templateIdsPrefill,
           templateOverrides: props.templateOverrides,
           prescriptionIdsPrefill: props.prescriptionIdsPrefill,
+          prescriptionOverrides: props.prescriptionOverrides,
           rxNotesPrefill: rxNotesPrefill()
         });
 
@@ -307,7 +354,11 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
     try {
       const res = await client.apollo.mutate({
         mutation: CreatePrescription,
-        variables: mapFormDataToPrescriptionInput(prescriptionFormData, props.patientId)
+        variables: mapFormDataToPrescriptionInput(
+          prescriptionFormData,
+          prescriptionFormData.treatment.id,
+          props.patientId
+        )
       });
       const created = res.data.createPrescription as Prescription;
       createdPrescription = created;
@@ -368,7 +419,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
     const res = await client.apollo.mutate({
       mutation: CreatePrescriptionTemplate,
       variables: {
-        ...mapFormDataToPrescriptionInput(prescription, props.patientId),
+        ...mapFormDataToPrescriptionInput(prescription, prescription.treatment.id, props.patientId),
         catalogId,
         isPrivate: true,
         ...(templateName ? { name: templateName } : {})

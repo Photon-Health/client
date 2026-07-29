@@ -105,7 +105,6 @@ test('additionalNotes are merged into prescriptions prefilled from templateIds',
 
   const { waitForDraftPrescription } = renderPrescribeWorkflow({
     templateIds: 'tpl_1',
-    templateOverrides: { tpl_1: { notes: 'Template override note' } },
     additionalNotes: 'Clinical additional note from host app'
   });
 
@@ -113,9 +112,42 @@ test('additionalNotes are merged into prescriptions prefilled from templateIds',
 
   const [sent] = capturedPrescriptionInputs;
   expect(sent.templateId).toBe('tpl_1');
-  // Bug: additionalNotes never reach the CreatePrescriptions mutation for
-  // template-prefilled rxs — only templateOverrides notes make it through.
-  expect(sent.notes).toContain('Clinical additional note from host app');
+  expect(sent.notes).toBe('Clinical additional note from host app');
+});
+
+test('additionalNotes are merged into prescriptions prefilled from templateIds with overrides', async () => {
+  const capturedPrescriptionInputs: PrescriptionInput[] = [];
+
+  const overrides: TemplateOverrides['tpl_1'] = {
+    notes: 'Override note for tpl_1'
+  };
+
+  server.use(
+    lambdasGql.mutation('CreatePrescriptions', ({ variables }) => {
+      const prescriptions = variables.prescriptions as PrescriptionInput[];
+      capturedPrescriptionInputs.push(...prescriptions);
+      return HttpResponse.json({
+        data: {
+          createPrescriptions: prescriptions.map((p, i) => ({
+            ...PRESCRIPTION,
+            id: `rx_tpl_${i}`
+          }))
+        }
+      });
+    })
+  );
+
+  const { waitForDraftPrescription } = renderPrescribeWorkflow({
+    templateIds: 'tpl_1',
+    templateOverrides: { tpl_1: overrides },
+    additionalNotes: 'Clinical additional note from host app'
+  });
+
+  await waitForDraftPrescription();
+
+  const [sent] = capturedPrescriptionInputs;
+  expect(sent.templateId).toBe('tpl_1');
+  expect(sent.notes).toBe([overrides.notes, 'Clinical additional note from host app'].join('\n\n'));
 });
 
 test('if prefilling from templateIds fails, render the prescription form', async () => {
