@@ -42,7 +42,9 @@ export interface OrderDetailsModalProps {
 
 const NEXT_STEPS_BY_PHARMACY: Record<string, string> = {
   [import.meta.env.VITE_AMAZON_PHARMACY_ID as string]:
-    'Amazon Pharmacy will text you shortly — no action needed.\n\nNo text? Log in at [amazon.com/pharmacy](https://amazon.com/pharmacy) to view your prescription or create an account. Your prescription should show up soon.\n\nStill have trouble? Contact support. You can also switch pharmacies if needed.'
+    'Amazon Pharmacy will text you shortly — no action needed.\n\nNo text? Log in at [amazon.com/pharmacy](https://amazon.com/pharmacy) to view your prescription or create an account. Your prescription should show up soon.\n\nStill have trouble? Contact support. You can also switch pharmacies if needed.',
+  [import.meta.env
+    .VITE_COST_PLUS_PHARMACY_ID as string]: `To receive your prescription as quickly as possible, go to [costplusdrugs.com/create-account](https://costplusdrugs.com/create-account) and create an account if you don't already have one. The pharmacy can't process your prescription until your account is set up.\n\nAlready have an account? Just log in — your prescription should appear shortly.\n\nStill have trouble? Contact support. You can also switch pharmacies if needed.`
 };
 
 const Row = ({ k, value }: { k: string; value: ReactNode }) => {
