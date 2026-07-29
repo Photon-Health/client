@@ -1,5 +1,14 @@
 import { createStore } from 'solid-js/store';
-import { PhotonClient } from '@photonhealth/sdk';
+import {
+  clearOrgLoginAttempt,
+  hasOrgLoginBeenAttempted,
+  isLoginLoopError,
+  LOGIN_LOOP_USER_MESSAGE,
+  markOrgLoginAttempted,
+  PhotonClient,
+  stripAuthParams
+} from '@photonhealth/sdk';
+import type { LoginOptions, LogoutOptions } from '@photonhealth/sdk';
 import type {
   Catalog,
   DispenseUnit,
@@ -14,11 +23,30 @@ import gql from 'graphql-tag';
 import jwtDecode from 'jwt-decode';
 import type { GraphQLFormattedError } from 'graphql';
 
+/**
+ * Shown when we cannot tell whether a session exists — typically silent auth
+ * being blocked in an embedded context, or an org/audience mismatch. Surfacing
+ * this suppresses autoLogin, which would otherwise redirect, succeed, and fail
+ * here again on arrival.
+ */
+export const SESSION_UNVERIFIABLE_MESSAGE =
+  'Unable to verify your session. Please refresh the page, or contact support if this keeps happening.';
+
+/** Shown when an org-scoped login keeps coming back without an `org_id` claim. */
+export const ORG_LOGIN_FAILED_MESSAGE =
+  'Unable to sign you in to your organization. Please contact support.';
+
 const defaultOnRedirectCallback = (appState?: any): void => {
   if (appState?.returnTo) {
     window.location.replace(appState?.returnTo);
   } else {
-    window.history.pushState(null, window.document.title, window.location.pathname);
+    // Drop the Auth0 params, but keep the host app's own query string — some
+    // consumers rely on it surviving a login round trip.
+    window.history.pushState(
+      null,
+      window.document.title,
+      `${window.location.pathname}${stripAuthParams(window.location.search)}`
+    );
   }
 };
 
@@ -64,8 +92,8 @@ export class PhotonClientStore {
     };
     handleRedirect: (url?: string) => Promise<void>;
     checkSession: () => Promise<void>;
-    login: (args?: object) => Promise<void>;
-    logout: () => void;
+    login: (args?: LoginOptions) => Promise<void>;
+    logout: (args?: LogoutOptions) => Promise<void>;
   };
   public getSDK: () => PhotonClient;
   public clinical: {
@@ -284,9 +312,25 @@ export class PhotonClientStore {
   }
 
   private async checkSession() {
+    const clientId = this.sdk.clientId;
     try {
-      await this.sdk.authentication.checkSession();
-      const authenticated = await this.sdk.authentication.isAuthenticated();
+      const probe = await this.sdk.authentication.probeSession();
+
+      if (probe.status === 'indeterminate') {
+        // We could not establish whether a session exists — typically silent
+        // auth being blocked, or an org/audience mismatch. Reporting this as
+        // logged out would have autoLogin redirect to Auth0, which succeeds,
+        // returns here, and fails identically: a loop of successful logins.
+        console.error('[PhotonClient]: Unable to verify the Auth0 session.', probe.error);
+        this.setStore('authentication', {
+          ...this.store.authentication,
+          isLoading: false,
+          error: SESSION_UNVERIFIABLE_MESSAGE
+        });
+        return;
+      }
+
+      const authenticated = probe.status === 'authenticated';
       this.setStore('authentication', {
         ...this.store.authentication,
         isAuthenticated: authenticated
@@ -304,10 +348,16 @@ export class PhotonClientStore {
       }
 
       let permissions: Permission[] = [];
+      let error: string | undefined = undefined;
+
       if (this.autoLogin || authenticated) {
         // getAccessToken is triggering the SSO screen to appear, so for auto-login=false, we don't want to call it
         try {
-          const token = await this.sdk.authentication.getAccessToken();
+          // Never redirect from here: checkSession also runs on a 60s poll, so
+          // a redirect on failure would yank the user away mid-session.
+          const token = await this.sdk.authentication.getAccessToken({
+            redirectOnFailure: false
+          });
           const decoded: {
             permissions: Permission[];
             'https://photon.health/assigned_org_id'?: string;
@@ -318,20 +368,35 @@ export class PhotonClientStore {
             !isUserLoggedIntoAnOrganization &&
             assignedOrgId
           ) {
-            // No org was configured upfront and the user isn't logged into one, but the
-            // token assigns them an org — re-login scoped to that org. Once the redirect
-            // comes back, user.org_id is set, so this only happens once.
-            this.sdk.setOrganization(assignedOrgId);
-            await this.sdk.authentication.login({
-              appState: {
-                // Preserve the original login's returnTo (recovered by handleRedirect)
-                // so the destination survives the second, org-scoped login.
-                returnTo:
-                  this.redirectAppState?.returnTo ??
-                  `${window.location.pathname}${window.location.search}`
-              }
-            });
-            return;
+            if (hasOrgLoginBeenAttempted(clientId, assignedOrgId)) {
+              // We already redirected once for this org and came back still
+              // without an org_id claim, so the org-scoped login isn't taking
+              // effect. Asking again just loops — surface it instead.
+              console.error(
+                `[PhotonClient]: Logged in with assigned org ${assignedOrgId}, but the session ` +
+                  'still carries no org_id claim. Verify the user is a member of that Auth0 ' +
+                  'organization and that the application has Organizations enabled.'
+              );
+              error = ORG_LOGIN_FAILED_MESSAGE;
+            } else {
+              // No org was configured upfront and the user isn't logged into one, but the
+              // token assigns them an org — re-login scoped to that org. The one-shot
+              // marker above is what bounds this if the claim never materializes.
+              markOrgLoginAttempted(clientId, assignedOrgId);
+              this.sdk.setOrganization(assignedOrgId);
+              await this.attemptLogin({
+                appState: {
+                  // Preserve the original login's returnTo (recovered by handleRedirect)
+                  // so the destination survives the second, org-scoped login.
+                  returnTo:
+                    this.redirectAppState?.returnTo ??
+                    `${window.location.pathname}${stripAuthParams(window.location.search)}`
+                }
+              });
+              // Either navigating away, or attemptLogin surfaced the reason it
+              // refused. Nothing useful left to compute either way.
+              return;
+            }
           }
           permissions = decoded?.permissions || [];
         } catch (_err) {
@@ -349,27 +414,73 @@ export class PhotonClientStore {
         isUserLoggedIntoAnOrganization &&
         selectedOrganizationId === user.org_id;
 
+      // Reaching here authenticated and without error means we not only got a
+      // session but could read it — the part that's already working when
+      // looping is *getting* one, so only this counts as proof of progress.
+      if (authenticated && !error) {
+        this.sdk.authentication.confirmSessionEstablished();
+        if (selectedOrganizationId) {
+          clearOrgLoginAttempt(clientId, selectedOrganizationId);
+        }
+      }
+
       this.setStore('authentication', {
         ...this.store.authentication,
         user: user,
         isLoading: false,
         isInOrg: isInOrg,
-        permissions: permissions || []
+        permissions: permissions || [],
+        error
       });
-    } catch (_e) {
+    } catch (e) {
+      // Unexpected failure (not a session verdict — probeSession reports those
+      // without throwing). Surface it so autoLogin doesn't read the absent
+      // session as "log in again".
+      console.error('[PhotonClient]: Session check failed.', e);
       this.setStore('authentication', {
         ...this.store.authentication,
-        isLoading: false
+        isLoading: false,
+        error: SESSION_UNVERIFIABLE_MESSAGE
       });
     }
   }
 
-  private async login(args = {}) {
-    await this.sdk.authentication.login(args);
+  /**
+   * Initiates a login redirect, turning a tripped login-loop breaker into
+   * surfaced error state instead of yet another redirect. Returns whether the
+   * redirect actually started.
+   */
+  private async attemptLogin(args: LoginOptions = {}): Promise<boolean> {
+    try {
+      await this.sdk.authentication.login(args);
+      return true;
+    } catch (error) {
+      if (isLoginLoopError(error)) {
+        console.error(`[PhotonClient]: ${(error as Error).message}`);
+        this.setStore('authentication', {
+          ...this.store.authentication,
+          isLoading: false,
+          error: LOGIN_LOOP_USER_MESSAGE
+        });
+        return false;
+      }
+      console.error('[PhotonClient]: Login failed', error);
+      this.setStore('authentication', {
+        ...this.store.authentication,
+        isLoading: false,
+        error: (error as Error)?.message ?? 'Login failed'
+      });
+      return false;
+    }
+  }
+
+  private async login(args: LoginOptions = {}) {
+    const started = await this.attemptLogin(args);
+    if (!started) return;
     await this.checkSession();
   }
 
-  private async logout(args = {}) {
+  private async logout(args: LogoutOptions = {}) {
     await this.sdk.authentication.logout(args);
     this.setStore('authentication', {
       ...this.store.authentication,

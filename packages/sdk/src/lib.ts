@@ -22,7 +22,23 @@ import {
 import pkg from '../package.json';
 import { AnalyticsClient } from './analytics/AnalyticsClient';
 
-export type { LoginOptions } from './auth';
+export type { LoginOptions, LogoutOptions, GetAccessTokenOptions, SessionProbe } from './auth';
+export { stripAuthParams } from './auth';
+export {
+  LoginLoopError,
+  isLoginLoopError,
+  clearLoginAttempts,
+  clearOrgLoginAttempt,
+  countLoginAttempts,
+  guardLoginAttempt,
+  hasOrgLoginBeenAttempted,
+  markOrgLoginAttempted,
+  recordLoginAttempt,
+  resetLoginRedirectLatch,
+  LOGIN_LOOP_MAX_ATTEMPTS,
+  LOGIN_LOOP_WINDOW_MS,
+  LOGIN_LOOP_USER_MESSAGE
+} from './loginLoopGuard';
 export * as types from './types';
 export * as fragments from './fragments';
 export * from './graphql/clinical-api';
@@ -67,7 +83,15 @@ export interface PhotonClientOptions {
 export class PhotonClient {
   public organization?: string;
 
+  public readonly clientId: string;
+
   private audience?: string;
+
+  /**
+   * Auth0 connection to authenticate against, for customers using SSO. Held so
+   * it survives setOrganization/clearOrganization rebuilding the AuthManager.
+   */
+  private connection?: string;
 
   /**
    * The GraphQL endpoint of the "legacy" Photon API
@@ -158,10 +182,13 @@ export class PhotonClient {
     };
     this.auth0Client = new Auth0Client(params);
     this.organization = organization;
+    this.clientId = clientId;
+    this.connection = connection;
     this.authentication = new AuthManager({
       authentication: this.auth0Client,
       organization: this.organization,
       audience: this.audience,
+      clientId: this.clientId,
       ...(connection ? { connection } : {})
     });
 
@@ -261,7 +288,9 @@ export class PhotonClient {
     const getToken = async () => {
       let token: string | undefined;
       try {
-        token = await this.authentication.getAccessToken();
+        // Analytics is fire-and-forget background traffic — it must never be
+        // the thing that navigates the user to a login screen.
+        token = await this.authentication.getAccessToken({ redirectOnFailure: false });
       } catch {
         // Session expired or auth unavailable — proceed without token
         // so the request gets a proper 401 from the API
@@ -281,7 +310,11 @@ export class PhotonClient {
     this.authentication = new AuthManager({
       authentication: this.auth0Client,
       organization: organizationId,
-      audience: this.audience
+      audience: this.audience,
+      clientId: this.clientId,
+      // Rebuilding the AuthManager used to drop `connection`, so an org change
+      // silently switched SSO customers back to the default login screen.
+      ...(this.connection ? { connection: this.connection } : {})
     });
     return this;
   }
@@ -295,7 +328,9 @@ export class PhotonClient {
     this.authentication = new AuthManager({
       authentication: this.auth0Client,
       organization: undefined,
-      audience: this.audience
+      audience: this.audience,
+      clientId: this.clientId,
+      ...(this.connection ? { connection: this.connection } : {})
     });
     this.authentication.login({});
     return this;

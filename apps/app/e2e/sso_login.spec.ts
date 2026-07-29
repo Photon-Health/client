@@ -1,4 +1,5 @@
 import { expect, Page, test } from '@playwright/test';
+import { captureNavigations } from './utils/auth_intercept';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -22,7 +23,7 @@ test('SSO login flow and logout loop regression', async ({ page }) => {
   await expectLandingPageVisible(page);
 
   // Phase 2: Re-visit /sso while authenticated — verify loggedOut=1 breaks any login/logout loop
-  const navigationUrls = setupNavigationCapture(page);
+  const navigationUrls = captureNavigations(page);
 
   await page.goto('/sso?connection=fakecustomer');
   await page.waitForURL(/loggedOut=1/, { timeout: 30_000 });
@@ -38,16 +39,6 @@ function setupAuthorizeRequestCapture(page: Page): string[] {
     const url = req.url();
     if (url.includes('/authorize') && !url.includes('prompt=none')) {
       urls.push(url);
-    }
-  });
-  return urls;
-}
-
-function setupNavigationCapture(page: Page): string[] {
-  const urls: string[] = [];
-  page.on('request', (req) => {
-    if (req.isNavigationRequest()) {
-      urls.push(req.url());
     }
   });
   return urls;

@@ -37,5 +37,12 @@ export default defineConfig({
     },
     target: 'es6',
     minify: false
+  },
+  test: {
+    // jsdom for sessionStorage and window.location, which the login-loop guard
+    // and AuthManager redirect handling both depend on.
+    environment: 'jsdom',
+    globals: true,
+    include: ['src/**/*.test.ts']
   }
 });
