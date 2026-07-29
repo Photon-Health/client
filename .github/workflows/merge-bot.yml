@@ -24,7 +24,7 @@ jobs:
         uses: actions/create-github-app-token@v3
         id: generate-token
         with:
-          app-id: ${{ secrets.CPR_APP_ID }}
+          client-id: ${{ secrets.CPR_APP_ID }}
           private-key: ${{ secrets.CPR_APP_SECRET }}
       - name: Fail if not ready
         if: ${{ !(contains(github.event.pull_request.labels.*.name, 'ready') || contains(github.event.pull_request.labels.*.name, 'ready to merge')) }}
