@@ -1,6 +1,7 @@
 import {
   DiagnosisCodesPrefill,
   DraftPrescriptionsProvider,
+  InitialPrescriptionsPrefill,
   PharmacySelectionProvider,
   PrescribeEventDispatchProvider,
   PrescribeProvider,
@@ -33,6 +34,7 @@ export interface PrescribeWorkflowComponentProps extends PrescribeProps {
   templateOverrides?: TemplateOverrides;
   prescriptionIds?: string;
   prescriptionOverrides?: PrescriptionOverrides;
+  initialPrescriptions?: InitialPrescriptionsPrefill;
   enableCoverageCheck: boolean;
   pharmacyId?: string;
   enableLocalPickup: boolean;
@@ -142,6 +144,7 @@ customElement(
     templateOverrides: undefined,
     prescriptionIds: undefined,
     prescriptionOverrides: undefined,
+    initialPrescriptions: undefined,
     hideSubmit: false,
     hideTemplates: false,
     hidePatientCard: false,

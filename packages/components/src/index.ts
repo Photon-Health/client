@@ -22,6 +22,7 @@ import {
   DraftPrescriptionItem,
   DraftPrescriptionLayout,
   DraftPrescriptionsProvider,
+  type InitialPrescriptionsPrefill,
   type PrescriptionFormData,
   type PrescriptionOverrides,
   type TemplateOverrides,
@@ -182,5 +183,6 @@ export type {
   CoverageOption,
   SupervisorPrefill,
   TryCreatePrescriptionTemplateOptions,
-  DiagnosisCodesPrefill
+  DiagnosisCodesPrefill,
+  InitialPrescriptionsPrefill
 };

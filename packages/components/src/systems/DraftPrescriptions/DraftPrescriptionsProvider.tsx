@@ -90,6 +90,24 @@ export type PrescriptionOverrides = {
   };
 };
 
+// At runtime `solid-element`'s customElement parses the `supervisor` HTML
+// attribute as JSON. Valid JSON → object; invalid JSON → the raw string.
+export type InitialPrescriptionsPrefill = Partial<InitialPrescriptionInput>[] | string;
+
+export type InitialPrescriptionInput = {
+  externalId?: string;
+  patientId: string;
+  treatmentId: string;
+  dispenseQuantity: number;
+  dispenseUnit: string;
+  dispenseAsWritten?: boolean;
+  fillsAllowed: number;
+  daysSupply: number;
+  instructions: string;
+  notes?: string;
+  doNotFillBeforeDate?: Date;
+};
+
 export type PrescriptionFormData = {
   id?: string;
   doNotFillBeforeDate?: string;
