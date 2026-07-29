@@ -55,6 +55,7 @@ interface DraftPrescriptionProviderProps {
   templateOverrides: TemplateOverrides;
   prescriptionIdsPrefill: string[];
   prescriptionOverrides: PrescriptionOverrides;
+  initialPrescriptions?: InitialPrescriptionsPrefill;
   enableCombineAndDuplicate: boolean;
   additionalNotes?: string;
   weight?: number;
@@ -167,6 +168,7 @@ const transformPrefillsToPrescriptionInputs = async ({
   templateOverrides,
   prescriptionIdsPrefill,
   prescriptionOverrides,
+  initialPrescriptions,
   rxNotesPrefill
 }: {
   client: PhotonClient;
@@ -175,6 +177,7 @@ const transformPrefillsToPrescriptionInputs = async ({
   templateOverrides: TemplateOverrides;
   prescriptionIdsPrefill: string[];
   prescriptionOverrides: PrescriptionOverrides;
+  initialPrescriptions?: InitialPrescriptionsPrefill;
   rxNotesPrefill: string;
 }) => {
   const rxToCreate: MutationCreatePrescriptionsArgs['prescriptions'] = [];
@@ -197,7 +200,7 @@ const transformPrefillsToPrescriptionInputs = async ({
     rxToCreate.push(...templatedCreateRxList);
   }
 
-  // Fetch prescriptions if needed
+  // Create prescriptions from prescription IDs
   if (prescriptionIdsPrefill.length > 0) {
     const fetchedPrescriptions = await Promise.all(
       prescriptionIdsPrefill.map(async (prescriptionId: string) => {
@@ -232,6 +235,25 @@ const transformPrefillsToPrescriptionInputs = async ({
       })
     );
     rxToCreate.push(...fetchedPrescriptions.filter((rx) => !!rx));
+  }
+
+  if (initialPrescriptions) {
+    if (typeof initialPrescriptions === 'string') {
+      throw new Error('Invalid JSON passed to initialPrescriptions');
+    }
+    for (const draft of initialPrescriptions) {
+      const hasRequiredFields =
+        draft.patientId &&
+        draft.treatmentId &&
+        draft.dispenseQuantity &&
+        draft.dispenseUnit &&
+        draft.fillsAllowed &&
+        draft.daysSupply &&
+        draft.instructions;
+      if (!hasRequiredFields) {
+        throw new Error('Missing required initialPrescriptions fields');
+      }
+    }
   }
 
   return rxToCreate;
@@ -283,6 +305,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
           templateOverrides: props.templateOverrides,
           prescriptionIdsPrefill: props.prescriptionIdsPrefill,
           prescriptionOverrides: props.prescriptionOverrides,
+          initialPrescriptions: props.initialPrescriptions,
           rxNotesPrefill: rxNotesPrefill()
         });
 

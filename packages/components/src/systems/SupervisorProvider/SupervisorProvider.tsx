@@ -74,7 +74,7 @@ export const createSupervisorFetch = async (
   supervisorPrefill: SupervisorPrefill
 ): Promise<SupervisorResult> => {
   if (typeof supervisorPrefill === 'string') {
-    return { errors: ['Invalid supervisor json passed in'] };
+    return { errors: ['Invalid JSON passed to supervisor'] };
   }
 
   if (!hasRequiredFields(supervisorPrefill)) {

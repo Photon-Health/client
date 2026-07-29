@@ -71,6 +71,7 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
           templateOverrides={props.templateOverrides || {}}
           prescriptionIdsPrefill={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
           prescriptionOverrides={props.prescriptionOverrides || {}}
+          initialPrescriptions={props.initialPrescriptions}
           enableCombineAndDuplicate={props.enableCombineAndDuplicate}
           additionalNotes={props.additionalNotes}
           weight={props.weight}
