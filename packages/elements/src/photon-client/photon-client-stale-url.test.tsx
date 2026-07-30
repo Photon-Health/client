@@ -51,7 +51,7 @@ beforeEach(() => {
   auth0.getTokenWithPopup.mockResolvedValue('test-access-token');
   auth0.loginWithRedirect.mockResolvedValue(undefined);
   auth0.logout.mockResolvedValue(undefined);
-  // The spent code cannot be exchanged.
+  // The stale code cannot be considered valid.
   auth0.handleRedirectCallback.mockRejectedValue(new Error('Invalid state'));
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
