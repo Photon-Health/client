@@ -1,4 +1,4 @@
-export type AnalyticsCategory = 'pageViewed' | 'ctaClicked' | 'fieldInteraction';
+export type AnalyticsCategory = 'elementViewed' | 'ctaClicked' | 'fieldInteraction';
 
 export interface FieldCompletionSnapshot {
   [fieldName: string]: { completed: boolean };
@@ -7,11 +7,11 @@ export interface FieldCompletionSnapshot {
 export type DraftPrescriptionSource = 'form' | 'med_history_refill' | 'prefill';
 
 // ---------------------------------------------------------------------------
-// Page View Events — each page gets a unique event name
+// Element View Events — each element gets a unique event name
 // ---------------------------------------------------------------------------
 
-export type PageViewEvent = {
-  name: 'Signature Attestation Page Viewed';
+export type ElementViewEvent = {
+  name: 'Signature Attestation Element Viewed';
   attestationVersion: string;
 };
 
@@ -89,7 +89,7 @@ export type FieldInteractionEvent =
 // Event map — used by dispatchAnalyticsTrackEvent generic
 // ---------------------------------------------------------------------------
 export type AnalyticsEventMap = {
-  pageViewed: PageViewEvent;
+  elementViewed: ElementViewEvent;
   ctaClicked: CtaClickEvent;
   fieldInteraction: FieldInteractionEvent;
 };
@@ -98,7 +98,7 @@ export type AnalyticsEventMap = {
 // Combined type — the CustomEvent detail shape used by the listener side
 // ---------------------------------------------------------------------------
 export type PhotonEmbedAnalyticsEventInput =
-  | ({ category: 'pageViewed' } & PageViewEvent)
+  | ({ category: 'elementViewed' } & ElementViewEvent)
   | ({ category: 'ctaClicked' } & CtaClickEvent)
   | ({ category: 'fieldInteraction' } & FieldInteractionEvent);
 

@@ -163,7 +163,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   createEffect(() => {
     const curr = status();
     if (curr.status === 'NEEDS ATTESTATION') {
-      dispatchAnalyticsTrackEvent('pageViewed', {
+      dispatchAnalyticsTrackEvent('elementViewed', {
         name: 'Signature Attestation Page Viewed',
         attestationVersion: curr.version
       });

@@ -298,7 +298,7 @@ const isFieldInteraction = (filter: Record<string, unknown> = {}) => {
 const isPageView = (pageName: string, filter: Record<string, unknown> = {}) => {
   return (event: CustomEvent) => {
     const detail = event.detail as AnalyticsDetail;
-    if (detail.category !== 'pageViewed' || detail.name !== pageName) {
+    if (detail.category !== 'elementViewed' || detail.name !== pageName) {
       return false;
     }
     return Object.entries(filter).every(([key, value]) => detail[key] === value);
