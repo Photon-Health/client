@@ -27,6 +27,10 @@ import {
 } from '../../fetch';
 import triggerToast from '../../utils/toastTriggers';
 import { constructRxNotes, formatPatientWeight } from './utils/formatters';
+import {
+  InitialPrescriptionInput,
+  initialPrescriptionInputSchema
+} from './utils/initialPrescriptionInputSchema';
 
 export type DraftPrescriptionsContextType = {
   // values
@@ -94,20 +98,6 @@ export type PrescriptionOverrides = {
 // At runtime `solid-element`'s customElement parses the `supervisor` HTML
 // attribute as JSON. Valid JSON → object; invalid JSON → the raw string.
 export type InitialPrescriptionsPrefill = Partial<InitialPrescriptionInput>[] | string;
-
-export type InitialPrescriptionInput = {
-  externalId?: string;
-  patientId: string;
-  treatmentId: string;
-  dispenseQuantity: number;
-  dispenseUnit: string;
-  dispenseAsWritten?: boolean;
-  fillsAllowed: number;
-  daysSupply: number;
-  instructions: string;
-  notes?: string;
-  doNotFillBeforeDate?: Date;
-};
 
 export type PrescriptionFormData = {
   id?: string;
@@ -182,7 +172,7 @@ const transformPrefillsToPrescriptionInputs = async ({
 }) => {
   const rxToCreate: MutationCreatePrescriptionsArgs['prescriptions'] = [];
 
-  // Create prescriptions from template ids with a few optional override values
+  // Create prescriptions from template IDs with possible overrides
   if (templateIdsPrefill.length > 0) {
     const dedupedTemplateIds = Array.from(new Set(templateIdsPrefill));
     const templatedCreateRxList = dedupedTemplateIds.map((templateId) => {
@@ -200,7 +190,7 @@ const transformPrefillsToPrescriptionInputs = async ({
     rxToCreate.push(...templatedCreateRxList);
   }
 
-  // Create prescriptions from prescription IDs
+  // Create prescriptions from prescription IDs with possible overrides
   if (prescriptionIdsPrefill.length > 0) {
     const fetchedPrescriptions = await Promise.all(
       prescriptionIdsPrefill.map(async (prescriptionId: string) => {
@@ -237,22 +227,19 @@ const transformPrefillsToPrescriptionInputs = async ({
     rxToCreate.push(...fetchedPrescriptions.filter((rx) => !!rx));
   }
 
+  // Create prescriptions from initialPrescriptions JSON array
   if (initialPrescriptions) {
     if (typeof initialPrescriptions === 'string') {
       throw new Error('Invalid JSON passed to initialPrescriptions');
     }
     for (const draft of initialPrescriptions) {
-      const hasRequiredFields =
-        draft.patientId &&
-        draft.treatmentId &&
-        draft.dispenseQuantity &&
-        draft.dispenseUnit &&
-        draft.fillsAllowed &&
-        draft.daysSupply &&
-        draft.instructions;
-      if (!hasRequiredFields) {
-        throw new Error('Missing required initialPrescriptions fields');
+      const result = initialPrescriptionInputSchema.safeParse(draft);
+
+      if (result.error) {
+        throw new Error(result.error.message);
       }
+
+      rxToCreate.push(result.data);
     }
   }
 
