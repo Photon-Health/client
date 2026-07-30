@@ -236,10 +236,10 @@ const transformPrefillsToPrescriptionInputs = async ({
       const result = initialPrescriptionInputSchema.safeParse(draft);
 
       if (result.error) {
-        throw new Error(result.error.message);
+        throw new Error(result.error.issues.map((i) => i.message).join(', '));
       }
 
-      rxToCreate.push(result.data);
+      rxToCreate.push({ ...result.data, patientId });
     }
   }
 
@@ -274,8 +274,9 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
   // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId
   createEffect(async () => {
     if (
-      // must have templateIds or prescriptionIds to create prescriptions
-      (props.templateIdsPrefill.length > 0 || props.prescriptionIdsPrefill.length > 0) &&
+      (props.templateIdsPrefill.length > 0 ||
+        props.prescriptionIdsPrefill.length > 0 ||
+        props.initialPrescriptions) &&
       // must have a patientId
       !!props.patientId &&
       // must not have created prescriptions yet
