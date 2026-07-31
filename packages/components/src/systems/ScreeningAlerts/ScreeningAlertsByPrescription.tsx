@@ -17,17 +17,18 @@ const isDraftedPrescription = (
   (entity as PrescriptionScreeningAlertInvolvedDraftedPrescription).__typename ===
   'PrescriptionScreeningAlertInvolvedDraftedPrescription';
 
-function groupAlertsByPrescription(
+export function groupAlertsByPrescription(
   screeningAlerts: PrescriptionScreeningAlert[]
 ): AlertsForPrescription[] {
   const prescriptionMap = new Map<string, AlertsForPrescription>();
 
   for (const alert of screeningAlerts) {
-    // loop through alerts for the drafted prescriptions in the order and organize by prescription id
+    // loop through alerts for the drafted prescriptions and organize by prescription name
+    // so multiple alerts for the same medication share a single group
     for (const prescription of alert.involvedEntities.filter(isDraftedPrescription)) {
-      const group = prescriptionMap.get(prescription.id) ?? { prescription, alerts: [] };
+      const group = prescriptionMap.get(prescription.name) ?? { prescription, alerts: [] };
       if (!group.alerts.includes(alert)) group.alerts.push(alert);
-      prescriptionMap.set(prescription.id, group);
+      prescriptionMap.set(prescription.name, group);
     }
   }
 
