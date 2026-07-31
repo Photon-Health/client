@@ -1,13 +1,4 @@
-import {
-  Box,
-  Button,
-  Center,
-  CircularProgress,
-  Container,
-  Text,
-  useToast,
-  VStack
-} from '@chakra-ui/react';
+import { Box, Button, Container, Text, useToast, VStack } from '@chakra-ui/react';
 import queryString from 'query-string';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { flushSync } from 'react-dom';
@@ -1134,21 +1125,6 @@ export const Pharmacy = () => {
   if (!order) {
     console.error('No error');
     return null;
-  }
-
-  if (initialLoad && isLoading) {
-    return (
-      <Box>
-        <Helmet>
-          <title>{t.selectAPharmacy}</title>
-        </Helmet>
-        <Container>
-          <Center h="100vh">
-            <CircularProgress isIndeterminate color="gray.800" />
-          </Center>
-        </Container>
-      </Box>
-    );
   }
 
   const patientClicksAddress = () => {
