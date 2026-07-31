@@ -591,29 +591,27 @@ export const Pharmacy = () => {
       setLoadingPharmacies(true);
       try {
         // Get pharmacies from photon db
-        let topRankedPharmacies: EnrichedPharmacy[] = [];
+        const topRankedRequests: Promise<EnrichedPharmacy[]>[] = [];
 
         // check if top ranked costco is enabled and there are GLP treatments
         if (enableTopRankedCostco) {
-          topRankedPharmacies = [
-            ...(await getCostco({ latitude, longitude })),
-            ...topRankedPharmacies
-          ];
+          topRankedRequests.push(getCostco({ latitude, longitude }));
         }
 
         if (enableTopRankedWalgreens && order?.readyBy === 'Urgent') {
-          topRankedPharmacies = [
-            ...(await getWalgreens({ latitude, longitude })),
-            ...topRankedPharmacies
-          ];
+          topRankedRequests.push(getWalgreens({ latitude, longitude }));
         }
 
         // using the existing enablePrice flag to determine if we should fetch pharmacies with prices
         // a different query than the original query
-        const pharmacies = await loadPharmacies({
-          latitude,
-          longitude
-        });
+        const [pharmacies, ...topRankedResults] = await Promise.all([
+          loadPharmacies({ latitude, longitude }),
+          ...topRankedRequests
+        ]);
+
+        const topRankedPharmacies: EnrichedPharmacy[] = ([] as EnrichedPharmacy[]).concat(
+          ...topRankedResults
+        );
 
         if (pharmacies?.length === 0) {
           if (enablePrice) {
