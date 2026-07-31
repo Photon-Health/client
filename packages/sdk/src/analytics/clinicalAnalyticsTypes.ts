@@ -4,7 +4,12 @@ export interface FieldCompletionSnapshot {
   [fieldName: string]: { completed: boolean };
 }
 
-export type DraftPrescriptionSource = 'form' | 'med_history_refill' | 'prefill';
+export type DraftPrescriptionSource =
+  | 'form'
+  | 'med_history_refill'
+  | 'template_prefill'
+  | 'prescription_id_prefill'
+  | 'initial_prescriptions_prefill';
 
 // ---------------------------------------------------------------------------
 // Element View Events — each element gets a unique event name

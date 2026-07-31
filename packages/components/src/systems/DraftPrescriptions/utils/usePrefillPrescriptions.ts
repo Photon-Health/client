@@ -1,6 +1,5 @@
 import { Accessor, createEffect, createSignal, Setter } from 'solid-js';
 import { MutationCreatePrescriptionsArgs, Prescription } from '@photonhealth/sdk/dist/types';
-import { PhotonClient } from '@photonhealth/sdk';
 import { buildPrescriptionSnapshot } from '../../../analytics/buildFieldSnapshot';
 import { usePrescribeEventDispatch } from '../../PrescribeEventDispatchProvider';
 import { usePhotonClient } from '../../SDKProvider';
@@ -62,152 +61,6 @@ export type PrefillPrescriptionsOptions = {
 
 type PrescriptionInputs = MutationCreatePrescriptionsArgs['prescriptions'];
 
-// Create prescriptions from template IDs with possible overrides
-const buildInputsFromTemplateIds = ({
-  patientId,
-  templateIdsPrefill,
-  templateOverrides,
-  rxNotesPrefill
-}: {
-  patientId: string;
-  templateIdsPrefill: string[];
-  templateOverrides: TemplateOverrides;
-  rxNotesPrefill: string;
-}): PrescriptionInputs => {
-  const dedupedTemplateIds = Array.from(new Set(templateIdsPrefill));
-
-  return dedupedTemplateIds.map((templateId) => ({
-    ...templateOverrides?.[templateId],
-    patientId,
-    templateId,
-    notes: constructRxNotes(null, templateOverrides?.[templateId]?.notes || null, rxNotesPrefill)
-  }));
-};
-
-// Create prescriptions from prescription IDs with possible overrides
-const buildInputsFromPrescriptionIds = async ({
-  client,
-  patientId,
-  prescriptionIdsPrefill,
-  prescriptionOverrides,
-  rxNotesPrefill
-}: {
-  client: PhotonClient;
-  patientId: string;
-  prescriptionIdsPrefill: string[];
-  prescriptionOverrides: PrescriptionOverrides;
-  rxNotesPrefill: string;
-}): Promise<PrescriptionInputs> => {
-  const fetchedPrescriptions = await Promise.all(
-    prescriptionIdsPrefill.map(async (prescriptionId: string) => {
-      const overrides = prescriptionOverrides?.[prescriptionId] || {};
-      const { data } = await client.apollo.query({
-        query: GetPrescription,
-        variables: { id: prescriptionId },
-        // request should throw if there are any errors
-        // retrieving the prescription
-        errorPolicy: 'none'
-      });
-      if (data?.prescription) {
-        const input = mapFormDataToPrescriptionInput(
-          {
-            ...data.prescription,
-            ...overrides,
-            notes: constructRxNotes(
-              data.prescription.notes || null,
-              overrides.notes || null,
-              rxNotesPrefill
-            ),
-            doNotFillBeforeDate: overrides.doNotFillBeforeDate
-              ? overrides.doNotFillBeforeDate.slice(0, 10)
-              : undefined
-          },
-          overrides.treatmentId || data.prescription.treatment.id,
-          patientId
-        );
-        return input;
-      }
-      return null;
-    })
-  );
-
-  return fetchedPrescriptions.filter((rx) => !!rx);
-};
-
-// Create prescriptions from the initialPrescriptions JSON array
-const buildInputsFromInitialPrescriptions = ({
-  patientId,
-  initialPrescriptions
-}: {
-  patientId: string;
-  initialPrescriptions: InitialPrescriptionsPrefill;
-}): PrescriptionInputs => {
-  if (typeof initialPrescriptions === 'string') {
-    throw new Error('Invalid JSON passed to initialPrescriptions');
-  }
-
-  return initialPrescriptions.map((draft) => {
-    const result = initialPrescriptionInputSchema.safeParse(draft);
-
-    if (result.error) {
-      throw new Error(result.error.issues.map((i) => i.message).join(', '));
-    }
-
-    return { ...result.data, patientId };
-  });
-};
-
-const transformPrefillsToPrescriptionInputs = async ({
-  client,
-  patientId,
-  templateIdsPrefill,
-  templateOverrides,
-  prescriptionIdsPrefill,
-  prescriptionOverrides,
-  initialPrescriptions,
-  rxNotesPrefill
-}: {
-  client: PhotonClient;
-  patientId: string;
-  templateIdsPrefill: string[];
-  templateOverrides: TemplateOverrides;
-  prescriptionIdsPrefill: string[];
-  prescriptionOverrides: PrescriptionOverrides;
-  initialPrescriptions?: InitialPrescriptionsPrefill;
-  rxNotesPrefill: string;
-}): Promise<PrescriptionInputs> => {
-  const rxToCreate: PrescriptionInputs = [];
-
-  if (templateIdsPrefill.length > 0) {
-    rxToCreate.push(
-      ...buildInputsFromTemplateIds({
-        patientId,
-        templateIdsPrefill,
-        templateOverrides,
-        rxNotesPrefill
-      })
-    );
-  }
-
-  if (prescriptionIdsPrefill.length > 0) {
-    rxToCreate.push(
-      ...(await buildInputsFromPrescriptionIds({
-        client,
-        patientId,
-        prescriptionIdsPrefill,
-        prescriptionOverrides,
-        rxNotesPrefill
-      }))
-    );
-  }
-
-  if (initialPrescriptions) {
-    rxToCreate.push(...buildInputsFromInitialPrescriptions({ patientId, initialPrescriptions }));
-  }
-
-  return rxToCreate;
-};
-
 /**
  * Creates draft prescriptions from the prefill props (template IDs, prescription IDs and
  * initial prescriptions) once a patientId is available. Runs at most once per mount.
@@ -234,37 +87,137 @@ export const usePrefillPrescriptions = (
       setIsLoadingPrefills(true);
 
       try {
-        const prefillPrescriptionInputs = await transformPrefillsToPrescriptionInputs({
-          client,
-          patientId: props.patientId,
-          templateIdsPrefill: props.templateIdsPrefill,
-          templateOverrides: props.templateOverrides,
-          prescriptionIdsPrefill: props.prescriptionIdsPrefill,
-          prescriptionOverrides: props.prescriptionOverrides,
-          initialPrescriptions: props.initialPrescriptions,
-          rxNotesPrefill: options.rxNotesPrefill()
-        });
+        const rxNotesPrefill = options.rxNotesPrefill();
+        const newRxs: Prescription[] = [];
 
-        if (!prefillPrescriptionInputs.length) {
-          return;
-        }
+        await Promise.all([
+          // Create prescriptions from template IDs with possible overrides
+          async () => {
+            if (props.templateIdsPrefill.length > 0) {
+              const dedupedTemplateIds = Array.from(new Set(props.templateIdsPrefill));
 
-        const res = await client.apollo.mutate({
-          mutation: CreatePrescriptions,
-          variables: { prescriptions: prefillPrescriptionInputs }
-        });
-        const newRxs = res.data.createPrescriptions as Prescription[];
+              const rxToCreate: PrescriptionInputs = dedupedTemplateIds.map((templateId) => ({
+                ...props.templateOverrides?.[templateId],
+                patientId: props.patientId,
+                templateId,
+                notes: constructRxNotes(
+                  null,
+                  props.templateOverrides?.[templateId]?.notes || null,
+                  rxNotesPrefill
+                )
+              }));
+
+              const res = await client.apollo.mutate({
+                mutation: CreatePrescriptions,
+                variables: { prescriptions: rxToCreate }
+              });
+              const prescriptions = res.data.createPrescriptions as Prescription[] | null;
+              if (prescriptions) {
+                prescriptions.forEach((rx) => {
+                  dispatchDraftPrescriptionCreated(rx);
+                  dispatchAnalyticsTrackEvent('ctaClicked', {
+                    name: 'Draft Prescription Added',
+                    draftPrescriptionSource: 'template_prefill',
+                    fields: buildPrescriptionSnapshot(rx)
+                  });
+                });
+                newRxs.push(...prescriptions);
+              }
+            }
+          },
+          // Create prescriptions from prescription IDs with possible overrides
+          async () => {
+            if (props.prescriptionIdsPrefill.length > 0) {
+              const rxToCreate: PrescriptionInputs = await Promise.all(
+                props.prescriptionIdsPrefill.map(async (prescriptionId: string) => {
+                  const overrides = props.prescriptionOverrides?.[prescriptionId] || {};
+                  const { data } = await client.apollo.query({
+                    query: GetPrescription,
+                    variables: { id: prescriptionId },
+                    // request should throw if there are any errors
+                    // retrieving the prescription
+                    errorPolicy: 'none'
+                  });
+                  if (data?.prescription) {
+                    const input = mapFormDataToPrescriptionInput(
+                      {
+                        ...data.prescription,
+                        ...overrides,
+                        notes: constructRxNotes(
+                          data.prescription.notes || null,
+                          overrides.notes || null,
+                          rxNotesPrefill
+                        ),
+                        doNotFillBeforeDate: overrides.doNotFillBeforeDate
+                          ? overrides.doNotFillBeforeDate.slice(0, 10)
+                          : undefined
+                      },
+                      overrides.treatmentId || data.prescription.treatment.id,
+                      props.patientId
+                    );
+                    return input;
+                  }
+                  return null;
+                })
+              );
+
+              const res = await client.apollo.mutate({
+                mutation: CreatePrescriptions,
+                variables: { prescriptions: rxToCreate }
+              });
+              const prescriptions = res.data.createPrescriptions as Prescription[] | null;
+              if (prescriptions) {
+                prescriptions.forEach((rx) => {
+                  dispatchDraftPrescriptionCreated(rx);
+                  dispatchAnalyticsTrackEvent('ctaClicked', {
+                    name: 'Draft Prescription Added',
+                    draftPrescriptionSource: 'prescription_id_prefill',
+                    fields: buildPrescriptionSnapshot(rx)
+                  });
+                });
+                newRxs.push(...prescriptions);
+              }
+            }
+          },
+          // Create prescriptions from the initialPrescriptions JSON array
+          async () => {
+            if (props.initialPrescriptions) {
+              if (typeof props.initialPrescriptions === 'string') {
+                throw new Error('Invalid JSON passed to initialPrescriptions');
+              }
+
+              const rxToCreate: PrescriptionInputs = props.initialPrescriptions.map((draft) => {
+                const result = initialPrescriptionInputSchema.safeParse(draft);
+
+                if (result.error) {
+                  throw new Error(result.error.issues.map((i) => i.message).join(', '));
+                }
+
+                return { ...result.data, patientId: props.patientId };
+              });
+
+              const res = await client.apollo.mutate({
+                mutation: CreatePrescriptions,
+                variables: { prescriptions: rxToCreate }
+              });
+              const prescriptions = res.data.createPrescriptions as Prescription[] | null;
+              if (prescriptions) {
+                prescriptions.forEach((rx) => {
+                  dispatchDraftPrescriptionCreated(rx);
+                  dispatchAnalyticsTrackEvent('ctaClicked', {
+                    name: 'Draft Prescription Added',
+                    draftPrescriptionSource: 'initial_prescriptions_prefill',
+                    fields: buildPrescriptionSnapshot(rx)
+                  });
+                });
+                newRxs.push(...prescriptions);
+              }
+            }
+          }
+        ]);
 
         if (newRxs) {
           options.setDraftPrescriptions((prev) => [...prev, ...newRxs]);
-          newRxs.forEach((rx) => {
-            dispatchDraftPrescriptionCreated(rx);
-            dispatchAnalyticsTrackEvent('ctaClicked', {
-              name: 'Draft Prescription Added',
-              draftPrescriptionSource: 'prefill',
-              fields: buildPrescriptionSnapshot(rx)
-            });
-          });
         }
       } catch (error) {
         console.error('Error while trying to create prescriptions from prefills', { error });
