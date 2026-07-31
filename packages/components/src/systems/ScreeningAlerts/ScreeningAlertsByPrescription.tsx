@@ -17,7 +17,7 @@ const isDraftedPrescription = (
   (entity as PrescriptionScreeningAlertInvolvedDraftedPrescription).__typename ===
   'PrescriptionScreeningAlertInvolvedDraftedPrescription';
 
-function groupAlertsByPrescription(
+export function groupAlertsByPrescription(
   screeningAlerts: PrescriptionScreeningAlert[]
 ): AlertsForPrescription[] {
   const prescriptionMap = new Map<string, AlertsForPrescription>();
