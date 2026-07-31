@@ -164,7 +164,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
     const curr = status();
     if (curr.status === 'NEEDS ATTESTATION') {
       dispatchAnalyticsTrackEvent('elementViewed', {
-        name: 'Signature Attestation Page Viewed',
+        name: 'Signature Attestation Element Viewed',
         attestationVersion: curr.version
       });
     }

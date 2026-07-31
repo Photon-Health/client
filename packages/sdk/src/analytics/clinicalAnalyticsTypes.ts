@@ -15,10 +15,23 @@ export type DraftPrescriptionSource =
 // Element View Events — each element gets a unique event name
 // ---------------------------------------------------------------------------
 
-export type ElementViewEvent = {
-  name: 'Signature Attestation Element Viewed';
-  attestationVersion: string;
-};
+export type ElementViewEvent =
+  | { name: 'New Patient Element Viewed' }
+  | { name: 'Update Patient Element Viewed' }
+  | {
+      name: 'New Prescriptions Element Viewed';
+      prefillPatientId: string;
+      prefillPharmacyId: string;
+      hasPrefillPatientExternalId: boolean;
+      hasPrefillTemplateIds: boolean;
+      hasPrefillPrescriptionIds: boolean;
+      hasPrefillWeight: boolean;
+      weightUnit: string;
+    }
+  | {
+      name: 'Signature Attestation Element Viewed';
+      attestationVersion: string;
+    };
 
 // ---------------------------------------------------------------------------
 // CTA Click Events — each variant has a unique, descriptive name
