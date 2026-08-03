@@ -123,7 +123,8 @@ describe('App', () => {
     expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
     expect(screen.getByTestId('PrescriptionsSummary')).toBeInTheDocument();
     await expectTotalPageViewAnalyticsCountToBe(1);
-    await userEvent.click(screen.getByText('Test Local Pickup Pharmacy'));
+    const pharmacyHeader = await screen.findByText('Test Local Pickup Pharmacy');
+    await userEvent.click(pharmacyHeader);
     await userEvent.click(screen.getByText('Select pharmacy'));
     expect(setOrderPharmacyMock).toHaveBeenCalledWith(
       'ord_testId777',

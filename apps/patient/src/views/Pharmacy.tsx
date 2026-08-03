@@ -275,7 +275,9 @@ export const Pharmacy = () => {
       ...pharmacyResults.filter((p) => !topRankedIds.includes(p.id))
     ];
 
+    // Wait until the pharmacy results have loaded before showing the preferred pharmacy on its own
     const combinedWithPreferred =
+      !isLoading &&
       existingPreferredPharmacyForList &&
       !combined.some((pharmacy) => pharmacy.id === existingPreferredPharmacyForList.id)
         ? [existingPreferredPharmacyForList, ...combined]
@@ -299,6 +301,7 @@ export const Pharmacy = () => {
     return [preferred, ...remaining];
   }, [
     isDemo,
+    isLoading,
     pharmacyResults,
     effectivePreferredPharmacyId,
     existingPreferredPharmacy,
