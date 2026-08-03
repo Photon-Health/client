@@ -1,5 +1,5 @@
 import * as zod from 'zod';
-import { CALENDAR_DATE_FORMAT } from '@photonhealth/components';
+import { CALENDAR_DATE_FORMAT } from '../../../utils/formatDate';
 import { differenceInHours, isToday, parse } from 'date-fns';
 
 export const NOTES_MAX_LENGTH = 210;
