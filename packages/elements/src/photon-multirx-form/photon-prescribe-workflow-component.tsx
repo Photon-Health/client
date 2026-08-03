@@ -5,12 +5,12 @@ import {
   PharmacySelectionProvider,
   PrescribeEventDispatchProvider,
   PrescribeProvider,
-  PrescriptionOverrides,
+  PrescriptionOverridesPrefill,
   PrescriptionScreeningProvider,
   RecentOrders,
   SupervisorPrefill,
   SupervisorProvider,
-  TemplateOverrides,
+  TemplateOverridesPrefill,
   usePrescribeEventDispatch
 } from '@photonhealth/components';
 import type { ElementViewEvent } from '@photonhealth/sdk';
@@ -45,8 +45,6 @@ const parseIdList = (ids?: string) =>
 const buildPrescribeWorkflowViewedEvent = (
   props: PrescribeWorkflowComponentProps
 ): PrescribeWorkflowViewedEvent => {
-  // Prefill HTML attributes attempt to parse JSON strings.
-  // If the attribute remains a string, the value couldn't be JSON parsed.
   const validatePrefill = <T,>(prefill?: T | string): T | undefined => {
     return prefill && typeof prefill !== 'string' ? prefill : undefined;
   };
@@ -115,9 +113,9 @@ const PrescribeWorkflowViewed = (props: { workflowProps: PrescribeWorkflowCompon
 
 export interface PrescribeWorkflowComponentProps extends PrescribeProps {
   templateIds?: string;
-  templateOverrides?: TemplateOverrides;
+  templateOverrides?: TemplateOverridesPrefill;
   prescriptionIds?: string;
-  prescriptionOverrides?: PrescriptionOverrides;
+  prescriptionOverrides?: PrescriptionOverridesPrefill;
   initialPrescriptions?: InitialPrescriptionsPrefill;
   enableCoverageCheck: boolean;
   pharmacyId?: string;

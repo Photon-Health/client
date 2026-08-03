@@ -23,8 +23,8 @@ import { formatPatientWeight } from './utils/formatters';
 import { mapFormDataToPrescriptionInput } from './utils/mappers';
 import {
   type InitialPrescriptionsPrefill,
-  type PrescriptionOverrides,
-  type TemplateOverrides,
+  type PrescriptionOverridesPrefill,
+  type TemplateOverridesPrefill,
   usePrefillPrescriptions
 } from './utils/usePrefillPrescriptions';
 
@@ -52,9 +52,9 @@ interface DraftPrescriptionProviderProps {
   children: JSXElement;
   patientId: string;
   templateIds: string[];
-  templateOverrides: TemplateOverrides;
+  templateOverrides: TemplateOverridesPrefill;
   prescriptionIds: string[];
-  prescriptionOverrides: PrescriptionOverrides;
+  prescriptionOverrides: PrescriptionOverridesPrefill;
   initialPrescriptions?: InitialPrescriptionsPrefill;
   enableCombineAndDuplicate: boolean;
   additionalNotes?: string;

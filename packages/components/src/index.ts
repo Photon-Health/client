@@ -25,7 +25,9 @@ import {
   type InitialPrescriptionsPrefill,
   type PrescriptionFormData,
   type PrescriptionOverrides,
+  type PrescriptionOverridesPrefill,
   type TemplateOverrides,
+  type TemplateOverridesPrefill,
   type TryCreatePrescriptionTemplateOptions,
   useDraftPrescriptions
 } from './systems/DraftPrescriptions';
@@ -56,6 +58,7 @@ import {
   RoutingConstraint
 } from './systems/RoutingConstraints';
 
+import type { Prefill } from './utils/Prefill';
 import triggerToast from './utils/toastTriggers';
 import generateString from './utils/generateString';
 import { createQuery } from './utils/createQuery';
@@ -177,8 +180,11 @@ export type {
   ParsedAddress,
   PharmacyOption,
   RoutingConstraint,
+  Prefill,
   TemplateOverrides,
+  TemplateOverridesPrefill,
   PrescriptionOverrides,
+  PrescriptionOverridesPrefill,
   PrescriptionFormData,
   CoverageOption,
   SupervisorPrefill,

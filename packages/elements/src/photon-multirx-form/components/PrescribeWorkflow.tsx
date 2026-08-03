@@ -23,6 +23,7 @@ import {
   useRecentOrders,
   useSupervisor
 } from '@photonhealth/components';
+import type { Prefill } from '@photonhealth/components';
 import { MeUserQuery, types } from '@photonhealth/sdk';
 import { PrescriptionState } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
@@ -72,7 +73,7 @@ export interface DisabledItem {
   reason?: string;
 }
 
-export type DisableListPrefill = Partial<DisabledItem>[] | string;
+export type DisableListPrefill = Prefill<DisabledItem[]>;
 
 export type PrescribeProps = {
   patientId?: string;

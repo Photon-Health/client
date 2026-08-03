@@ -5,6 +5,7 @@ import { usePrescribeEventDispatch } from '../../PrescribeEventDispatchProvider'
 import { usePhotonClient } from '../../SDKProvider';
 import { CreatePrescriptions, GetPrescription } from '../../../fetch';
 import triggerToast from '../../../utils/toastTriggers';
+import { Prefill } from '../../../utils/Prefill';
 import { constructRxNotes } from './formatters';
 import { mapFormDataToPrescriptionInput } from './mappers';
 import {
@@ -25,7 +26,7 @@ export type TemplateOverrides = {
   };
 };
 
-type TemplateOverridesPrefill = TemplateOverrides | string;
+export type TemplateOverridesPrefill = Prefill<TemplateOverrides>;
 
 export type PrescriptionOverrides = {
   [prescriptionId: string]: {
@@ -43,11 +44,9 @@ export type PrescriptionOverrides = {
   };
 };
 
-type PrescriptionOverridesPrefill = PrescriptionOverrides | string;
+export type PrescriptionOverridesPrefill = Prefill<PrescriptionOverrides>;
 
-// At runtime `solid-element`'s customElement parses the `supervisor` HTML
-// attribute as JSON. Valid JSON → object; invalid JSON → the raw string.
-export type InitialPrescriptionsPrefill = Partial<InitialPrescriptionInput>[] | string;
+export type InitialPrescriptionsPrefill = Prefill<InitialPrescriptionInput[]>;
 
 export type PrefillPrescriptionsProps = {
   patientId: string;
