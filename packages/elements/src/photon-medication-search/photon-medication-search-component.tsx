@@ -13,17 +13,17 @@ import { PhotonDropdown } from '../photon-dropdown';
 // Types
 import { Medication, PrescriptionTemplate, TreatmentOption } from '@photonhealth/sdk/dist/types';
 import { CatalogStore } from '../stores/catalog';
-import { DisableList } from '../photon-multirx-form/components/PrescribeWorkflow';
+import { DisableListPrefill } from '../photon-multirx-form/components/PrescribeWorkflow';
 
 import { ApolloClient } from '@apollo/client';
 
 import tailwind from '../tailwind.css?inline';
 
-// Utility Functions
+type BlockedMedsMap = { [treatmentId: string]: string | undefined };
 
-function createBlockedMedsMap(disableList: DisableList | undefined) {
-  if (!disableList || disableList.length === 0) {
-    return {} as Record<string, string | undefined>;
+function createBlockedMedsMap(disableList: DisableListPrefill | undefined) {
+  if (!disableList || disableList.length === 0 || typeof disableList === 'string') {
+    return {} as BlockedMedsMap;
   }
 
   return disableList.reduce((acc, cur) => {
@@ -34,12 +34,12 @@ function createBlockedMedsMap(disableList: DisableList | undefined) {
       acc[treatmentId] = cur.reason; // reason can be undefined
     }
     return acc;
-  }, {} as Record<string, string | undefined>);
+  }, {} as BlockedMedsMap);
 }
 
 function isTreatmentDisabled(
   treatmentId: string | undefined,
-  blockedMedsMap: Record<string, string | undefined>
+  blockedMedsMap: BlockedMedsMap
 ): { disabled?: boolean; disableReason?: string } {
   if (!treatmentId) {
     return { disabled: false };
@@ -266,7 +266,7 @@ interface ComponentProps {
   selected?: Treatment | PrescriptionTemplate | TreatmentOption;
   offCatalogOption?: Medication;
   searchText: string;
-  disableList?: DisableList;
+  disableList?: DisableListPrefill;
 }
 
 const Component = (props: ComponentProps) => {

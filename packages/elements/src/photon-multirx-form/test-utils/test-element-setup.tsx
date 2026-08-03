@@ -46,6 +46,7 @@ export function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponen
     enableMedHistoryRefillButton: false,
     enableCombineAndDuplicate: false,
     optionalPatientAddress: false,
+    allowOffCatalogSearch: true,
     triggerSubmit: false,
     toastBuffer: 0,
     enableCoverageCheck: false,

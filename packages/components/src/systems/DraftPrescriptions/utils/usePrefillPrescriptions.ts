@@ -25,6 +25,8 @@ export type TemplateOverrides = {
   };
 };
 
+type TemplateOverridesPrefill = TemplateOverrides | string;
+
 export type PrescriptionOverrides = {
   [prescriptionId: string]: {
     externalId?: string;
@@ -41,16 +43,18 @@ export type PrescriptionOverrides = {
   };
 };
 
+type PrescriptionOverridesPrefill = PrescriptionOverrides | string;
+
 // At runtime `solid-element`'s customElement parses the `supervisor` HTML
 // attribute as JSON. Valid JSON → object; invalid JSON → the raw string.
 export type InitialPrescriptionsPrefill = Partial<InitialPrescriptionInput>[] | string;
 
 export type PrefillPrescriptionsProps = {
   patientId: string;
-  templateIdsPrefill: string[];
-  templateOverrides: TemplateOverrides;
-  prescriptionIdsPrefill: string[];
-  prescriptionOverrides: PrescriptionOverrides;
+  templateIds: string[];
+  templateOverrides: TemplateOverridesPrefill;
+  prescriptionIds: string[];
+  prescriptionOverrides: PrescriptionOverridesPrefill;
   initialPrescriptions?: InitialPrescriptionsPrefill;
 };
 
@@ -78,8 +82,8 @@ export const usePrefillPrescriptions = (
 
   createEffect(async () => {
     const hasPrefills =
-      props.templateIdsPrefill.length > 0 ||
-      props.prescriptionIdsPrefill.length > 0 ||
+      props.templateIds.length > 0 ||
+      props.prescriptionIds.length > 0 ||
       props.initialPrescriptions;
 
     if (hasPrefills && !!props.patientId && !hasCreatedPrefillPrescriptions()) {
@@ -90,21 +94,21 @@ export const usePrefillPrescriptions = (
         const rxNotesPrefill = options.rxNotesPrefill();
         const newRxs: Prescription[] = [];
 
-        await Promise.all([
+        const rxPromises = [
           // Create prescriptions from template IDs with possible overrides
           async () => {
-            if (props.templateIdsPrefill.length > 0) {
-              const dedupedTemplateIds = Array.from(new Set(props.templateIdsPrefill));
+            if (props.templateIds.length > 0) {
+              const dedupedTemplateIds = Array.from(new Set(props.templateIds));
+              const overrides =
+                props.templateOverrides && typeof props.templateOverrides !== 'string'
+                  ? props.templateOverrides
+                  : {};
 
               const rxToCreate: PrescriptionInputs = dedupedTemplateIds.map((templateId) => ({
-                ...props.templateOverrides?.[templateId],
+                ...overrides[templateId],
                 patientId: props.patientId,
                 templateId,
-                notes: constructRxNotes(
-                  null,
-                  props.templateOverrides?.[templateId]?.notes || null,
-                  rxNotesPrefill
-                )
+                notes: constructRxNotes(null, overrides[templateId]?.notes || null, rxNotesPrefill)
               }));
 
               const res = await client.apollo.mutate({
@@ -127,10 +131,13 @@ export const usePrefillPrescriptions = (
           },
           // Create prescriptions from prescription IDs with possible overrides
           async () => {
-            if (props.prescriptionIdsPrefill.length > 0) {
+            if (props.prescriptionIds.length > 0) {
               const rxToCreate: PrescriptionInputs = await Promise.all(
-                props.prescriptionIdsPrefill.map(async (prescriptionId: string) => {
-                  const overrides = props.prescriptionOverrides?.[prescriptionId] || {};
+                props.prescriptionIds.map(async (prescriptionId: string) => {
+                  const overrides =
+                    props.prescriptionOverrides && typeof props.prescriptionOverrides !== 'string'
+                      ? props.prescriptionOverrides
+                      : {};
                   const { data } = await client.apollo.query({
                     query: GetPrescription,
                     variables: { id: prescriptionId },
@@ -142,17 +149,17 @@ export const usePrefillPrescriptions = (
                     const input = mapFormDataToPrescriptionInput(
                       {
                         ...data.prescription,
-                        ...overrides,
+                        ...overrides[prescriptionId],
                         notes: constructRxNotes(
                           data.prescription.notes || null,
-                          overrides.notes || null,
+                          overrides[prescriptionId]?.notes || null,
                           rxNotesPrefill
                         ),
-                        doNotFillBeforeDate: overrides.doNotFillBeforeDate
-                          ? overrides.doNotFillBeforeDate.slice(0, 10)
+                        doNotFillBeforeDate: overrides[prescriptionId]?.doNotFillBeforeDate
+                          ? overrides[prescriptionId]?.doNotFillBeforeDate.slice(0, 10)
                           : undefined
                       },
-                      overrides.treatmentId || data.prescription.treatment.id,
+                      overrides[prescriptionId]?.treatmentId || data.prescription.treatment.id,
                       props.patientId
                     );
                     return input;
@@ -214,7 +221,9 @@ export const usePrefillPrescriptions = (
               }
             }
           }
-        ]);
+        ];
+
+        await Promise.all(rxPromises.map((promise) => promise()));
 
         if (newRxs) {
           options.setDraftPrescriptions((prev) => [...prev, ...newRxs]);

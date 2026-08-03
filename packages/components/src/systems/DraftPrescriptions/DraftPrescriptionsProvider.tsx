@@ -51,9 +51,9 @@ const DraftPrescriptionsContext = createContext<DraftPrescriptionsContextType>()
 interface DraftPrescriptionProviderProps {
   children: JSXElement;
   patientId: string;
-  templateIdsPrefill: string[];
+  templateIds: string[];
   templateOverrides: TemplateOverrides;
-  prescriptionIdsPrefill: string[];
+  prescriptionIds: string[];
   prescriptionOverrides: PrescriptionOverrides;
   initialPrescriptions?: InitialPrescriptionsPrefill;
   enableCombineAndDuplicate: boolean;

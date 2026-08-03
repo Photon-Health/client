@@ -16,17 +16,53 @@ export type DraftPrescriptionSource =
 // ---------------------------------------------------------------------------
 
 export type ElementViewEvent =
-  | { name: 'New Patient Element Viewed' }
-  | { name: 'Update Patient Element Viewed' }
   | {
-      name: 'New Prescriptions Element Viewed';
-      prefillPatientId: string;
-      prefillPharmacyId: string;
-      hasPrefillPatientExternalId: boolean;
-      hasPrefillTemplateIds: boolean;
-      hasPrefillPrescriptionIds: boolean;
-      hasPrefillWeight: boolean;
-      weightUnit: string;
+      name: 'Prescribe Workflow Viewed';
+      patientId?: string;
+      catalogId?: string;
+      groupId?: string;
+      mailOrderIds?: string;
+      pharmacyId?: string;
+      hasExternalOrderId: boolean;
+      hasDisableList: boolean;
+      disableList?: string[];
+      hideSubmit: boolean;
+      hideTemplates: boolean;
+      hidePatientCard: boolean;
+      enableOrder: boolean;
+      enableMedHistory: boolean;
+      enableMedHistoryLinks: boolean;
+      enableMedHistoryRefillButton: boolean;
+      enableCombineAndDuplicate: boolean;
+      enableCoverageCheck: boolean;
+      enableLocalPickup: boolean;
+      enableSendToPatient: boolean;
+      enableDeliveryPharmacies: boolean;
+      optionalPatientAddress: boolean;
+      allowOffCatalogSearch: boolean;
+      triggerSubmit: boolean;
+      toastBuffer: number;
+      // Prescription prefill behavior
+      // Not logging full objects since Mixpanel
+      // encourages use of primitive values
+      // Whether any value was passed in
+      hasTemplateIdsPrefill: boolean;
+      // If able to parse value, how many were passed in
+      numTemplateIds: number;
+      // Whether overrides were passed in
+      hasTemplateOverridesPrefill: boolean;
+      hasPrescriptionIdsPrefill: boolean;
+      numPrescriptionIds: number;
+      hasPrescriptionOverridesPrefill: boolean;
+      hasInitialPrescriptionsPrefill: boolean;
+      numInitialPrescriptions: number;
+      // Other prefill behavior
+      hasSupervisorPrefill: boolean;
+      hasDiagnosisCodesPrefill: boolean;
+      hasAddressPrefill: boolean;
+      additionalNotesLength: number;
+      hasWeight: boolean;
+      hasWeightUnit: boolean;
     }
   | {
       name: 'Signature Attestation Element Viewed';

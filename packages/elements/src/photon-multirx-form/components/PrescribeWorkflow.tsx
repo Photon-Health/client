@@ -68,11 +68,11 @@ export type Address = {
 };
 
 export interface DisabledItem {
-  treatmentIds?: string[];
+  treatmentIds: string[];
   reason?: string;
 }
 
-export type DisableList = DisabledItem[];
+export type DisableListPrefill = Partial<DisabledItem>[] | string;
 
 export type PrescribeProps = {
   patientId?: string;
@@ -95,8 +95,8 @@ export type PrescribeProps = {
   formActions?: any;
   externalOrderId?: string;
   catalogId?: string;
-  allowOffCatalogSearch?: boolean;
-  disableList?: DisableList;
+  allowOffCatalogSearch: boolean;
+  disableList?: DisableListPrefill;
   groupId?: string;
 };
 
