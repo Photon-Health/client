@@ -33,6 +33,10 @@ function flattenSnapshot(fields: FieldCompletionSnapshot): Record<string, boolea
   );
 }
 
+// The context query usually resolves in less than a second, so we'll probably never
+// reach this max. Can adjust as needed.e
+const MAX_QUEUED_EVENTS = 50;
+
 export const AnalyticsEventListener = (props: {
   clientRef: HTMLDivElement;
   /* Pass extra properties when photon-client is rendered in our web app */
@@ -42,6 +46,29 @@ export const AnalyticsEventListener = (props: {
   const client = usePhotonClient();
   const [contextData, setContextData] = createSignal<ProviderContextData | null>(null);
   const store = usePhoton();
+  // This array doesn't need to be stored in a reactive signal since
+  // nothing needs to subscribe to it - we just read it once contextData updates
+  let queuedEvents: PhotonEmbedAnalyticsEventInput[] = [];
+
+  const trackEvent = (detail: PhotonEmbedAnalyticsEventInput, context: ProviderContextData) => {
+    const { name, ...rest } = detail;
+
+    // Flatten field completion snapshots (CTA events)
+    const payload = { ...rest } as Record<string, unknown>;
+    if (payload.fields) {
+      const snapshot = flattenSnapshot(payload.fields as FieldCompletionSnapshot);
+      delete payload.fields;
+      Object.assign(payload, snapshot);
+    }
+
+    const properties: ApiObject = {
+      ...context,
+      ...payload,
+      ...props.appAnalyticsProperties
+    };
+    // Don't await this method, tracking analytics shouldn't block the JS thread
+    client.analytics.track({ event: name, userId: context.providerId, properties });
+  };
 
   createEffect(async () => {
     // In an embed-only setup, this component renders before the user is authenticated.
@@ -77,9 +104,19 @@ export const AnalyticsEventListener = (props: {
       } catch {
         // AnalyticsContextQuery should fail silently
         // There's also an edge case caused by the double-login scenario where
-        // a rediret cancels the in-flight request, which is acceptable for now
+        // a redirect cancels the in-flight request, which is acceptable for now
       }
     }
+  });
+
+  // Send anything that was dispatched before the context query resolved
+  createEffect(() => {
+    const context = contextData();
+    if (!context || queuedEvents.length === 0) return;
+
+    const pending = queuedEvents;
+    queuedEvents = [];
+    pending.forEach((detail) => trackEvent(detail, context));
   });
 
   createEffect(() => {
@@ -95,29 +132,19 @@ export const AnalyticsEventListener = (props: {
       ((e: CustomEvent<PhotonEmbedAnalyticsEventInput>) => {
         const context = contextData();
         if (!context) {
-          console.warn(
-            '📊 [Analytics: To Analytics API] Analytics context not defined, skipping tracking'
-          );
+          // The max number of events should almost never be exceeded.
+          // Re-evaluate analytics setup if we are constantly dropping events
+          if (queuedEvents.length >= MAX_QUEUED_EVENTS) {
+            console.warn(
+              '📊 [Analytics: To Analytics API] Queue full while waiting for analytics context, dropping oldest event'
+            );
+            queuedEvents.shift();
+          }
+          queuedEvents.push(e.detail);
           return;
         }
 
-        const { name, ...rest } = e.detail;
-
-        // Flatten field completion snapshots (CTA events)
-        const payload = { ...rest } as Record<string, unknown>;
-        if (payload.fields) {
-          const snapshot = flattenSnapshot(payload.fields as FieldCompletionSnapshot);
-          delete payload.fields;
-          Object.assign(payload, snapshot);
-        }
-
-        const properties: ApiObject = {
-          ...context,
-          ...payload,
-          ...props.appAnalyticsProperties
-        };
-        // Don't await this method, tracking analytics shouldn't block the JS thread
-        client.analytics.track({ event: name, userId: context.providerId, properties });
+        trackEvent(e.detail, context);
       }) as EventListener,
       listenerOptions
     );
