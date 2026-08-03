@@ -68,7 +68,7 @@
     "jsdom": "^28.1.0",
     "lint-staged": "^15.2.10",
     "msw": "^2.12.14",
-    "nx": "22.5.4",
+    "nx": "22.7.2",
     "postcss": "8.5.18",
     "prettier": "^2.8.1",
     "react-test-renderer": "^18.2.0",
