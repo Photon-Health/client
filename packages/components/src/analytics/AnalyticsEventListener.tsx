@@ -34,7 +34,7 @@ function flattenSnapshot(fields: FieldCompletionSnapshot): Record<string, boolea
 }
 
 // The context query usually resolves in less than a second, so we'll probably never
-// reach this max. Can adjust as needed.e
+// reach this max. Can adjust as needed.
 const MAX_QUEUED_EVENTS = 50;
 
 export const AnalyticsEventListener = (props: {
