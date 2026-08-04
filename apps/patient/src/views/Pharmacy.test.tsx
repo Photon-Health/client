@@ -16,7 +16,7 @@ import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
 import { getOrder, getPharmaciesByLocation, rerouteOrder, setOrderPharmacy } from '../api';
 import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
-import { FulfillmentType } from '../__generated__/graphql';
+import { FulfillmentType, Pharmacy } from '../__generated__/graphql';
 import { OfferBundleDetails } from '../utils/models';
 import {
   hasConfirmedAutoroutedPharmacy,
@@ -532,6 +532,49 @@ describe('Pharmacy page', () => {
     expect(preferredIndex).toBeGreaterThan(-1);
     expect(otherIndex).toBeGreaterThan(-1);
     expect(preferredIndex).toBeLessThan(otherIndex);
+  }, 10_000);
+
+  test('does not show preferred pharmacy alone while pharmacy results are still loading', async () => {
+    const { getPharmaciesByLocation, getOrder } = await import('../api');
+    const preferredId = 'phr_preferredId123';
+
+    const singlePrescriptionOrder = generateOrder({
+      id: 'ord_testId777',
+      state: 'ROUTING',
+      patient: generatePatient({
+        preferredPharmacies: [{ id: preferredId, name: 'Preferred Pharmacy' }]
+      }),
+      fills: [generateFill('test-treatment')],
+      address: {
+        street1: '123 Main St',
+        city: 'New York',
+        state: 'NY',
+        postalCode: '10001',
+        country: 'US'
+      }
+    });
+
+    vi.mocked(getOrder).mockResolvedValue(singlePrescriptionOrder);
+
+    let resolvePharmacies: (value: { pharmaciesByLocation: Pharmacy[] }) => void;
+    vi.mocked(getPharmaciesByLocation).mockReturnValue(
+      new Promise((resolve) => {
+        resolvePharmacies = resolve;
+      })
+    );
+
+    renderApp();
+    await navigateToPharmacyScreen();
+
+    // Pharmacy results haven't resolved yet so don't render preferred pharmacy alone
+    expect(screen.queryByTestId('pharmacy-info')).not.toBeInTheDocument();
+
+    resolvePharmacies!({
+      pharmaciesByLocation: [generatePharmacy({ id: 'phr_otherId999', name: 'Other Pharmacy' })]
+    });
+
+    expect(await screen.findByText('Preferred Pharmacy')).toBeInTheDocument();
+    expect(await screen.findByText('Other Pharmacy')).toBeInTheDocument();
   }, 10_000);
 
   describe('multi-rx offers', () => {
