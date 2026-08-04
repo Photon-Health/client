@@ -1,13 +1,4 @@
-import {
-  Box,
-  Button,
-  Center,
-  CircularProgress,
-  Container,
-  Text,
-  useToast,
-  VStack
-} from '@chakra-ui/react';
+import { Box, Button, Container, Text, useToast, VStack } from '@chakra-ui/react';
 import queryString from 'query-string';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { flushSync } from 'react-dom';
@@ -284,7 +275,9 @@ export const Pharmacy = () => {
       ...pharmacyResults.filter((p) => !topRankedIds.includes(p.id))
     ];
 
+    // Wait until the pharmacy results have loaded before showing the preferred pharmacy on its own
     const combinedWithPreferred =
+      !isLoading &&
       existingPreferredPharmacyForList &&
       !combined.some((pharmacy) => pharmacy.id === existingPreferredPharmacyForList.id)
         ? [existingPreferredPharmacyForList, ...combined]
@@ -308,6 +301,7 @@ export const Pharmacy = () => {
     return [preferred, ...remaining];
   }, [
     isDemo,
+    isLoading,
     pharmacyResults,
     effectivePreferredPharmacyId,
     existingPreferredPharmacy,
@@ -591,29 +585,27 @@ export const Pharmacy = () => {
       setLoadingPharmacies(true);
       try {
         // Get pharmacies from photon db
-        let topRankedPharmacies: EnrichedPharmacy[] = [];
+        const topRankedRequests: Promise<EnrichedPharmacy[]>[] = [];
 
         // check if top ranked costco is enabled and there are GLP treatments
         if (enableTopRankedCostco) {
-          topRankedPharmacies = [
-            ...(await getCostco({ latitude, longitude })),
-            ...topRankedPharmacies
-          ];
+          topRankedRequests.push(getCostco({ latitude, longitude }));
         }
 
         if (enableTopRankedWalgreens && order?.readyBy === 'Urgent') {
-          topRankedPharmacies = [
-            ...(await getWalgreens({ latitude, longitude })),
-            ...topRankedPharmacies
-          ];
+          topRankedRequests.push(getWalgreens({ latitude, longitude }));
         }
 
         // using the existing enablePrice flag to determine if we should fetch pharmacies with prices
         // a different query than the original query
-        const pharmacies = await loadPharmacies({
-          latitude,
-          longitude
-        });
+        const [pharmacies, ...topRankedResults] = await Promise.all([
+          loadPharmacies({ latitude, longitude }),
+          ...topRankedRequests
+        ]);
+
+        const topRankedPharmacies: EnrichedPharmacy[] = ([] as EnrichedPharmacy[]).concat(
+          ...topRankedResults
+        );
 
         if (pharmacies?.length === 0) {
           if (enablePrice) {
@@ -1136,21 +1128,6 @@ export const Pharmacy = () => {
   if (!order) {
     console.error('No error');
     return null;
-  }
-
-  if (initialLoad && isLoading) {
-    return (
-      <Box>
-        <Helmet>
-          <title>{t.selectAPharmacy}</title>
-        </Helmet>
-        <Container>
-          <Center h="100vh">
-            <CircularProgress isIndeterminate color="gray.800" />
-          </Center>
-        </Container>
-      </Box>
-    );
   }
 
   const patientClicksAddress = () => {
