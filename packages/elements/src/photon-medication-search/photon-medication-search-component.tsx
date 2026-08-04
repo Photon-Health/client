@@ -13,7 +13,7 @@ import { PhotonDropdown } from '../photon-dropdown';
 // Types
 import { Medication, PrescriptionTemplate, TreatmentOption } from '@photonhealth/sdk/dist/types';
 import { CatalogStore } from '../stores/catalog';
-import { DisableListPrefill } from '../photon-multirx-form/components/PrescribeWorkflow';
+import { DisabledMedicationsPrefill } from '../photon-multirx-form/components/PrescribeWorkflow';
 
 import { ApolloClient } from '@apollo/client';
 
@@ -21,7 +21,7 @@ import tailwind from '../tailwind.css?inline';
 
 type BlockedMedsMap = { [treatmentId: string]: string | undefined };
 
-function createBlockedMedsMap(disableList: DisableListPrefill | undefined) {
+function createBlockedMedsMap(disableList: DisabledMedicationsPrefill | undefined) {
   if (!disableList || disableList.length === 0 || typeof disableList === 'string') {
     return {} as BlockedMedsMap;
   }
@@ -266,7 +266,7 @@ interface ComponentProps {
   selected?: Treatment | PrescriptionTemplate | TreatmentOption;
   offCatalogOption?: Medication;
   searchText: string;
-  disableList?: DisableListPrefill;
+  disableList?: DisabledMedicationsPrefill;
 }
 
 const Component = (props: ComponentProps) => {
