@@ -16,7 +16,7 @@ import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
 import { getOrder, getPharmaciesByLocation, rerouteOrder, setOrderPharmacy } from '../api';
 import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
-import { FulfillmentType } from '../__generated__/graphql';
+import { FulfillmentType, Pharmacy } from '../__generated__/graphql';
 import { OfferBundleDetails } from '../utils/models';
 import {
   hasConfirmedAutoroutedPharmacy,
@@ -556,11 +556,11 @@ describe('Pharmacy page', () => {
 
     vi.mocked(getOrder).mockResolvedValue(singlePrescriptionOrder);
 
-    let resolvePharmacies: (value: { pharmaciesByLocation: unknown[] }) => void;
+    let resolvePharmacies: (value: { pharmaciesByLocation: Pharmacy[] }) => void;
     vi.mocked(getPharmaciesByLocation).mockReturnValue(
       new Promise((resolve) => {
         resolvePharmacies = resolve;
-      }) as ReturnType<typeof getPharmaciesByLocation>
+      })
     );
 
     renderApp();
