@@ -1,10 +1,10 @@
 /**
- * The prescribe flow element has several "prefill" attributes
-that accept complex JSON strings.
+ * The prescribe flow element has several "prefill" attributes that accept complex JSON strings.
  * At runtime, `solid-element`'s customElement attempts to JSON parse these values.
- * Parseable JSON → object; unparseable JSON such as '{"firstName' → the raw string.
+ * - parseable JSON string > object
+ * - unparseable JSON string such as '{"firstName' > stays as the raw string.
  * Engineers should ensure that types defined with this helper
- * are properly validated and handled.
+ * can be properly type narrowed from raw string > Unvalidated type generic > validated generic
  */
 export type Prefill<T> = Unvalidated<T> | string;
 
