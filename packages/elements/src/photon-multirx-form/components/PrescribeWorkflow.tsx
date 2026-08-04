@@ -578,7 +578,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   store={props.formStore}
                   weight={props.weight}
                   weightUnit={props.weightUnit}
-                  prefillNotes={rxNotesPrefill()}
                   enableOrder={props.enableOrder}
                   catalogId={props.catalogId}
                   allowOffCatalogSearch={props.allowOffCatalogSearch}

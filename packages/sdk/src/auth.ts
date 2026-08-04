@@ -12,6 +12,37 @@ const STATE_RE = /[?&]state=[^&]+/;
 const ERROR_RE = /[?&]error=[^&]+/;
 
 /**
+ * Query params belonging to an Auth0 redirect.
+ *
+ * These have to be removed from the URL once a redirect has been handled —
+ * successfully or not. While they remain, `hasAuthParams()` keeps reporting
+ * true, so every subsequent page load re-runs the same authorization code
+ * exchange instead of checking the existing session. A spent code fails that
+ * exchange forever, and the app can never recover on its own.
+ */
+const AUTH_REDIRECT_PARAMS = [
+  'code',
+  'state',
+  'error',
+  'error_description',
+  'error_uri',
+  'iss',
+  'photon'
+];
+
+/**
+ * Removes Auth0 redirect params while preserving the host app's own query
+ * string, which consumers rely on surviving a login round trip.
+ */
+export function stripAuthParams(search: string): string {
+  if (!search) return '';
+  const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+  AUTH_REDIRECT_PARAMS.forEach((param) => params.delete(param));
+  const remaining = params.toString();
+  return remaining ? `?${remaining}` : '';
+}
+
+/**
  * Configuration options for AuthManager
  * @param authentication An instaniated Auth0 Client
  * @param organization An id of an organization to login as
@@ -228,9 +259,13 @@ export class AuthManager {
    */
   public async handleRedirect(url?: string) {
     try {
-      return this.authentication.handleRedirectCallback(url);
-    } catch (err) {
-      console.error(err);
+      // Must be awaited inside the try. Returning the promise un-awaited meant
+      // a rejected exchange bypassed this catch entirely, so the failure was
+      // never logged here and surfaced only as an opaque rejection upstream.
+      return await this.authentication.handleRedirectCallback(url);
+    } catch (error) {
+      console.error('[PhotonClient]: Failed to complete the Auth0 redirect.', error);
+      throw error;
     }
   }
 
