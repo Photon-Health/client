@@ -20,9 +20,6 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
-      # there was an issue with the rollup binary not being available in the runner https://github.com/npm/cli/issues/4828
-      - name: Install Rollup
-        run: npm install @rollup/rollup-linux-x64-gnu
       - run: npm ci
       - run: npx nx run components:test
       - run: npx nx run elements:test
