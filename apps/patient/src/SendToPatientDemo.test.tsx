@@ -63,7 +63,7 @@ describe('Send To Patient Demo', () => {
     await userEvent.click(screen.getByText('Capsule Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
 
-    await screen.findByText(/Order placed/i, {}, { timeout: 2500 });
+    expect(await screen.findByText(/Order placed/i, {}, { timeout: 2500 })).toBeInTheDocument();
 
     expect(triggerDemoNotification).toHaveBeenCalledWith(
       '8005551212',
@@ -85,7 +85,7 @@ describe('Send To Patient Demo', () => {
     await userEvent.click(screen.getByText('Amazon Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
 
-    await screen.findByText(/Order placed/i, {}, { timeout: 2500 });
+    expect(await screen.findByText(/Order placed/i, {}, { timeout: 2500 })).toBeInTheDocument();
     expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
   }, 10_000);
 
