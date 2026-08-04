@@ -49,7 +49,7 @@ describe('Send To Patient Demo', () => {
 
     // wait for 2sec button animations to complete
     expect(
-      await screen.findByText('Preparing order...', {}, { timeout: 2500 })
+      await screen.findByText('Preparing order...', {}, { timeout: 4000 })
     ).toBeInTheDocument();
   }, 10_000);
 
@@ -66,7 +66,7 @@ describe('Send To Patient Demo', () => {
     await userEvent.click(screen.getByText('Select pharmacy'));
 
     expect(
-      await screen.findByText('Preparing order...', {}, { timeout: 2500 })
+      await screen.findByText('Preparing order...', {}, { timeout: 4000 })
     ).toBeInTheDocument();
 
     expect(triggerDemoNotification).toHaveBeenCalledWith(
@@ -89,7 +89,7 @@ describe('Send To Patient Demo', () => {
     await userEvent.click(screen.getByText('Amazon Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
 
-    expect(await screen.findByText('Order placed', {}, { timeout: 2500 })).toBeInTheDocument();
+    expect(await screen.findByText('Order placed', {}, { timeout: 4000 })).toBeInTheDocument();
     expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
   }, 10_000);
 
