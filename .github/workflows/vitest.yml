@@ -24,10 +24,7 @@ jobs:
       - name: Install Rollup
         run: npm install @rollup/rollup-linux-x64-gnu
       - run: npm ci
-      - run: npm run build --if-present
-      - run: npx nx run sdk:build
       - run: npx nx run components:test
       - run: npx nx run elements:test
       - run: npx nx run app:test
-      - run: npx nx run patient:codegen
       - run: npx nx run patient:test
