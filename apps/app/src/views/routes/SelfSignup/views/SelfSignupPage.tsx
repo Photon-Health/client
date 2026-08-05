@@ -153,6 +153,7 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
     if (!lastName) missingFields.push('lastName');
     if (!email) missingFields.push('email');
     if (!phone) missingFields.push('phone');
+    // TODO: Can we remove this console?
     // logging this so we can see occurrences in DataDog RUM
     console.warn(`Prefill data missing from token for ${email}: ${missingFields.join(', ')}`);
   }
