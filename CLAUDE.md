@@ -276,7 +276,9 @@ declare global {
 
 ### Analytics
 
-The clinical and patient apps use **RudderStack** and **Mixpanel** for product analytics and **Datadog RUM** for monitoring/session replay. Datadog RUM specifically cannot be used from `packages/elements` (published to npm) because its singleton pattern would conflict with a customer's own Datadog instance — so RUM stays host-app-only. The two systems serve different purposes and are set up differently per app.
+The clinical and patient apps use **RudderStack** and **Mixpanel** for product analytics. The two systems serve different purposes and are set up differently per app.
+
+Host-app analytics SDKs stay host-app-only: they must not be initialized from `packages/elements`, which is published to npm, because a singleton inside the package would conflict with a customer's own instance of the same SDK.
 
 `packages/elements`/`packages/components` do send analytics of their own via a separate path — see **Elements/Components** below. 
 
@@ -293,8 +295,6 @@ The clinical and patient apps use **RudderStack** and **Mixpanel** for product a
 - Context data (providerId, orgId, orgName, environment, etc.) is automatically injected into every `track` call
 - The underlying `ProviderAnalytics` class (`src/configs/providerAnalytics.ts`) is a lazy singleton accessed via `getProviderAnalytics()` — use the hook in components, use `getProviderAnalytics()` only outside React
 - For pre-auth tracking (e.g. self-signup), use `trackSelfSignupEvent()` from `src/configs/analytics.ts` which posts directly to the `/auth0/track-event` REST endpoint
-
-**Datadog RUM:** Initialized in `src/instrumentation/index.ts` via `initializeInstrumentation()`. User context (org, email) is set via `setInstrumentationUserContext()` which is called automatically by `ProviderAnalyticsProvider` when the user authenticates.
 
 **Prescribe Workflow Analytics (Embed Events):** The prescribe workflow lives in Solid.js web components (`packages/elements`, `packages/components`) and cannot call RudderStack directly — see **Elements/Components** below for the event schema, dispatch mechanism, and listener.
 
@@ -435,7 +435,7 @@ All new utility functions, views, and components must include tests. Match the t
 - **Component vs. page-level tests**: When adding tests for a component, ask the engineer whether the component is complex enough to warrant isolated component tests, or if it can be implicitly covered by a page-level test that exercises it in context.
 - Test files use `.test.ts` or `.test.tsx` extension and live alongside source files
 - Test files are excluded from ESLint (configured in `.eslintrc.json` ignorePatterns)
-- Patient app has a shared `setupTests.ts` that globally mocks `react-ga4`, `@datadog/browser-rum`, `@client/settings`, and polyfills `IntersectionObserver`
+- Patient app has a shared `setupTests.ts` that globally mocks `react-ga4`, `./configs/analytics`, `@client/settings`, and polyfills `IntersectionObserver`
 - Patient app tests use `vi.mock()` to stub API modules, analytics, and heavy components before rendering
 - Test data generators (`apps/patient/src/test-utils/generators.ts`) use a factory pattern: `generateOrder({ state: 'ROUTING' })` creates a full order with defaults, overridden by the partial you pass in
 
