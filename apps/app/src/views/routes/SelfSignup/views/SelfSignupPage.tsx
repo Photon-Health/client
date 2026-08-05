@@ -5,7 +5,6 @@ import { trackSelfSignupEvent } from '../../../../configs/analytics';
 import { SignupFormData } from './form';
 import { useEffect, useMemo } from 'react';
 import { datadogRum } from '@datadog/browser-rum';
-import { setInstrumentationSelfSignupUserContext } from '../../../../instrumentation/setInstrumentationUserContext';
 import { SignupForm } from './SignupForm';
 import { UnverifiedUserAlert } from './UnverifiedUserAlert';
 
@@ -75,7 +74,6 @@ export const SelfSignupPage = () => {
   useEffect(() => {
     const hasPrefilledName = !!(firstName && lastName);
     const fullName = hasPrefilledName ? `${firstName} ${lastName}` : undefined;
-    setInstrumentationSelfSignupUserContext({ email: email ?? '', name: fullName ?? '' });
     trackSelfSignupEvent(
       'Self Signup Page Viewed',
       {

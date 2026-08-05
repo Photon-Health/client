@@ -16,11 +16,6 @@ vi.mock('@client/settings', () => ({
   getOrgMailOrderPharms: vi.fn(() => undefined)
 }));
 
-// Datadog instrumentation context setter — no-op in tests
-vi.mock('./instrumentation/setInstrumentationUserContext', () => ({
-  setInstrumentationUserContext: vi.fn()
-}));
-
 // Chakra's `useBreakpointValue` (and other Chakra responsive helpers) calls
 // `window.matchMedia`, which jsdom does not implement.
 if (!window.matchMedia) {

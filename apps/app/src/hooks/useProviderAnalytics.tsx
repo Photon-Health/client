@@ -13,7 +13,6 @@ import { usePhoton } from '@photonhealth/react';
 import { ApiObject } from '@rudderstack/analytics-js';
 import { type ClinicalAppEventName } from '@photonhealth/sdk';
 import { getProviderAnalytics } from '../configs/providerAnalytics';
-import { setInstrumentationUserContext } from '../instrumentation/setInstrumentationUserContext';
 
 const ENVIRONMENT = import.meta.env.VITE_ENV_NAME || 'development';
 
@@ -141,15 +140,9 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
     [data]
   );
 
-  // Set Datadog instrumentation context and identify user for RudderStack when data is loaded
+  // Identify user for RudderStack when data is loaded
   useEffect(() => {
     if (data?.me && data?.organization) {
-      setInstrumentationUserContext({
-        org_id: data.organization.id,
-        email: data.me.email,
-        name: data.me.name?.full ?? '',
-        customer_id: data.organization.customer?.id
-      });
       getProviderAnalytics().identify(data.me.email, {
         email: data.me.email,
         user_id: data.me.id,
