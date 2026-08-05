@@ -146,18 +146,6 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   const customerAppName: string | undefined = decodedPayload.customerAppName;
   const customerAgreementPrefix: string | undefined = decodedPayload.customerAgreementPrefix;
 
-  if (!npi || !firstName || !lastName || !email || !phone) {
-    const missingFields = [];
-    if (!npi) missingFields.push('npi');
-    if (!firstName) missingFields.push('firstName');
-    if (!lastName) missingFields.push('lastName');
-    if (!email) missingFields.push('email');
-    if (!phone) missingFields.push('phone');
-    // TODO: Can we remove this console?
-    // logging this so we can see occurrences in DataDog RUM
-    console.warn(`Prefill data missing from token for ${email}: ${missingFields.join(', ')}`);
-  }
-
   if (!verified || !VALID_LICENSES.has(credentials ?? 'none')) {
     console.error(`Non verified prescriber attempted to sign up`, decodedPayload);
   }
