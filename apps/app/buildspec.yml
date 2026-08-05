@@ -26,8 +26,6 @@ phases:
       - npm rebuild
   build:
     commands:
-      - export DD_GIT_COMMIT_SHA=$(git rev-parse HEAD)
-      - export DD_GIT_REPOSITORY_URL=$(git config --get remote.origin.url)
       - printenv
       - node -v
       - npm -v
@@ -72,18 +70,6 @@ phases:
             https://api.github.com/repos/Photon-Health/client/actions/workflows/pr-e2e-tests.yml/dispatches \
             -d "{\"ref\":\"$CODEBUILD_WEBHOOK_HEAD_REF\",\"inputs\":{\"output_dir\":\"$OUTPUT_DIR\",\"sha\":\"$CODEBUILD_RESOLVED_SOURCE_VERSION\",\"app\":\"app\"}}"
         fi
-      - echo Installing Datadog CI
-      - npm install -g @datadog/datadog-ci
-      - echo Uploading source maps to Datadog
-      - |
-        export DATADOG_API_KEY=$(aws secretsmanager get-secret-value --secret-id $DATADOG_SOURCE_MAPS_API_KEY --query 'SecretString' --output text)
-        SERVICE_NAME=$(node -p "require('./apps/app/package.json').name")
-        PACKAGE_VERSION=$(git rev-parse HEAD)
-        ENVIRONMENT=$OUTPUT_DIR
-        npx datadog-ci sourcemaps upload dist/apps/app \
-          --service=$SERVICE_NAME \
-          --release-version=$PACKAGE_VERSION \
-          --minified-path-prefix=https://app.${ENVIRONMENT}.health
 
 artifacts:
   files:
