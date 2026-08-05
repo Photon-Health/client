@@ -69,7 +69,7 @@ type VariablesCreateOrder = {
 
 export default function RecentOrdersCombineDialog() {
   let ref: Ref<any> | undefined;
-  const { draftPrescriptions } = useDraftPrescriptions();
+  const { draftPrescriptions, setDraftPrescriptions } = useDraftPrescriptions();
   const { dispatchOrderCreated, dispatchOrderCombined, dispatchAnalyticsTrackEvent } =
     usePrescribeEventDispatch();
 
@@ -149,6 +149,10 @@ export default function RecentOrdersCombineDialog() {
       });
 
       setIsCombiningOrders(false);
+      // The fills now live on the combined order. Clear the drafts so embed
+      // hosts that don't handle photon-order-combined (and therefore never
+      // unmount this workflow) can't resubmit the same prescriptions.
+      setDraftPrescriptions([]);
       actions.setIsCombineDialogOpen(false);
       return;
     } catch {
@@ -180,6 +184,8 @@ export default function RecentOrdersCombineDialog() {
           isCombinedOrder: false
         });
         setIsCombiningOrders(false);
+        setDraftPrescriptions([]);
+        actions.setIsCombineDialogOpen(false);
       } catch {
         triggerToast({
           header: 'Error Creating Order',
@@ -187,6 +193,9 @@ export default function RecentOrdersCombineDialog() {
           status: 'info'
         });
         setIsCombiningOrders(false);
+        // Close the dialog rather than leaving the button re-enabled: every
+        // additional click here re-sends the same failing mutations
+        actions.setIsCombineDialogOpen(false);
         return;
       }
     }
