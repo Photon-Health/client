@@ -186,7 +186,7 @@ test('emits supervisor error event when JSON is malformed', async () => {
 
   expect(supervisorErrorEvents[0].detail).toEqual(
     expect.objectContaining({
-      errors: expect.arrayContaining(['Invalid supervisor json passed in'])
+      errors: expect.arrayContaining(['Invalid JSON passed to supervisor'])
     })
   );
 

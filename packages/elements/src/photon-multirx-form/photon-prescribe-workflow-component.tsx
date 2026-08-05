@@ -1,20 +1,23 @@
 import {
   DiagnosisCodesPrefill,
   DraftPrescriptionsProvider,
+  InitialPrescriptionsPrefill,
   PharmacySelectionProvider,
   PrescribeEventDispatchProvider,
   PrescribeProvider,
-  PrescriptionOverrides,
+  PrescriptionOverridesPrefill,
   PrescriptionScreeningProvider,
   RecentOrders,
   SupervisorPrefill,
   SupervisorProvider,
-  TemplateOverrides
+  TemplateOverridesPrefill,
+  usePrescribeEventDispatch
 } from '@photonhealth/components';
+import type { ElementViewEvent } from '@photonhealth/sdk';
 import { customElement } from 'solid-element';
 import { createFormStore } from '../stores/form';
 import { PrescribeProps, PrescribeWorkflow } from './components/PrescribeWorkflow';
-import { onCleanup } from 'solid-js';
+import { onCleanup, onMount } from 'solid-js';
 import { PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
@@ -28,11 +31,92 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
+type PrescribeWorkflowViewedEvent = Extract<
+  ElementViewEvent,
+  { name: 'Prescribe Workflow Viewed' }
+>;
+
+const parseIdList = (ids?: string) =>
+  ids
+    ?.split(',')
+    .map((id) => id.trim())
+    .filter(Boolean) ?? [];
+
+const buildPrescribeWorkflowViewedEvent = (
+  props: PrescribeWorkflowComponentProps
+): PrescribeWorkflowViewedEvent => {
+  const validatePrefill = <T,>(prefill?: T | string): T | undefined => {
+    return prefill && typeof prefill !== 'string' ? prefill : undefined;
+  };
+
+  return {
+    name: 'Prescribe Workflow Viewed',
+    patientId: props.patientId,
+    catalogId: props.catalogId,
+    groupId: props.groupId,
+    mailOrderIds: props.mailOrderIds,
+    pharmacyId: props.pharmacyId,
+    hasExternalOrderId: Boolean(props.externalOrderId),
+    hasDisableList: Boolean(props.disableList),
+    disableList:
+      validatePrefill(props.disableList)
+        ?.map((item) => item.treatmentIds)
+        .filter((ids) => !!ids)
+        .flat() || undefined,
+    hideSubmit: props.hideSubmit,
+    hideTemplates: props.hideTemplates,
+    hidePatientCard: props.hidePatientCard,
+    enableOrder: props.enableOrder,
+    enableMedHistory: props.enableMedHistory,
+    enableMedHistoryLinks: props.enableMedHistoryLinks,
+    enableMedHistoryRefillButton: props.enableMedHistoryRefillButton,
+    enableCombineAndDuplicate: props.enableCombineAndDuplicate,
+    enableCoverageCheck: props.enableCoverageCheck,
+    enableLocalPickup: props.enableLocalPickup,
+    enableSendToPatient: props.enableSendToPatient,
+    enableDeliveryPharmacies: props.enableDeliveryPharmacies,
+    optionalPatientAddress: props.optionalPatientAddress,
+    allowOffCatalogSearch: props.allowOffCatalogSearch,
+    triggerSubmit: props.triggerSubmit,
+    toastBuffer: props.toastBuffer,
+    hasTemplateIdsPrefill: Boolean(props.templateIds),
+    numTemplateIds: parseIdList(props.templateIds).length,
+    hasTemplateOverridesPrefill: Boolean(props.templateOverrides),
+    hasPrescriptionIdsPrefill: Boolean(props.prescriptionIds),
+    numPrescriptionIds: parseIdList(props.prescriptionIds).length,
+    hasPrescriptionOverridesPrefill: Boolean(props.prescriptionOverrides),
+    hasInitialPrescriptionsPrefill: Boolean(props.initialPrescriptions),
+    numInitialPrescriptions: validatePrefill(props.initialPrescriptions)?.length || 0,
+    hasSupervisorPrefill: Boolean(props.supervisor),
+    hasDiagnosisCodesPrefill: Boolean(props.diagnosisCodes),
+    hasAddressPrefill: Boolean(props.address),
+    additionalNotesLength: props.additionalNotes?.length || 0,
+    hasWeight: props.weight !== undefined && props.weight !== null,
+    hasWeightUnit: Boolean(props.weightUnit)
+  };
+};
+
+// Rendered inside PrescribeEventDispatchProvider so the mount event can be
+// dispatched from the event dispatch ref
+const PrescribeWorkflowViewed = (props: { workflowProps: PrescribeWorkflowComponentProps }) => {
+  const { dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
+
+  onMount(() => {
+    dispatchAnalyticsTrackEvent(
+      'elementViewed',
+      buildPrescribeWorkflowViewedEvent(props.workflowProps)
+    );
+  });
+
+  return null;
+};
+
 export interface PrescribeWorkflowComponentProps extends PrescribeProps {
   templateIds?: string;
-  templateOverrides?: TemplateOverrides;
+  templateOverrides?: TemplateOverridesPrefill;
   prescriptionIds?: string;
-  prescriptionOverrides?: PrescriptionOverrides;
+  prescriptionOverrides?: PrescriptionOverridesPrefill;
+  initialPrescriptions?: InitialPrescriptionsPrefill;
   enableCoverageCheck: boolean;
   pharmacyId?: string;
   enableLocalPickup: boolean;
@@ -62,13 +146,15 @@ export const PhotonPrescribeWorkflowComponent = (props: PrescribeWorkflowCompone
 
   return (
     <PrescribeEventDispatchProvider>
+      <PrescribeWorkflowViewed workflowProps={props} />
       <RecentOrders patientId={store.patient?.value?.id}>
         <DraftPrescriptionsProvider
           patientId={store.patient?.value?.id}
-          templateIdsPrefill={props.templateIds?.split(',').map((id) => id.trim()) || []}
+          templateIds={parseIdList(props.templateIds)}
           templateOverrides={props.templateOverrides || {}}
-          prescriptionIdsPrefill={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
+          prescriptionIds={parseIdList(props.prescriptionIds)}
           prescriptionOverrides={props.prescriptionOverrides || {}}
+          initialPrescriptions={props.initialPrescriptions}
           enableCombineAndDuplicate={props.enableCombineAndDuplicate}
           additionalNotes={props.additionalNotes}
           weight={props.weight}
@@ -142,6 +228,7 @@ customElement(
     templateOverrides: undefined,
     prescriptionIds: undefined,
     prescriptionOverrides: undefined,
+    initialPrescriptions: undefined,
     hideSubmit: false,
     hideTemplates: false,
     hidePatientCard: false,

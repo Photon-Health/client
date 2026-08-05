@@ -162,7 +162,7 @@ async function simulatePatientPageViewEvent(pageName: string) {
       bubbles: true,
       composed: true,
       detail: {
-        category: 'pageViewed',
+        category: 'elementViewed',
         name: pageName
       }
     })

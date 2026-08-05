@@ -34,7 +34,7 @@ import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import clearForm from './util/clearForm';
 import repopulateForm from './util/repopulateForm';
-import { DisableList } from '../PrescribeWorkflow';
+import { DisabledMedicationsPrefill } from '../PrescribeWorkflow';
 import { afterDate, message } from '../../../validators';
 import { formatCharacterCount } from './util/formatCharacterCount';
 
@@ -66,7 +66,7 @@ export const DraftPrescriptionForm = (props: {
   weightUnit?: string;
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
-  disableList?: DisableList;
+  disableList?: DisabledMedicationsPrefill;
   onHideForm: () => void;
 }) => {
   const { tryCreatePrescription, draftPrescriptions, rxNotesPrefill } = useDraftPrescriptions();

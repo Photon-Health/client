@@ -43,11 +43,149 @@ test('page views', async () => {
   const { analyticsEvents, waitForSignatureAttestationModal } = renderPrescribeWorkflow();
 
   await waitForSignatureAttestationModal();
-  const event = analyticsEvents.find(isPageView('Signature Attestation Page Viewed'));
+  const event = analyticsEvents.find(isElementView('Signature Attestation Element Viewed'));
   expect(event?.detail).toEqual(
     expect.objectContaining({
       attestationVersion: 'v1',
       timestamp: expect.any(String)
+    })
+  );
+});
+
+test('Prescribe Workflow Viewed reports the element configuration', async () => {
+  const { analyticsEvents } = renderPrescribeWorkflow({
+    // Ids
+    patientId: 'pat_123',
+    catalogId: 'cat_1',
+    groupId: 'grp_1',
+    pharmacyId: 'phr_1',
+    mailOrderIds: 'phr_mail_1,phr_mail_2',
+    externalOrderId: 'ord_external_1',
+    disableList: [
+      { treatmentIds: ['trt_1', 'trt_2'], reason: 'Not covered' },
+      { treatmentIds: ['trt_3'] }
+    ],
+    // Feature flags
+    hideSubmit: true,
+    hideTemplates: true,
+    hidePatientCard: true,
+    enableOrder: true,
+    enableMedHistory: true,
+    enableMedHistoryLinks: true,
+    enableMedHistoryRefillButton: true,
+    enableCombineAndDuplicate: true,
+    enableCoverageCheck: true,
+    enableLocalPickup: true,
+    enableSendToPatient: true,
+    enableDeliveryPharmacies: true,
+    optionalPatientAddress: true,
+    allowOffCatalogSearch: true,
+    triggerSubmit: false,
+    toastBuffer: 40,
+    // Prescription prefills
+    templateIds: 'tmp_1,tmp_2',
+    templateOverrides: { tmp_1: { daysSupply: 30 } },
+    prescriptionIds: 'rx_1',
+    prescriptionOverrides: { rx_1: { daysSupply: 10 } },
+    initialPrescriptions: [{ treatmentId: 'trt_1' }],
+    // Other prefills
+    supervisor: { npi: '1234567890' },
+    diagnosisCodes: [{ code: 'A00' }],
+    address: { street1: '106 N 7th St', city: 'Brooklyn', state: 'NY', postalCode: '11249' },
+    additionalNotes: 'Take with food',
+    weight: 180,
+    weightUnit: 'lbs'
+  });
+
+  const event = analyticsEvents.find(isElementView('Prescribe Workflow Viewed'));
+  expect(event?.detail).toEqual({
+    name: 'Prescribe Workflow Viewed',
+    category: 'elementViewed',
+    timestamp: expect.any(String),
+    // Ids are logged as-is
+    patientId: 'pat_123',
+    catalogId: 'cat_1',
+    groupId: 'grp_1',
+    pharmacyId: 'phr_1',
+    mailOrderIds: 'phr_mail_1,phr_mail_2',
+    hasExternalOrderId: true,
+    // Disabled treatment ids are flattened out of the disable list
+    hasDisableList: true,
+    disableList: ['trt_1', 'trt_2', 'trt_3'],
+    // Feature flags are logged as-is
+    hideSubmit: true,
+    hideTemplates: true,
+    hidePatientCard: true,
+    enableOrder: true,
+    enableMedHistory: true,
+    enableMedHistoryLinks: true,
+    enableMedHistoryRefillButton: true,
+    enableCombineAndDuplicate: true,
+    enableCoverageCheck: true,
+    enableLocalPickup: true,
+    enableSendToPatient: true,
+    enableDeliveryPharmacies: true,
+    optionalPatientAddress: true,
+    allowOffCatalogSearch: true,
+    triggerSubmit: false,
+    toastBuffer: 40,
+    // Prescription prefills are reduced to primitives — no contents logged
+    hasTemplateIdsPrefill: true,
+    numTemplateIds: 2,
+    hasTemplateOverridesPrefill: true,
+    hasPrescriptionIdsPrefill: true,
+    numPrescriptionIds: 1,
+    hasPrescriptionOverridesPrefill: true,
+    hasInitialPrescriptionsPrefill: true,
+    numInitialPrescriptions: 1,
+    // Other prefills we're interested in tracking
+    hasSupervisorPrefill: true,
+    hasDiagnosisCodesPrefill: true,
+    hasAddressPrefill: true,
+    additionalNotesLength: 'Take with food'.length,
+    hasWeight: true,
+    hasWeightUnit: true
+  });
+});
+
+test('Prescribe Workflow Viewed reports absent and unparseable prefills', async () => {
+  const { analyticsEvents } = renderPrescribeWorkflow({
+    patientId: undefined,
+    // solid-element leaves an attribute as a raw string when its JSON can't be parsed
+    disableList: '[{ treatmentIds: }]',
+    initialPrescriptions: '[{ treatmentId: }]',
+    templateIds: '',
+    weight: 0
+  });
+
+  const event = analyticsEvents.find(isElementView('Prescribe Workflow Viewed'));
+  expect(event?.detail).toEqual(
+    expect.objectContaining({
+      patientId: undefined,
+      catalogId: undefined,
+      groupId: undefined,
+      pharmacyId: undefined,
+      mailOrderIds: undefined,
+      hasExternalOrderId: false,
+      // Passed in, but nothing could be parsed out of it
+      hasDisableList: true,
+      disableList: undefined,
+      hasInitialPrescriptionsPrefill: true,
+      numInitialPrescriptions: 0,
+      // Empty string counts as not passed in
+      hasTemplateIdsPrefill: false,
+      numTemplateIds: 0,
+      hasTemplateOverridesPrefill: false,
+      hasPrescriptionIdsPrefill: false,
+      numPrescriptionIds: 0,
+      hasPrescriptionOverridesPrefill: false,
+      hasSupervisorPrefill: false,
+      hasDiagnosisCodesPrefill: false,
+      hasAddressPrefill: false,
+      additionalNotesLength: 0,
+      // A weight of 0 still counts as passed in
+      hasWeight: true,
+      hasWeightUnit: false
     })
   );
 });
@@ -222,7 +360,7 @@ test('attestation CTA', async () => {
   await waitForSignatureAttestationModal();
 
   // Assert page view fired
-  expect(analyticsEvents.find(isPageView('Signature Attestation Page Viewed'))).toBeDefined();
+  expect(analyticsEvents.find(isElementView('Signature Attestation Element Viewed'))).toBeDefined();
 
   // Click cancel
   await user.click(screen.getByRole('button', { name: /cancel/i }));
@@ -266,7 +404,7 @@ test('photon-signature-attestation-resolved does not fire before user agrees whe
   });
 });
 
-test('Signature Attestation Page Viewed fires before photon-signature-attestation-resolved when attestation required', async () => {
+test('Signature Attestation Element Viewed fires before photon-signature-attestation-resolved when attestation required', async () => {
   useNeedsSignatureAttestation(server);
   const { analyticsEvents, attestationResolvedEvents, user, waitForSignatureAttestationModal } =
     renderPrescribeWorkflow();
@@ -274,7 +412,7 @@ test('Signature Attestation Page Viewed fires before photon-signature-attestatio
   await waitForSignatureAttestationModal();
 
   // Attestation Viewed must have fired already
-  expect(analyticsEvents.find(isPageView('Signature Attestation Page Viewed'))).toBeDefined();
+  expect(analyticsEvents.find(isElementView('Signature Attestation Element Viewed'))).toBeDefined();
   // But resolved must not have fired yet
   expect(attestationResolvedEvents.length).toBe(0);
 
@@ -295,10 +433,10 @@ const isFieldInteraction = (filter: Record<string, unknown> = {}) => {
   };
 };
 
-const isPageView = (pageName: string, filter: Record<string, unknown> = {}) => {
+const isElementView = (pageName: string, filter: Record<string, unknown> = {}) => {
   return (event: CustomEvent) => {
     const detail = event.detail as AnalyticsDetail;
-    if (detail.category !== 'pageViewed' || detail.name !== pageName) {
+    if (detail.category !== 'elementViewed' || detail.name !== pageName) {
       return false;
     }
     return Object.entries(filter).every(([key, value]) => detail[key] === value);
