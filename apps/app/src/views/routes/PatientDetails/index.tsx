@@ -29,7 +29,6 @@ import OrderStatusBadge, { OrderFulfillmentState } from '../../components/OrderS
 import InfoGrid from '../../components/InfoGrid';
 import CopyText from '../../components/CopyText';
 import SectionTitleRow from '../../components/SectionTitleRow';
-import { datadogRum } from '@datadog/browser-rum';
 
 export const Patient = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -124,11 +123,6 @@ export const Patient = () => {
             aria-label="Edit patient details"
             as={RouterLink}
             to={`/patients/update/${patientId}`}
-            onClick={() => {
-              datadogRum.addAction('edit_patient_btn_click', {
-                patientId
-              });
-            }}
             leftIcon={<FiEdit />}
             variant="outline"
             borderColor="orange.500"
@@ -142,11 +136,6 @@ export const Patient = () => {
             aria-label="New Order"
             as={RouterLink}
             to={`/prescriptions/new?patientId=${patientId}`}
-            onClick={() => {
-              datadogRum.addAction('create_prescription_btn_click', {
-                patientId
-              });
-            }}
             colorScheme="blue"
           >
             Create Prescription
@@ -283,11 +272,6 @@ export const Patient = () => {
                   to={`/orders/new?patientId=${patientId}`}
                   colorScheme="blue"
                   size="sm"
-                  onClick={() => {
-                    datadogRum.addAction('create_order_btn_click', {
-                      patientId
-                    });
-                  }}
                   isDisabled={loading}
                 >
                   Create Order

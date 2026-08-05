@@ -4,7 +4,6 @@ import { auth0Config } from '../../../../configs/auth';
 import { trackSelfSignupEvent } from '../../../../configs/analytics';
 import { SignupFormData } from './form';
 import { useEffect, useMemo } from 'react';
-import { datadogRum } from '@datadog/browser-rum';
 import { SignupForm } from './SignupForm';
 import { UnverifiedUserAlert } from './UnverifiedUserAlert';
 
@@ -132,8 +131,6 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   }
   const [, payload] = tosSessionToken.split('.');
   const decodedPayload = JSON.parse(atob(payload));
-
-  datadogRum.setGlobalContextProperty('SelfSignupData', { decodedPayload });
 
   const firstName: string = decodedPayload.first_name;
   const lastName: string = decodedPayload.last_name;
