@@ -1,4 +1,4 @@
-import { createEffect, createMemo, For, Ref } from 'solid-js';
+import { createMemo, For } from 'solid-js';
 import * as zod from 'zod';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
@@ -12,7 +12,6 @@ import Textarea from '../../particles/Textarea';
 import formatRxString from '../../utils/formatRxString';
 import uniqueFills from '../../utils/uniqueFills';
 import { usePhotonClient } from '../SDKProvider';
-import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import { createMutation } from '../../utils/createMutation';
 import { usePrescribeEventDispatch } from '../PrescribeEventDispatchProvider';
 
@@ -93,19 +92,12 @@ Description:
 const formName = 'prescribe-flow-duplicate';
 
 export default function RecentOrdersIssueDialog() {
-  let ref: Ref<any> | undefined;
   const [state, actions] = useRecentOrders();
   const { dispatchTicketCreatedDuplicate } = usePrescribeEventDispatch();
   const client = usePhotonClient();
 
   const [createTicketMutation, data] = createMutation<{ id: string }, InputValues>(CREATE_TICKET, {
     client: client.apolloClinical
-  });
-
-  createEffect(() => {
-    if (state.isIssueDialogOpen) {
-      dispatchDatadogAction('prescribe-issue-dialog-open', {}, ref);
-    }
   });
 
   const fills = createMemo(() => {
@@ -119,7 +111,6 @@ export default function RecentOrdersIssueDialog() {
   });
 
   const createTicket = async (values: TicketProps) => {
-    dispatchDatadogAction('prescribe-issue-dialog-submitting', {}, ref);
     const body = composeTicket({
       patient: { id: state?.patientId, name: state?.patientName },
       order: { id: state?.orderWithIssue?.id },
@@ -175,11 +166,10 @@ export default function RecentOrdersIssueDialog() {
     <Dialog
       open={state.isIssueDialogOpen}
       onClose={() => {
-        dispatchDatadogAction('prescribe-issue-dialog-exit', {}, ref);
         actions.setIsIssueDialogOpen(false);
       }}
     >
-      <div class="flex flex-col gap-6" ref={ref}>
+      <div class="flex flex-col gap-6">
         <div>
           <Text bold class="mb-2">
             Report issue with existing order
@@ -244,7 +234,6 @@ export default function RecentOrdersIssueDialog() {
             variant="naked"
             size="xl"
             onClick={() => {
-              dispatchDatadogAction('prescribe-issue-dialog-exit', {}, ref);
               actions.setIsIssueDialogOpen(false);
             }}
           >

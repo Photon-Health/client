@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, For, Ref } from 'solid-js';
+import { createMemo, createSignal, For } from 'solid-js';
 import gql from 'graphql-tag';
 import { useRecentOrders } from '.';
 import Button from '../../particles/Button';
@@ -10,7 +10,6 @@ import uniqueFills from '../../utils/uniqueFills';
 import { usePhotonClient } from '../SDKProvider';
 import triggerToast from '../../utils/toastTriggers';
 import { Address } from '../PatientInfo';
-import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import { createMutation } from '../../utils/createMutation';
 import { Order } from '@photonhealth/sdk/dist/types';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
@@ -68,7 +67,6 @@ type VariablesCreateOrder = {
 };
 
 export default function RecentOrdersCombineDialog() {
-  let ref: Ref<any> | undefined;
   const { draftPrescriptions, setDraftPrescriptions } = useDraftPrescriptions();
   const { dispatchOrderCreated, dispatchOrderCombined, dispatchAnalyticsTrackEvent } =
     usePrescribeEventDispatch();
@@ -92,13 +90,6 @@ export default function RecentOrdersCombineDialog() {
     }
   );
 
-  createEffect(() => {
-    if (state.isCombineDialogOpen) {
-      dispatchDatadogAction('prescribe-combine-dialog-open', {}, ref);
-      // Analytics for button clicks are dispatched in onCombineOrdersClick and the "No" button handler
-    }
-  });
-
   const routingOrder = createMemo(() => {
     return state.orders.find((order) => order.state === 'ROUTING');
   });
@@ -121,7 +112,6 @@ export default function RecentOrdersCombineDialog() {
     }
 
     setIsCombiningOrders(true);
-    dispatchDatadogAction('prescribe-combine-dialog-combining', {}, ref);
     dispatchAnalyticsTrackEvent('ctaClicked', {
       name: 'Combine Orders Confirmed',
       buttonText: 'Yes, combine orders'
@@ -205,11 +195,10 @@ export default function RecentOrdersCombineDialog() {
     <Dialog
       open={state.isCombineDialogOpen}
       onClose={() => {
-        dispatchDatadogAction('prescribe-combine-dialog-exit', {}, ref);
         actions.setIsCombineDialogOpen(false);
       }}
     >
-      <div class="flex flex-col gap-6" ref={ref}>
+      <div class="flex flex-col gap-6">
         <div>
           <div class="table bg-blue-50 text-blue-600 p-2 rounded-full mb-4">
             <Icon name="exclamationCircle" />
@@ -280,7 +269,6 @@ export default function RecentOrdersCombineDialog() {
             variant="secondary"
             size="xl"
             onClick={() => {
-              dispatchDatadogAction('prescribe-combine-dialog-not-combining', {}, ref);
               dispatchAnalyticsTrackEvent('ctaClicked', {
                 name: 'Combine Orders Rejected',
                 buttonText: 'No, send new order'
