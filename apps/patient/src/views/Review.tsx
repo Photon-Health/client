@@ -48,7 +48,7 @@ export const Review = () => {
 
       // Address saved successfully
       setAddressSubmitted(true);
-      await fetchOrder();
+      await fetchOrder(undefined, { triggerNavigationAfterFetch: false });
     }
 
     if (!isDemo) {

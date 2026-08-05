@@ -46,6 +46,7 @@ export function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponen
     enableMedHistoryRefillButton: false,
     enableCombineAndDuplicate: false,
     optionalPatientAddress: false,
+    allowOffCatalogSearch: true,
     triggerSubmit: false,
     toastBuffer: 0,
     enableCoverageCheck: false,
@@ -91,8 +92,13 @@ export function renderPrescribeWorkflow(props: Partial<PrescribeWorkflowComponen
     await user.click(screen.getByRole('button', { name: /add prescription/i }));
   }
 
-  async function waitForDraftPrescription() {
-    await screen.findByText(TREATMENT.name, {}, { timeout: 3000 });
+  async function waitForDraftPrescription(treatmentName: string = TREATMENT.name) {
+    // A rendered draft prescription is the only thing in the workflow
+    // that has its own Delete controls, so wait on those.
+    await screen.findAllByRole('button', { name: /^delete$/i }, { timeout: 3000 });
+    // The medication search dropdown also renders the default TREATMENT name as an <option>,
+    // so this assert by itself is not enough to cover the expected result
+    await screen.findByText(treatmentName, { ignore: 'option,script,style' }, { timeout: 3000 });
   }
 
   return {

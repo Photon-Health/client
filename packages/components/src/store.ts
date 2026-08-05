@@ -1,5 +1,5 @@
 import { createStore } from 'solid-js/store';
-import { PhotonClient } from '@photonhealth/sdk';
+import { PhotonClient, stripAuthParams } from '@photonhealth/sdk';
 import type {
   Catalog,
   DispenseUnit,
@@ -14,11 +14,28 @@ import gql from 'graphql-tag';
 import jwtDecode from 'jwt-decode';
 import type { GraphQLFormattedError } from 'graphql';
 
+/**
+ * Drops the Auth0 redirect params from the address bar without navigating,
+ * keeping the host app's own query string — some consumers rely on it
+ * surviving a login round trip.
+ *
+ * replaceState rather than pushState: a URL holding a spent authorization code
+ * must not be reachable by pressing Back either, or the failure comes straight
+ * back.
+ */
+const clearAuthParamsFromUrl = (): void => {
+  window.history.replaceState(
+    null,
+    window.document.title,
+    `${window.location.pathname}${stripAuthParams(window.location.search)}`
+  );
+};
+
 const defaultOnRedirectCallback = (appState?: any): void => {
   if (appState?.returnTo) {
     window.location.replace(appState?.returnTo);
   } else {
-    window.history.pushState(null, window.document.title, window.location.pathname);
+    clearAuthParamsFromUrl();
   }
 };
 
@@ -62,7 +79,8 @@ export class PhotonClientStore {
       error?: string;
       isLoading: boolean;
     };
-    handleRedirect: (url?: string) => Promise<void>;
+    /** Resolves to whether the authorization code exchange actually succeeded. */
+    handleRedirect: (url?: string) => Promise<boolean>;
     checkSession: () => Promise<void>;
     login: (args?: object) => Promise<void>;
     logout: () => void;
@@ -214,7 +232,7 @@ export class PhotonClientStore {
     this.store = store;
     this.authentication = {
       state: store.authentication,
-      handleRedirect: async (url?: string) => {
+      handleRedirect: async (url?: string): Promise<boolean> => {
         try {
           const result = await this.sdk.authentication.handleRedirect(url);
           defaultOnRedirectCallback(result?.appState);
@@ -224,13 +242,18 @@ export class PhotonClientStore {
           } finally {
             this.redirectAppState = undefined;
           }
+          return true;
         } catch (err: any) {
           const urlParams = new URLSearchParams(window.location.search);
           const errorMessage = urlParams.get('error_description');
-          if (err.message.includes('must be an organization id')) {
+
+          clearAuthParamsFromUrl();
+
+          if (err?.message?.includes('must be an organization id')) {
             this.setStore('authentication', {
               ...this.store.authentication,
-              error: 'The provided organization id is invalid or does not exist'
+              error: 'The provided organization id is invalid or does not exist',
+              isLoading: false
             });
           } else if (errorMessage?.includes('is not part of the org')) {
             this.setStore('authentication', {
@@ -239,11 +262,17 @@ export class PhotonClientStore {
               isLoading: false
             });
           } else {
-            this.setStore('authentication', {
-              ...this.store.authentication,
-              error: err.message
-            });
+            await this.checkSession();
+
+            if (!this.store.authentication.isAuthenticated) {
+              this.setStore('authentication', {
+                ...this.store.authentication,
+                error: err?.message ?? 'Unable to complete sign in',
+                isLoading: false
+              });
+            }
           }
+          return false;
         }
       },
       checkSession: this.checkSession.bind(this),

@@ -11,6 +11,7 @@ import { CreateSupervisorMutation, PhotonClient } from '@photonhealth/sdk';
 import { SupervisorInput } from '@photonhealth/sdk/dist/clinical-api/types';
 import { usePhotonClient } from '../SDKProvider';
 import { usePrescribeEventDispatch } from '../PrescribeEventDispatchProvider';
+import { Prefill } from '../../utils/Prefill';
 
 export interface SupervisorContextType {
   supervisorId: Accessor<string | undefined>;
@@ -19,9 +20,7 @@ export interface SupervisorContextType {
 
 const SupervisorContext = createContext<SupervisorContextType>();
 
-// At runtime `solid-element`'s customElement parses the `supervisor` HTML
-// attribute as JSON. Valid JSON → object; invalid JSON → the raw string.
-export type SupervisorPrefill = Partial<SupervisorInput> | string;
+export type SupervisorPrefill = Prefill<SupervisorInput>;
 
 interface SupervisorProviderProps {
   children: JSXElement;
@@ -74,7 +73,7 @@ export const createSupervisorFetch = async (
   supervisorPrefill: SupervisorPrefill
 ): Promise<SupervisorResult> => {
   if (typeof supervisorPrefill === 'string') {
-    return { errors: ['Invalid supervisor json passed in'] };
+    return { errors: ['Invalid JSON passed to supervisor'] };
   }
 
   if (!hasRequiredFields(supervisorPrefill)) {

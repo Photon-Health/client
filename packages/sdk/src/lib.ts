@@ -23,6 +23,7 @@ import pkg from '../package.json';
 import { AnalyticsClient } from './analytics/AnalyticsClient';
 
 export type { LoginOptions } from './auth';
+export { stripAuthParams } from './auth';
 export * as types from './types';
 export * as fragments from './fragments';
 export * from './graphql/clinical-api';
@@ -31,7 +32,7 @@ export type {
   FieldCompletionSnapshot,
   DraftPrescriptionSource,
   ClinicalAppEventName,
-  PageViewEvent,
+  ElementViewEvent,
   CtaClickEvent,
   FieldInteractionEvent,
   PhotonEmbedAnalyticsEventInput,

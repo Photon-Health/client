@@ -42,6 +42,13 @@
       },
       "dependsOn": ["codegen:clinical-api"]
     },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/sdk",
+        "command": "vitest run"
+      }
+    },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
