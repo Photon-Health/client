@@ -254,7 +254,6 @@ Key events:
 - `photon-patient-closed` — patient dialog dismissed
 - `photon-order-created` — order created (detail: `{ order: { id } }`)
 - `photon-order-combined` — order combined with existing (detail: `{ order: { id } }`)
-- `photon-datadog-action` — forward Datadog RUM actions to host (detail: `{ action, data }`)
 
 **Usage in the clinical app:**
 

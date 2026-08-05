@@ -1,4 +1,3 @@
-import { datadogRum } from '@datadog/browser-rum';
 import { usePhoton } from '@photonhealth/react';
 import { useQuery } from '@apollo/client';
 import { MutableRefObject, useEffect, useMemo, useRef } from 'react';
@@ -137,20 +136,6 @@ export const PrescriptionForm = () => {
       'photon-order-combined',
       (e: { detail: { order: { id: string } } }) => {
         navigate(`/orders/${e.detail.order.id}`);
-      },
-      listenerOptions
-    );
-    ref.current.addEventListener(
-      'photon-datadog-action',
-      (e: {
-        detail: {
-          action: string;
-          data: {
-            [key: string]: unknown;
-          };
-        };
-      }) => {
-        datadogRum.addAction(e.detail.action, e.detail.data);
       },
       listenerOptions
     );
