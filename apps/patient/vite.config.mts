@@ -11,7 +11,6 @@ export default defineConfig({
   },
   build: {
     outDir: '../../dist/apps/patient',
-    sourcemap: true,
     emptyOutDir: true
   },
   test: {
