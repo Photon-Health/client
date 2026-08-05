@@ -103,6 +103,67 @@ test('sends a photon-analytics-track-event to the analytics API', async () => {
   });
 });
 
+test('queues events dispatched before the analytics context resolves, then sends them', async () => {
+  const analyticsTrackSpy = vi.fn();
+  let releaseContextQuery = () => {};
+  const contextQueryGate = new Promise<void>((resolve) => {
+    releaseContextQuery = resolve;
+  });
+
+  server.use(
+    clinicalGql.query('AnalyticsContextQuery', async () => {
+      await contextQueryGate;
+      return HttpResponse.json({
+        data: { me: { ...PROVIDER, roles: [] }, organization: ORGANIZATION }
+      });
+    }),
+    http.post('http://analytics-api.tau.health:8080/event', async ({ request }) => {
+      analyticsTrackSpy(await request.json());
+      return HttpResponse.json({ status: 'ok' });
+    })
+  );
+
+  const { rootElement } = renderPhotonClient();
+
+  const dispatchTrackEvent = (name: string) =>
+    rootElement.dispatchEvent(
+      new CustomEvent('photon-analytics-track-event', {
+        bubbles: true,
+        composed: true,
+        detail: { category: 'ctaClicked', name, timestamp: new Date().toISOString() }
+      })
+    );
+
+  dispatchTrackEvent('Order Sent');
+  dispatchTrackEvent('Patient Created');
+
+  // Awaiting this blank promise ensures all tasks on the JS task queue
+  // initialized by dispatchTrackEvent have completed
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  // After awaiting all tasks, ensure nothing is sent
+  // while the context query is still in flight
+  expect(analyticsTrackSpy).not.toHaveBeenCalled();
+
+  releaseContextQuery();
+
+  await waitFor(() => {
+    expect(analyticsTrackSpy).toHaveBeenCalledTimes(2);
+  });
+  // Each queued event should maintain its own timestamp
+  expect(analyticsTrackSpy).toHaveBeenCalledWith(
+    expect.objectContaining({
+      event: 'Order Sent',
+      properties: expect.objectContaining({ timestamp: expect.any(String) })
+    })
+  );
+  expect(analyticsTrackSpy).toHaveBeenCalledWith(
+    expect.objectContaining({
+      event: 'Patient Created',
+      properties: expect.objectContaining({ timestamp: expect.any(String) })
+    })
+  );
+});
+
 test('fails silently when the analytics API request fails', async () => {
   const analyticsContextQuerySpy = vi.fn();
   const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});

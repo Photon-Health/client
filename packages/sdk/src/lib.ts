@@ -32,7 +32,7 @@ export type {
   FieldCompletionSnapshot,
   DraftPrescriptionSource,
   ClinicalAppEventName,
-  PageViewEvent,
+  ElementViewEvent,
   CtaClickEvent,
   FieldInteractionEvent,
   PhotonEmbedAnalyticsEventInput,
