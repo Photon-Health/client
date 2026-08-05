@@ -16,6 +16,7 @@ import {
   DiagnosisCodeType,
   PrescriptionScreeningAlert
 } from '@photonhealth/sdk/dist/clinical-api/types';
+import { Prefill } from '../utils/Prefill';
 
 type ScreenablePrescription = {
   dispenseAsWritten?: boolean;
@@ -61,7 +62,7 @@ export interface PrescriptionScreeningContextValue {
 
 const PrescriptionScreeningContext = createContext<PrescriptionScreeningContextValue>();
 
-export type DiagnosisCodesPrefill = Partial<DiagnosisCode>[] | string;
+export type DiagnosisCodesPrefill = Prefill<DiagnosisCode[]>;
 
 interface PrescriptionScreeningProviderProps {
   children: JSXElement;

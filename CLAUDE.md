@@ -327,7 +327,7 @@ The prescribe workflow lives in Solid.js web components (`packages/elements`, `p
 
 | Category | Type | Description |
 |----------|------|-------------|
-| `pageViewed` | `PageViewEvent` | Page/view lifecycle — each variant has a unique `name` (e.g. "New Prescriptions Page Viewed", "Signature Attestation Page Viewed") |
+| `elementViewed` | `ElementViewEvent` | element lifecycle — each variant has a unique `name` (e.g. "New Prescriptions Element Viewed", "Signature Attestation Element Viewed") |
 | `ctaClicked` | `CtaClickEvent` | Call-to-action clicks — each variant has a unique descriptive `name` |
 | `fieldInteraction` | `FieldInteractionEvent` | Form field completeness — all share `name: 'Field Interaction'` with `formName`, `fieldName`, `hasValue`, `isOptional` |
 
@@ -341,7 +341,7 @@ CTA event names: "Patient Created", "Patient Updated", "Order Sent", "Prescripti
 const { dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
 dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Order Sent', buttonText: 'Send', ... });
 dispatchAnalyticsTrackEvent('fieldInteraction', { name: 'Field Interaction', formName: '...', ... });
-dispatchAnalyticsTrackEvent('pageViewed', { name: 'New Prescriptions Page Viewed', ... });
+dispatchAnalyticsTrackEvent('elementViewed', { name: 'New Prescriptions Page Viewed', ... });
 ```
 This dispatches a `photon-analytics-track-event` CustomEvent (`composed: true, bubbles: true`) with `detail: { ...event, category, timestamp }`.
 
@@ -355,7 +355,7 @@ This dispatches a `photon-analytics-track-event` CustomEvent (`composed: true, b
 
 | File | Purpose |
 |------|---------|
-| `packages/sdk/src/analytics/clinicalAnalyticsTypes.ts` | Event type definitions (`AnalyticsCategory`, `AnalyticsEventMap`, `PageViewEvent`, `CtaClickEvent`, `FieldInteractionEvent`) |
+| `packages/sdk/src/analytics/clinicalAnalyticsTypes.ts` | Event type definitions (`AnalyticsCategory`, `AnalyticsEventMap`, `ElementViewEvent`, `CtaClickEvent`, `FieldInteractionEvent`) |
 | `packages/components/src/analytics/dispatchAnalyticsTrackEvent.ts` | Generic dispatch function — creates and fires the CustomEvent |
 | `packages/components/src/analytics/buildFieldSnapshot.ts` | Field snapshot utilities and form field constants |
 | `packages/components/src/systems/PrescribeEventDispatchProvider.tsx` | Solid.js context provider exposing `dispatchAnalyticsTrackEvent` via `usePrescribeEventDispatch()` |

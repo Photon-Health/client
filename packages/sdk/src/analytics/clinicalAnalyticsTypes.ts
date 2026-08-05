@@ -1,19 +1,73 @@
-export type AnalyticsCategory = 'pageViewed' | 'ctaClicked' | 'fieldInteraction';
+export type AnalyticsCategory = 'elementViewed' | 'ctaClicked' | 'fieldInteraction';
 
 export interface FieldCompletionSnapshot {
   [fieldName: string]: { completed: boolean };
 }
 
-export type DraftPrescriptionSource = 'form' | 'med_history_refill' | 'prefill';
+export type DraftPrescriptionSource =
+  | 'form'
+  | 'med_history_refill'
+  | 'template_prefill'
+  | 'prescription_id_prefill'
+  | 'initial_prescriptions_prefill';
 
 // ---------------------------------------------------------------------------
-// Page View Events — each page gets a unique event name
+// Element View Events — each element gets a unique event name
 // ---------------------------------------------------------------------------
 
-export type PageViewEvent = {
-  name: 'Signature Attestation Page Viewed';
-  attestationVersion: string;
-};
+export type ElementViewEvent =
+  | {
+      name: 'Prescribe Workflow Viewed';
+      patientId?: string;
+      catalogId?: string;
+      groupId?: string;
+      mailOrderIds?: string;
+      pharmacyId?: string;
+      hasExternalOrderId: boolean;
+      hasDisableList: boolean;
+      disableList?: string[];
+      hideSubmit: boolean;
+      hideTemplates: boolean;
+      hidePatientCard: boolean;
+      enableOrder: boolean;
+      enableMedHistory: boolean;
+      enableMedHistoryLinks: boolean;
+      enableMedHistoryRefillButton: boolean;
+      enableCombineAndDuplicate: boolean;
+      enableCoverageCheck: boolean;
+      enableLocalPickup: boolean;
+      enableSendToPatient: boolean;
+      enableDeliveryPharmacies: boolean;
+      optionalPatientAddress: boolean;
+      allowOffCatalogSearch: boolean;
+      triggerSubmit: boolean;
+      toastBuffer: number;
+      // Prescription prefill behavior
+      // Not logging full objects since Mixpanel
+      // encourages use of primitive values
+      // Whether any value was passed in
+      hasTemplateIdsPrefill: boolean;
+      // If able to parse value, how many were passed in
+      numTemplateIds: number;
+      // Whether overrides were passed in
+      hasTemplateOverridesPrefill: boolean;
+      hasPrescriptionIdsPrefill: boolean;
+      numPrescriptionIds: number;
+      hasPrescriptionOverridesPrefill: boolean;
+      hasInitialPrescriptionsPrefill: boolean;
+      numInitialPrescriptions: number;
+      // Other prefill behavior
+      hasSupervisorPrefill: boolean;
+      hasDiagnosisCodesPrefill: boolean;
+      hasAddressPrefill: boolean;
+      additionalNotesLength: number;
+      hasWeight: boolean;
+      hasWeightUnit: boolean;
+    }
+  | {
+      name: 'Signature Attestation Element Viewed';
+      attestationVersion: string;
+    };
 
 // ---------------------------------------------------------------------------
 // CTA Click Events — each variant has a unique, descriptive name
@@ -89,7 +143,7 @@ export type FieldInteractionEvent =
 // Event map — used by dispatchAnalyticsTrackEvent generic
 // ---------------------------------------------------------------------------
 export type AnalyticsEventMap = {
-  pageViewed: PageViewEvent;
+  elementViewed: ElementViewEvent;
   ctaClicked: CtaClickEvent;
   fieldInteraction: FieldInteractionEvent;
 };
@@ -98,7 +152,7 @@ export type AnalyticsEventMap = {
 // Combined type — the CustomEvent detail shape used by the listener side
 // ---------------------------------------------------------------------------
 export type PhotonEmbedAnalyticsEventInput =
-  | ({ category: 'pageViewed' } & PageViewEvent)
+  | ({ category: 'elementViewed' } & ElementViewEvent)
   | ({ category: 'ctaClicked' } & CtaClickEvent)
   | ({ category: 'fieldInteraction' } & FieldInteractionEvent);
 
