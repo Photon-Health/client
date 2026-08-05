@@ -89,9 +89,10 @@ const PhotonPharmacySelectComponent = (props: PhotonPharmacySelectProps) => {
         <RecentOrders patientId={props.patientId ?? ''}>
           <DraftPrescriptionsProvider
             patientId={props.patientId || ''}
-            templateIdsPrefill={[]}
+            templateIds={[]}
             templateOverrides={{}}
-            prescriptionIdsPrefill={[]}
+            prescriptionIds={[]}
+            prescriptionOverrides={{}}
             enableCombineAndDuplicate={false}
           >
             <PharmacySelectionProvider

@@ -34,7 +34,7 @@ import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import clearForm from './util/clearForm';
 import repopulateForm from './util/repopulateForm';
-import { DisableList } from '../PrescribeWorkflow';
+import { DisabledMedicationsPrefill } from '../PrescribeWorkflow';
 import { afterDate, message } from '../../../validators';
 import { formatCharacterCount } from './util/formatCharacterCount';
 
@@ -64,13 +64,12 @@ export const DraftPrescriptionForm = (props: {
   store: Record<string, any>;
   weight?: number;
   weightUnit?: string;
-  prefillNotes?: string;
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
-  disableList?: DisableList;
+  disableList?: DisabledMedicationsPrefill;
   onHideForm: () => void;
 }) => {
-  const { tryCreatePrescription, draftPrescriptions } = useDraftPrescriptions();
+  const { tryCreatePrescription, draftPrescriptions, rxNotesPrefill } = useDraftPrescriptions();
   const { dispatchOrderError, dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
   const { screenDraftedPrescriptions, screeningAlerts } = usePrescriptionScreening();
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
@@ -87,14 +86,14 @@ export const DraftPrescriptionForm = (props: {
     }
 
     // initialize values in the prescribe form
-    clearForm(props.actions, { notes: props.prefillNotes });
+    clearForm(props.actions, { notes: rxNotesPrefill() });
   });
 
   const handleTreatmentSelected = (e: any) => {
     if (e.detail.data.__typename === 'PrescriptionTemplate') {
       repopulateForm(props.actions, {
         ...e.detail.data,
-        notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
+        notes: [e.detail.data?.notes, rxNotesPrefill()].filter((x) => x).join('\n\n')
       });
     } else {
       props.actions.updateFormValue({
@@ -176,14 +175,14 @@ export const DraftPrescriptionForm = (props: {
 
     // RESET THE FORM
     setOffCatalog(undefined);
-    clearForm(props.actions, { notes: props.prefillNotes });
+    clearForm(props.actions, { notes: rxNotesPrefill() });
 
     setSearchText('');
   };
 
   const handleCancel = () => {
     props.onHideForm();
-    clearForm(props.actions, { notes: props.prefillNotes });
+    clearForm(props.actions, { notes: rxNotesPrefill() });
   };
 
   createEffect(() => {
@@ -206,7 +205,7 @@ export const DraftPrescriptionForm = (props: {
         disable-list={props.disableList}
         on:photon-treatment-selected={handleTreatmentSelected}
         on:photon-treatment-unselected={() => {
-          clearForm(props.actions, { notes: props.prefillNotes });
+          clearForm(props.actions, { notes: rxNotesPrefill() });
 
           screenDraftedPrescriptions();
         }}

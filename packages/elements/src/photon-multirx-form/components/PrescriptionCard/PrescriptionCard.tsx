@@ -9,7 +9,7 @@ import {
 import { DraftPrescriptions } from './DraftPrescriptions';
 import { createEffect, createSignal, Show, untrack } from 'solid-js';
 import { DraftPrescriptionForm } from './DraftPrescriptionForm';
-import { DisableList } from '../PrescribeWorkflow';
+import { DisabledMedicationsPrefill } from '../PrescribeWorkflow';
 import { PhotonTooltip } from '../../../photon-tooltip';
 
 export const PrescriptionCard = (props: {
@@ -18,11 +18,10 @@ export const PrescriptionCard = (props: {
   hideAddToTemplates: boolean;
   weight?: number;
   weightUnit?: string;
-  prefillNotes?: string;
   enableOrder: boolean;
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
-  disableList?: DisableList;
+  disableList?: DisabledMedicationsPrefill;
 }) => {
   let prescriptionFormRef: HTMLDivElement | undefined;
   let prescriptionsCardRef: HTMLDivElement | undefined;
@@ -96,7 +95,6 @@ export const PrescriptionCard = (props: {
                 store={props.store}
                 weight={props.weight}
                 weightUnit={props.weightUnit}
-                prefillNotes={props.prefillNotes}
                 catalogId={props.catalogId}
                 allowOffCatalogSearch={props.allowOffCatalogSearch}
                 disableList={props.disableList}

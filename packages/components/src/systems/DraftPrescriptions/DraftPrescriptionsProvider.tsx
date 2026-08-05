@@ -1,32 +1,32 @@
 import {
   Accessor,
   createContext,
-  createEffect,
   createMemo,
   createSignal,
   JSXElement,
   Setter,
   useContext
 } from 'solid-js';
-import {
-  MutationCreatePrescriptionsArgs,
-  Prescription,
-  PrescriptionState
-} from '@photonhealth/sdk/dist/types';
-import { DraftPrescriptionSource, PhotonClient } from '@photonhealth/sdk';
+import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
+import { DraftPrescriptionSource } from '@photonhealth/sdk';
 import { buildPrescriptionSnapshot } from '../../analytics/buildFieldSnapshot';
 import { usePrescribeEventDispatch } from '../PrescribeEventDispatchProvider';
 import { useRecentOrders } from '../RecentOrders';
 import { usePhotonClient } from '../SDKProvider';
 import {
   CreatePrescription,
-  CreatePrescriptions,
   CreatePrescriptionTemplate,
-  GetPrescription,
   UpdatePrescriptionStates
 } from '../../fetch';
 import triggerToast from '../../utils/toastTriggers';
 import { formatPatientWeight } from './utils/formatters';
+import { mapFormDataToPrescriptionInput } from './utils/mappers';
+import {
+  type InitialPrescriptionsPrefill,
+  type PrescriptionOverridesPrefill,
+  type TemplateOverridesPrefill,
+  usePrefillPrescriptions
+} from './utils/usePrefillPrescriptions';
 
 export type DraftPrescriptionsContextType = {
   // values
@@ -51,27 +51,16 @@ const DraftPrescriptionsContext = createContext<DraftPrescriptionsContextType>()
 interface DraftPrescriptionProviderProps {
   children: JSXElement;
   patientId: string;
-  templateIdsPrefill: string[];
-  templateOverrides: TemplateOverrides;
-  prescriptionIdsPrefill: string[];
+  templateIds: string[];
+  templateOverrides: TemplateOverridesPrefill;
+  prescriptionIds: string[];
+  prescriptionOverrides: PrescriptionOverridesPrefill;
+  initialPrescriptions?: InitialPrescriptionsPrefill;
   enableCombineAndDuplicate: boolean;
   additionalNotes?: string;
   weight?: number;
   weightUnit?: string;
 }
-
-export type TemplateOverrides = {
-  [key: string]: {
-    daysSupply?: number;
-    dispenseAsWritten?: boolean;
-    dispenseQuantity?: number;
-    dispenseUnit?: string;
-    fillsAllowed?: number;
-    instructions?: string;
-    notes?: string;
-    externalId?: string;
-  };
-};
 
 export type PrescriptionFormData = {
   id?: string;
@@ -92,21 +81,6 @@ export type PrescriptionFormData = {
   diagnoseCodes: string[];
 };
 
-const transformPrescriptionFormData = (prescription: PrescriptionFormData, patientId: string) => ({
-  externalId: prescription.externalId,
-  patientId: patientId,
-  treatmentId: prescription.treatment?.id,
-  dispenseAsWritten: prescription.dispenseAsWritten,
-  dispenseQuantity: prescription.dispenseQuantity,
-  dispenseUnit: prescription.dispenseUnit,
-  fillsAllowed: prescription.fillsAllowed,
-  daysSupply: prescription.daysSupply,
-  instructions: prescription.instructions,
-  notes: prescription.notes,
-  doNotFillBeforeDate: prescription.doNotFillBeforeDate,
-  diagnoses: prescription.diagnoseCodes
-});
-
 export type TryCreatePrescriptionTemplateOptions = {
   addToTemplates?: boolean;
   templateName?: string;
@@ -121,68 +95,11 @@ function isTreatmentInDraftPrescriptions(
   return draftedPrescriptions.some((draft) => draft.treatment.id === treatmentId);
 }
 
-const createPrefillPrescriptionsOnApi = async ({
-  client,
-  props,
-  rxNotesPrefill
-}: {
-  client: PhotonClient;
-  props: DraftPrescriptionProviderProps;
-  rxNotesPrefill?: string;
-}) => {
-  let rxToCreate: MutationCreatePrescriptionsArgs['prescriptions'] = [];
-
-  // Create prescriptions from template ids with a few optional override values
-  if (props.templateIdsPrefill.length > 0) {
-    const dedupedTemplateIds = Array.from(new Set(props.templateIdsPrefill));
-    const templatedCreateRxList = dedupedTemplateIds.map((templateId) => {
-      const templateOverrideNotes = props.templateOverrides?.[templateId]?.notes;
-      const notes = templateOverrideNotes
-        ? `${templateOverrideNotes}\n\n${rxNotesPrefill}`
-        : rxNotesPrefill;
-      return {
-        ...props.templateOverrides?.[templateId],
-        patientId: props.patientId,
-        templateId,
-        notes
-      };
-    });
-    rxToCreate = rxToCreate.concat(templatedCreateRxList);
-  }
-
-  // Fetch prescriptions if needed
-  if (props.prescriptionIdsPrefill.length > 0) {
-    const fetchedPrescriptions = await Promise.all(
-      props.prescriptionIdsPrefill.map(async (prescriptionId: string) => {
-        const { data } = await client.apollo.query({
-          query: GetPrescription,
-          variables: { id: prescriptionId }
-        });
-        return transformPrescriptionFormData(data?.prescription, props.patientId);
-      })
-    );
-    rxToCreate = rxToCreate.concat(fetchedPrescriptions);
-  }
-
-  if (!rxToCreate.length) {
-    return;
-  }
-
-  const res = await client.apollo.mutate({
-    mutation: CreatePrescriptions,
-    variables: { prescriptions: rxToCreate }
-  });
-  const newRxs = res.data.createPrescriptions as Prescription[];
-  return newRxs;
-};
-
 export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps) => {
   const { dispatchDraftPrescriptionCreated, dispatchAnalyticsTrackEvent } =
     usePrescribeEventDispatch();
   const [, recentOrdersActions] = useRecentOrders();
   const client = usePhotonClient();
-  const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
-  const [isLoadingPrefills, setIsLoadingPrefills] = createSignal<boolean>(false);
   const [draftPrescriptions, setDraftPrescriptions] = createSignal<Prescription[]>([]);
 
   const prescriptionIds = createMemo(() =>
@@ -190,54 +107,19 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
   );
 
   const rxNotesPrefill = createMemo(() => {
-    let notesPrefill = '';
-    if (props.additionalNotes) notesPrefill = `${props.additionalNotes}\n\n`;
-    if (props.weight)
-      notesPrefill = `${notesPrefill}${formatPatientWeight(props.weight, props.weightUnit)}`;
+    const notesPrefill = [
+      props.additionalNotes || '',
+      props.weight ? formatPatientWeight(props.weight, props.weightUnit) : ''
+    ]
+      .filter((note) => !!note)
+      .join('\n\n');
 
-    return notesPrefill || undefined;
+    return notesPrefill || '';
   });
 
-  // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId
-  createEffect(async () => {
-    if (
-      // must have templateIds or prescriptionIds to create prescriptions
-      (props.templateIdsPrefill.length > 0 || props.prescriptionIdsPrefill.length > 0) &&
-      // must have a patientId
-      !!props.patientId &&
-      // must not have created prescriptions yet
-      !hasCreatedPrescriptions()
-    ) {
-      setHasCreatedPrescriptions(true);
-      setIsLoadingPrefills(true);
-
-      try {
-        const newRxs = await createPrefillPrescriptionsOnApi({
-          client,
-          props,
-          rxNotesPrefill: rxNotesPrefill()
-        });
-        if (newRxs) {
-          setDraftPrescriptions((prev) => [...prev, ...newRxs]);
-          newRxs.forEach((rx) => {
-            dispatchDraftPrescriptionCreated(rx);
-            dispatchAnalyticsTrackEvent('ctaClicked', {
-              name: 'Draft Prescription Added',
-              draftPrescriptionSource: 'prefill',
-              fields: buildPrescriptionSnapshot(rx)
-            });
-          });
-        }
-      } catch (error) {
-        console.error('Error while trying to create prescriptions from prefill IDs', { error });
-        triggerToast({
-          status: 'error',
-          body: 'There was an issue creating prescriptions from prefill IDs. Please check your configuration.'
-        });
-      } finally {
-        setIsLoadingPrefills(false);
-      }
-    }
+  const { isLoadingPrefills } = usePrefillPrescriptions(props, {
+    rxNotesPrefill,
+    setDraftPrescriptions
   });
 
   const tryCreatePrescription = async (
@@ -286,7 +168,11 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
     try {
       const res = await client.apollo.mutate({
         mutation: CreatePrescription,
-        variables: transformPrescriptionFormData(prescriptionFormData, props.patientId)
+        variables: mapFormDataToPrescriptionInput(
+          prescriptionFormData,
+          prescriptionFormData.treatment.id,
+          props.patientId
+        )
       });
       const created = res.data.createPrescription as Prescription;
       createdPrescription = created;
@@ -347,7 +233,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
     const res = await client.apollo.mutate({
       mutation: CreatePrescriptionTemplate,
       variables: {
-        ...transformPrescriptionFormData(prescription, props.patientId),
+        ...mapFormDataToPrescriptionInput(prescription, prescription.treatment.id, props.patientId),
         catalogId,
         isPrivate: true,
         ...(templateName ? { name: templateName } : {})
