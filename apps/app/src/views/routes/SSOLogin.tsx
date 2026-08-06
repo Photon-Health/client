@@ -4,7 +4,6 @@ import { useSearchParams } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
 import { Logo } from '../components/Logo';
 import { useEffect, useRef } from 'react';
-import { datadogRum } from '@datadog/browser-rum';
 
 export const SSOLogin = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
@@ -32,11 +31,9 @@ export const SSOLogin = () => {
 
   useEffect(() => {
     if (isLoading) {
-      datadogRum.addAction('SSOLogin-Debug', { state: 'isLoading' });
       return;
     }
     if (isAuthenticated && !alreadyLoggedOut) {
-      datadogRum.addAction('SSOLogin-Debug', { state: 'isAuthenticated' });
       // Logout first in case user has a session with a different org/connection.
       // loggedOut=1 prevents a logout→silent-reauth→logout loop when the IDP session persists.
       const url = new URL(window.location.href);
@@ -56,7 +53,6 @@ export const SSOLogin = () => {
     if (loginInitiated.current) return;
     loginInitiated.current = true;
 
-    datadogRum.addAction('SSOLogin-Debug', { state: 'login' });
     login({
       connection
     });

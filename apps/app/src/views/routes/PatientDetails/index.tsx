@@ -29,7 +29,6 @@ import OrderStatusBadge, { OrderFulfillmentState } from '../../components/OrderS
 import InfoGrid from '../../components/InfoGrid';
 import CopyText from '../../components/CopyText';
 import SectionTitleRow from '../../components/SectionTitleRow';
-import { datadogRum } from '@datadog/browser-rum';
 
 export const Patient = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -124,11 +123,6 @@ export const Patient = () => {
             aria-label="Edit patient details"
             as={RouterLink}
             to={`/patients/update/${patientId}`}
-            onClick={() => {
-              datadogRum.addAction('edit_patient_btn_click', {
-                patientId
-              });
-            }}
             leftIcon={<FiEdit />}
             variant="outline"
             borderColor="orange.500"
@@ -142,11 +136,6 @@ export const Patient = () => {
             aria-label="New Order"
             as={RouterLink}
             to={`/prescriptions/new?patientId=${patientId}`}
-            onClick={() => {
-              datadogRum.addAction('create_prescription_btn_click', {
-                patientId
-              });
-            }}
             colorScheme="blue"
           >
             Create Prescription
@@ -156,7 +145,7 @@ export const Patient = () => {
     >
       <Card>
         <CardHeader>
-          <Text fontWeight="medium" data-dd-privacy="mask" className="mp-mask">
+          <Text fontWeight="medium" className="mp-mask">
             {loading ? (
               <SkeletonText skeletonHeight={5} noOfLines={1} width="200px" />
             ) : (
@@ -179,7 +168,7 @@ export const Patient = () => {
               {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : patient?.dateOfBirth ? (
-                <Text fontSize="md" data-dd-privacy="mask" className="mp-mask">
+                <Text fontSize="md" className="mp-mask">
                   {formatDateLongUTC(patient.dateOfBirth)}
                 </Text>
               ) : (
@@ -193,7 +182,7 @@ export const Patient = () => {
               {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : patient?.sex ? (
-                <Text fontSize="md" data-dd-privacy="mask" className="mp-mask">
+                <Text fontSize="md" className="mp-mask">
                   {sexMap[patient.sex as keyof object]}{' '}
                 </Text>
               ) : (
@@ -207,7 +196,7 @@ export const Patient = () => {
               {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : patient?.gender ? (
-                <Text fontSize="md" data-dd-privacy="mask" className="mp-mask">
+                <Text fontSize="md" className="mp-mask">
                   {patient.gender}
                 </Text>
               ) : (
@@ -226,7 +215,6 @@ export const Patient = () => {
                   href={`tel:${patient.phone}`}
                   isExternal
                   textDecoration="underline"
-                  data-dd-privacy="mask"
                   className="mp-mask"
                 >
                   {formatPhone(patient.phone)}
@@ -247,7 +235,6 @@ export const Patient = () => {
                   href={`mailto:${patient.email}`}
                   isExternal
                   textDecoration="underline"
-                  data-dd-privacy="mask"
                   className="mp-mask"
                 >
                   {patient.email}
@@ -283,11 +270,6 @@ export const Patient = () => {
                   to={`/orders/new?patientId=${patientId}`}
                   colorScheme="blue"
                   size="sm"
-                  onClick={() => {
-                    datadogRum.addAction('create_order_btn_click', {
-                      patientId
-                    });
-                  }}
                   isDisabled={loading}
                 >
                   Create Order

@@ -56,9 +56,7 @@ export const PatientCard = ({ loading, patient }: PatientCardProps) => {
                     skeletonHeight="4"
                   />
                 ) : (
-                  <Text data-dd-privacy="mask" className="mp-mask">
-                    {patient?.name.full}
-                  </Text>
+                  <Text className="mp-mask">{patient?.name.full}</Text>
                 )}
               </GridItem>
               <GridItem area="sexAtBirth" whiteSpace="nowrap">
@@ -74,9 +72,7 @@ export const PatientCard = ({ loading, patient }: PatientCardProps) => {
                     skeletonHeight="4"
                   />
                 ) : patient?.sex ? (
-                  <Text data-dd-privacy="mask" className="mp-mask">
-                    {patient?.sex}
-                  </Text>
+                  <Text className="mp-mask">{patient?.sex}</Text>
                 ) : (
                   <Text as="i">None</Text>
                 )}
@@ -94,9 +90,7 @@ export const PatientCard = ({ loading, patient }: PatientCardProps) => {
                     skeletonHeight="4"
                   />
                 ) : patient?.gender ? (
-                  <Text data-dd-privacy="mask" className="mp-mask">
-                    {patient?.gender}
-                  </Text>
+                  <Text className="mp-mask">{patient?.gender}</Text>
                 ) : (
                   <Text as="i">None</Text>
                 )}
@@ -122,9 +116,7 @@ export const PatientCard = ({ loading, patient }: PatientCardProps) => {
                     skeletonHeight="4"
                   />
                 ) : patient?.phone ? (
-                  <Text data-dd-privacy="mask" className="mp-mask">
-                    {formatPhone(patient.phone)}
-                  </Text>
+                  <Text className="mp-mask">{formatPhone(patient.phone)}</Text>
                 ) : (
                   <Text as="i">None</Text>
                 )}
@@ -142,9 +134,7 @@ export const PatientCard = ({ loading, patient }: PatientCardProps) => {
                     skeletonHeight="4"
                   />
                 ) : patient?.email ? (
-                  <Text data-dd-privacy="mask" className="mp-mask">
-                    {patient.email}
-                  </Text>
+                  <Text className="mp-mask">{patient.email}</Text>
                 ) : (
                   <Text as="i">None</Text>
                 )}
