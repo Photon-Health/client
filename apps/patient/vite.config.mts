@@ -2,22 +2,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { execSync } from 'child_process';
-
-const commitHash = execSync('git rev-parse HEAD').toString().trim();
 
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
-  define: {
-    __COMMIT_HASH__: JSON.stringify(commitHash)
-  },
   server: {
     port: 3001,
     open: true
   },
   build: {
     outDir: '../../dist/apps/patient',
-    sourcemap: true,
     emptyOutDir: true
   },
   test: {
