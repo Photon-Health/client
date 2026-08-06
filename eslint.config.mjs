@@ -37,8 +37,7 @@ export default tseslint.config(
         Keyframe: 'readonly',
         PropertyIndexedKeyframes: 'readonly',
         KeyframeAnimationOptions: 'readonly',
-        GeolocationPosition: 'readonly',
-        __COMMIT_HASH__: 'readonly'
+        GeolocationPosition: 'readonly'
       }
     },
     rules: {

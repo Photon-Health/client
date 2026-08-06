@@ -50,9 +50,7 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
   return (
     <Tr key={invite.id}>
       <Td>
-        <Text data-dd-privacy="mask" className="mp-mask">
-          {invite.invitee}
-        </Text>
+        <Text className="mp-mask">{invite.invitee}</Text>
       </Td>
       <Td>
         <Badge size="sm" colorScheme={invite.expired ? 'red' : 'green'}>

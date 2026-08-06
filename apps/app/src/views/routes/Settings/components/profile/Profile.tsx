@@ -110,7 +110,7 @@ export const Profile = () => {
       ]).map(({ title, value }) => ({
         title,
         value: value ? (
-          <Text fontSize="sm" data-dd-privacy="mask" className="mp-mask">
+          <Text fontSize="sm" className="mp-mask">
             {value}
           </Text>
         ) : (

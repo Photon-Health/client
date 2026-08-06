@@ -11,19 +11,9 @@ Object.defineProperty(window, 'crypto', {
   configurable: true
 });
 
-// Datadog RUM does not initialize in jsdom
-vi.mock('@datadog/browser-rum', () => ({
-  datadogRum: { addAction: vi.fn(), init: vi.fn(), setUser: vi.fn() }
-}));
-
 // @client/settings reads VITE_ENV_NAME at module scope — undefined in CI
 vi.mock('@client/settings', () => ({
   getOrgMailOrderPharms: vi.fn(() => undefined)
-}));
-
-// Datadog instrumentation context setter — no-op in tests
-vi.mock('./instrumentation/setInstrumentationUserContext', () => ({
-  setInstrumentationUserContext: vi.fn()
 }));
 
 // Chakra's `useBreakpointValue` (and other Chakra responsive helpers) calls
