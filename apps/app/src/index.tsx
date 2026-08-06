@@ -3,9 +3,6 @@ import { ChakraProvider } from '@chakra-ui/react';
 import theme from './configs/theme';
 import { App } from './App';
 import '@photonhealth/elements';
-import { initializeInstrumentation } from './instrumentation';
-
-initializeInstrumentation();
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
