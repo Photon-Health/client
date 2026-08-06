@@ -99,7 +99,7 @@ export const clinicalApiUrl: { [key in Env]: string } = {
 };
 
 export const analyticsApiUrl: { [key in Env]: string } = {
-  tau: 'http://analytics-api.tau.health:8080',
+  tau: 'http://analytics-api.tau.health',
   boson: 'https://analytics-api.boson.health',
   neutron: 'https://analytics-api.neutron.health',
   photon: 'https://analytics-api.photon.health'

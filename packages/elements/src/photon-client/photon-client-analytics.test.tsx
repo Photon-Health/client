@@ -47,7 +47,7 @@ test('sends a photon-analytics-track-event to the analytics API', async () => {
   const orderWorkflowId = 'test-order-workflow-id';
 
   server.use(
-    http.post('http://analytics-api.tau.health:8080/event', async ({ request }) => {
+    http.post('http://analytics-api.tau.health/event', async ({ request }) => {
       analyticsTrackSpy(await request.json());
       return HttpResponse.json({ status: 'ok' });
     }),
@@ -117,7 +117,7 @@ test('queues events dispatched before the analytics context resolves, then sends
         data: { me: { ...PROVIDER, roles: [] }, organization: ORGANIZATION }
       });
     }),
-    http.post('http://analytics-api.tau.health:8080/event', async ({ request }) => {
+    http.post('http://analytics-api.tau.health/event', async ({ request }) => {
       analyticsTrackSpy(await request.json());
       return HttpResponse.json({ status: 'ok' });
     })
@@ -169,7 +169,7 @@ test('fails silently when the analytics API request fails', async () => {
   const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
   server.use(
-    http.post('http://analytics-api.tau.health:8080/event', () => HttpResponse.error()),
+    http.post('http://analytics-api.tau.health/event', () => HttpResponse.error()),
     clinicalGql.query('AnalyticsContextQuery', () => {
       analyticsContextQuerySpy();
       return HttpResponse.json({
