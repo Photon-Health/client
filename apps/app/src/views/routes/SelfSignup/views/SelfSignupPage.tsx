@@ -4,8 +4,6 @@ import { auth0Config } from '../../../../configs/auth';
 import { trackSelfSignupEvent } from '../../../../configs/analytics';
 import { SignupFormData } from './form';
 import { useEffect, useMemo } from 'react';
-import { datadogRum } from '@datadog/browser-rum';
-import { setInstrumentationSelfSignupUserContext } from '../../../../instrumentation/setInstrumentationUserContext';
 import { SignupForm } from './SignupForm';
 import { UnverifiedUserAlert } from './UnverifiedUserAlert';
 
@@ -75,7 +73,6 @@ export const SelfSignupPage = () => {
   useEffect(() => {
     const hasPrefilledName = !!(firstName && lastName);
     const fullName = hasPrefilledName ? `${firstName} ${lastName}` : undefined;
-    setInstrumentationSelfSignupUserContext({ email: email ?? '', name: fullName ?? '' });
     trackSelfSignupEvent(
       'Self Signup Page Viewed',
       {
@@ -135,8 +132,6 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   const [, payload] = tosSessionToken.split('.');
   const decodedPayload = JSON.parse(atob(payload));
 
-  datadogRum.setGlobalContextProperty('SelfSignupData', { decodedPayload });
-
   const firstName: string = decodedPayload.first_name;
   const lastName: string = decodedPayload.last_name;
   const email: string = decodedPayload.email;
@@ -150,17 +145,6 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   const supportEmail: string | undefined = decodedPayload.supportEmail;
   const customerAppName: string | undefined = decodedPayload.customerAppName;
   const customerAgreementPrefix: string | undefined = decodedPayload.customerAgreementPrefix;
-
-  if (!npi || !firstName || !lastName || !email || !phone) {
-    const missingFields = [];
-    if (!npi) missingFields.push('npi');
-    if (!firstName) missingFields.push('firstName');
-    if (!lastName) missingFields.push('lastName');
-    if (!email) missingFields.push('email');
-    if (!phone) missingFields.push('phone');
-    // logging this so we can see occurrences in DataDog RUM
-    console.warn(`Prefill data missing from token for ${email}: ${missingFields.join(', ')}`);
-  }
 
   if (!verified || !VALID_LICENSES.has(credentials ?? 'none')) {
     console.error(`Non verified prescriber attempted to sign up`, decodedPayload);

@@ -1,10 +1,9 @@
-import { createSignal, Ref } from 'solid-js';
+import { createSignal } from 'solid-js';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
 import { ScreeningAlertsByEntity } from './ScreeningAlertsByPrescription';
-import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import { PrescriptionScreeningAlert } from '@photonhealth/sdk/dist/clinical-api/types';
 
 type ScreeningAlertAcknowledgementDialogProps = {
@@ -39,31 +38,6 @@ export function ScreeningAlertAcknowledgementDialog(
   props: ScreeningAlertAcknowledgementDialogProps
 ) {
   const [isOpen, setIsOpen] = createSignal<boolean>(true);
-  let ref: Ref<any> | undefined;
-
-  function ignoreWarningAndCreateAnyway() {
-    dispatchDatadogAction(
-      'prescribe-clinical-alerting-acknowledge-alerts',
-      props.alerts.reduce((acc, value, index) => {
-        acc[index] = value.description;
-        return acc;
-      }, {} as Record<string, string>),
-      ref
-    );
-    props.onIgnoreWarningAndCreateAnyway();
-  }
-
-  function onRevisitPrescriptions() {
-    dispatchDatadogAction(
-      'prescribe-clinical-alerting-revisit-prescriptions',
-      props.alerts.reduce((acc, value, index) => {
-        acc[index] = value.description;
-        return acc;
-      }, {} as Record<string, string>),
-      ref
-    );
-    props.onRevisitPrescriptions();
-  }
 
   return (
     <Dialog
@@ -73,7 +47,7 @@ export function ScreeningAlertAcknowledgementDialog(
         props.onRevisitPrescriptions();
       }}
     >
-      <div ref={ref} class="grid gap-6">
+      <div class="grid gap-6">
         <div class="flex flex-col gap-6">
           <div>
             <div class="table bg-blue-50 text-blue-600 p-2 rounded-full mb-4">
@@ -92,7 +66,7 @@ export function ScreeningAlertAcknowledgementDialog(
             size="xl"
             onClick={() => {
               setIsOpen(false);
-              ignoreWarningAndCreateAnyway();
+              props.onIgnoreWarningAndCreateAnyway();
             }}
           >
             Send order
@@ -102,7 +76,7 @@ export function ScreeningAlertAcknowledgementDialog(
             size="xl"
             onClick={() => {
               setIsOpen(false);
-              onRevisitPrescriptions();
+              props.onRevisitPrescriptions();
             }}
           >
             Cancel
