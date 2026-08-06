@@ -51,7 +51,6 @@ import { useApolloClient, useMutation, useQuery } from '@apollo/client';
 import { CANCEL_ORDER, ROUTE_ORDER } from '../../mutations';
 import { TicketModal } from '../components/TicketModal';
 import { Fill, Order as OrderType } from '@photonhealth/sdk/dist/types';
-import { datadogRum } from '@datadog/browser-rum';
 import { useProviderAnalytics } from '../../hooks/useProviderAnalytics';
 import { StyledToast } from '../components/StyledToast';
 import { RerouteOrderButton } from '../components/RerouteOrderButton';
@@ -391,10 +390,6 @@ export const OrderDetailPage = () => {
                 order?.fulfillment?.state === 'SHIPPED'
               }
               onClick={async () => {
-                datadogRum.addAction('cancel_order_btn_click', {
-                  orderId: id
-                });
-
                 const decision = await confirmWrapper('Cancel this order?', {
                   description: (
                     <RadioGroup onChange={setCancelReason}>
@@ -450,10 +445,6 @@ export const OrderDetailPage = () => {
               aria-label="Report Issue"
               colorScheme="blue"
               onClick={() => {
-                datadogRum.addAction('report_issue_btn_click', {
-                  orderId: id
-                });
-
                 setIsTicketModalOpen(true);
               }}
               isDisabled={loading}
@@ -594,10 +585,6 @@ export const OrderDetailPage = () => {
                         {shouldShowSelectPharmacyButton(order, routingHistory) ? (
                           <Button
                             onClick={() => {
-                              datadogRum.addAction('select_pharmacy_btn_click', {
-                                orderId: id
-                              });
-
                               onOpen();
                             }}
                             colorScheme="blue"

@@ -158,7 +158,7 @@ const lambdasHandlers = [
 // ---------------------------------------------------------------------------
 
 const analyticsApiHandlers = [
-  http.post('http://analytics-api.tau.health:8080/event', () => HttpResponse.json({ status: 'ok' }))
+  http.post('http://analytics-api.tau.health/event', () => HttpResponse.json({ status: 'ok' }))
 ];
 
 export const defaultHandlers = [...servicesHandlers, ...lambdasHandlers, ...analyticsApiHandlers];
