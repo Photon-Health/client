@@ -234,7 +234,11 @@ export const Pharmacy = () => {
   const [latitude, setLatitude] = useState<number>();
   const [longitude, setLongitude] = useState<number>();
   const [patientLocation, setPatientLocation] = useState(
-    order?.address ? formatAddress(order.address) : undefined
+    order?.address
+      ? formatAddress(order.address)
+      : order?.patient.address
+      ? formatAddress(order?.patient.address)
+      : undefined
   );
   const [cleanAddress, setCleanAddress] = useState<string>();
   const [loadingLocation, setLoadingLocation] = useState(false);
