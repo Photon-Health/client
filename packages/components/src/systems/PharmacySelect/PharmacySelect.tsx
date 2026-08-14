@@ -206,7 +206,8 @@ export function PharmacySelect(props: PharmacySelectProps) {
                     name: 'Field Interaction',
                     formName: 'select_pharmacy',
                     currentTab: TabNamesEnum.localPickup,
-                    pharmacySelected: pharmacy.id
+                    pharmacySelected: pharmacy.id,
+                    pharmacySelectedName: pharmacy.name
                   });
                 }}
                 hidePreferred={!(props.enableSavingPreferredPharmacy ?? true)}
@@ -247,7 +248,8 @@ export function PharmacySelect(props: PharmacySelectProps) {
                       name: 'Field Interaction',
                       formName: 'select_pharmacy',
                       currentTab: TabNamesEnum.mailOrder,
-                      pharmacySelected: pharmacy.id
+                      pharmacySelected: pharmacy.id,
+                      pharmacySelectedName: pharmacy.name
                     });
                   }}
                 />
@@ -260,6 +262,12 @@ export function PharmacySelect(props: PharmacySelectProps) {
                       setSelected={(pharmacyId) => {
                         setMailOrderOption(undefined);
                         setMailOrderId(pharmacyId);
+                        dispatchAnalyticsTrackEvent('fieldInteraction', {
+                          name: 'Field Interaction',
+                          formName: 'select_pharmacy',
+                          currentTab: TabNamesEnum.mailOrder,
+                          pharmacySelected: pharmacyId
+                        });
                       }}
                       contextRef={(context) => (radioGroupContext = context)}
                     >

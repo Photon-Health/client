@@ -151,6 +151,7 @@ export type FieldInteractionEvent =
       formName: 'select_pharmacy';
       currentTab: string;
       pharmacySelected: string;
+      pharmacySelectedName?: string;
     };
 
 // ---------------------------------------------------------------------------
