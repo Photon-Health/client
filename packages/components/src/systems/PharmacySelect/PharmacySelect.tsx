@@ -94,21 +94,28 @@ export function PharmacySelect(props: PharmacySelectProps) {
   });
 
   onMount(() => {
-    // add the tabs to tabs
-    setTabs([
+    const tabOptions = [
       ...(pharmacySelectionContext.enableSendToPatient() ? [TabNamesEnum.sendToPatient] : []),
       ...(pharmacySelectionContext.enableLocalPickup() ? [TabNamesEnum.localPickup] : []),
       ...(pharmacySelectionContext.enableDeliveryPharmacies() ? [TabNamesEnum.mailOrder] : [])
-    ]);
+    ];
+    // add the tabs to tabs
+    setTabs(tabOptions);
 
     // Fulfillment option from the first tab name
     const firstOption = fulfillmentOptions.find(
-      (option) => option.name === tabs()[0]
+      (option) => option.name === tabOptions[0]
     )?.fulfillmentType;
 
     // Sets the initial fulfillment type to the first available tab
     pharmacySelectionContext.setFulfillmentType(parseFulfillmentType(firstOption));
-    setActiveTab(tabs()[0]);
+    setActiveTab(tabOptions[0]);
+
+    dispatchAnalyticsTrackEvent('elementViewed', {
+      name: 'Pharmacy Select Element Viewed',
+      tabs: tabOptions,
+      initialTabSelected: tabOptions[0]
+    });
   });
 
   createEffect(() => {
@@ -128,28 +135,35 @@ export function PharmacySelect(props: PharmacySelectProps) {
       setTabs([...tabs(), newTab]);
     }
 
-    const type = fulfillmentOptions.find((option) => option.name === newTab)?.fulfillmentType;
-    pharmacySelectionContext.setFulfillmentType(parseFulfillmentType(type));
-
     dispatchAnalyticsTrackEvent('fieldInteraction', {
       name: 'Field Interaction',
       formName: 'select_pharmacy',
       tabSelected: newTab,
       hasPreferredPharmacy: props.hasPreferredPharmacy ?? false
     });
-
-    // Preserve the selected pharmacy ID for Local Pickup and Mail Order tabs
-    if (newTab === TabNamesEnum.localPickup && localPharmId()) {
-      pharmacySelectionContext.setPharmacyId(localPharmId());
-    } else if (newTab === TabNamesEnum.mailOrder && mailOrderId()) {
-      pharmacySelectionContext.setPharmacyId(mailOrderId());
-    } else {
-      // Use the selectedCoverageOption's pharmacy, if available, for Send To Patient flow.
-      // This is a bit strange - doing this for our first version of RTBC feature.
-      // But we dont yet have a better way to show the Provider what pharmacy they selected by selecting a Coverage Option
-      pharmacySelectionContext.setPharmacyId(selectedCoverageOption()?.pharmacy.id);
-    }
   };
+
+  // Propagate selected pharmacy back to pharmacySelectionContext
+  // based on changes in activeTab or pharmacy Ids
+  createEffect(() => {
+    const type = fulfillmentOptions.find((option) => option.name === activeTab())?.fulfillmentType;
+    pharmacySelectionContext.setFulfillmentType(parseFulfillmentType(type));
+
+    if (activeTab() === TabNamesEnum.localPickup) {
+      pharmacySelectionContext.setPharmacyId(localPharmId());
+      return;
+    }
+
+    if (activeTab() === TabNamesEnum.mailOrder) {
+      pharmacySelectionContext.setPharmacyId(mailOrderId());
+      return;
+    }
+
+    // Use the selectedCoverageOption's pharmacy, if available, for Send To Patient flow.
+    // This is a bit strange - doing this for our first version of RTBC feature.
+    // But we dont yet have a better way to show the Provider what pharmacy they selected by selecting a Coverage Option
+    pharmacySelectionContext.setPharmacyId(selectedCoverageOption()?.pharmacy.id || undefined);
+  });
 
   return (
     <div>
@@ -188,9 +202,12 @@ export function PharmacySelect(props: PharmacySelectProps) {
                 patientId={props?.patientIds?.[0]}
                 setPharmacy={(pharmacy) => {
                   setLocalPharmId(pharmacy.id);
-                  if (activeTab() === TabNamesEnum.localPickup) {
-                    pharmacySelectionContext.setPharmacyId(pharmacy.id);
-                  }
+                  dispatchAnalyticsTrackEvent('fieldInteraction', {
+                    name: 'Field Interaction',
+                    formName: 'select_pharmacy',
+                    currentTab: TabNamesEnum.localPickup,
+                    pharmacySelected: pharmacy.id
+                  });
                 }}
                 hidePreferred={!(props.enableSavingPreferredPharmacy ?? true)}
                 setPreferred={(shouldSetPreferred) => {
@@ -226,9 +243,12 @@ export function PharmacySelect(props: PharmacySelectProps) {
                   selectPharmacy={(pharmacy) => {
                     setMailOrderOption(pharmacy);
                     setMailOrderId(pharmacy.id);
-                    if (activeTab() === TabNamesEnum.mailOrder) {
-                      pharmacySelectionContext.setPharmacyId(pharmacy.id);
-                    }
+                    dispatchAnalyticsTrackEvent('fieldInteraction', {
+                      name: 'Field Interaction',
+                      formName: 'select_pharmacy',
+                      currentTab: TabNamesEnum.mailOrder,
+                      pharmacySelected: pharmacy.id
+                    });
                   }}
                 />
                 {(pharmacySelectionContext.mailOrderPharmacyIds()?.length ?? 0) > 0 && (
@@ -240,9 +260,6 @@ export function PharmacySelect(props: PharmacySelectProps) {
                       setSelected={(pharmacyId) => {
                         setMailOrderOption(undefined);
                         setMailOrderId(pharmacyId);
-                        if (activeTab() === TabNamesEnum.mailOrder) {
-                          pharmacySelectionContext.setPharmacyId(pharmacyId);
-                        }
                       }}
                       contextRef={(context) => (radioGroupContext = context)}
                     >
