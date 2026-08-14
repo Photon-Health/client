@@ -67,6 +67,11 @@ export type ElementViewEvent =
   | {
       name: 'Signature Attestation Element Viewed';
       attestationVersion: string;
+    }
+  | {
+      name: 'Pharmacy Select Element Viewed';
+      tabs: string[];
+      initialTabSelected: string;
     };
 
 // ---------------------------------------------------------------------------
@@ -120,6 +125,9 @@ export type CtaClickEvent =
 
 // ---------------------------------------------------------------------------
 // Field Interaction Events — all share "Field Interaction"
+//
+// The purpose is to track manual user interactions, not programmatic updates
+// to form fields.
 // ---------------------------------------------------------------------------
 
 export type FieldInteractionEvent =
@@ -130,14 +138,20 @@ export type FieldInteractionEvent =
       hasValue: boolean;
       isOptional: boolean;
     }
+  | { name: 'Field Interaction'; formName: string; patientId: string }
   | {
       name: 'Field Interaction';
-      formName: string;
+      formName: 'select_pharmacy';
       tabSelected: string;
       hasPreferredPharmacy: boolean;
       setAsPreferred?: boolean;
     }
-  | { name: 'Field Interaction'; formName: string; patientId: string };
+  | {
+      name: 'Field Interaction';
+      formName: 'select_pharmacy';
+      currentTab: string;
+      pharmacySelected: string;
+    };
 
 // ---------------------------------------------------------------------------
 // Event map — used by dispatchAnalyticsTrackEvent generic
