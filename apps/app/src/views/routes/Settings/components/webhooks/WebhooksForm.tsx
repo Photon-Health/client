@@ -82,6 +82,8 @@ export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
     'photon:order:completed',
     'photon:order:error',
     'photon:order:canceled',
+    'photon:order:routed',
+    "patient:order:rerouted",
     'photon:prescription:created',
     'photon:prescription:depleted',
     'photon:prescription:active'
