@@ -114,7 +114,8 @@ export function PharmacySelect(props: PharmacySelectProps) {
     dispatchAnalyticsTrackEvent('elementViewed', {
       name: 'Pharmacy Select Element Viewed',
       tabs: tabOptions,
-      initialTabSelected: tabOptions[0]
+      initialTabSelected: tabOptions[0],
+      hasPreferredPharmacy: props.hasPreferredPharmacy || false
     });
   });
 
@@ -138,8 +139,8 @@ export function PharmacySelect(props: PharmacySelectProps) {
     dispatchAnalyticsTrackEvent('fieldInteraction', {
       name: 'Field Interaction',
       formName: 'select_pharmacy',
-      tabSelected: newTab,
-      hasPreferredPharmacy: props.hasPreferredPharmacy ?? false
+      fieldName: 'activeTab',
+      value: newTab
     });
   };
 
@@ -205,9 +206,8 @@ export function PharmacySelect(props: PharmacySelectProps) {
                   dispatchAnalyticsTrackEvent('fieldInteraction', {
                     name: 'Field Interaction',
                     formName: 'select_pharmacy',
-                    currentTab: TabNamesEnum.localPickup,
-                    pharmacySelected: pharmacy.id,
-                    pharmacySelectedName: pharmacy.name
+                    fieldName: 'pharmacyId',
+                    value: pharmacy.id
                   });
                 }}
                 hidePreferred={!(props.enableSavingPreferredPharmacy ?? true)}
@@ -216,9 +216,8 @@ export function PharmacySelect(props: PharmacySelectProps) {
                   dispatchAnalyticsTrackEvent('fieldInteraction', {
                     name: 'Field Interaction',
                     formName: 'select_pharmacy',
-                    tabSelected: TabNamesEnum.localPickup,
-                    hasPreferredPharmacy: props.hasPreferredPharmacy ?? false,
-                    setAsPreferred: shouldSetPreferred
+                    fieldName: 'setPreferredPharmacy',
+                    value: String(shouldSetPreferred)
                   });
                 }}
               />
@@ -247,9 +246,8 @@ export function PharmacySelect(props: PharmacySelectProps) {
                     dispatchAnalyticsTrackEvent('fieldInteraction', {
                       name: 'Field Interaction',
                       formName: 'select_pharmacy',
-                      currentTab: TabNamesEnum.mailOrder,
-                      pharmacySelected: pharmacy.id,
-                      pharmacySelectedName: pharmacy.name
+                      fieldName: 'pharmacyId',
+                      value: pharmacy.id
                     });
                   }}
                 />
@@ -265,8 +263,8 @@ export function PharmacySelect(props: PharmacySelectProps) {
                         dispatchAnalyticsTrackEvent('fieldInteraction', {
                           name: 'Field Interaction',
                           formName: 'select_pharmacy',
-                          currentTab: TabNamesEnum.mailOrder,
-                          pharmacySelected: pharmacyId
+                          fieldName: 'pharmacyId',
+                          value: pharmacyId
                         });
                       }}
                       contextRef={(context) => (radioGroupContext = context)}

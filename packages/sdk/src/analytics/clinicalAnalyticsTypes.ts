@@ -72,6 +72,7 @@ export type ElementViewEvent =
       name: 'Pharmacy Select Element Viewed';
       tabs: string[];
       initialTabSelected: string;
+      hasPreferredPharmacy: boolean;
     };
 
 // ---------------------------------------------------------------------------
@@ -142,16 +143,14 @@ export type FieldInteractionEvent =
   | {
       name: 'Field Interaction';
       formName: 'select_pharmacy';
-      tabSelected: string;
-      hasPreferredPharmacy: boolean;
-      setAsPreferred?: boolean;
+      fieldName: string;
+      value: string;
     }
   | {
       name: 'Field Interaction';
       formName: 'select_pharmacy';
-      currentTab: string;
-      pharmacySelected: string;
-      pharmacySelectedName?: string;
+      fieldName: string;
+      value: string;
     };
 
 // ---------------------------------------------------------------------------
