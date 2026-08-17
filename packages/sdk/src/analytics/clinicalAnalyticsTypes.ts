@@ -73,6 +73,7 @@ export type ElementViewEvent =
       tabs: string[];
       initialTabSelected: string;
       hasPreferredPharmacy: boolean;
+      enableSavingPreferredPharmacy: boolean;
     };
 
 // ---------------------------------------------------------------------------

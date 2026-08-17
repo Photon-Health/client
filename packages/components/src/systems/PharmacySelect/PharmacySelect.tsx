@@ -115,7 +115,8 @@ export function PharmacySelect(props: PharmacySelectProps) {
       name: 'Pharmacy Select Element Viewed',
       tabs: tabOptions,
       initialTabSelected: tabOptions[0],
-      hasPreferredPharmacy: props.hasPreferredPharmacy || false
+      hasPreferredPharmacy: props.hasPreferredPharmacy || false,
+      enableSavingPreferredPharmacy: props.enableSavingPreferredPharmacy || false
     });
   });
 
@@ -216,7 +217,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
                   dispatchAnalyticsTrackEvent('fieldInteraction', {
                     name: 'Field Interaction',
                     formName: 'select_pharmacy',
-                    fieldName: 'setPreferredPharmacy',
+                    fieldName: 'setUpdatePreferredPharmacy',
                     value: String(shouldSetPreferred)
                   });
                 }}
