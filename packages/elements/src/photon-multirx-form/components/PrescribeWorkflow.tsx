@@ -350,6 +350,23 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       const selectedPharmacyId = pharmacySelectionContext.pharmacyId();
       const selectedFulfillmentType = pharmacySelectionContext.fulfillmentType();
 
+      if (selectedFulfillmentType && !selectedPharmacyId) {
+        setIsLoading(false);
+        triggerToast({
+          status: 'error',
+          header: 'Error Creating Order',
+          body: `Please choose a pharmacy for ${
+            selectedFulfillmentType === 'PICK_UP' ? 'Local Pickup' : 'Mail Order'
+          }, or choose Send to Patient`
+        });
+        dispatchOrderError([
+          new Error(
+            `Pharmacy required for fullfilment type ${selectedFulfillmentType}`
+          ) as GraphQLFormattedError
+        ]);
+        return;
+      }
+
       if (
         pharmacySelectionContext.updatePreferredPharmacy() &&
         selectedPharmacyId &&
