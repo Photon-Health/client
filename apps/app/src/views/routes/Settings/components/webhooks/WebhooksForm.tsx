@@ -53,7 +53,7 @@ interface WebhooksFormProps {
   close: () => void;
 }
 
-const webhookFormCreateMutation = graphql( /* GraphQL */ `
+const webhookFormCreateMutation = graphql(/* GraphQL */ `
   mutation WebhookFormCreateMutation($url: String!, $sharedSecret: String!, $filters: [String!]!) {
     createWebhookConfig(url: $url, filters: $filters, sharedSecret: $sharedSecret)
   }
