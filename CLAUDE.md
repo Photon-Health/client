@@ -326,12 +326,11 @@ The prescribe workflow lives in Solid.js web components (`packages/elements`, `p
 
 | Category | Type | Description |
 |----------|------|-------------|
-| `elementViewed` | `ElementViewEvent` | element lifecycle — each variant has a unique `name` (e.g. "New Prescriptions Element Viewed", "Signature Attestation Element Viewed") |
+| `elementViewed` | `ElementViewEvent` | element lifecycle — each variant has a unique `name`: "Prescribe Workflow Viewed", "Signature Attestation Element Viewed" |
 | `ctaClicked` | `CtaClickEvent` | Call-to-action clicks — each variant has a unique descriptive `name` |
-| `fieldInteraction` | `FieldInteractionEvent` | Form field completeness — all share `name: 'Field Interaction'` with `formName`, `fieldName`, `hasValue`, `isOptional` |
+| `fieldInteraction` | `FieldInteractionEvent` | Form interaction — all variants share `name: 'Field Interaction'` and a `formName`, but carry different payloads |
 
-CTA click events have two sub-types:
-CTA event names: "Patient Created", "Patient Updated", "Order Sent", "Prescriptions Activated", "Signature Attestation Agreed", "Signature Attestation Canceled", "Order Canceled", "Draft Prescription Added", "Draft Prescription Edited", "Draft Prescription Deleted", "Added To Medication History", "Combine Orders Confirmed", "Combine Orders Rejected", "Screening Alert Acknowledged", "Screening Alert Canceled", "Pharmacy Selected".
+CTA event names: "Patient Created", "Patient Updated", "Patient Edited", "Order Sent", "Prescriptions Activated", "Signature Attestation Agreed", "Signature Attestation Canceled", "Order Canceled", "Draft Prescription Added", "Draft Prescription Edited", "Draft Prescription Deleted", "Added To Medication History", "Combine Orders Confirmed", "Combine Orders Rejected", "Screening Alert Acknowledged", "Screening Alert Canceled", "Pharmacy Selected by Provider".
 
 *Type-safe dispatch* — `AnalyticsEventMap` (in the SDK) maps each `AnalyticsCategory` to its event type. The generic function `dispatchAnalyticsTrackEvent<C>(category, event)` enforces that the category and event type are always coupled at compile time.
 
@@ -340,7 +339,7 @@ CTA event names: "Patient Created", "Patient Updated", "Order Sent", "Prescripti
 const { dispatchAnalyticsTrackEvent } = usePrescribeEventDispatch();
 dispatchAnalyticsTrackEvent('ctaClicked', { name: 'Order Sent', buttonText: 'Send', ... });
 dispatchAnalyticsTrackEvent('fieldInteraction', { name: 'Field Interaction', formName: '...', ... });
-dispatchAnalyticsTrackEvent('elementViewed', { name: 'New Prescriptions Page Viewed', ... });
+dispatchAnalyticsTrackEvent('elementViewed', { name: 'Prescribe Workflow Viewed', ... });
 ```
 This dispatches a `photon-analytics-track-event` CustomEvent (`composed: true, bubbles: true`) with `detail: { ...event, category, timestamp }`.
 

@@ -34,7 +34,6 @@ export interface PharmacySelectionContextType {
   fulfillmentType: Accessor<types.FulfillmentType | undefined>;
   updatePreferredPharmacy: Accessor<boolean>;
   autoRoutedPharmacyId: Accessor<string | undefined>;
-  isAutoRouted: Accessor<boolean>;
 
   // Routing
   routingConstraints: Accessor<RoutingConstraint[]>;
@@ -132,8 +131,6 @@ export const PharmacySelectionProvider = (props: PharmacySelectionProviderProps)
     }
   });
 
-  const isAutoRouted = createMemo(() => Boolean(autoRoutedPharmacyId()));
-
   const enableLocalPickup = createMemo(
     () => props.enableLocalPickup || (!props.enableSendToPatient && !props.mailOrderIds)
   );
@@ -157,7 +154,6 @@ export const PharmacySelectionProvider = (props: PharmacySelectionProviderProps)
     fulfillmentType,
     updatePreferredPharmacy,
     autoRoutedPharmacyId,
-    isAutoRouted,
 
     routingConstraints,
     combinedRoutingConstraint,
