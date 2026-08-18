@@ -13,7 +13,6 @@ export const mockPharmacySelectionContextValues = (): PharmacySelectionContextTy
     fulfillmentType,
     updatePreferredPharmacy,
     autoRoutedPharmacyId: () => undefined,
-    isAutoRouted: () => false,
     routingConstraints: () => [],
     combinedRoutingConstraint: () => ({
       prescriptions: [],

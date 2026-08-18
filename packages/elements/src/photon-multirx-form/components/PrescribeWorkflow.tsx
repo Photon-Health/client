@@ -348,11 +348,29 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
     try {
       const selectedPharmacyId = pharmacySelectionContext.pharmacyId();
+      const selectedFulfillmentType = pharmacySelectionContext.fulfillmentType();
+
+      if (selectedFulfillmentType && !selectedPharmacyId) {
+        setIsLoading(false);
+        triggerToast({
+          status: 'error',
+          header: 'Error Creating Order',
+          body: `Please choose a pharmacy for ${
+            selectedFulfillmentType === 'PICK_UP' ? 'Local Pickup' : 'Mail Order'
+          }, or choose Send to Patient`
+        });
+        dispatchOrderError([
+          new Error(
+            `Pharmacy required for fullfilment type ${selectedFulfillmentType}`
+          ) as GraphQLFormattedError
+        ]);
+        return;
+      }
 
       if (
         pharmacySelectionContext.updatePreferredPharmacy() &&
         selectedPharmacyId &&
-        pharmacySelectionContext.fulfillmentType() === 'PICK_UP'
+        selectedFulfillmentType === 'PICK_UP'
       ) {
         const patient = props.formStore.patient?.value;
         if (patient?.preferredPharmacies && patient?.preferredPharmacies?.length > 0) {
@@ -397,7 +415,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           ...(props.groupId ? { groupId: props.groupId } : {}),
           patientId: props.formStore.patient?.value.id,
           pharmacyId,
-          fulfillmentType: pharmacySelectionContext.fulfillmentType() || '',
+          fulfillmentType: selectedFulfillmentType || '',
           ...(addressId()
             ? { addressId: addressId() }
             : hasValidAddress()
@@ -423,7 +441,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         buttonText: 'Send',
         orderId: orderData!.createOrder.id,
         prescriptionCount: draftPrescriptions().length,
-        fulfillmentType: pharmacySelectionContext.fulfillmentType() || 'SEND_TO_PATIENT',
+        fulfillmentType: selectedFulfillmentType || 'SEND_TO_PATIENT',
         hasPreferredPharmacy: hasPreferredPharmacy(),
         setAsPreferred: pharmacySelectionContext.updatePreferredPharmacy(),
         pharmacyId: pharmacyId || null,
@@ -587,7 +605,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 <Show when={props.enableOrder && needsSupervisor()}>
                   <SupervisorCard actions={props.formActions} store={props.formStore} />
                 </Show>
-                <Show when={props.enableOrder && !pharmacySelectionContext.isAutoRouted()}>
+                <Show when={props.enableOrder && !pharmacySelectionContext.autoRoutedPharmacyId()}>
                   <OrderCard store={props.formStore} />
                 </Show>
                 <Show when={forceAddressForm() && props.formStore.patient?.value?.id}>
@@ -610,7 +628,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     }}
                   />
                 </Show>
-                <Show when={props.enableOrder && pharmacySelectionContext.isAutoRouted()}>
+                <Show when={props.enableOrder && pharmacySelectionContext.autoRoutedPharmacyId()}>
                   <PharmacyCard pharmacyId={pharmacySelectionContext.autoRoutedPharmacyId()} />
                 </Show>
                 <Show when={!props.hideSubmit && draftPrescriptions().length > 0}>

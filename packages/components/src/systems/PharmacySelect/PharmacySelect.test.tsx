@@ -108,6 +108,7 @@ test('tab switching updates fulfillment type and preserves pharmacy selection pe
   expect(ctxRef.pharmacyId()).toBeUndefined();
 
   await user.click(screen.getByTestId('mail-pharmacy-phr_mail_1'));
+  expect(ctxRef.fulfillmentType()).toBe('MAIL_ORDER');
   expect(ctxRef.pharmacyId()).toBe('phr_mail_1');
 
   await user.click(screen.getByText('Send to Patient'));
@@ -119,6 +120,7 @@ test('tab switching updates fulfillment type and preserves pharmacy selection pe
   expect(ctxRef.pharmacyId()).toBe('phr_mail_1');
 
   await user.click(screen.getByTestId('mail-pharmacy-phr_mail_2'));
+  expect(ctxRef.fulfillmentType()).toBe('MAIL_ORDER');
   expect(ctxRef.pharmacyId()).toBe('phr_mail_2');
 
   await user.click(screen.getByText('Local Pickup'));
