@@ -103,6 +103,32 @@ async function loadTreatmentOptions(
   return req?.data?.treatments?.map((t) => ({ ...t, isOffCatalog: true })) ?? [];
 }
 
+const normalizeTreatmentName = (name?: string | null) => name?.toLowerCase().trim() ?? '';
+
+/**
+ * A single medication can have several rows in the medications table — one per package NDC
+ * MediSpan has published for it — all sharing a name and medispan id but with distinct ids.
+ * Treatment search always resolves to the newest of those, which means a medication the org
+ * has catalogued shows up twice: once from the catalog, once from search under a different id.
+ *
+ * That breaks `disable-list`, which matches on treatment id: the catalogued id is disabled
+ * while its search-returned twin is not. Drop the search result so the catalogued version
+ * wins, since that's the one the org's configuration refers to.
+ *
+ * Matching is on display name because it's the only field both queries return. Catalog names
+ * come from a generated display name whose `scd`/`sbd` variants ignore `prescribable_name`
+ * (see `generateMedicationDisplayName` in lambdas' medication model), so duplicates in
+ * catalogs holding those rows won't collapse — they're left as-is rather than mismatched.
+ */
+export function excludeCatalogDuplicates(
+  treatmentOptions: Treatment[],
+  catalogTreatments: Treatment[]
+): Treatment[] {
+  const catalogNames = new Set(catalogTreatments.map((t) => normalizeTreatmentName(t.name)));
+
+  return treatmentOptions.filter((t) => !catalogNames.has(normalizeTreatmentName(t.name)));
+}
+
 function getFilteredData(
   props: ComponentProps,
   searchText: string,
@@ -113,13 +139,13 @@ function getFilteredData(
   // If no data, return empty array
   if (!store.catalog.data) return [];
 
+  const catalogTreatments = store.catalog.data.treatments.map((x) => x as Treatment);
+
   const catalogData = [
     ...(props.offCatalogOption ? [props.offCatalogOption as Treatment] : []),
-    ...(store.catalog.data
-      ? store.catalog.data.templates.map((x) => x as PrescriptionTemplate)
-      : []),
-    ...(store.catalog.data ? store.catalog.data.treatments.map((x) => x as Treatment) : []),
-    ...treatmentOptions
+    ...store.catalog.data.templates.map((x) => x as PrescriptionTemplate),
+    ...catalogTreatments,
+    ...excludeCatalogDuplicates(treatmentOptions, catalogTreatments)
   ];
 
   const searchTerms = searchText.toLowerCase().split(/\s+/); // Split search text by whitespace into individual words
