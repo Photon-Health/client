@@ -124,13 +124,18 @@ export function getFilteredData(
   // If no data, return empty array
   if (!store.catalog.data) return [];
 
+  const prescriptionTemplates = store.catalog.data.templates.map((x) => x as PrescriptionTemplate);
   const catalogTreatments = store.catalog.data.treatments.map((x) => x as Treatment);
+  const allTreatmentsExcludingCatalogDuplicates = excludeCatalogDuplicates(
+    treatmentOptions,
+    catalogTreatments
+  );
 
   const catalogData = [
     ...(props.offCatalogOption ? [props.offCatalogOption as Treatment] : []),
-    ...store.catalog.data.templates.map((x) => x as PrescriptionTemplate),
+    ...prescriptionTemplates,
     ...catalogTreatments,
-    ...excludeCatalogDuplicates(treatmentOptions, catalogTreatments)
+    ...allTreatmentsExcludingCatalogDuplicates
   ];
 
   const searchTerms = searchText.toLowerCase().split(/\s+/); // Split search text by whitespace into individual words
