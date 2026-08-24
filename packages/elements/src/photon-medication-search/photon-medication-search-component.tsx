@@ -105,22 +105,7 @@ async function loadTreatmentOptions(
 
 const normalizeTreatmentName = (name?: string | null) => name?.toLowerCase().trim() ?? '';
 
-/**
- * A single medication can have several rows in the medications table — one per package NDC
- * MediSpan has published for it — all sharing a name and medispan id but with distinct ids.
- * Treatment search always resolves to the newest of those, which means a medication the org
- * has catalogued shows up twice: once from the catalog, once from search under a different id.
- *
- * That breaks `disable-list`, which matches on treatment id: the catalogued id is disabled
- * while its search-returned twin is not. Drop the search result so the catalogued version
- * wins, since that's the one the org's configuration refers to.
- *
- * Matching is on display name because it's the only field both queries return. Catalog names
- * come from a generated display name whose `scd`/`sbd` variants ignore `prescribable_name`
- * (see `generateMedicationDisplayName` in lambdas' medication model), so duplicates in
- * catalogs holding those rows won't collapse — they're left as-is rather than mismatched.
- */
-export function excludeCatalogDuplicates(
+function excludeCatalogDuplicates(
   treatmentOptions: Treatment[],
   catalogTreatments: Treatment[]
 ): Treatment[] {
@@ -129,7 +114,7 @@ export function excludeCatalogDuplicates(
   return treatmentOptions.filter((t) => !catalogNames.has(normalizeTreatmentName(t.name)));
 }
 
-function getFilteredData(
+export function getFilteredData(
   props: ComponentProps,
   searchText: string,
   treatmentOptions: Treatment[]
@@ -280,7 +265,7 @@ function getGroupsConfig(props: ComponentProps) {
 
 // Component Definition
 
-interface ComponentProps {
+export interface ComponentProps {
   label?: string;
   required?: boolean;
   invalid?: boolean;
