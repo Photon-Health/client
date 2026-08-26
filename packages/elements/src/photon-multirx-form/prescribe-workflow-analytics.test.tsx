@@ -264,22 +264,26 @@ test('pharmacy tab field interactions', async () => {
   await user.click(screen.getByText('Local Pickup'));
 
   const localPickupEvent = analyticsEvents.find(
-    isFieldInteraction({ tabSelected: 'Local Pickup' })
+    isFieldInteraction({ fieldName: 'activeTab', value: 'Local Pickup' })
   );
   expect(localPickupEvent?.detail).toEqual(
     expect.objectContaining({
       formName: 'select_pharmacy',
-      hasPreferredPharmacy: false,
+      fieldName: 'activeTab',
+      value: 'Local Pickup',
       timestamp: expect.any(String)
     })
   );
 
   await user.click(screen.getByText('Mail Order'));
-  const mailOrderEvent = analyticsEvents.find(isFieldInteraction({ tabSelected: 'Mail Order' }));
+  const mailOrderEvent = analyticsEvents.find(
+    isFieldInteraction({ fieldName: 'activeTab', value: 'Mail Order' })
+  );
   expect(mailOrderEvent?.detail).toEqual(
     expect.objectContaining({
       formName: 'select_pharmacy',
-      hasPreferredPharmacy: false,
+      fieldName: 'activeTab',
+      value: 'Mail Order',
       timestamp: expect.any(String)
     })
   );
@@ -287,12 +291,13 @@ test('pharmacy tab field interactions', async () => {
   // Click back to "Send to Patient" tab
   await user.click(screen.getByText('Send to Patient'));
   const sendToPatientEvent = analyticsEvents.find(
-    isFieldInteraction({ tabSelected: 'Send to Patient' })
+    isFieldInteraction({ fieldName: 'activeTab', value: 'Send to Patient' })
   );
   expect(sendToPatientEvent?.detail).toEqual(
     expect.objectContaining({
       formName: 'select_pharmacy',
-      hasPreferredPharmacy: false,
+      fieldName: 'activeTab',
+      value: 'Send to Patient',
       timestamp: expect.any(String)
     })
   );
