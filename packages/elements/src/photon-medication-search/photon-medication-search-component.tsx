@@ -103,7 +103,18 @@ async function loadTreatmentOptions(
   return req?.data?.treatments?.map((t) => ({ ...t, isOffCatalog: true })) ?? [];
 }
 
-function getFilteredData(
+const normalizeTreatmentName = (name?: string | null) => name?.toLowerCase().trim() ?? '';
+
+function excludeCatalogDuplicates(
+  treatmentOptions: Treatment[],
+  catalogTreatments: Treatment[]
+): Treatment[] {
+  const catalogNames = new Set(catalogTreatments.map((t) => normalizeTreatmentName(t.name)));
+
+  return treatmentOptions.filter((t) => !catalogNames.has(normalizeTreatmentName(t.name)));
+}
+
+export function getFilteredData(
   props: ComponentProps,
   searchText: string,
   treatmentOptions: Treatment[]
@@ -113,13 +124,18 @@ function getFilteredData(
   // If no data, return empty array
   if (!store.catalog.data) return [];
 
+  const prescriptionTemplates = store.catalog.data.templates.map((x) => x as PrescriptionTemplate);
+  const catalogTreatments = store.catalog.data.treatments.map((x) => x as Treatment);
+  const allTreatmentsExcludingCatalogDuplicates = excludeCatalogDuplicates(
+    treatmentOptions,
+    catalogTreatments
+  );
+
   const catalogData = [
     ...(props.offCatalogOption ? [props.offCatalogOption as Treatment] : []),
-    ...(store.catalog.data
-      ? store.catalog.data.templates.map((x) => x as PrescriptionTemplate)
-      : []),
-    ...(store.catalog.data ? store.catalog.data.treatments.map((x) => x as Treatment) : []),
-    ...treatmentOptions
+    ...prescriptionTemplates,
+    ...catalogTreatments,
+    ...allTreatmentsExcludingCatalogDuplicates
   ];
 
   const searchTerms = searchText.toLowerCase().split(/\s+/); // Split search text by whitespace into individual words
@@ -254,7 +270,7 @@ function getGroupsConfig(props: ComponentProps) {
 
 // Component Definition
 
-interface ComponentProps {
+export interface ComponentProps {
   label?: string;
   required?: boolean;
   invalid?: boolean;
