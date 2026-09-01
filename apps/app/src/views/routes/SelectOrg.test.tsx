@@ -96,6 +96,35 @@ test('shows orgs and pending invites together; expired invites are hidden', asyn
   expect(screen.queryByText(/expired org/i)).not.toBeInTheDocument();
 });
 
+test('hides invites for orgs the user is already a member of', async () => {
+  mockInvites([
+    makeInvite(),
+    makeInvite({ id: 'uinv_2', organizationId: 'org_a', organizationName: 'alpha health' })
+  ]);
+
+  renderWithProviders(<SelectOrg />);
+
+  // org_a renders as a member org, but not as an invite
+  expect(await screen.findByText('Invited org')).toBeInTheDocument();
+  expect(screen.getByText('Alpha health')).toBeInTheDocument();
+  expect(screen.getAllByRole('button', { name: /accept invite/i })).toHaveLength(1);
+});
+
+test('de-dupes invites by org id, keeping same-name invites for different orgs', async () => {
+  mockInvites([
+    makeInvite(),
+    // duplicate of the same org — collapsed
+    makeInvite({ id: 'uinv_2', organizationName: 'Invited Org' }),
+    // same name but a different org — kept
+    makeInvite({ id: 'uinv_3', organizationId: 'org_other' })
+  ]);
+
+  renderWithProviders(<SelectOrg />);
+
+  expect(await screen.findAllByRole('button', { name: /accept invite/i })).toHaveLength(2);
+  expect(screen.getAllByText('Invited org')).toHaveLength(2);
+});
+
 test('accepting an invite logs in to the invited org', async () => {
   mockInvites([makeInvite({ organizationId: 'org_invited' })]);
 
@@ -118,6 +147,19 @@ test('single org with a pending invite renders the page instead of auto-logging 
   expect(await screen.findByText('Invited org')).toBeInTheDocument();
   expect(screen.getByText('Alpha health')).toBeInTheDocument();
   expect(photonMock.login).not.toHaveBeenCalled();
+});
+
+test('single org auto-logs in when the only invite is for that same org', async () => {
+  photonMock.organizations = [{ id: 'org_a', name: 'alpha health' }];
+  mockInvites([makeInvite({ organizationId: 'org_a', organizationName: 'alpha health' })]);
+
+  renderWithProviders(<SelectOrg />);
+
+  await waitFor(() => {
+    expect(photonMock.login).toHaveBeenCalledWith(
+      expect.objectContaining({ organizationId: 'org_a' })
+    );
+  });
 });
 
 test('single org with no invites auto-logs in', async () => {

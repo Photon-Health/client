@@ -15,7 +15,7 @@ import { FiLogIn } from 'react-icons/fi';
 import { useQuery } from '@apollo/client';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { myInvitesQuery } from '../../queries/clinical-api';
 
@@ -33,7 +33,23 @@ export const SelectOrg = () => {
     client: clinicalClient
   });
 
-  const pendingInvites = (invitesData?.myInvites ?? []).filter((invite) => !invite.expired);
+  const pendingInvites = useMemo(() => {
+    const memberOrgIds = new Set<string>(
+      (organizations || []).map((org: { id: string }) => org.id)
+    );
+    const seenOrgIds = new Set<string>();
+    return (invitesData?.myInvites ?? []).filter((invite) => {
+      if (invite.expired || memberOrgIds.has(invite.organizationId)) {
+        return false;
+      }
+      const orgId = invite.organizationId;
+      if (seenOrgIds.has(orgId)) {
+        return false;
+      }
+      seenOrgIds.add(orgId);
+      return true;
+    });
+  }, [organizations, invitesData]);
 
   useEffect(() => {
     if (loading || invitesLoading) {
@@ -65,7 +81,7 @@ export const SelectOrg = () => {
         organizationId: organizations[0].id
       });
     }
-  }, [organizations, loading, invitesLoading, invitesData]);
+  }, [organizations, loading, invitesLoading, pendingInvites]);
 
   useEffect(() => {
     if (searchParams.has('orgs')) {
