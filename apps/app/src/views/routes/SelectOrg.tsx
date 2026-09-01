@@ -30,7 +30,10 @@ export const SelectOrg = () => {
 
   const { login, logout, getOrganizations, setOrganization, clinicalClient } = usePhoton();
   const { organizations, loading } = getOrganizations();
+
+  // Not passing in any user ID here, just using this as a basic "on-off" switch.
   const { enabled: invitesEnabled, loading: flagLoading } = useFeatureFlag('select_org_invites');
+
   const { data: invitesData, loading: invitesLoading } = useQuery(myInvitesQuery, {
     client: clinicalClient,
     skip: !invitesEnabled
