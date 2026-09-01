@@ -92,6 +92,7 @@ test('shows orgs and pending invites together; expired invites are hidden', asyn
 
   expect(screen.getByText(/pending invitations/i)).toBeInTheDocument();
   expect(screen.getByText('Invited org')).toBeInTheDocument();
+  expect(screen.getByText(/invited by admin@example.com/i)).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /accept invite/i })).toBeInTheDocument();
   expect(screen.queryByText(/expired org/i)).not.toBeInTheDocument();
 });

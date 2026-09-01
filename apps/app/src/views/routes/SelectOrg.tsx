@@ -123,9 +123,14 @@ export const SelectOrg = () => {
 
   const invites = pendingInvites.map((invite) => (
     <HStack key={invite.id} justify="space-between">
-      <Text fontSize="lg" fontWeight="medium">
-        {displayName(invite.organizationName)}
-      </Text>
+      <Stack spacing="0">
+        <Text fontSize="lg" fontWeight="medium">
+          {displayName(invite.organizationName)}
+        </Text>
+        <Text color="muted" fontSize="sm">
+          Invited by {invite.inviter}
+        </Text>
+      </Stack>
       <Button
         size="sm"
         variant="primary"
