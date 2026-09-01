@@ -12,9 +12,14 @@ import {
 
 import { FiLogIn } from 'react-icons/fi';
 
+import { useQuery } from '@apollo/client';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
 import { useEffect } from 'react';
+
+import { myInvitesQuery } from '../../queries/clinical-api';
+
+const displayName = (name: string) => name.charAt(0).toUpperCase() + name.slice(1);
 
 export const SelectOrg = () => {
   const location = useLocation();
@@ -22,32 +27,45 @@ export const SelectOrg = () => {
 
   const from = `${(location.pathname || '/') + (location.search || '')}`;
 
-  const { login, logout, getOrganizations, setOrganization } = usePhoton();
+  const { login, logout, getOrganizations, setOrganization, clinicalClient } = usePhoton();
   const { organizations, loading } = getOrganizations();
+  const { data: invitesData, loading: invitesLoading } = useQuery(myInvitesQuery, {
+    client: clinicalClient
+  });
+
+  const pendingInvites = (invitesData?.myInvites ?? []).filter((invite) => !invite.expired);
 
   useEffect(() => {
-    if (!loading) {
-      if (organizations?.length === 0) {
-        const queryString = location.search.replace(/^\?/, '');
-        const searchParams = new URLSearchParams(queryString);
-        searchParams.append('orgs', '0');
-
-        if (location?.pathname && location?.pathname !== '/') {
-          searchParams.append('pathname', location.pathname);
-        }
-
-        logout({ returnTo: `${window.location.origin}?${searchParams.toString()}` });
-      } else if (organizations?.length === 1) {
-        setOrganization(organizations[0].id);
-        login({
-          appState: {
-            returnTo: from
-          },
-          organizationId: organizations[0].id
-        });
-      }
+    if (loading || invitesLoading) {
+      return;
     }
-  }, [organizations, loading]);
+
+    // A user with pending invites always sees this page, even if they would
+    // otherwise be auto-logged-in (one org) or logged out (no orgs).
+    if (pendingInvites.length > 0) {
+      return;
+    }
+
+    if (organizations?.length === 0) {
+      const queryString = location.search.replace(/^\?/, '');
+      const searchParams = new URLSearchParams(queryString);
+      searchParams.append('orgs', '0');
+
+      if (location?.pathname && location?.pathname !== '/') {
+        searchParams.append('pathname', location.pathname);
+      }
+
+      logout({ returnTo: `${window.location.origin}?${searchParams.toString()}` });
+    } else if (organizations?.length === 1) {
+      setOrganization(organizations[0].id);
+      login({
+        appState: {
+          returnTo: from
+        },
+        organizationId: organizations[0].id
+      });
+    }
+  }, [organizations, loading, invitesLoading, invitesData]);
 
   useEffect(() => {
     if (searchParams.has('orgs')) {
@@ -63,7 +81,7 @@ export const SelectOrg = () => {
     return (
       <HStack key={name} justify="space-between">
         <Text fontSize="lg" fontWeight="medium">
-          {name.charAt(0).toUpperCase() + name.slice(1)}
+          {displayName(name)}
         </Text>
         <Button
           key={id}
@@ -87,7 +105,32 @@ export const SelectOrg = () => {
     );
   });
 
-  if (loading) {
+  const invites = pendingInvites.map((invite) => (
+    <HStack key={invite.id} justify="space-between">
+      <Text fontSize="lg" fontWeight="medium">
+        {displayName(invite.organizationName)}
+      </Text>
+      <Button
+        size="sm"
+        variant="primary"
+        rightIcon={<FiLogIn />}
+        value={invite.organizationId}
+        onClick={() => {
+          setOrganization(invite.organizationId);
+          login({
+            organizationId: invite.organizationId,
+            appState: {
+              returnTo: from
+            }
+          });
+        }}
+      >
+        Accept Invite
+      </Button>
+    </HStack>
+  ));
+
+  if (loading || invitesLoading) {
     return (
       <Center padding="1.5em" height="100vh">
         <CircularProgress isIndeterminate color="green.300" />
@@ -97,18 +140,32 @@ export const SelectOrg = () => {
 
   return (
     <Container maxW="2xl">
-      {organizations?.length > 1 && (
+      {(organizations?.length > 1 || pendingInvites.length > 0) && (
         <Card p={5} mt={5} borderTopWidth="4px" borderColor="accent">
           <Stack spacing="3">
             <Text fontSize="lg" fontWeight="medium" alignSelf="center">
               Select an organization
             </Text>
             <Text color="muted" fontSize="sm" alignSelf="center">
-              You are a member of multiple organizations. Please choose the organization you would
-              like to log in to.
+              {organizations?.length > 1
+                ? 'You are a member of multiple organizations. Please choose the organization you would like to log in to.'
+                : 'You have pending invitations. Accept an invitation to continue.'}
             </Text>
-            <Divider />
-            {orgs}
+            {organizations?.length > 0 && (
+              <>
+                <Divider />
+                {orgs}
+              </>
+            )}
+            {pendingInvites.length > 0 && (
+              <>
+                <Divider />
+                <Text fontSize="md" fontWeight="medium">
+                  Pending invitations
+                </Text>
+                {invites}
+              </>
+            )}
           </Stack>
         </Card>
       )}
