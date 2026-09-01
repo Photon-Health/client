@@ -1,6 +1,8 @@
 import { ApiObject, IdentifyTraits, RudderAnalytics } from '@rudderstack/analytics-js';
 import mixpanel from 'mixpanel-browser';
 
+import { FEATURE_FLAG_DEFAULTS, FlagKeys } from './featureFlags';
+
 const RUDDERSTACK_WRITE_KEY = import.meta.env.VITE_RUDDERSTACK_WRITE_KEY;
 const RUDDERSTACK_DATA_PLANE_URL = import.meta.env.VITE_RUDDERSTACK_DATA_PLANE_URL;
 const MIXPANEL_TOKEN = import.meta.env.VITE_MIXPANEL_TOKEN;
@@ -56,6 +58,23 @@ export class ProviderAnalytics {
     }
     if (this.mixpanelEnabled) {
       mixpanel.identify(userId);
+    }
+  }
+
+  /**
+   * Check a Mixpanel feature flag. Resolves to the flag's default from
+   * `FEATURE_FLAG_DEFAULTS` when Mixpanel is not configured or the lookup
+   * fails.
+   */
+  async isFeatureEnabled(flagName: FlagKeys): Promise<boolean> {
+    const fallbackValue = FEATURE_FLAG_DEFAULTS[flagName];
+    if (!this.mixpanelEnabled) {
+      return fallbackValue;
+    }
+    try {
+      return await mixpanel.flags.is_enabled(flagName, fallbackValue);
+    } catch {
+      return fallbackValue;
     }
   }
 

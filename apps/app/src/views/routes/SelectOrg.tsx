@@ -17,6 +17,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
 import { useEffect, useMemo } from 'react';
 
+import { useFeatureFlag } from '../../hooks/useFeatureFlag';
 import { myInvitesQuery } from '../../queries/clinical-api';
 
 const displayName = (name: string) => name.charAt(0).toUpperCase() + name.slice(1);
@@ -29,11 +30,16 @@ export const SelectOrg = () => {
 
   const { login, logout, getOrganizations, setOrganization, clinicalClient } = usePhoton();
   const { organizations, loading } = getOrganizations();
+  const { enabled: invitesEnabled, loading: flagLoading } = useFeatureFlag('select_org_invites');
   const { data: invitesData, loading: invitesLoading } = useQuery(myInvitesQuery, {
-    client: clinicalClient
+    client: clinicalClient,
+    skip: !invitesEnabled
   });
 
   const pendingInvites = useMemo(() => {
+    if (!invitesEnabled) {
+      return [];
+    }
     const memberOrgIds = new Set<string>(
       (organizations || []).map((org: { id: string }) => org.id)
     );
@@ -49,10 +55,10 @@ export const SelectOrg = () => {
       seenOrgIds.add(orgId);
       return true;
     });
-  }, [organizations, invitesData]);
+  }, [organizations, invitesData, invitesEnabled]);
 
   useEffect(() => {
-    if (loading || invitesLoading) {
+    if (loading || flagLoading || invitesLoading) {
       return;
     }
 
@@ -81,7 +87,7 @@ export const SelectOrg = () => {
         organizationId: organizations[0].id
       });
     }
-  }, [organizations, loading, invitesLoading, pendingInvites]);
+  }, [organizations, loading, flagLoading, invitesLoading, pendingInvites]);
 
   useEffect(() => {
     if (searchParams.has('orgs')) {
@@ -151,7 +157,7 @@ export const SelectOrg = () => {
     </HStack>
   ));
 
-  if (loading || invitesLoading) {
+  if (loading || flagLoading || invitesLoading) {
     return (
       <Center padding="1.5em" height="100vh">
         <CircularProgress isIndeterminate color="green.300" />

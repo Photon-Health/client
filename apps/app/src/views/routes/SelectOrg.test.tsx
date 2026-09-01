@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { HttpResponse } from 'msw';
 import { beforeEach, expect, test, vi } from 'vitest';
 
-import { setupHarness } from '../../test-utils';
+import { harness, setupHarness } from '../../test-utils';
 import { SelectOrg } from './SelectOrg';
 
 // SelectOrg needs more of usePhoton than the global harness mock exposes
@@ -77,6 +77,7 @@ beforeEach(() => {
     { id: 'org_a', name: 'alpha health' },
     { id: 'org_b', name: 'beta clinic' }
   ];
+  harness.featureFlags.select_org_invites = true;
 });
 
 test('shows orgs and pending invites together; expired invites are hidden', async () => {
@@ -153,6 +154,31 @@ test('single org with a pending invite renders the page instead of auto-logging 
 test('single org auto-logs in when the only invite is for that same org', async () => {
   photonMock.organizations = [{ id: 'org_a', name: 'alpha health' }];
   mockInvites([makeInvite({ organizationId: 'org_a', organizationName: 'alpha health' })]);
+
+  renderWithProviders(<SelectOrg />);
+
+  await waitFor(() => {
+    expect(photonMock.login).toHaveBeenCalledWith(
+      expect.objectContaining({ organizationId: 'org_a' })
+    );
+  });
+});
+
+test('flag off: invites are not shown', async () => {
+  harness.featureFlags.select_org_invites = false;
+  mockInvites([makeInvite()]);
+
+  renderWithProviders(<SelectOrg />);
+
+  expect(await screen.findByText('Alpha health')).toBeInTheDocument();
+  expect(screen.queryByText(/pending invitations/i)).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /accept invite/i })).not.toBeInTheDocument();
+});
+
+test('flag off: single org auto-logs in even with pending invites', async () => {
+  harness.featureFlags.select_org_invites = false;
+  photonMock.organizations = [{ id: 'org_a', name: 'alpha health' }];
+  mockInvites([makeInvite()]);
 
   renderWithProviders(<SelectOrg />);
 
