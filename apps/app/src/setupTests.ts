@@ -82,6 +82,7 @@ export const harness: {
   user: MockUser;
   isAuthenticated: boolean;
   isLoading: boolean;
+  featureFlags: Record<string, boolean>;
   trackSpy: Mock<(...args: unknown[]) => void>;
   identifySpy: Mock<(...args: unknown[]) => void>;
 } = {
@@ -90,6 +91,8 @@ export const harness: {
   user: DEFAULT_USER,
   isAuthenticated: true,
   isLoading: false,
+  // Mocked Mixpanel flags — unset flags resolve to FEATURE_FLAG_DEFAULTS.
+  featureFlags: {},
   // Spies are mutable references (not replaced) so captured references in
   // the vi.mock factories stay valid across tests; `.mockClear()` rather
   // than reassign.
@@ -113,10 +116,15 @@ vi.mock('@photonhealth/react', async (importOriginal) => {
   };
 });
 
-vi.mock('./configs/providerAnalytics', () => ({
-  getProviderAnalytics: () => ({
-    track: (...args: unknown[]) => harness.trackSpy(...args),
-    identify: (...args: unknown[]) => harness.identifySpy(...args),
-    isInitialized: true
-  })
-}));
+vi.mock('./configs/providerAnalytics', async () => {
+  const { FEATURE_FLAG_DEFAULTS } = await import('./configs/featureFlags');
+  return {
+    getProviderAnalytics: () => ({
+      track: (...args: unknown[]) => harness.trackSpy(...args),
+      identify: (...args: unknown[]) => harness.identifySpy(...args),
+      isFeatureEnabled: async (flagName: keyof typeof FEATURE_FLAG_DEFAULTS) =>
+        harness.featureFlags[flagName] ?? FEATURE_FLAG_DEFAULTS[flagName],
+      isInitialized: true
+    })
+  };
+});
