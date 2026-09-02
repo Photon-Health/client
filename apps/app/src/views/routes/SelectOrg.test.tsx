@@ -140,6 +140,7 @@ test('accepting an invite logs in to the invited org', async () => {
   );
 });
 
+// Comment
 test('single org with a pending invite renders the page instead of auto-logging in', async () => {
   photonMock.organizations = [{ id: 'org_a', name: 'alpha health' }];
   mockInvites([makeInvite()]);
