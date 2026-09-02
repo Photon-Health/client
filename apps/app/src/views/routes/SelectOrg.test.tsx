@@ -94,7 +94,7 @@ test('shows orgs and pending invites together; expired invites are hidden', asyn
   expect(screen.getByText(/pending invitations/i)).toBeInTheDocument();
   expect(screen.getByText('Invited org')).toBeInTheDocument();
   expect(screen.getByText(/invited by admin@example.com/i)).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /accept invite/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /join/i })).toBeInTheDocument();
   expect(screen.queryByText(/expired org/i)).not.toBeInTheDocument();
 });
 
@@ -109,7 +109,7 @@ test('hides invites for orgs the user is already a member of', async () => {
   // org_a renders as a member org, but not as an invite
   expect(await screen.findByText('Invited org')).toBeInTheDocument();
   expect(screen.getByText('Alpha health')).toBeInTheDocument();
-  expect(screen.getAllByRole('button', { name: /accept invite/i })).toHaveLength(1);
+  expect(screen.getAllByRole('button', { name: /join/i })).toHaveLength(1);
 });
 
 test('de-dupes invites by org id, keeping same-name invites for different orgs', async () => {
@@ -123,7 +123,7 @@ test('de-dupes invites by org id, keeping same-name invites for different orgs',
 
   renderWithProviders(<SelectOrg />);
 
-  expect(await screen.findAllByRole('button', { name: /accept invite/i })).toHaveLength(2);
+  expect(await screen.findAllByRole('button', { name: /join/i })).toHaveLength(2);
   expect(screen.getAllByText('Invited org')).toHaveLength(2);
 });
 
@@ -132,7 +132,7 @@ test('accepting an invite logs in to the invited org', async () => {
 
   renderWithProviders(<SelectOrg />);
 
-  await userEvent.click(await screen.findByRole('button', { name: /accept invite/i }));
+  await userEvent.click(await screen.findByRole('button', { name: /join/i }));
 
   expect(photonMock.setOrganization).toHaveBeenCalledWith('org_invited');
   expect(photonMock.login).toHaveBeenCalledWith(
@@ -172,7 +172,7 @@ test('flag off: invites are not shown', async () => {
 
   expect(await screen.findByText('Alpha health')).toBeInTheDocument();
   expect(screen.queryByText(/pending invitations/i)).not.toBeInTheDocument();
-  expect(screen.queryByRole('button', { name: /accept invite/i })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /join/i })).not.toBeInTheDocument();
 });
 
 test('flag off: single org auto-logs in even with pending invites', async () => {

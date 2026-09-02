@@ -155,7 +155,7 @@ export const SelectOrg = () => {
           });
         }}
       >
-        Accept Invite
+        Join
       </Button>
     </HStack>
   ));
