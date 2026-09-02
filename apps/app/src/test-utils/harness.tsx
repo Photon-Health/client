@@ -50,6 +50,7 @@ export function setupHarness(...initialHandlers: RequestHandler[]) {
     harness.user = DEFAULT_USER;
     harness.isAuthenticated = true;
     harness.isLoading = false;
+    harness.featureFlags = {};
   });
 
   afterEach(() => {
