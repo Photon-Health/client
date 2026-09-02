@@ -22,8 +22,9 @@ vi.mock('../../views/Main', () => ({
   useOrderContext: () => ({ order: mockOrder })
 }));
 
-vi.mock('../offers', () => ({
-  getOfferType: () => 'None'
+vi.mock('../offerAnalytics', () => ({
+  getOfferType: () => 'None',
+  deriveCostType: () => undefined
 }));
 
 describe('OfferImpressionTracker', () => {

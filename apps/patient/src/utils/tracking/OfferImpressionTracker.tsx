@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
-import { EnrichedPharmacy, OfferBundleDetails } from '../models';
+import { EnrichedPharmacy, OfferBundleComplete } from '../models';
 import { useOrderContext } from '../../views/Main';
-import { getOfferType } from '../offers';
+import { deriveCostType, getOfferType } from '../offerAnalytics';
 import { Prescription } from '../../__generated__/graphql';
 import { usePatientAnalytics } from '../../hooks/usePatientAnalytics';
 
@@ -23,7 +23,7 @@ const OfferImpressionTracker = ({
   enabled
 }: {
   children: React.ReactNode;
-  offer: OfferBundleDetails | undefined;
+  offer: OfferBundleComplete | undefined;
   pharmacy: EnrichedPharmacy;
   ordinalPosition: number;
   isAlreadySelected: boolean;
@@ -71,7 +71,7 @@ const OfferImpressionTracker = ({
           isClosingSoon: pharmacy.isClosingSoon,
           isAlreadySelected: isAlreadySelected,
           deliveryEstimate: offer?.deliveryEstimate,
-          costType: offer?.costType,
+          costType: offer ? deriveCostType(offer) : undefined,
           costAmount: offer?.costAmount,
           costAmountTitle: offer?.costAmountTitle,
           retailAmount: offer?.retailAmount,
@@ -79,7 +79,7 @@ const OfferImpressionTracker = ({
           numPrescriptions: rxIds.size,
           multiMedOffer: rxIds.size > 1,
           hasRefills: rxIds.size < order.fills.length,
-          tags: offer?.tags,
+          tags: offer?.tags?.map((tag) => tag.label),
           promotions: offer?.medications?.flatMap(
             (med) =>
               med.promotions?.map((promo) => ({

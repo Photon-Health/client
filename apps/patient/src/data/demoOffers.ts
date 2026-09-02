@@ -1,11 +1,12 @@
 import { PHARMACY_BRANDING } from '../components/pharmacy-card-list';
-import { OfferBundleDetails } from '../utils/models';
+import { OfferBundleComplete } from '../utils/models';
 
-export const demoOffers: OfferBundleDetails[] = [
+export const demoOffers: OfferBundleComplete[] = [
   {
+    source: 'AMAZON_PHARMACY',
+    isPromoted: true,
     tags: [],
     deliveryEstimate: '2-3 days',
-    costType: 'PRIME_RX',
     costAmount: 50,
     costAmountTitle: 'Prime Rx Price',
     retailAmount: 100,

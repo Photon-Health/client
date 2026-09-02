@@ -1,5 +1,6 @@
 import {
   GetPharmaciesByLocationQuery,
+  GetOfferBundlesForOrderQuery,
   GetOrderQuery,
   Address as GQLAddress,
   FulfillmentType,
@@ -21,35 +22,46 @@ export type Pharmacy = NotMaybe<GetPharmaciesByLocationQuery['pharmaciesByLocati
 
 export type OrderFulfillment = NotMaybe<Order['fulfillment']>;
 
-export interface OfferBundleDetails {
+export type OfferBundleResponse = GetOfferBundlesForOrderQuery['offerBundles'][number];
+export type PrescriptionOffer = NotMaybe<OfferBundleResponse['offers']>[number];
+export type OfferAttributeTag = NotMaybe<OfferBundleResponse['attributeTags']>[number];
+
+export type OfferPrescriptionSummary = {
+  name?: string;
+  pricingType?: string;
+  amount?: number;
+  retailAmount?: number;
+  promotions?: Array<OfferPromotion>;
+};
+
+// offer bundle fields that are computed on client based on offer bundle response
+export interface OfferBundleComputed {
   deliveryEstimate?: string;
-  costType?: string;
   costAmount?: number;
   costAmountTitle?: string;
   retailAmount?: number;
   retailAmountTitle?: string;
+  medications?: Array<OfferPrescriptionSummary>;
+}
+
+// offer bundle shape after combining computed and server provided fields
+export interface OfferBundleComplete extends OfferBundleComputed {
+  source?: string;
+  isPromoted?: boolean;
   pharmacy: {
     id: string;
     name: string;
-    fulfillmentTypes: FulfillmentType[];
+    fulfillmentTypes?: FulfillmentType[];
     logo?: string;
   };
-  tags: string[];
-  medications?: Array<{
-    name?: string;
-    pricingType?: string;
-    amount?: number;
-    amountTitle?: string;
-    retailAmount?: number;
-    retailAmountTitle?: string;
-    promotions?: Array<OfferPromotion>;
-  }>;
+  tags: OfferAttributeTag[];
 }
 
 export const OfferTypes = {
   RxSense: 'RxSense',
   GoodRx: 'GoodRx',
-  AmazonPharmacy: 'Amazon Pharmacy'
+  AmazonPharmacy: 'Amazon Pharmacy',
+  Novocare: 'Novocare'
 } as const;
 
 export type OfferTypeKey = keyof typeof OfferTypes;

@@ -2,14 +2,23 @@ import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@c
 import { FiInfo, FiStar, FiTag } from 'react-icons/fi';
 import { Tooltip } from '../Tooltip';
 import { text as t } from '../../utils/text';
-import { OfferBundleDetails, OfferPromotionTypes, Promotion } from '../../utils/models';
+import { OfferBundleComplete, OfferPromotionTypes, Promotion } from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';
+import { SPONSORED_TAG_KIND } from '../../utils/offers';
 
 const PreferredTag = () => {
   return (
     <Tag size="sm" colorScheme="blue">
       <TagLeftIcon boxSize="12px" as={FiStar} />
       <TagLabel>{t.preferred}</TagLabel>
+    </Tag>
+  );
+};
+
+const AttributeTag = ({ label }: { label: string }) => {
+  return (
+    <Tag size="sm" colorScheme="blue">
+      <TagLabel>{label}</TagLabel>
     </Tag>
   );
 };
@@ -69,8 +78,8 @@ const CouponTag = ({
 };
 
 interface OfferInfoProps {
-  pharmacy?: Pick<OfferBundleDetails['pharmacy'], 'id' | 'name' | 'logo'>;
-  offer: OfferBundleDetails;
+  pharmacy?: Pick<OfferBundleComplete['pharmacy'], 'id' | 'name' | 'logo'>;
+  offer: OfferBundleComplete;
   isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
 }
@@ -80,24 +89,16 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
     return null;
   }
 
+  // Sponsored is a special type of Promoted offer that we have to display alongside a tooltip (identified by `tag.kind`)
+  const sponsoredTag = offer.tags.find((tag) => tag.kind === SPONSORED_TAG_KIND);
+
   const offerTags = [
-    ...offer.tags,
-    ...(isPreferred ? [t.preferred] : []),
-    ...(isCurrentPharmacy ? ['current'] : [])
-  ].map((tag) => {
-    switch (tag) {
-      case t.preferred:
-        return <PreferredTag />;
-      case 'current':
-        return <CurrentPharmacyTag />;
-      default:
-        return (
-          <Tag key={tag} size="sm" colorScheme="blue">
-            <TagLabel>{tag}</TagLabel>
-          </Tag>
-        );
-    }
-  });
+    ...offer.tags
+      .filter((tag) => tag.kind !== SPONSORED_TAG_KIND)
+      .map((tag) => <AttributeTag key={tag.kind} label={tag.label} />),
+    ...(isPreferred ? [<PreferredTag key="preferred" />] : []),
+    ...(isCurrentPharmacy ? [<CurrentPharmacyTag key="current" />] : [])
+  ];
 
   // if we aren't explicitly given the cost amount
   // we'll expect patients to pay the retail amount
@@ -110,8 +111,6 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
     offer.retailAmount != null && costAmount != null && offer.retailAmount <= costAmount;
   const retailAmount = retailIsSameOrLower ? undefined : offer.retailAmount;
   const retailAmountTitle = retailIsSameOrLower ? undefined : offer.retailAmountTitle;
-
-  const isAmazonPharmacy = pharmacy.id === import.meta.env.VITE_AMAZON_PHARMACY_ID;
 
   const isMultiRx = (offer.medications?.length ?? 0) > 1;
 
@@ -143,7 +142,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
             </Box>
           ) : null}
           <Text data-testid="pharmacy-info-name" fontSize="md" fontWeight={'medium'}>
-            {offer.pharmacy.name}
+            {pharmacy.name}
           </Text>
         </HStack>
 
@@ -209,10 +208,12 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
       )}
 
       <VStack w="full" alignItems="start">
-        <Text fontSize="sm" fontWeight="semibold">
-          {offer.deliveryEstimate}
-        </Text>
-        {isAmazonPharmacy && (
+        {offer.deliveryEstimate ? (
+          <Text fontSize="sm" fontWeight="semibold">
+            {offer.deliveryEstimate}
+          </Text>
+        ) : null}
+        {sponsoredTag && (
           <Tooltip
             label="This pharmacy has paid for preferred placement. Photon Health does not endorse this pharmacy over others. Other pharmacies may offer this medication at the same or similar price."
             placement="bottom-start"
@@ -224,7 +225,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
           >
             <HStack alignItems={'center'} spacing={1}>
               <Text fontSize="sm" color="gray.500">
-                Sponsored
+                {sponsoredTag.label}
               </Text>
               <FiInfo color="var(--chakra-colors-gray-500)" size={16} />
             </HStack>
