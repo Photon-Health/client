@@ -181,12 +181,6 @@ export const SelectOrg = () => {
                 ? 'You are a member of multiple organizations. Please choose the organization you would like to log in to.'
                 : 'You have pending invitations. Accept an invitation to continue.'}
             </Text>
-            {organizations?.length > 0 && (
-              <>
-                <Divider />
-                {orgs}
-              </>
-            )}
             {pendingInvites.length > 0 && (
               <>
                 <Divider />
@@ -194,6 +188,12 @@ export const SelectOrg = () => {
                   Pending invitations
                 </Text>
                 {invites}
+              </>
+            )}
+            {organizations?.length > 0 && (
+              <>
+                <Divider />
+                {orgs}
               </>
             )}
           </Stack>
