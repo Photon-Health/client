@@ -27,7 +27,7 @@
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/client-preset": "^4.1.0",
     "@graphql-codegen/typescript-graphql-request": "^6.2.0",
-    "@nx/eslint-plugin": "22.7.8",
+    "@nx/eslint-plugin": "23.2.0",
     "@nx/js": "22.5.4",
     "@nx/react": "23.1.1",
     "@nx/workspace": "22.5.4",
