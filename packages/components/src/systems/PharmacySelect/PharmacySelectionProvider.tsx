@@ -131,6 +131,18 @@ export const PharmacySelectionProvider = (props: PharmacySelectionProviderProps)
     }
   });
 
+  // A routing constraint that auto-routes the order unmounts PharmacySelect along
+  // with its tabs, so whatever it had put in the selection signals is no longer
+  // something the prescriber can see or change. Clear it, or the order gets
+  // validated (and routed) against an invisible selection.
+  createEffect(() => {
+    if (autoRoutedPharmacyId()) {
+      setPharmacyId(undefined);
+      setFulfillmentType(undefined);
+      setUpdatePreferredPharmacy(false);
+    }
+  });
+
   const enableLocalPickup = createMemo(
     () => props.enableLocalPickup || (!props.enableSendToPatient && !props.mailOrderIds)
   );
