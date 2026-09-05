@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { FiInfo } from 'react-icons/fi';
 
 const holidays = [
-  '2025-09-01', // Labor Day
+  '2026-09-07', // Labor Day
   '2025-07-04', // july 4
   '2025-11-27', // Thanksgiving
   '2025-12-24', // Christmas Eve
