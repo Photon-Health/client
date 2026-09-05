@@ -17,7 +17,7 @@ import { routeElements } from '../Routes';
 import { getOrder, getPharmaciesByLocation, rerouteOrder, setOrderPharmacy } from '../api';
 import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
 import { FulfillmentType, Pharmacy } from '../__generated__/graphql';
-import { OfferBundleDetails } from '../utils/models';
+import { OfferBundleComplete } from '../utils/models';
 import {
   hasConfirmedAutoroutedPharmacy,
   markAutoroutedPharmacyConfirmed
@@ -117,24 +117,10 @@ describe('Pharmacy page', () => {
     let getPharmacyMock: MockedFunction<typeof getPharmacy>;
     let getOrderMock: MockedFunction<typeof getOrder>;
 
-    const mockOfferBundles: OfferBundleDetails[] = [
+    const mockOfferBundles: OfferBundleComplete[] = [
       {
-        costType: 'INSURANCE_ESTIMATE',
-        deliveryEstimate: 'Delivers in 2-3 days',
-        costAmount: 25.99,
-        costAmountTitle: 'Insurance Price',
-        retailAmount: 150.0,
-        retailAmountTitle: 'Retail',
-        pharmacy: {
-          id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-          name: 'Amazon Pharmacy',
-          fulfillmentTypes: ['MAIL_ORDER']
-        },
-        tags: ['In Stock', 'Free Shipping'],
-        medications: [{ name: 'Metformin 500mg', amount: 25.99, retailAmount: 150.0 }]
-      },
-      {
-        costType: 'PRIME_RX',
+        source: 'AMAZON_PHARMACY',
+        isPromoted: true,
         deliveryEstimate: 'Delivers in 1-2 days',
         costAmount: 19.99,
         costAmountTitle: 'Prime Rx Price',
@@ -145,7 +131,10 @@ describe('Pharmacy page', () => {
           name: 'Amazon Pharmacy',
           fulfillmentTypes: ['MAIL_ORDER']
         },
-        tags: ['Prime Member', 'Fast Delivery'],
+        tags: [
+          { kind: 'IN_STOCK', label: 'In Stock' },
+          { kind: 'FREE_DELIVERY', label: 'Free Shipping' }
+        ],
         medications: [{ name: 'Metformin 500mg', amount: 19.99, retailAmount: 120.0 }]
       }
     ];
@@ -582,7 +571,8 @@ describe('Pharmacy page', () => {
       const { fetchOfferBundles } = await import('./pharmacy.utils');
       vi.mocked(fetchOfferBundles).mockResolvedValueOnce([
         {
-          costType: 'MIXED',
+          source: 'AMAZON_PHARMACY',
+          isPromoted: true,
           costAmount: 21.98,
           costAmountTitle: 'Total Price',
           retailAmount: 200.0,
@@ -634,7 +624,8 @@ describe('Pharmacy page', () => {
       const { fetchOfferBundles } = await import('./pharmacy.utils');
       vi.mocked(fetchOfferBundles).mockResolvedValueOnce([
         {
-          costType: 'CASH',
+          source: 'AMAZON_PHARMACY',
+          isPromoted: true,
           costAmount: 24.99,
           costAmountTitle: 'Cash Price',
           retailAmount: 200.0,
