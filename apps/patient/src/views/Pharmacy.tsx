@@ -1116,6 +1116,8 @@ export const Pharmacy = () => {
   const aboveFoldOffers = placement.aboveFold;
   const deliveryOffers = placement.inTab.filter(isDeliveryOffer);
   const pickupOffers = placement.inTab.filter((offer) => !isDeliveryOffer(offer));
+  // Above-fold cards are visible from either tab, so each tab's ranking starts after these cards
+  const optionsAboveTabs = aboveFoldOffers.length;
 
   const showBrandedOptions = !isDemo && (enableCourier || enableMailOrder);
 
@@ -1208,10 +1210,12 @@ export const Pharmacy = () => {
                   autoroutedPharmacyId={autoroutedPharmacyId}
                   currentPharmacyId={currentPharmacyId}
                   handleSelect={handleSelect}
+                  numberOfPrecedingOptions={optionsAboveTabs}
                 />
               )}
               {showBrandedOptions && (
                 <BrandedOptions
+                  numberOfOffers={optionsAboveTabs + deliveryOffers.length}
                   options={brandedOptions}
                   location={patientLocation}
                   selectedId={selectedId}
@@ -1232,7 +1236,9 @@ export const Pharmacy = () => {
                   shouldTrackOfferImpressionsAndSelections={
                     shouldTrackOfferImpressionsAndSelections
                   }
-                  numberOfPrecedingOptions={deliveryOffers.length + brandedOptions.length}
+                  numberOfPrecedingOptions={
+                    optionsAboveTabs + deliveryOffers.length + brandedOptions.length
+                  }
                 />
               ) : brandedOptions.length === 0 && deliveryOffers.length === 0 ? (
                 <Text fontSize="sm" color="gray.600" py={4}>
@@ -1258,6 +1264,7 @@ export const Pharmacy = () => {
                   autoroutedPharmacyId={autoroutedPharmacyId}
                   currentPharmacyId={currentPharmacyId}
                   handleSelect={handleSelect}
+                  numberOfPrecedingOptions={optionsAboveTabs}
                 />
               )}
               <PickupPharmacyCardList
@@ -1281,7 +1288,9 @@ export const Pharmacy = () => {
                 autoroutedPharmacyId={autoroutedPharmacyId}
                 currentPharmacyId={currentPharmacyId}
                 setCouponModalOpen={setCouponModalOpen}
-                numberOfBrandedOptions={pickupOffers.length + brandedOptions.length}
+                numberOfBrandedOptions={
+                  optionsAboveTabs + pickupOffers.length + brandedOptions.length
+                }
                 shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
               >
                 <BenefitsBanner
