@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
 import { OfferCard } from './OfferCard';
-import { OfferBundleDetails } from '../../utils/models';
+import { PharmacyOffer } from '../../utils/models';
 
 vi.mock('./OfferInfo', () => ({
   OfferInfo: ({ isCurrentPharmacy }: { isCurrentPharmacy?: boolean }) => (
@@ -15,16 +15,16 @@ vi.mock('./OfferInfo', () => ({
 }));
 
 describe('OfferCard', () => {
-  const baseOffer: OfferBundleDetails = {
+  const baseOffer: PharmacyOffer = {
     pharmacy: {
       id: 'amazon-pharmacy',
       name: 'Amazon Pharmacy',
       fulfillmentTypes: ['MAIL_ORDER']
     },
     deliveryEstimate: 'Delivers in 2-3 days',
-    costType: 'INSURANCE_ESTIMATE',
     tags: [],
-    medications: []
+    pricing: {},
+    prescriptions: []
   };
 
   test('OfferCard renders sent here badge when pharmacy is fulfilling current order', () => {
