@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { summarizeOfferBundle } from './offers';
-import { PrescriptionOffer } from './models';
+import { OfferPrescription } from './models';
 
 const SAME_DAY = 'Same-Day';
 const ONE_DAY = 'Delivery in 1 day, after you place your order';
@@ -26,13 +26,13 @@ const buildOffer = ({
   retailAmount?: number;
   promotions?: Array<{ type?: string; amount?: number; amountSaved?: number }>;
   deliveryPromise?: string;
-}): PrescriptionOffer =>
+}): OfferPrescription =>
   ({
     priceType,
     deliveryEstimate: deliveryPromise ? { deliveryPromise } : undefined,
     prescription: { id: prescriptionId, treatment: { id: 'trt_1', name } },
     prescriptionPrice: { amount, retailAmount, promotions }
-  } as PrescriptionOffer);
+  } as OfferPrescription);
 
 describe('summarizeOfferBundle', () => {
   test('picks the cheapest price per medication independently', () => {
@@ -52,7 +52,7 @@ describe('summarizeOfferBundle', () => {
       buildOffer({ priceType: 'MEMBERSHIP', amount: 20 })
     ]);
 
-    expect(summary.medications).toEqual([expect.objectContaining({ pricingType: 'MEMBERSHIP' })]);
+    expect(summary.prescriptions).toEqual([expect.objectContaining({ pricingType: 'MEMBERSHIP' })]);
   });
 
   test('prefers a priced offer over one with no price', () => {
@@ -98,7 +98,7 @@ describe('summarizeOfferBundle', () => {
     const summary = summarizeOfferBundle([buildOffer({ priceType: 'INSURANCE', amount: 40 })]);
 
     expect(summary.costAmount).toBeUndefined();
-    expect(summary.medications).toEqual([]);
+    expect(summary.prescriptions).toEqual([]);
   });
 
   test('costAmountTitle is specific when all medications are CASH', () => {
@@ -148,7 +148,7 @@ describe('promotion prices', () => {
     ]);
 
     expect(summary.costAmount).toBe(5);
-    expect(summary.medications).toEqual([expect.objectContaining({ pricingType: 'CASH' })]);
+    expect(summary.prescriptions).toEqual([expect.objectContaining({ pricingType: 'CASH' })]);
   });
 
   test('keeps the promotions on the medication line for the coupon tag', () => {
@@ -160,7 +160,7 @@ describe('promotion prices', () => {
       })
     ]);
 
-    expect(summary.medications).toEqual([
+    expect(summary.prescriptions).toEqual([
       expect.objectContaining({
         promotions: [{ type: RX_COUPON, amount: 15, amountSaved: 6 }]
       })
@@ -185,7 +185,7 @@ describe('retail amounts', () => {
       buildOffer({ priceType: 'MEMBERSHIP', amount: 18, retailAmount: 999 })
     ]);
 
-    expect(summary.medications).toEqual([
+    expect(summary.prescriptions).toEqual([
       expect.objectContaining({ pricingType: 'MEMBERSHIP', amount: 18, retailAmount: 55 })
     ]);
   });
@@ -205,7 +205,7 @@ describe('retail amounts', () => {
       buildOffer({ prescriptionId: 'rx_3', priceType: 'CASH', amount: 5, retailAmount: 7 })
     ]);
 
-    expect(summary.medications).toHaveLength(3);
+    expect(summary.prescriptions).toHaveLength(3);
     expect(summary.costAmount).toBe(15);
     expect(summary.retailAmount).toBe(27);
   });

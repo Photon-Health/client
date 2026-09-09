@@ -111,7 +111,7 @@ describe('fetchOfferBundles', () => {
     expect(cards).toHaveLength(1);
     // Offers from both bundles are summarized together into one total.
     expect(cards[0].costAmount).toBe(25);
-    expect(cards[0].medications).toHaveLength(2);
+    expect(cards[0].prescriptions).toHaveLength(2);
   });
 
   test('returns one card per pharmacy', async () => {
@@ -163,6 +163,6 @@ describe('fetchOfferBundles', () => {
     const [card] = await fetchOfferBundles(order);
 
     expect(card.costAmount).toBeUndefined();
-    expect(card.medications).toEqual([]);
+    expect(card.prescriptions).toEqual([]);
   });
 });

@@ -2,7 +2,7 @@ import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@c
 import { FiInfo, FiStar, FiTag } from 'react-icons/fi';
 import { Tooltip } from '../Tooltip';
 import { text as t } from '../../utils/text';
-import { OfferBundleComplete, OfferPromotionTypes, Promotion } from '../../utils/models';
+import { OfferBundleView, OfferPromotionTypes, Promotion } from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';
 import { SPONSORED_TAG_KIND } from '../../utils/offers';
 
@@ -78,8 +78,8 @@ const CouponTag = ({
 };
 
 interface OfferInfoProps {
-  pharmacy?: Pick<OfferBundleComplete['pharmacy'], 'id' | 'name' | 'logo'>;
-  offer: OfferBundleComplete;
+  pharmacy?: Pick<OfferBundleView['pharmacy'], 'id' | 'name' | 'logo'>;
+  offer: OfferBundleView;
   isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
 }
@@ -112,10 +112,10 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
   const retailAmount = retailIsSameOrLower ? undefined : offer.retailAmount;
   const retailAmountTitle = retailIsSameOrLower ? undefined : offer.retailAmountTitle;
 
-  const isMultiRx = (offer.medications?.length ?? 0) > 1;
+  const isMultiRx = (offer.prescriptions?.length ?? 0) > 1;
 
   const singleMedPromotions = !isMultiRx
-    ? offer.medications?.[0]?.promotions?.filter(
+    ? offer.prescriptions?.[0]?.promotions?.filter(
         (promo) => promo.type === OfferPromotionTypes.AmazonPharmacyRXCoupon
       )
     : undefined;
@@ -166,7 +166,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
 
       {isMultiRx && (
         <VStack w="full" bg="gray.50" borderRadius="md" p={3}>
-          {offer.medications?.map((med) => (
+          {offer.prescriptions?.map((med) => (
             <HStack key={med.name} w="full" justify="space-between" align="start">
               <VStack align="flex-start">
                 <Tooltip

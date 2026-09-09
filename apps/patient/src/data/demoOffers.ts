@@ -1,7 +1,7 @@
 import { PHARMACY_BRANDING } from '../components/pharmacy-card-list';
-import { OfferBundleComplete } from '../utils/models';
+import { OfferBundleView } from '../utils/models';
 
-export const demoOffers: OfferBundleComplete[] = [
+export const demoOffers: OfferBundleView[] = [
   {
     source: 'AMAZON_PHARMACY',
     isPromoted: true,
@@ -17,6 +17,6 @@ export const demoOffers: OfferBundleComplete[] = [
       fulfillmentTypes: ['MAIL_ORDER'],
       logo: PHARMACY_BRANDING['phr_demoAmazon'].logo
     },
-    medications: [{ name: 'Lisinopril 10mg Tablet', amount: 50, retailAmount: 100 }]
+    prescriptions: [{ name: 'Lisinopril 10mg Tablet', amount: 50, retailAmount: 100 }]
   }
 ];

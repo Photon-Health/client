@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
-import { EnrichedPharmacy, OfferBundleComplete } from '../models';
+import { EnrichedPharmacy, OfferBundleView } from '../models';
 import { useOrderContext } from '../../views/Main';
 import { deriveCostType, getOfferType } from '../offerAnalytics';
 import { Prescription } from '../../__generated__/graphql';
@@ -23,7 +23,7 @@ const OfferImpressionTracker = ({
   enabled
 }: {
   children: React.ReactNode;
-  offer: OfferBundleComplete | undefined;
+  offer: OfferBundleView | undefined;
   pharmacy: EnrichedPharmacy;
   ordinalPosition: number;
   isAlreadySelected: boolean;
@@ -80,14 +80,14 @@ const OfferImpressionTracker = ({
           multiMedOffer: rxIds.size > 1,
           hasRefills: rxIds.size < order.fills.length,
           tags: offer?.tags?.map((tag) => tag.label),
-          promotions: offer?.medications?.flatMap(
+          promotions: offer?.prescriptions?.flatMap(
             (med) =>
               med.promotions?.map((promo) => ({
                 medicationName: med.name,
                 ...promo
               })) ?? []
           ),
-          medicationCosts: offer?.medications
+          medicationCosts: offer?.prescriptions
         });
       }
     }

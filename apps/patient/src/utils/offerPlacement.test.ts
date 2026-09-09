@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
 import { isDeliveryOffer, selectOfferPlacement } from './offerPlacement';
-import { OfferBundleComplete } from './models';
+import { OfferBundleView } from './models';
 
-const bundle = (overrides: Partial<OfferBundleComplete>): OfferBundleComplete => ({
+const bundle = (overrides: Partial<OfferBundleView>): OfferBundleView => ({
   pharmacy: { id: 'phr_default', name: 'Pharmacy', fulfillmentTypes: ['MAIL_ORDER'] },
   tags: [],
   ...overrides

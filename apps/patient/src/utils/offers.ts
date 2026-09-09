@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import { OfferPriceType } from '../__generated__/graphql';
 import {
-  OfferPrescriptionSummary,
-  PrescriptionOffer,
-  OfferBundleComputed,
+  OfferPrescriptionView,
+  OfferPrescription,
+  OfferBundleSummary,
   OfferPromotionTypes,
   Promotion
 } from './models';
@@ -40,7 +40,7 @@ function isApplicable(promotion: Promotion): boolean {
 }
 
 // Currently only supports Amazon Pharmacy RX coupons
-function getAmountAfterPromotions(offer: PrescriptionOffer): number | undefined {
+function getAmountAfterPromotions(offer: OfferPrescription): number | undefined {
   const amount = offer.prescriptionPrice?.amount;
   if (offer.priceType === 'INSURANCE') {
     return amount;
@@ -57,7 +57,7 @@ function getAmountAfterPromotions(offer: PrescriptionOffer): number | undefined 
   return largest.amount! - largest.amountSaved!;
 }
 
-function buildCashRetailByPrescription(offers: PrescriptionOffer[]): Map<string, number> {
+function buildCashRetailByPrescription(offers: OfferPrescription[]): Map<string, number> {
   return offers.reduce<Map<string, number>>((cashRetail, offer) => {
     const prescriptionId = offer.prescription?.id;
     const retailAmount = offer.prescriptionPrice?.retailAmount;
@@ -68,10 +68,10 @@ function buildCashRetailByPrescription(offers: PrescriptionOffer[]): Map<string,
   }, new Map());
 }
 
-function toMedication(
-  offer: PrescriptionOffer,
+function toPrescriptionView(
+  offer: OfferPrescription,
   cashRetailByPrescription: Map<string, number>
-): OfferPrescriptionSummary {
+): OfferPrescriptionView {
   const cashRetailAmount =
     offer.priceType === 'MEMBERSHIP' && offer.prescription?.id != null
       ? cashRetailByPrescription.get(offer.prescription.id)
@@ -87,7 +87,7 @@ function toMedication(
 }
 
 // Cheapest wins; a priced offer beats an unpriced one; ties go to the membership price.
-function cheapestOffer(offers: PrescriptionOffer[]): PrescriptionOffer {
+function cheapestOffer(offers: OfferPrescription[]): OfferPrescription {
   return offers.reduce((cheapest, candidate) => {
     const candidateAmount = getAmountAfterPromotions(candidate);
     const cheapestAmount = getAmountAfterPromotions(cheapest);
@@ -112,7 +112,7 @@ function promisedDays(deliveryPromise: string): number {
 }
 
 // The whole order arrives when its slowest medication does.
-function getLatestDeliveryEstimate(offers: PrescriptionOffer[]): string | undefined {
+function getLatestDeliveryEstimate(offers: OfferPrescription[]): string | undefined {
   const promises = offers
     .map((offer) => offer.deliveryEstimate?.deliveryPromise)
     .filter((promise): promise is string => promise != null);
@@ -132,8 +132,8 @@ function sumDefined(values: Array<number | undefined>): number | undefined {
   );
 }
 
-function getCostAmountTitle(medications: OfferPrescriptionSummary[]): string | undefined {
-  const priceTypes = new Set(medications.map((medication) => medication.pricingType));
+function getCostAmountTitle(prescriptions: OfferPrescriptionView[]): string | undefined {
+  const priceTypes = new Set(prescriptions.map((prescription) => prescription.pricingType));
   if (priceTypes.size > 1) {
     return MIXED_PRICE_TITLE;
   }
@@ -142,9 +142,9 @@ function getCostAmountTitle(medications: OfferPrescriptionSummary[]): string | u
   return priceType ? PRICE_TYPE_TITLES[priceType as OfferPriceType] : undefined;
 }
 
-// Builds the card total, delivery estimate and per-medication breakdown for a bundle by
+// Builds the card total, delivery estimate and per-prescription breakdown for a bundle by
 // choosing the cheapest offer per prescription and summing them.
-export function summarizeOfferBundle(offers: PrescriptionOffer[] | undefined): OfferBundleComputed {
+export function summarizeOfferBundle(offers: OfferPrescription[] | undefined): OfferBundleSummary {
   const candidates = (offers ?? []).filter(
     (offer) =>
       offer.priceType != null &&
@@ -153,21 +153,21 @@ export function summarizeOfferBundle(offers: PrescriptionOffer[] | undefined): O
   );
 
   if (candidates.length === 0) {
-    return { medications: [] };
+    return { prescriptions: [] };
   }
 
   const cashRetailByPrescription = buildCashRetailByPrescription(candidates);
   const chosen = Object.values(_.groupBy(candidates, (offer) => offer.prescription!.id)).map(
     cheapestOffer
   );
-  const medications = chosen.map((offer) => toMedication(offer, cashRetailByPrescription));
+  const prescriptions = chosen.map((offer) => toPrescriptionView(offer, cashRetailByPrescription));
 
   return {
     deliveryEstimate: getLatestDeliveryEstimate(chosen),
-    costAmount: sumDefined(medications.map((medication) => medication.amount)),
-    costAmountTitle: getCostAmountTitle(medications),
-    retailAmount: sumDefined(medications.map((medication) => medication.retailAmount)),
+    costAmount: sumDefined(prescriptions.map((prescription) => prescription.amount)),
+    costAmountTitle: getCostAmountTitle(prescriptions),
+    retailAmount: sumDefined(prescriptions.map((prescription) => prescription.retailAmount)),
     retailAmountTitle: RETAIL_TITLE,
-    medications
+    prescriptions
   };
 }

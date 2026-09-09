@@ -10,7 +10,7 @@ import { FixedFooter, LocationModal, PoweredBy } from '../components';
 import { CouponModal } from '../components/coupons';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy, wait } from '../utils/general';
-import { Pharmacy as EnrichedPharmacy, OfferBundleComplete, Order } from '../utils/models';
+import { Pharmacy as EnrichedPharmacy, OfferBundleView, Order } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -259,7 +259,7 @@ export const Pharmacy = () => {
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
 
-  const [offers, setOffers] = useState<OfferBundleComplete[] | undefined>(undefined);
+  const [offers, setOffers] = useState<OfferBundleView[] | undefined>(undefined);
 
   const placement = useMemo(() => selectOfferPlacement(offers), [offers]);
   // All offer-derived pharmacies (top slot + tabs) — feeds pharmacy resolution + analytics.

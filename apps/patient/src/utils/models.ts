@@ -22,11 +22,12 @@ export type Pharmacy = NotMaybe<GetPharmaciesByLocationQuery['pharmaciesByLocati
 
 export type OrderFulfillment = NotMaybe<Order['fulfillment']>;
 
-export type OfferBundleResponse = GetOfferBundlesForOrderQuery['offerBundles'][number];
-export type PrescriptionOffer = NotMaybe<OfferBundleResponse['offers']>[number];
-export type OfferAttributeTag = NotMaybe<OfferBundleResponse['attributeTags']>[number];
+export type OfferBundle = GetOfferBundlesForOrderQuery['offerBundles'][number];
+export type OfferPrescription = OfferBundle['offers'][number];
+export type OfferAttributeTag = NotMaybe<OfferBundle['attributeTags']>[number];
 
-export type OfferPrescriptionSummary = {
+// one presciption's price breakdown for an offer
+export type OfferPrescriptionView = {
   name?: string;
   pricingType?: string;
   amount?: number;
@@ -34,18 +35,18 @@ export type OfferPrescriptionSummary = {
   promotions?: Array<OfferPromotion>;
 };
 
-// offer bundle fields that are computed on client based on offer bundle response
-export interface OfferBundleComputed {
+// totals, labels, overall delivery estimate and the per-prescription breakdown
+export interface OfferBundleSummary {
   deliveryEstimate?: string;
   costAmount?: number;
   costAmountTitle?: string;
   retailAmount?: number;
   retailAmountTitle?: string;
-  medications?: Array<OfferPrescriptionSummary>;
+  prescriptions?: Array<OfferPrescriptionView>;
 }
 
-// offer bundle shape after combining computed and server provided fields
-export interface OfferBundleComplete extends OfferBundleComputed {
+// offer bundle shape after combining totals and top level offer attributes
+export interface OfferBundleView extends OfferBundleSummary {
   source?: string;
   isPromoted?: boolean;
   pharmacy: {

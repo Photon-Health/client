@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
 import { deriveCostType, getOfferType } from './offerAnalytics';
-import { EnrichedPharmacy, OfferBundleComplete, OfferTypes } from './models';
+import { EnrichedPharmacy, OfferBundleView, OfferTypes } from './models';
 
-const bundle = (overrides: Partial<OfferBundleComplete>): OfferBundleComplete => ({
+const bundle = (overrides: Partial<OfferBundleView>): OfferBundleView => ({
   pharmacy: { id: 'p', name: 'P' },
   tags: [],
   ...overrides
@@ -37,13 +37,13 @@ describe('deriveCostType', () => {
   test('is MIXED when the picked lines span price types', () => {
     const offer = bundle({
       source: 'AMAZON_PHARMACY',
-      medications: [{ pricingType: 'CASH' }, { pricingType: 'MEMBERSHIP' }]
+      prescriptions: [{ pricingType: 'CASH' }, { pricingType: 'MEMBERSHIP' }]
     });
     expect(deriveCostType(offer)).toBe('MIXED');
   });
 
   test('is the single price type when the lines share one', () => {
-    const offer = bundle({ source: 'AMAZON_PHARMACY', medications: [{ pricingType: 'CASH' }] });
+    const offer = bundle({ source: 'AMAZON_PHARMACY', prescriptions: [{ pricingType: 'CASH' }] });
     expect(deriveCostType(offer)).toBe('CASH');
   });
 });

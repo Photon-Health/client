@@ -17,7 +17,7 @@ import { routeElements } from '../Routes';
 import { getOrder, getPharmaciesByLocation, rerouteOrder, setOrderPharmacy } from '../api';
 import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
 import { FulfillmentType, Pharmacy } from '../__generated__/graphql';
-import { OfferBundleComplete } from '../utils/models';
+import { OfferBundleView } from '../utils/models';
 import {
   hasConfirmedAutoroutedPharmacy,
   markAutoroutedPharmacyConfirmed
@@ -117,7 +117,7 @@ describe('Pharmacy page', () => {
     let getPharmacyMock: MockedFunction<typeof getPharmacy>;
     let getOrderMock: MockedFunction<typeof getOrder>;
 
-    const mockOfferBundles: OfferBundleComplete[] = [
+    const mockOfferBundles: OfferBundleView[] = [
       {
         source: 'AMAZON_PHARMACY',
         isPromoted: true,
@@ -135,7 +135,7 @@ describe('Pharmacy page', () => {
           { kind: 'IN_STOCK', label: 'In Stock' },
           { kind: 'FREE_DELIVERY', label: 'Free Shipping' }
         ],
-        medications: [{ name: 'Metformin 500mg', amount: 19.99, retailAmount: 120.0 }]
+        prescriptions: [{ name: 'Metformin 500mg', amount: 19.99, retailAmount: 120.0 }]
       }
     ];
 
@@ -584,7 +584,7 @@ describe('Pharmacy page', () => {
             fulfillmentTypes: ['MAIL_ORDER']
           },
           tags: [],
-          medications: [
+          prescriptions: [
             { name: 'Metformin', pricingType: 'CASH', amount: 9.99, retailAmount: 100.0 },
             { name: 'Lisinopril', pricingType: 'PRIME_RX', amount: 11.99, retailAmount: 100.0 }
           ]
@@ -637,7 +637,7 @@ describe('Pharmacy page', () => {
             fulfillmentTypes: ['MAIL_ORDER']
           },
           tags: [],
-          medications: [
+          prescriptions: [
             {
               name: 'Metformin',
               amount: 9.99,

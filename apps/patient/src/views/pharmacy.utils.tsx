@@ -1,17 +1,12 @@
 import _ from 'lodash';
 import { getOfferBundles } from '../api';
-import {
-  EnrichedPharmacy,
-  ExtendedFulfillmentType,
-  OfferBundleComplete,
-  Order
-} from '../utils/models';
+import { EnrichedPharmacy, ExtendedFulfillmentType, OfferBundleView, Order } from '../utils/models';
 import { summarizeOfferBundle } from '../utils/offers';
 import { Pharmacy as PharmacyType } from '../__generated__/graphql';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
-export async function fetchOfferBundles(order: Order): Promise<OfferBundleComplete[] | undefined> {
+export async function fetchOfferBundles(order: Order): Promise<OfferBundleView[]> {
   const bundles = await getOfferBundles(order.id);
 
   // Group by pharmacy so all bundles from one source are tied to one pharmacy card

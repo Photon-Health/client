@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, test, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { OffersList } from './OffersList';
-import { OfferBundleComplete } from '../../utils/models';
+import { OfferBundleView } from '../../utils/models';
 
 // Mock the OfferImpressionTracker component
 vi.mock('../../utils/tracking/OfferImpressionTracker', () => ({
@@ -44,7 +44,7 @@ vi.mock('./OfferCard', () => ({
 }));
 
 describe('OffersList', () => {
-  const mockOffers: OfferBundleComplete[] = [
+  const mockOffers: OfferBundleView[] = [
     {
       pharmacy: {
         id: 'amazon-pharmacy',
@@ -60,7 +60,7 @@ describe('OffersList', () => {
         { kind: 'IN_STOCK', label: 'In Stock' },
         { kind: 'FREE_DELIVERY', label: 'Free Shipping' }
       ],
-      medications: [{ name: 'Metformin 500mg', amount: 25.99, retailAmount: 150.0 }]
+      prescriptions: [{ name: 'Metformin 500mg', amount: 25.99, retailAmount: 150.0 }]
     },
     {
       pharmacy: {
@@ -70,7 +70,7 @@ describe('OffersList', () => {
       },
       deliveryEstimate: 'Delivers in 3-5 days',
       tags: [{ kind: 'SPECIAL_OFFER', label: 'Special Offer' }],
-      medications: []
+      prescriptions: []
     }
   ];
 
