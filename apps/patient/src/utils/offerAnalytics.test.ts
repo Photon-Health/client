@@ -5,6 +5,7 @@ import { EnrichedPharmacy, PharmacyOffer, OfferTypes } from './models';
 const bundle = (overrides: Partial<PharmacyOffer>): PharmacyOffer => ({
   pharmacy: { id: 'p', name: 'P' },
   tags: [],
+  pricing: {},
   ...overrides
 });
 

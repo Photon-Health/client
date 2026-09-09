@@ -72,6 +72,7 @@ describe('OffersList', () => {
       },
       deliveryEstimate: 'Delivers in 3-5 days',
       tags: [{ kind: 'SPECIAL_OFFER', label: 'Special Offer' }],
+      pricing: {},
       prescriptions: []
     }
   ];

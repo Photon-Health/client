@@ -23,6 +23,7 @@ describe('OfferCard', () => {
     },
     deliveryEstimate: 'Delivers in 2-3 days',
     tags: [],
+    pricing: {},
     prescriptions: []
   };
 
