@@ -2,7 +2,7 @@ import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@c
 import { FiInfo, FiStar, FiTag } from 'react-icons/fi';
 import { Tooltip } from '../Tooltip';
 import { text as t } from '../../utils/text';
-import { OfferBundleView, OfferPromotionTypes, Promotion } from '../../utils/models';
+import { PharmacyOffer, OfferPromotionTypes, Promotion } from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';
 import { SPONSORED_TAG_KIND } from '../../utils/offers';
 
@@ -78,8 +78,8 @@ const CouponTag = ({
 };
 
 interface OfferInfoProps {
-  pharmacy?: Pick<OfferBundleView['pharmacy'], 'id' | 'name' | 'logo'>;
-  offer: OfferBundleView;
+  pharmacy?: Pick<PharmacyOffer['pharmacy'], 'id' | 'name' | 'logo'>;
+  offer: PharmacyOffer;
   isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
 }
@@ -102,15 +102,17 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
 
   // if we aren't explicitly given the cost amount
   // we'll expect patients to pay the retail amount
-  const costAmount = offer.costAmount ?? offer.retailAmount;
-  const costAmountTitle = offer.costAmountTitle ?? offer.retailAmountTitle;
+  const costAmount = offer.pricing.costAmount ?? offer.pricing.retailAmount;
+  const costAmountTitle = offer.pricing.costAmountTitle ?? offer.pricing.retailAmountTitle;
 
   // if they cost is higher than the retail amount
   // there's no point in showing what the strike price because it will be clear they're paying more
   const retailIsSameOrLower =
-    offer.retailAmount != null && costAmount != null && offer.retailAmount <= costAmount;
-  const retailAmount = retailIsSameOrLower ? undefined : offer.retailAmount;
-  const retailAmountTitle = retailIsSameOrLower ? undefined : offer.retailAmountTitle;
+    offer.pricing.retailAmount != null &&
+    costAmount != null &&
+    offer.pricing.retailAmount <= costAmount;
+  const retailAmount = retailIsSameOrLower ? undefined : offer.pricing.retailAmount;
+  const retailAmountTitle = retailIsSameOrLower ? undefined : offer.pricing.retailAmountTitle;
 
   const isMultiRx = (offer.prescriptions?.length ?? 0) > 1;
 

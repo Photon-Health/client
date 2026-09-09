@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
 import { OfferCard } from './OfferCard';
-import { OfferBundleView } from '../../utils/models';
+import { PharmacyOffer } from '../../utils/models';
 
 vi.mock('./OfferInfo', () => ({
   OfferInfo: ({ isCurrentPharmacy }: { isCurrentPharmacy?: boolean }) => (
@@ -15,7 +15,7 @@ vi.mock('./OfferInfo', () => ({
 }));
 
 describe('OfferCard', () => {
-  const baseOffer: OfferBundleView = {
+  const baseOffer: PharmacyOffer = {
     pharmacy: {
       id: 'amazon-pharmacy',
       name: 'Amazon Pharmacy',

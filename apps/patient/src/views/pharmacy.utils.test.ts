@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { fetchOfferBundles } from './pharmacy.utils';
+import { fetchPharmacyOffers } from './pharmacy.utils';
 import { getOfferBundles } from '../api';
 import { GetOfferBundlesForOrderQuery, OfferPriceType } from '../__generated__/graphql';
 import { Order } from '../utils/models';
@@ -62,7 +62,7 @@ const buildBundle = (overrides: Partial<BundleResponse> = {}): BundleResponse =>
 const mockBundles = (bundles: BundleResponse[]) =>
   vi.mocked(getOfferBundles).mockResolvedValue(bundles);
 
-describe('fetchOfferBundles', () => {
+describe('fetchPharmacyOffers', () => {
   beforeEach(() => {
     vi.mocked(getOfferBundles).mockReset();
   });
@@ -70,13 +70,13 @@ describe('fetchOfferBundles', () => {
   test('returns no cards when the order has no bundles', async () => {
     mockBundles([]);
 
-    await expect(fetchOfferBundles(order)).resolves.toEqual([]);
+    await expect(fetchPharmacyOffers(order)).resolves.toEqual([]);
   });
 
   test('returns card with source, pharmacy and attribute tags', async () => {
     mockBundles([buildBundle({ offers: [buildOffer({ priceType: 'CASH', amount: 20 })] })]);
 
-    const [card] = await fetchOfferBundles(order);
+    const [card] = await fetchPharmacyOffers(order);
 
     expect(card).toEqual(
       expect.objectContaining({
@@ -106,11 +106,11 @@ describe('fetchOfferBundles', () => {
       })
     ]);
 
-    const cards = await fetchOfferBundles(order);
+    const cards = await fetchPharmacyOffers(order);
 
     expect(cards).toHaveLength(1);
     // Offers from both bundles are summarized together into one total.
-    expect(cards[0].costAmount).toBe(25);
+    expect(cards[0].pricing.costAmount).toBe(25);
     expect(cards[0].prescriptions).toHaveLength(2);
   });
 
@@ -125,7 +125,7 @@ describe('fetchOfferBundles', () => {
       })
     ]);
 
-    const cards = await fetchOfferBundles(order);
+    const cards = await fetchPharmacyOffers(order);
 
     expect(cards.map((card) => card.pharmacy.id)).toEqual(['phr_amazon', 'phr_novocare']);
   });
@@ -133,7 +133,7 @@ describe('fetchOfferBundles', () => {
   test('does not promote the card when there are 0 promoted bundles', async () => {
     mockBundles([buildBundle({ isPromoted: false })]);
 
-    const [card] = await fetchOfferBundles(order);
+    const [card] = await fetchPharmacyOffers(order);
 
     expect(card.isPromoted).toBe(false);
   });
@@ -144,7 +144,7 @@ describe('fetchOfferBundles', () => {
       buildBundle({ offers: [buildOffer({ priceType: 'CASH', amount: 20 })] })
     ]);
 
-    const cards = await fetchOfferBundles(order);
+    const cards = await fetchPharmacyOffers(order);
 
     expect(cards.map((card) => card.pharmacy.id)).toEqual(['phr_amazon']);
   });
@@ -152,7 +152,7 @@ describe('fetchOfferBundles', () => {
   test('defaults tags to an empty list when the bundle has none', async () => {
     mockBundles([buildBundle({ attributeTags: undefined })]);
 
-    const [card] = await fetchOfferBundles(order);
+    const [card] = await fetchPharmacyOffers(order);
 
     expect(card.tags).toEqual([]);
   });
@@ -160,9 +160,9 @@ describe('fetchOfferBundles', () => {
   test('leaves a card priceless when its only bundle is insurance', async () => {
     mockBundles([buildBundle({ offers: [buildOffer({ priceType: 'INSURANCE', amount: 40 })] })]);
 
-    const [card] = await fetchOfferBundles(order);
+    const [card] = await fetchPharmacyOffers(order);
 
-    expect(card.costAmount).toBeUndefined();
+    expect(card.pricing.costAmount).toBeUndefined();
     expect(card.prescriptions).toEqual([]);
   });
 });

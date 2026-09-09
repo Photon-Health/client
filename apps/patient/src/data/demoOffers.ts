@@ -1,16 +1,18 @@
 import { PHARMACY_BRANDING } from '../components/pharmacy-card-list';
-import { OfferBundleView } from '../utils/models';
+import { PharmacyOffer } from '../utils/models';
 
-export const demoOffers: OfferBundleView[] = [
+export const demoOffers: PharmacyOffer[] = [
   {
     source: 'AMAZON_PHARMACY',
     isPromoted: true,
     tags: [],
     deliveryEstimate: '2-3 days',
-    costAmount: 50,
-    costAmountTitle: 'Prime Rx Price',
-    retailAmount: 100,
-    retailAmountTitle: 'Retail Price',
+    pricing: {
+      costAmount: 50,
+      costAmountTitle: 'Prime Rx Price',
+      retailAmount: 100,
+      retailAmountTitle: 'Retail Price'
+    },
     pharmacy: {
       id: 'phr_demoAmazon',
       name: 'Amazon Pharmacy',

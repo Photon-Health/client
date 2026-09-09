@@ -10,7 +10,7 @@ import { FixedFooter, LocationModal, PoweredBy } from '../components';
 import { CouponModal } from '../components/coupons';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy, wait } from '../utils/general';
-import { Pharmacy as EnrichedPharmacy, OfferBundleView, Order } from '../utils/models';
+import { Pharmacy as EnrichedPharmacy, PharmacyOffer, Order } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -35,7 +35,7 @@ import {
   Prescription
 } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
-import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
+import { fetchPharmacyOffers, getPharmacy } from './pharmacy.utils';
 import { isDeliveryOffer, selectOfferPlacement } from '../utils/offerPlacement';
 import _ from 'lodash';
 import {
@@ -259,7 +259,7 @@ export const Pharmacy = () => {
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
 
-  const [offers, setOffers] = useState<OfferBundleView[] | undefined>(undefined);
+  const [offers, setOffers] = useState<PharmacyOffer[] | undefined>(undefined);
 
   const placement = useMemo(() => selectOfferPlacement(offers), [offers]);
   // All offer-derived pharmacies (top slot + tabs) — feeds pharmacy resolution + analytics.
@@ -343,7 +343,7 @@ export const Pharmacy = () => {
     const getOffers = async () => {
       // only fetch offers if we don't have any
       if (!offers) {
-        const fetchedOffers = await fetchOfferBundles(order);
+        const fetchedOffers = await fetchPharmacyOffers(order);
 
         if (JSON.stringify(fetchedOffers) !== JSON.stringify(offers)) {
           setOffers(fetchedOffers);
@@ -705,8 +705,8 @@ export const Pharmacy = () => {
       name: o.pharmacy.name,
       fulfillmentTypes: o.pharmacy.fulfillmentTypes,
       logo: o.pharmacy.logo,
-      price: o.costAmount ?? 0,
-      retailPrice: o.retailAmount ?? 0
+      price: o.pricing.costAmount ?? 0,
+      retailPrice: o.pricing.retailAmount ?? 0
     }));
 
     const selectedPharmacy: EnrichedPharmacy | undefined = [
@@ -811,8 +811,8 @@ export const Pharmacy = () => {
       initialRouteType: getInitialRouteType(order),
       enablePrice,
       hasPrice: selectedPharmacy.price !== undefined,
-      price: selectedPharmacy.price || selectedOffer?.costAmount,
-      retailPrice: selectedPharmacy.retailPrice || selectedOffer?.retailAmount
+      price: selectedPharmacy.price || selectedOffer?.pricing.costAmount,
+      retailPrice: selectedPharmacy.retailPrice || selectedOffer?.pricing.retailAmount
     });
 
     if (isDemo) {
@@ -827,8 +827,8 @@ export const Pharmacy = () => {
       name: o.pharmacy.name,
       fulfillmentTypes: o.pharmacy.fulfillmentTypes,
       logo: o.pharmacy.logo,
-      price: o.costAmount ?? 0,
-      retailPrice: o.retailAmount ?? 0
+      price: o.pricing.costAmount ?? 0,
+      retailPrice: o.pricing.retailAmount ?? 0
     }));
 
     const allPharmaciesIncludingOffers = [...pharmaciesFromOffers, ...pickupPharmacies];
@@ -1047,9 +1047,9 @@ export const Pharmacy = () => {
     ).size;
 
     if (selectedOffer) {
-      extraOfferMetadata.sawPrice = selectedOffer.costAmount !== undefined;
-      extraOfferMetadata.price = selectedOffer.costAmount;
-      extraOfferMetadata.retailPrice = selectedOffer.retailAmount;
+      extraOfferMetadata.sawPrice = selectedOffer.pricing.costAmount !== undefined;
+      extraOfferMetadata.price = selectedOffer.pricing.costAmount;
+      extraOfferMetadata.retailPrice = selectedOffer.pricing.retailAmount;
       extraOfferMetadata.priceType = deriveCostType(selectedOffer);
     }
 
@@ -1326,8 +1326,8 @@ export const Pharmacy = () => {
                 name: o.pharmacy.name,
                 fulfillmentTypes: o.pharmacy.fulfillmentTypes,
                 logo: o.pharmacy.logo,
-                price: o.costAmount ?? 0,
-                retailPrice: o.retailAmount ?? 0
+                price: o.pricing.costAmount ?? 0,
+                retailPrice: o.pricing.retailAmount ?? 0
               }));
 
               const allPharmaciesIncludingOffers = [

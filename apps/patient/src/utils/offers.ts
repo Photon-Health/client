@@ -3,7 +3,7 @@ import { OfferPriceType } from '../__generated__/graphql';
 import {
   OfferPrescriptionView,
   OfferPrescription,
-  OfferBundleSummary,
+  PharmacyOffer,
   OfferPromotionTypes,
   Promotion
 } from './models';
@@ -142,9 +142,11 @@ function getCostAmountTitle(prescriptions: OfferPrescriptionView[]): string | un
   return priceType ? PRICE_TYPE_TITLES[priceType as OfferPriceType] : undefined;
 }
 
-// Builds the card total, delivery estimate and per-prescription breakdown for a bundle by
-// choosing the cheapest offer per prescription and summing them.
-export function summarizeOfferBundle(offers: OfferPrescription[] | undefined): OfferBundleSummary {
+// The pricing, delivery estimate and per-prescription breakdown for one pharmacy's offer,
+// chosen by taking the cheapest offer per prescription and summing them.
+export function summarizePharmacyOffer(
+  offers: OfferPrescription[] | undefined
+): Pick<PharmacyOffer, 'deliveryEstimate' | 'pricing' | 'prescriptions'> {
   const candidates = (offers ?? []).filter(
     (offer) =>
       offer.priceType != null &&
@@ -153,7 +155,7 @@ export function summarizeOfferBundle(offers: OfferPrescription[] | undefined): O
   );
 
   if (candidates.length === 0) {
-    return { prescriptions: [] };
+    return { pricing: {}, prescriptions: [] };
   }
 
   const cashRetailByPrescription = buildCashRetailByPrescription(candidates);
@@ -164,10 +166,12 @@ export function summarizeOfferBundle(offers: OfferPrescription[] | undefined): O
 
   return {
     deliveryEstimate: getLatestDeliveryEstimate(chosen),
-    costAmount: sumDefined(prescriptions.map((prescription) => prescription.amount)),
-    costAmountTitle: getCostAmountTitle(prescriptions),
-    retailAmount: sumDefined(prescriptions.map((prescription) => prescription.retailAmount)),
-    retailAmountTitle: RETAIL_TITLE,
+    pricing: {
+      costAmount: sumDefined(prescriptions.map((prescription) => prescription.amount)),
+      costAmountTitle: getCostAmountTitle(prescriptions),
+      retailAmount: sumDefined(prescriptions.map((prescription) => prescription.retailAmount)),
+      retailAmountTitle: RETAIL_TITLE
+    },
     prescriptions
   };
 }

@@ -1,7 +1,7 @@
 import { Card, CardBody } from '@chakra-ui/react';
 
 import { OfferInfo } from './OfferInfo';
-import { OfferBundleView } from '../../utils/models';
+import { PharmacyOffer } from '../../utils/models';
 import { PharmacyCardSentHereFrame } from '../pharmacy-card/sent-here/PharmacyCardSentHereFrame';
 import {
   getPharmacyCardBorderStyle,
@@ -9,12 +9,12 @@ import {
 } from '../pharmacy-card/sent-here/pharmacyCardSentHereStyles';
 
 interface Props {
-  offer: OfferBundleView;
+  offer: PharmacyOffer;
   isAutoroutedPharmacy: boolean;
   isPharmacyFulfillingCurrentOrder: boolean;
   selected: boolean;
   isPreferred: boolean;
-  handleSelect: (id: string, offer?: OfferBundleView) => void;
+  handleSelect: (id: string, offer?: PharmacyOffer) => void;
 }
 export const OfferCard = ({
   offer,

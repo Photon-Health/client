@@ -35,18 +35,16 @@ export type OfferPrescriptionView = {
   promotions?: Array<OfferPromotion>;
 };
 
-// totals, labels, overall delivery estimate and the per-prescription breakdown
-export interface OfferBundleSummary {
-  deliveryEstimate?: string;
+// what the patient pays for the whole offer, with the labels to show
+export interface OfferPricing {
   costAmount?: number;
   costAmountTitle?: string;
   retailAmount?: number;
   retailAmountTitle?: string;
-  prescriptions?: Array<OfferPrescriptionView>;
 }
 
-// offer bundle shape after combining totals and top level offer attributes
-export interface OfferBundleView extends OfferBundleSummary {
+// one pharmacy's offer, merged from the bundles that pharmacy returned
+export interface PharmacyOffer {
   source?: string;
   isPromoted?: boolean;
   pharmacy: {
@@ -56,6 +54,9 @@ export interface OfferBundleView extends OfferBundleSummary {
     logo?: string;
   };
   tags: OfferAttributeTag[];
+  deliveryEstimate?: string;
+  pricing: OfferPricing;
+  prescriptions?: Array<OfferPrescriptionView>;
 }
 
 export const OfferTypes = {

@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
 import { deriveCostType, getOfferType } from './offerAnalytics';
-import { EnrichedPharmacy, OfferBundleView, OfferTypes } from './models';
+import { EnrichedPharmacy, PharmacyOffer, OfferTypes } from './models';
 
-const bundle = (overrides: Partial<OfferBundleView>): OfferBundleView => ({
+const bundle = (overrides: Partial<PharmacyOffer>): PharmacyOffer => ({
   pharmacy: { id: 'p', name: 'P' },
   tags: [],
   ...overrides
