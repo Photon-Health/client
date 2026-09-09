@@ -72,6 +72,7 @@ export const Webhooks = () => {
               <Table variant="unstyled" size="sm">
                 <Thead>
                   <Tr>
+                    <Th>ID</Th>
                     <Th>URL</Th>
                     <Th>Status</Th>
                     <Th />
