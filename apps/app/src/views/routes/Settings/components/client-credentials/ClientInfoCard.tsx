@@ -45,7 +45,7 @@ export const ClientInfoCard = (props: ClientInfoCardProps) => {
           <>
             {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
             <ClientSecretView clientSecret={clientCreds.secret!} clientId={clientCreds.id} />
-            <RotateSecret clientId={clientCreds.id} />
+            <RotateSecret clientId={clientCreds.id} clientSecret={clientCreds.secret} />
           </>
         )}
       </Stack>
