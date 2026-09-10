@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
-import { EnrichedPharmacy, OfferBundleDetails } from '../models';
+import { EnrichedPharmacy, PharmacyOffer } from '../models';
 import { useOrderContext } from '../../views/Main';
-import { getOfferType } from '../offers';
+import { deriveCostType, getOfferType } from '../offerAnalytics';
 import { Prescription } from '../../__generated__/graphql';
 import { usePatientAnalytics } from '../../hooks/usePatientAnalytics';
 
@@ -23,7 +23,7 @@ const OfferImpressionTracker = ({
   enabled
 }: {
   children: React.ReactNode;
-  offer: OfferBundleDetails | undefined;
+  offer: PharmacyOffer | undefined;
   pharmacy: EnrichedPharmacy;
   ordinalPosition: number;
   isAlreadySelected: boolean;
@@ -53,7 +53,7 @@ const OfferImpressionTracker = ({
             .map((p) => p.id)
         );
 
-        const price = offer?.costAmount || pharmacy.price;
+        const price = offer?.pricing.costAmount || pharmacy.price;
         const offerType = getOfferType({ pharmacy, offer }) ?? 'None';
 
         patientAnalytics.track('Offer Impression', order, {
@@ -71,23 +71,23 @@ const OfferImpressionTracker = ({
           isClosingSoon: pharmacy.isClosingSoon,
           isAlreadySelected: isAlreadySelected,
           deliveryEstimate: offer?.deliveryEstimate,
-          costType: offer?.costType,
-          costAmount: offer?.costAmount,
-          costAmountTitle: offer?.costAmountTitle,
-          retailAmount: offer?.retailAmount,
-          retailAmountTitle: offer?.retailAmountTitle,
+          costType: offer ? deriveCostType(offer) : undefined,
+          costAmount: offer?.pricing.costAmount,
+          costAmountTitle: offer?.pricing.costAmountTitle,
+          retailAmount: offer?.pricing.retailAmount,
+          retailAmountTitle: offer?.pricing.retailAmountTitle,
           numPrescriptions: rxIds.size,
           multiMedOffer: rxIds.size > 1,
           hasRefills: rxIds.size < order.fills.length,
-          tags: offer?.tags,
-          promotions: offer?.medications?.flatMap(
+          tags: offer?.tags?.map((tag) => tag.label),
+          promotions: offer?.prescriptions?.flatMap(
             (med) =>
               med.promotions?.map((promo) => ({
                 medicationName: med.name,
                 ...promo
               })) ?? []
           ),
-          medicationCosts: offer?.medications
+          medicationCosts: offer?.prescriptions
         });
       }
     }

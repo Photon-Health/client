@@ -15,9 +15,9 @@ import {
 import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
 import { getOrder, getPharmaciesByLocation, rerouteOrder, setOrderPharmacy } from '../api';
-import { fetchOfferBundles, getPharmacy } from './pharmacy.utils';
+import { fetchPharmacyOffers, getPharmacy } from './pharmacy.utils';
 import { FulfillmentType, Pharmacy } from '../__generated__/graphql';
-import { OfferBundleDetails } from '../utils/models';
+import { PharmacyOffer } from '../utils/models';
 import {
   hasConfirmedAutoroutedPharmacy,
   markAutoroutedPharmacyConfirmed
@@ -67,7 +67,7 @@ vi.mock('../configs/graphqlClient', () => ({
 }));
 
 vi.mock('./pharmacy.utils', () => ({
-  fetchOfferBundles: vi.fn(),
+  fetchPharmacyOffers: vi.fn(),
   getPharmacy: vi.fn()
 }));
 
@@ -100,8 +100,8 @@ describe('Pharmacy page', () => {
     });
     vi.mocked(getPharmaciesByLocation).mockResolvedValue({ pharmaciesByLocation: [] });
 
-    const { fetchOfferBundles, getPharmacy } = await import('./pharmacy.utils');
-    vi.mocked(fetchOfferBundles).mockResolvedValue([]);
+    const { fetchPharmacyOffers, getPharmacy } = await import('./pharmacy.utils');
+    vi.mocked(fetchPharmacyOffers).mockResolvedValue([]);
     vi.mocked(getPharmacy).mockReturnValue({
       type: 'MAIL_ORDER',
       selectedPharmacy: { id: 'amazon_pharmacy_id', name: 'Amazon Pharmacy' }
@@ -113,46 +113,37 @@ describe('Pharmacy page', () => {
   });
 
   describe('offers', async () => {
-    let fetchOfferBundlesMock: MockedFunction<typeof fetchOfferBundles>;
+    let fetchPharmacyOffersMock: MockedFunction<typeof fetchPharmacyOffers>;
     let getPharmacyMock: MockedFunction<typeof getPharmacy>;
     let getOrderMock: MockedFunction<typeof getOrder>;
 
-    const mockOfferBundles: OfferBundleDetails[] = [
+    const mockOfferBundles: PharmacyOffer[] = [
       {
-        costType: 'INSURANCE_ESTIMATE',
-        deliveryEstimate: 'Delivers in 2-3 days',
-        costAmount: 25.99,
-        costAmountTitle: 'Insurance Price',
-        retailAmount: 150.0,
-        retailAmountTitle: 'Retail',
-        pharmacy: {
-          id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-          name: 'Amazon Pharmacy',
-          fulfillmentTypes: ['MAIL_ORDER']
-        },
-        tags: ['In Stock', 'Free Shipping'],
-        medications: [{ name: 'Metformin 500mg', amount: 25.99, retailAmount: 150.0 }]
-      },
-      {
-        costType: 'PRIME_RX',
+        source: 'AMAZON_PHARMACY',
+        isPromoted: true,
         deliveryEstimate: 'Delivers in 1-2 days',
-        costAmount: 19.99,
-        costAmountTitle: 'Prime Rx Price',
-        retailAmount: 120.0,
-        retailAmountTitle: 'Retail',
+        pricing: {
+          costAmount: 19.99,
+          costAmountTitle: 'Prime Rx Price',
+          retailAmount: 120.0,
+          retailAmountTitle: 'Retail'
+        },
         pharmacy: {
           id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
           name: 'Amazon Pharmacy',
           fulfillmentTypes: ['MAIL_ORDER']
         },
-        tags: ['Prime Member', 'Fast Delivery'],
-        medications: [{ name: 'Metformin 500mg', amount: 19.99, retailAmount: 120.0 }]
+        tags: [
+          { kind: 'IN_STOCK', label: 'In Stock' },
+          { kind: 'FREE_DELIVERY', label: 'Free Shipping' }
+        ],
+        prescriptions: [{ name: 'Metformin 500mg', amount: 19.99, retailAmount: 120.0 }]
       }
     ];
 
     beforeEach(async () => {
-      fetchOfferBundlesMock = vi.mocked(fetchOfferBundles);
-      fetchOfferBundlesMock.mockResolvedValue(mockOfferBundles);
+      fetchPharmacyOffersMock = vi.mocked(fetchPharmacyOffers);
+      fetchPharmacyOffersMock.mockResolvedValue(mockOfferBundles);
 
       getPharmacyMock = vi.mocked(getPharmacy);
       getPharmacyMock.mockReturnValue({
@@ -252,8 +243,8 @@ describe('Pharmacy page', () => {
 
     test('does not show offers when no offers are available', async () => {
       // Override the mock to return empty array for this test
-      const { fetchOfferBundles } = await import('./pharmacy.utils');
-      vi.mocked(fetchOfferBundles).mockResolvedValueOnce([]);
+      const { fetchPharmacyOffers } = await import('./pharmacy.utils');
+      vi.mocked(fetchPharmacyOffers).mockResolvedValueOnce([]);
 
       const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
@@ -310,8 +301,8 @@ describe('Pharmacy page', () => {
         // No address provided
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
-      const { fetchOfferBundles } = await import('./pharmacy.utils');
-      vi.mocked(fetchOfferBundles).mockResolvedValueOnce([]);
+      const { fetchPharmacyOffers } = await import('./pharmacy.utils');
+      vi.mocked(fetchPharmacyOffers).mockResolvedValueOnce([]);
 
       const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
       getPharmaciesByLocationMock.mockResolvedValue({
@@ -374,8 +365,8 @@ describe('Pharmacy page', () => {
 
     test('does not show offers even when order has address (current behavior)', async () => {
       // Override the mock to return empty array for this test
-      const { fetchOfferBundles } = await import('./pharmacy.utils');
-      vi.mocked(fetchOfferBundles).mockResolvedValueOnce([]);
+      const { fetchPharmacyOffers } = await import('./pharmacy.utils');
+      vi.mocked(fetchPharmacyOffers).mockResolvedValueOnce([]);
 
       const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
@@ -579,14 +570,17 @@ describe('Pharmacy page', () => {
 
   describe('multi-rx offers', () => {
     test('shows Total Price title for mixed CASH and PRIME_RX bundle', async () => {
-      const { fetchOfferBundles } = await import('./pharmacy.utils');
-      vi.mocked(fetchOfferBundles).mockResolvedValueOnce([
+      const { fetchPharmacyOffers } = await import('./pharmacy.utils');
+      vi.mocked(fetchPharmacyOffers).mockResolvedValueOnce([
         {
-          costType: 'MIXED',
-          costAmount: 21.98,
-          costAmountTitle: 'Total Price',
-          retailAmount: 200.0,
-          retailAmountTitle: 'Retail',
+          source: 'AMAZON_PHARMACY',
+          isPromoted: true,
+          pricing: {
+            costAmount: 21.98,
+            costAmountTitle: 'Total Price',
+            retailAmount: 200.0,
+            retailAmountTitle: 'Retail'
+          },
           deliveryEstimate: 'Delivers in 2-3 days',
           pharmacy: {
             id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
@@ -594,7 +588,7 @@ describe('Pharmacy page', () => {
             fulfillmentTypes: ['MAIL_ORDER']
           },
           tags: [],
-          medications: [
+          prescriptions: [
             { name: 'Metformin', pricingType: 'CASH', amount: 9.99, retailAmount: 100.0 },
             { name: 'Lisinopril', pricingType: 'PRIME_RX', amount: 11.99, retailAmount: 100.0 }
           ]
@@ -631,14 +625,17 @@ describe('Pharmacy page', () => {
     }, 10_000);
 
     test('shows per-medication prices and promotions for multi-rx bundle offers', async () => {
-      const { fetchOfferBundles } = await import('./pharmacy.utils');
-      vi.mocked(fetchOfferBundles).mockResolvedValueOnce([
+      const { fetchPharmacyOffers } = await import('./pharmacy.utils');
+      vi.mocked(fetchPharmacyOffers).mockResolvedValueOnce([
         {
-          costType: 'CASH',
-          costAmount: 24.99,
-          costAmountTitle: 'Cash Price',
-          retailAmount: 200.0,
-          retailAmountTitle: 'Retail',
+          source: 'AMAZON_PHARMACY',
+          isPromoted: true,
+          pricing: {
+            costAmount: 24.99,
+            costAmountTitle: 'Cash Price',
+            retailAmount: 200.0,
+            retailAmountTitle: 'Retail'
+          },
           deliveryEstimate: 'Delivers in 2-3 days',
           pharmacy: {
             id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
@@ -646,7 +643,7 @@ describe('Pharmacy page', () => {
             fulfillmentTypes: ['MAIL_ORDER']
           },
           tags: [],
-          medications: [
+          prescriptions: [
             {
               name: 'Metformin',
               amount: 9.99,
@@ -791,8 +788,8 @@ describe('Pharmacy page', () => {
       vi.mocked(setOrderPharmacy).mockResolvedValue(true);
       vi.mocked(rerouteOrder).mockResolvedValue(true);
 
-      const { fetchOfferBundles, getPharmacy } = await import('./pharmacy.utils');
-      vi.mocked(fetchOfferBundles).mockResolvedValue([]);
+      const { fetchPharmacyOffers, getPharmacy } = await import('./pharmacy.utils');
+      vi.mocked(fetchPharmacyOffers).mockResolvedValue([]);
       vi.mocked(getPharmacy).mockReturnValue({
         type: 'PICK_UP',
         selectedPharmacy: testAutoroutedPharmacy

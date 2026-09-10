@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, test, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { OffersList } from './OffersList';
-import { OfferBundleDetails } from '../../utils/models';
+import { PharmacyOffer } from '../../utils/models';
 
 // Mock the OfferImpressionTracker component
 vi.mock('../../utils/tracking/OfferImpressionTracker', () => ({
@@ -32,10 +32,10 @@ vi.mock('./OfferCard', () => ({
       <div data-testid="pharmacy-info">
         <div data-testid="pharmacy-info-name">{offer.pharmacy.name}</div>
         <div>{offer.deliveryEstimate}</div>
-        {offer.costAmount && <div>${offer.costAmount}</div>}
-        {offer.tags?.map((tag: string) => (
-          <span key={tag} data-testid={`tag-${tag}`}>
-            {tag}
+        {offer.pricing?.costAmount && <div>${offer.pricing.costAmount}</div>}
+        {offer.tags?.map((tag: { kind: string; label: string }) => (
+          <span key={tag.kind} data-testid={`tag-${tag.label}`}>
+            {tag.label}
           </span>
         ))}
       </div>
@@ -44,7 +44,7 @@ vi.mock('./OfferCard', () => ({
 }));
 
 describe('OffersList', () => {
-  const mockOffers: OfferBundleDetails[] = [
+  const mockOffers: PharmacyOffer[] = [
     {
       pharmacy: {
         id: 'amazon-pharmacy',
@@ -52,13 +52,17 @@ describe('OffersList', () => {
         fulfillmentTypes: ['MAIL_ORDER']
       },
       deliveryEstimate: 'Delivers in 2-3 days',
-      costType: 'INSURANCE_ESTIMATE',
-      costAmount: 25.99,
-      costAmountTitle: 'Insurance Price',
-      retailAmount: 150.0,
-      retailAmountTitle: 'Retail',
-      tags: ['In Stock', 'Free Shipping'],
-      medications: [{ name: 'Metformin 500mg', amount: 25.99, retailAmount: 150.0 }]
+      pricing: {
+        costAmount: 25.99,
+        costAmountTitle: 'Insurance Price',
+        retailAmount: 150.0,
+        retailAmountTitle: 'Retail'
+      },
+      tags: [
+        { kind: 'IN_STOCK', label: 'In Stock' },
+        { kind: 'FREE_DELIVERY', label: 'Free Shipping' }
+      ],
+      prescriptions: [{ name: 'Metformin 500mg', amount: 25.99, retailAmount: 150.0 }]
     },
     {
       pharmacy: {
@@ -67,9 +71,9 @@ describe('OffersList', () => {
         fulfillmentTypes: ['MAIL_ORDER']
       },
       deliveryEstimate: 'Delivers in 3-5 days',
-      costType: 'NOVOCARE_OFFER',
-      tags: ['Special Offer'],
-      medications: []
+      tags: [{ kind: 'SPECIAL_OFFER', label: 'Special Offer' }],
+      pricing: {},
+      prescriptions: []
     }
   ];
 
