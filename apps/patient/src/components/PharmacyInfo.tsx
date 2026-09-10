@@ -22,7 +22,6 @@ import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import { formatAddress, formatPrice, titleCase } from '../utils/formatters';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
-import { BrandedOptionOverrides } from './pharmacy-card-list';
 
 dayjs.extend(customParseFormat);
 
@@ -222,26 +221,6 @@ const DistanceAddress = ({
   );
 };
 
-type CostWidgetProps = {
-  costAmount?: number;
-  costType?: string;
-};
-
-const CostWidget = ({ costAmount, costType }: CostWidgetProps) => {
-  if (costAmount == 0 || !costAmount) {
-    return null;
-  }
-
-  return (
-    <VStack spacing={0} align="flex-end" minW="fit-content">
-      <Text fontSize="sm">
-        {costType === 'INSURANCE_ESTIMATE' ? 'Avg. Copay Price' : 'As Low As'}
-      </Text>
-      <Text fontWeight="bold">${formatPrice(costAmount)}</Text>
-    </VStack>
-  );
-};
-
 interface PharmacyInfoProps {
   pharmacy: EnrichedPharmacy;
   tagline?: string;
@@ -256,7 +235,6 @@ interface PharmacyInfoProps {
   showHours?: boolean;
   isCurrentPharmacy?: boolean;
   orderFulfillment?: OrderFulfillment;
-  brandedOptionOverride?: BrandedOptionOverrides;
 }
 
 export const PharmacyInfo = ({
@@ -271,8 +249,7 @@ export const PharmacyInfo = ({
   isStatus = false,
   showHours = false,
   isCurrentPharmacy = false,
-  orderFulfillment,
-  brandedOptionOverride
+  orderFulfillment
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
@@ -288,16 +265,6 @@ export const PharmacyInfo = ({
   const trackingLink = orderFulfillment && getFulfillmentTrackingLink(orderFulfillment);
   const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
   const directionsUrl = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
-
-  const isAmazonPharmacy = pharmacy.id === import.meta.env.VITE_AMAZON_PHARMACY_ID;
-  const showAmazonTagline =
-    isAmazonPharmacy && brandedOptionOverride?.amazonPharmacyOverride?.deliveryEstimate;
-
-  const isNovocarePharmacy = pharmacy.id === import.meta.env.VITE_NOVOCARE_PHARMACY_ID;
-  const showNovocareTagline =
-    isNovocarePharmacy && brandedOptionOverride?.novocareExperimentOverride;
-
-  const taglineOverride = showNovocareTagline || showAmazonTagline;
 
   return (
     <VStack data-testid="pharmacy-info" align="start" w="full">
@@ -339,23 +306,11 @@ export const PharmacyInfo = ({
             ) : null}
           </VStack>
         ) : null}
-
-        {showAmazonTagline ? (
-          <CostWidget
-            costAmount={brandedOptionOverride?.amazonPharmacyOverride?.costAmount}
-            costType={brandedOptionOverride?.amazonPharmacyOverride?.costType}
-          />
-        ) : null}
       </HStack>
 
       {showDetails ? (
         <VStack direction={isStatus ? 'column-reverse' : 'column'} w="full" alignItems={'start'}>
-          {taglineOverride ? (
-            <Text fontSize="sm" color="gray.500">
-              {taglineOverride}
-            </Text>
-          ) : null}
-          {!taglineOverride && tagline ? (
+          {tagline ? (
             <Text fontSize="sm" color="gray.500">
               {tagline}
             </Text>
@@ -399,19 +354,9 @@ export const PharmacyInfo = ({
               <TagLabel fontWeight="bold">Available in your area</TagLabel>
             </Tag>
           ) : null}
-          {showFreeDeliveryTag && !showAmazonTagline && !showNovocareTagline ? (
+          {showFreeDeliveryTag ? (
             <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
               <TagLabel fontWeight="bold">Free Delivery</TagLabel>
-            </Tag>
-          ) : null}
-          {isAmazonPharmacy && showAmazonTagline ? (
-            <Tag size="sm" colorScheme="blue" flexShrink={0}>
-              <TagLabel fontWeight="bold">In Stock</TagLabel>
-            </Tag>
-          ) : null}
-          {isNovocarePharmacy && showNovocareTagline ? (
-            <Tag size="sm" colorScheme="blue" flexShrink={0}>
-              <TagLabel fontWeight="bold">In Stock</TagLabel>
             </Tag>
           ) : null}
         </HStack>
