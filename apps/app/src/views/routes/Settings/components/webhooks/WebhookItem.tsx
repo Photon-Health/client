@@ -41,6 +41,9 @@ export const WebhookItem = (props: WebhookItemProps) => {
   return (
     <Tr key={webhook.id}>
       <Td>
+        <Text color="muted">{webhook.id}</Text>
+      </Td>
+      <Td>
         <Text color="muted">{webhook.url}</Text>
       </Td>
       <Td>

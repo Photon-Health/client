@@ -447,61 +447,43 @@ export const GET_INFO_PAGE_DATA = gql`
   ${PHARMACY_FIELDS}
 `;
 
-export const GET_OFFERS = gql`
-  query GetOffersForOrder($orderId: ID!) {
-    offers(orderId: $orderId) {
-      deliveryEstimate {
-        deliveryPromise
-        deliveryPromiseRangeEnd
-        deliveryPromiseRangeStart
-      }
-      cost {
-        type
-        amount
-        amountTitle
-        retailAmount
-        retailAmountTitle
-      }
-      supplier
-    }
-  }
-`;
-
 export const GET_OFFER_BUNDLES = gql`
   query GetOfferBundlesForOrder($orderId: ID!) {
     offerBundles(orderId: $orderId) {
-      aggregateCost {
-        totalAmount
-        totalRetailAmount
+      source
+      isPromoted
+      pharmacy {
+        id
+        name
+        logo
+        fulfillmentTypes
       }
-      medications {
-        medicationPrice {
-          amount
-          amountTitle
-          promotions {
-            type
-            amount
-            amountSaved
-          }
-          retailAmount
-          retailAmountTitle
-        }
+      attributeTags {
+        kind
+        label
+      }
+      offers {
+        priceType
         deliveryEstimate {
           deliveryPromise
         }
-        pricingType
         prescription {
+          id
           treatment {
             id
             name
           }
         }
+        prescriptionPrice {
+          amount
+          retailAmount
+          promotions {
+            type
+            amount
+            amountSaved
+          }
+        }
       }
-      amountTitle
-      retailAmountTitle
-      deliveryEstimate
-      pricingType
-      supplier
     }
   }
 `;

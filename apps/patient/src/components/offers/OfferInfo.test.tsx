@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { OfferInfo } from './OfferInfo';
-import { OfferBundleDetails } from '../../utils/models';
+import { PharmacyOffer } from '../../utils/models';
 
 // Mock the text utility
 vi.mock('../../utils/text', () => ({
@@ -15,7 +15,7 @@ describe('OfferInfo', () => {
     vi.unstubAllEnvs();
   });
 
-  const baseOffer: OfferBundleDetails = {
+  const baseOffer: PharmacyOffer = {
     pharmacy: {
       id: 'test-pharmacy-id',
       name: 'Test Pharmacy',
@@ -23,13 +23,17 @@ describe('OfferInfo', () => {
       logo: 'https://example.com/logo.png'
     },
     deliveryEstimate: 'Delivers in 2-3 days',
-    costType: 'INSURANCE_ESTIMATE',
-    costAmount: 25.99,
-    costAmountTitle: 'Insurance Price',
-    retailAmount: 150.0,
-    retailAmountTitle: 'Retail',
-    tags: ['In Stock', 'Free Shipping'],
-    medications: [{ name: 'Metformin 500mg', amount: 25.99, retailAmount: 150.0 }]
+    pricing: {
+      costAmount: 25.99,
+      costAmountTitle: 'Insurance Price',
+      retailAmount: 150.0,
+      retailAmountTitle: 'Retail'
+    },
+    tags: [
+      { kind: 'IN_STOCK', label: 'In Stock' },
+      { kind: 'FREE_DELIVERY', label: 'Free Shipping' }
+    ],
+    prescriptions: [{ name: 'Metformin 500mg', amount: 25.99, retailAmount: 150.0 }]
   };
 
   test('renders pharmacy name and logo', () => {
@@ -94,8 +98,14 @@ describe('OfferInfo', () => {
   });
 
   test('does not show retail price when same as or less than cost amount', () => {
-    const offerWithSameCost = { ...baseOffer, costAmount: 150.0, retailAmount: 150.0 };
-    const offerWithLowerRetail = { ...baseOffer, costAmount: 150.0, retailAmount: 100.0 };
+    const offerWithSameCost = {
+      ...baseOffer,
+      pricing: { ...baseOffer.pricing, costAmount: 150.0, retailAmount: 150.0 }
+    };
+    const offerWithLowerRetail = {
+      ...baseOffer,
+      pricing: { ...baseOffer.pricing, costAmount: 150.0, retailAmount: 100.0 }
+    };
 
     const { unmount } = render(
       <OfferInfo
@@ -178,10 +188,12 @@ describe('OfferInfo', () => {
   test('handles missing cost information gracefully', () => {
     const offerWithoutCost = {
       ...baseOffer,
-      costAmount: undefined,
-      costAmountTitle: undefined,
-      retailAmount: undefined,
-      retailAmountTitle: undefined
+      pricing: {
+        costAmount: undefined,
+        costAmountTitle: undefined,
+        retailAmount: undefined,
+        retailAmountTitle: undefined
+      }
     };
 
     render(
@@ -201,10 +213,12 @@ describe('OfferInfo', () => {
   test('uses retail amount as cost when cost amount is not provided', () => {
     const offerWithOnlyRetail = {
       ...baseOffer,
-      costAmount: undefined,
-      costAmountTitle: undefined,
-      retailAmount: 100.0,
-      retailAmountTitle: 'Retail Price'
+      pricing: {
+        costAmount: undefined,
+        costAmountTitle: undefined,
+        retailAmount: 100.0,
+        retailAmountTitle: 'Retail Price'
+      }
     };
 
     render(
@@ -284,26 +298,45 @@ describe('OfferInfo', () => {
     expect(screen.getByText('Free Shipping')).toBeInTheDocument();
   });
 
-  test('shows Sponsored text when pharmacy is Amazon', () => {
-    const amazonPharmacyId = 'amazon-pharmacy-id';
-    vi.stubEnv('VITE_AMAZON_PHARMACY_ID', amazonPharmacyId);
-
-    const amazonPharmacy = { ...baseOffer.pharmacy, id: amazonPharmacyId };
+  test('shows Sponsored badge when the SPONSORED attribute tag is present', () => {
+    const sponsoredOffer: PharmacyOffer = {
+      ...baseOffer,
+      tags: [
+        { kind: 'SPONSORED', label: 'Sponsored' },
+        { kind: 'IN_STOCK', label: 'In Stock' }
+      ]
+    };
 
     render(
       <OfferInfo
-        pharmacy={amazonPharmacy}
-        offer={{ ...baseOffer, pharmacy: amazonPharmacy }}
+        pharmacy={sponsoredOffer.pharmacy}
+        offer={sponsoredOffer}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
     );
 
+    // Rendered once as the distinct badge, not also as a plain chip in the tag row.
     expect(screen.getByText('Sponsored')).toBeInTheDocument();
+    expect(screen.getAllByText('Sponsored')).toHaveLength(1);
+    expect(screen.getByText('In Stock')).toBeInTheDocument();
+  });
+
+  test('does not show Sponsored badge without the SPONSORED tag', () => {
+    render(
+      <OfferInfo
+        pharmacy={baseOffer.pharmacy}
+        offer={baseOffer}
+        isCurrentPharmacy={false}
+        isPreferred={false}
+      />
+    );
+
+    expect(screen.queryByText('Sponsored')).not.toBeInTheDocument();
   });
 
   describe('OfferInfo — medication breakdown list', () => {
-    const baseBundle: OfferBundleDetails = {
+    const baseBundle: PharmacyOffer = {
       pharmacy: {
         id: 'test-pharmacy-id',
         name: 'Test Pharmacy',
@@ -311,20 +344,21 @@ describe('OfferInfo', () => {
         logo: undefined
       },
       deliveryEstimate: 'Delivers in 2-3 days',
-      costType: 'PRIME_RX',
-      costAmount: 45.0,
-      costAmountTitle: 'Prime Rx Price',
-      retailAmount: 200.0,
-      retailAmountTitle: 'Retail',
+      pricing: {
+        costAmount: 45.0,
+        costAmountTitle: 'Prime Rx Price',
+        retailAmount: 200.0,
+        retailAmountTitle: 'Retail'
+      },
       tags: [],
-      medications: [
+      prescriptions: [
         { name: 'Metformin 500mg', amount: 20.0, retailAmount: 100.0 },
         { name: 'Lisinopril 10mg', amount: 25.0, retailAmount: 100.0 }
       ]
     };
 
     test('does not render the breakdown list when medications array is empty', () => {
-      const emptyMedsBundle: OfferBundleDetails = { ...baseBundle, medications: [] };
+      const emptyMedsBundle: PharmacyOffer = { ...baseBundle, prescriptions: [] };
 
       render(
         <OfferInfo
@@ -340,9 +374,9 @@ describe('OfferInfo', () => {
     });
 
     test('does not render the breakdown list for single-med', () => {
-      const singleMedBundle: OfferBundleDetails = {
+      const singleMedBundle: PharmacyOffer = {
         ...baseBundle,
-        medications: [{ name: 'Metformin 500mg', amount: 20.0, retailAmount: 100.0 }]
+        prescriptions: [{ name: 'Metformin 500mg', amount: 20.0, retailAmount: 100.0 }]
       };
 
       render(
@@ -358,9 +392,9 @@ describe('OfferInfo', () => {
     });
 
     test('renders each medication and retail strikethrough only when retail is greater than cost for multi-med', () => {
-      const bundle: OfferBundleDetails = {
+      const bundle: PharmacyOffer = {
         ...baseBundle,
-        medications: [
+        prescriptions: [
           { name: 'Metformin 500mg', amount: 20.0, retailAmount: 100.0 }, // retail > cost
           { name: 'Lisinopril 10mg', amount: 25.0, retailAmount: 25.0 }, // retail === cost
           { name: 'Atorvastatin 10mg', amount: 30.0, retailAmount: 10.0 } // retail < cost
@@ -390,7 +424,7 @@ describe('OfferInfo', () => {
   });
 
   describe('OfferInfo — coupon tag', () => {
-    const baseSingleMedBundle: OfferBundleDetails = {
+    const baseSingleMedBundle: PharmacyOffer = {
       pharmacy: {
         id: 'test-pharmacy-id',
         name: 'Amazon Pharmacy',
@@ -398,13 +432,14 @@ describe('OfferInfo', () => {
         logo: undefined
       },
       deliveryEstimate: 'Delivers in 2-3 days',
-      costType: 'PRIME_RX',
-      costAmount: 25.0,
-      costAmountTitle: 'Prime Rx Price',
-      retailAmount: 100.0,
-      retailAmountTitle: 'Retail',
+      pricing: {
+        costAmount: 25.0,
+        costAmountTitle: 'Prime Rx Price',
+        retailAmount: 100.0,
+        retailAmountTitle: 'Retail'
+      },
       tags: [],
-      medications: [{ name: 'Metformin 500mg', amount: 25.0, retailAmount: 100.0 }]
+      prescriptions: [{ name: 'Metformin 500mg', amount: 25.0, retailAmount: 100.0 }]
     };
 
     test('does not render coupon tag when single-med has no promotions', () => {
@@ -421,11 +456,11 @@ describe('OfferInfo', () => {
     });
 
     test('renders coupon tag with savings amount when single-med has promotion', () => {
-      const offerWithCoupon: OfferBundleDetails = {
+      const offerWithCoupon: PharmacyOffer = {
         ...baseSingleMedBundle,
-        medications: [
+        prescriptions: [
           {
-            ...baseSingleMedBundle.medications![0],
+            ...baseSingleMedBundle.prescriptions![0],
             promotions: [{ type: 'PHARMACY_RX_COUPON', amountSaved: 15 }]
           }
         ]
@@ -445,11 +480,11 @@ describe('OfferInfo', () => {
     });
 
     test('renders "with coupon if eligible" when single-med promotion has no amountSaved', () => {
-      const offerWithZeroCoupon: OfferBundleDetails = {
+      const offerWithZeroCoupon: PharmacyOffer = {
         ...baseSingleMedBundle,
-        medications: [
+        prescriptions: [
           {
-            ...baseSingleMedBundle.medications![0],
+            ...baseSingleMedBundle.prescriptions![0],
             promotions: [{ type: 'PHARMACY_RX_COUPON', amountSaved: 0 }]
           }
         ]
@@ -469,9 +504,9 @@ describe('OfferInfo', () => {
     });
 
     test('renders coupon tag per medication in multi-med breakdown', () => {
-      const multiMedWithCoupons: OfferBundleDetails = {
+      const multiMedWithCoupons: PharmacyOffer = {
         ...baseSingleMedBundle,
-        medications: [
+        prescriptions: [
           {
             name: 'Metformin 500mg',
             amount: 20.0,
@@ -499,9 +534,9 @@ describe('OfferInfo', () => {
     });
 
     test('does not render coupon tag for multi-med medication with no promotion', () => {
-      const multiMedPartialCoupons: OfferBundleDetails = {
+      const multiMedPartialCoupons: PharmacyOffer = {
         ...baseSingleMedBundle,
-        medications: [
+        prescriptions: [
           {
             name: 'Metformin 500mg',
             amount: 20.0,

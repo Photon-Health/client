@@ -50,7 +50,7 @@ vi.mock('./views/pharmacy.utils', async () => {
   );
   return {
     ...actual,
-    fetchOfferBundles: vi.fn().mockResolvedValue([])
+    fetchPharmacyOffers: vi.fn().mockResolvedValue([])
   };
 });
 
@@ -117,8 +117,8 @@ describe('Rerouting', () => {
     vi.mocked(setOrderPharmacy).mockResolvedValue(true);
     vi.mocked(rerouteOrder).mockResolvedValue(true);
 
-    const { fetchOfferBundles } = await import('./views/pharmacy.utils');
-    vi.mocked(fetchOfferBundles).mockResolvedValue([]);
+    const { fetchPharmacyOffers } = await import('./views/pharmacy.utils');
+    vi.mocked(fetchPharmacyOffers).mockResolvedValue([]);
   });
 
   afterEach(() => {

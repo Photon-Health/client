@@ -1,7 +1,7 @@
 import { SlideFade } from '@chakra-ui/react';
 import { OfferImpressionTracker } from '../../utils/tracking/OfferImpressionTracker';
 import { OfferCard } from './OfferCard';
-import { OfferBundleDetails } from '../../utils/models';
+import { PharmacyOffer } from '../../utils/models';
 
 export const OffersList = ({
   offers,
@@ -10,15 +10,17 @@ export const OffersList = ({
   preferredPharmacyId,
   autoroutedPharmacyId,
   currentPharmacyId,
-  handleSelect
+  handleSelect,
+  numberOfPrecedingOptions = 0
 }: {
-  offers: OfferBundleDetails[];
+  offers: PharmacyOffer[];
   shouldTrackOfferImpressionsAndSelections: boolean;
   selectedPharmacyId: string;
   preferredPharmacyId: string;
   autoroutedPharmacyId?: string;
   currentPharmacyId?: string;
   handleSelect: (id: string) => void;
+  numberOfPrecedingOptions?: number;
 }) => {
   return (
     <>
@@ -30,7 +32,7 @@ export const OffersList = ({
               id: offer.pharmacy.id,
               name: offer.pharmacy.name
             }}
-            ordinalPosition={index}
+            ordinalPosition={index + numberOfPrecedingOptions}
             isAlreadySelected={selectedPharmacyId === offer.pharmacy.id}
             enabled={shouldTrackOfferImpressionsAndSelections}
             offer={offer}

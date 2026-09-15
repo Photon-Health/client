@@ -3,7 +3,6 @@ import { SlideFade } from '@chakra-ui/react';
 import { BrandedPharmacyCard } from './BrandedPharmacyCard';
 import { OfferImpressionTracker } from '../../utils/tracking/OfferImpressionTracker';
 import { getPharmacy } from '../../views/pharmacy.utils';
-import { OfferBundleDetails } from '../../utils/models';
 
 interface Props {
   options: string[];
@@ -11,15 +10,9 @@ interface Props {
   selectedId: string;
   autoroutedPharmacyId?: string;
   currentPharmacyId?: string;
-  brandedOptionOverrides: BrandedOptionOverrides;
   handleSelect: (id: string) => void;
   shouldTrackOfferImpressionsAndSelections: boolean;
   numberOfOffers?: number;
-}
-
-export interface BrandedOptionOverrides {
-  amazonPharmacyOverride?: OfferBundleDetails;
-  novocareExperimentOverride?: string;
 }
 
 export const BrandedOptions = ({
@@ -29,7 +22,6 @@ export const BrandedOptions = ({
   handleSelect,
   autoroutedPharmacyId,
   currentPharmacyId,
-  brandedOptionOverrides,
   shouldTrackOfferImpressionsAndSelections,
   numberOfOffers = 0
 }: Props) => {
@@ -56,7 +48,6 @@ export const BrandedOptions = ({
               isPharmacyFulfillingCurrentOrder={currentPharmacyId === id}
               selected={selectedId === id}
               handleSelect={handleSelect}
-              brandedOptionOverrides={brandedOptionOverrides}
             />
           </OfferImpressionTracker>
         </SlideFade>

@@ -57,7 +57,7 @@ vi.mock('./configs/graphqlClient', () => ({
 }));
 
 vi.mock('./views/pharmacy.utils', () => ({
-  fetchOfferBundles: vi.fn().mockResolvedValue([]),
+  fetchPharmacyOffers: vi.fn().mockResolvedValue([]),
   getPharmacy: vi.fn().mockReturnValue({
     type: 'PICKUP',
     selectedPharmacy: { id: 'phr_testId123', name: 'Test Local Pickup Pharmacy' }

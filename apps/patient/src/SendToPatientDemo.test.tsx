@@ -22,7 +22,7 @@ vi.mock('./utils/preloadImage', () => ({
 }));
 
 vi.mock('./views/pharmacy.utils', () => ({
-  fetchOfferBundles: vi.fn().mockResolvedValue([]),
+  fetchPharmacyOffers: vi.fn().mockResolvedValue([]),
   getPharmacy: vi.fn().mockReturnValue({
     type: 'PICKUP',
     selectedPharmacy: { id: 'phr_demo', name: 'Central Pharmacy' }
