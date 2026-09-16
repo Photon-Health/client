@@ -1,3 +1,4 @@
+import { format, isValid, parse } from 'date-fns';
 import { JSX } from 'solid-js';
 import Input from '../Input';
 
@@ -8,6 +9,21 @@ export interface DateInputProps {
   onDateChange?: (value: string | undefined) => void;
   onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 }
+
+const DATE_FORMATS = [
+  'yyyy-MM-dd',
+  'yyyy/MM/dd',
+  'M/d/yyyy',
+  'M-d-yyyy',
+  'M.d.yyyy',
+  'd/M/yyyy',
+  'd-M-yyyy',
+  'd.M.yyyy',
+  'MMM d, yyyy',
+  'MMM d yyyy',
+  'MMMM d, yyyy',
+  'MMMM d yyyy'
+];
 
 export default function DateInput(props: DateInputProps) {
   return (
@@ -20,24 +36,29 @@ export default function DateInput(props: DateInputProps) {
         props.onDateChange?.(e.currentTarget.value || undefined);
       }}
       onPaste={(e: ClipboardEvent & { currentTarget: HTMLInputElement }) => {
-        const pasteText = e.clipboardData?.getData('Text');
-        if (!pasteText) return;
-        const formatted = formatDate(pasteText);
-        if (formatted) {
-          e.preventDefault();
-          props.onDateChange?.(formatted);
-        }
+        const pastedValue = e.clipboardData?.getData('Text');
+        if (!pastedValue) return;
+
+        const formatted = formatPastedDate(pastedValue);
+        if (!formatted) return;
+
+        e.preventDefault();
+        props.onDateChange?.(formatted);
       }}
       onBlur={props.onBlur}
     />
   );
 }
 
-function formatDate(dateString: string): string {
-  const dateParts = dateString.split(/[/\s-]/);
-  if (dateParts.length !== 3) return '';
-  const [month, day, year] = dateParts.map((part) => parseInt(part));
-  if (isNaN(month) || isNaN(day) || isNaN(year)) return '';
-  if (month < 1 || month > 12 || day < 1 || day > 31) return '';
-  return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+function formatPastedDate(value: string): string | undefined {
+  const trimmedValue = value.trim();
+
+  for (const dateFormat of DATE_FORMATS) {
+    const date = parse(trimmedValue, dateFormat, new Date());
+    if (isValid(date)) {
+      return format(date, 'yyyy-MM-dd');
+    }
+  }
+
+  return undefined;
 }
