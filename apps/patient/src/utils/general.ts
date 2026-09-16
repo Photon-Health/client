@@ -4,8 +4,6 @@ import isToday from 'dayjs/plugin/isToday';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import costcoLogo from '../assets/costco_logo_small.png';
-import walgreensLogo from '../assets/walgreens_logo_small_circle.png';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 import {
   EnrichedPharmacy,
@@ -125,7 +123,7 @@ export const preparePharmacy = (
   let opens = '';
   let closes = '';
   const showReadyIn30Min = false; // not being utilized currently but will revisit so not removing completely
-  let logo: string | undefined = undefined;
+  const logo = pharmacy.logo ?? undefined;
 
   // for mail-order pharmacies, use the info mapped by this branding constant
   if (fulfillmentType && isDelivery({ pharmacy, fulfillmentType })) {
@@ -133,14 +131,6 @@ export const preparePharmacy = (
       ...pharmacy,
       ...PHARMACY_BRANDING[pharmacy.id]
     };
-  }
-
-  // Add logo and urgent badge to certain pharmacies
-  const pharmacyNameLowerCase = pharmacy.name.toLowerCase();
-  if (pharmacyNameLowerCase.includes('walgreens')) {
-    logo = walgreensLogo;
-  } else if (pharmacyNameLowerCase.includes('costco')) {
-    logo = costcoLogo;
   }
 
   if (pharmacy.nextEvents) {
