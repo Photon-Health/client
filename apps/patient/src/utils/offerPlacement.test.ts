@@ -29,6 +29,38 @@ describe('selectOfferPlacement', () => {
     expect(inTab).toHaveLength(0);
   });
 
+  test('routes UK Health offers to their tabs when more than one is promoted', () => {
+    const onsite = bundle({
+      source: 'UK_HEALTH',
+      isPromoted: true,
+      pharmacy: { id: 'phr_uk_onsite', name: 'Kentucky Clinic', fulfillmentTypes: ['PICK_UP'] }
+    });
+    const mailOrder = bundle({
+      source: 'UK_HEALTH',
+      isPromoted: true,
+      pharmacy: {
+        id: 'phr_uk_mail',
+        name: 'Kentucky Clinic Mail',
+        fulfillmentTypes: ['MAIL_ORDER']
+      }
+    });
+
+    const { aboveFold, inTab } = selectOfferPlacement([onsite, mailOrder]);
+
+    expect(aboveFold).toHaveLength(0);
+    expect(inTab.map((o) => o.pharmacy.id)).toEqual(['phr_uk_onsite', 'phr_uk_mail']);
+  });
+
+  test('keeps a lone promoted UK Health offer above the fold', () => {
+    const onsite = bundle({ source: 'UK_HEALTH', isPromoted: true });
+    const amazonInTab = bundle({ source: 'AMAZON_PHARMACY', isPromoted: false });
+
+    const { aboveFold, inTab } = selectOfferPlacement([onsite, amazonInTab]);
+
+    expect(aboveFold.map((o) => o.source)).toEqual(['UK_HEALTH']);
+    expect(inTab.map((o) => o.source)).toEqual(['AMAZON_PHARMACY']);
+  });
+
   test('puts non-promoted offers in-tab', () => {
     const amazon = bundle({
       source: 'AMAZON_PHARMACY',

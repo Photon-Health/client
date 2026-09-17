@@ -63,7 +63,8 @@ export const OfferTypes = {
   RxSense: 'RxSense',
   GoodRx: 'GoodRx',
   AmazonPharmacy: 'Amazon Pharmacy',
-  Novocare: 'Novocare'
+  Novocare: 'Novocare',
+  UkHealth: 'UK Health'
 } as const;
 
 export type OfferTypeKey = keyof typeof OfferTypes;

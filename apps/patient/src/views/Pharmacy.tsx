@@ -1199,52 +1199,54 @@ export const Pharmacy = () => {
                 sentToMailOrder={orderPharmacyIsMailOrder}
                 activeTab={activeTab}
               />
-              {deliveryOffers.length > 0 && (
-                <OffersList
-                  offers={deliveryOffers}
-                  shouldTrackOfferImpressionsAndSelections={
-                    shouldTrackOfferImpressionsAndSelections
-                  }
-                  selectedPharmacyId={selectedId}
-                  preferredPharmacyId={effectivePreferredPharmacyId}
-                  autoroutedPharmacyId={autoroutedPharmacyId}
-                  currentPharmacyId={currentPharmacyId}
-                  handleSelect={handleSelect}
-                  numberOfPrecedingOptions={optionsAboveTabs}
-                />
-              )}
-              {showBrandedOptions && (
-                <BrandedOptions
-                  numberOfOffers={optionsAboveTabs + deliveryOffers.length}
-                  options={brandedOptions}
-                  location={patientLocation}
-                  selectedId={selectedId}
-                  handleSelect={handleSelect}
-                  autoroutedPharmacyId={autoroutedPharmacyId}
-                  currentPharmacyId={currentPharmacyId}
-                  shouldTrackOfferImpressionsAndSelections={
-                    shouldTrackOfferImpressionsAndSelections
-                  }
-                />
-              )}
-              {inlineMailOrderOptions.length > 0 ? (
-                <MailOrderSelectList
-                  options={inlineMailOrderOptions}
-                  selectedId={selectedId}
-                  autoroutedPharmacyId={autoroutedPharmacyId}
-                  onSelect={(option) => handleSelect(option.id)}
-                  shouldTrackOfferImpressionsAndSelections={
-                    shouldTrackOfferImpressionsAndSelections
-                  }
-                  numberOfPrecedingOptions={
-                    optionsAboveTabs + deliveryOffers.length + brandedOptions.length
-                  }
-                />
-              ) : brandedOptions.length === 0 && deliveryOffers.length === 0 ? (
-                <Text fontSize="sm" color="gray.600" py={4}>
-                  No delivery pharmacies available.
-                </Text>
-              ) : null}
+              <VStack spacing={2} align="stretch" w="full">
+                {deliveryOffers.length > 0 && (
+                  <OffersList
+                    offers={deliveryOffers}
+                    shouldTrackOfferImpressionsAndSelections={
+                      shouldTrackOfferImpressionsAndSelections
+                    }
+                    selectedPharmacyId={selectedId}
+                    preferredPharmacyId={effectivePreferredPharmacyId}
+                    autoroutedPharmacyId={autoroutedPharmacyId}
+                    currentPharmacyId={currentPharmacyId}
+                    handleSelect={handleSelect}
+                    numberOfPrecedingOptions={optionsAboveTabs}
+                  />
+                )}
+                {showBrandedOptions && (
+                  <BrandedOptions
+                    numberOfOffers={optionsAboveTabs + deliveryOffers.length}
+                    options={brandedOptions}
+                    location={patientLocation}
+                    selectedId={selectedId}
+                    handleSelect={handleSelect}
+                    autoroutedPharmacyId={autoroutedPharmacyId}
+                    currentPharmacyId={currentPharmacyId}
+                    shouldTrackOfferImpressionsAndSelections={
+                      shouldTrackOfferImpressionsAndSelections
+                    }
+                  />
+                )}
+                {inlineMailOrderOptions.length > 0 ? (
+                  <MailOrderSelectList
+                    options={inlineMailOrderOptions}
+                    selectedId={selectedId}
+                    autoroutedPharmacyId={autoroutedPharmacyId}
+                    onSelect={(option) => handleSelect(option.id)}
+                    shouldTrackOfferImpressionsAndSelections={
+                      shouldTrackOfferImpressionsAndSelections
+                    }
+                    numberOfPrecedingOptions={
+                      optionsAboveTabs + deliveryOffers.length + brandedOptions.length
+                    }
+                  />
+                ) : brandedOptions.length === 0 && deliveryOffers.length === 0 ? (
+                  <Text fontSize="sm" color="gray.600" py={4}>
+                    No delivery pharmacies available.
+                  </Text>
+                ) : null}
+              </VStack>
             </TabPanel>
           ) : (
             <TabPanel ariaLabel="Select a pickup pharmacy" pb={showFooter ? 32 : 8}>
@@ -1253,52 +1255,57 @@ export const Pharmacy = () => {
                 sentToMailOrder={orderPharmacyIsMailOrder}
                 activeTab={activeTab}
               />
-              {pickupOffers.length > 0 && (
-                <OffersList
-                  offers={pickupOffers}
+              <BenefitsBanner
+                onTooltipClick={() =>
+                  patientAnalytics.track('Benefits Banner Tooltip Clicked', order)
+                }
+              />
+              {/* offers and pharmacy cards are one list of options, so they share the card rhythm
+                  rather than TabPanel's wider section gap */}
+              <VStack spacing={2} align="stretch" w="full">
+                {pickupOffers.length > 0 && (
+                  <OffersList
+                    offers={pickupOffers}
+                    shouldTrackOfferImpressionsAndSelections={
+                      shouldTrackOfferImpressionsAndSelections
+                    }
+                    selectedPharmacyId={selectedId}
+                    preferredPharmacyId={effectivePreferredPharmacyId}
+                    autoroutedPharmacyId={autoroutedPharmacyId}
+                    currentPharmacyId={currentPharmacyId}
+                    handleSelect={handleSelect}
+                    numberOfPrecedingOptions={optionsAboveTabs}
+                  />
+                )}
+                <PickupPharmacyCardList
+                  location={patientLocation}
+                  pharmacies={pickupPharmacies}
+                  preferredPharmacy={effectivePreferredPharmacyId}
+                  savingPreferred={savingPreferred}
+                  selectedId={selectedId}
+                  handleSelect={handleSelect}
+                  handleShowMore={handleShowMore}
+                  handleSetPreferred={handleSetPreferredPharmacy}
+                  loadingMore={isLoading}
+                  showingAllPharmacies={showingAllPharmacies}
+                  showPrice={isDemo || !orderIsMultiRx}
+                  enableOpenNow={enableOpenNow}
+                  enable24Hr={enable24Hr}
+                  enablePrice={enablePrice}
+                  setEnableOpenNow={setEnableOpenNow}
+                  setEnable24Hr={setEnable24Hr}
+                  showFilters={false}
+                  autoroutedPharmacyId={autoroutedPharmacyId}
+                  currentPharmacyId={currentPharmacyId}
+                  setCouponModalOpen={setCouponModalOpen}
+                  numberOfBrandedOptions={
+                    optionsAboveTabs + pickupOffers.length + brandedOptions.length
+                  }
                   shouldTrackOfferImpressionsAndSelections={
                     shouldTrackOfferImpressionsAndSelections
                   }
-                  selectedPharmacyId={selectedId}
-                  preferredPharmacyId={effectivePreferredPharmacyId}
-                  autoroutedPharmacyId={autoroutedPharmacyId}
-                  currentPharmacyId={currentPharmacyId}
-                  handleSelect={handleSelect}
-                  numberOfPrecedingOptions={optionsAboveTabs}
                 />
-              )}
-              <PickupPharmacyCardList
-                location={patientLocation}
-                pharmacies={pickupPharmacies}
-                preferredPharmacy={effectivePreferredPharmacyId}
-                savingPreferred={savingPreferred}
-                selectedId={selectedId}
-                handleSelect={handleSelect}
-                handleShowMore={handleShowMore}
-                handleSetPreferred={handleSetPreferredPharmacy}
-                loadingMore={isLoading}
-                showingAllPharmacies={showingAllPharmacies}
-                showPrice={isDemo || !orderIsMultiRx}
-                enableOpenNow={enableOpenNow}
-                enable24Hr={enable24Hr}
-                enablePrice={enablePrice}
-                setEnableOpenNow={setEnableOpenNow}
-                setEnable24Hr={setEnable24Hr}
-                showFilters={false}
-                autoroutedPharmacyId={autoroutedPharmacyId}
-                currentPharmacyId={currentPharmacyId}
-                setCouponModalOpen={setCouponModalOpen}
-                numberOfBrandedOptions={
-                  optionsAboveTabs + pickupOffers.length + brandedOptions.length
-                }
-                shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
-              >
-                <BenefitsBanner
-                  onTooltipClick={() =>
-                    patientAnalytics.track('Benefits Banner Tooltip Clicked', order)
-                  }
-                />
-              </PickupPharmacyCardList>
+              </VStack>
             </TabPanel>
           )}
         </>
