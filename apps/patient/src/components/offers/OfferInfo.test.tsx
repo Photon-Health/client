@@ -6,7 +6,7 @@ import { PharmacyOffer } from '../../utils/models';
 // Mock the text utility
 vi.mock('../../utils/text', () => ({
   text: {
-    preferred: 'Preferred'
+    preferred: 'Your usual'
   }
 }));
 
@@ -159,6 +159,22 @@ describe('OfferInfo', () => {
     expect(screen.getByText('Free Shipping')).toBeInTheDocument();
   });
 
+  test('renders attribute tags below the delivery estimate', () => {
+    render(
+      <OfferInfo
+        pharmacy={baseOffer.pharmacy}
+        offer={baseOffer}
+        isCurrentPharmacy={false}
+        isPreferred={false}
+      />
+    );
+
+    const estimate = screen.getByText('Delivers in 2-3 days');
+    const tag = screen.getByText('In Stock');
+
+    expect(estimate.compareDocumentPosition(tag)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
   test('shows preferred tag when isPreferred is true', () => {
     render(
       <OfferInfo
@@ -169,7 +185,7 @@ describe('OfferInfo', () => {
       />
     );
 
-    expect(screen.getByText('Preferred')).toBeInTheDocument();
+    expect(screen.getByText('Your usual')).toBeInTheDocument();
   });
 
   test('shows current pharmacy tag when isCurrentPharmacy is true', () => {
@@ -292,7 +308,7 @@ describe('OfferInfo', () => {
       />
     );
 
-    expect(screen.getByText('Preferred')).toBeInTheDocument();
+    expect(screen.getByText('Your usual')).toBeInTheDocument();
     expect(screen.getByText('Current Pharmacy')).toBeInTheDocument();
     expect(screen.getByText('In Stock')).toBeInTheDocument();
     expect(screen.getByText('Free Shipping')).toBeInTheDocument();

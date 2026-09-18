@@ -1,5 +1,5 @@
-import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@chakra-ui/react';
-import { FiInfo, FiStar, FiTag } from 'react-icons/fi';
+import { Box, HStack, Image, Tag, TagLabel, Text, VStack } from '@chakra-ui/react';
+import { FiInfo, FiTag } from 'react-icons/fi';
 import { Tooltip } from '../Tooltip';
 import { text as t } from '../../utils/text';
 import { PharmacyOffer, OfferPromotionTypes, Promotion } from '../../utils/models';
@@ -8,8 +8,7 @@ import { SPONSORED_TAG_KIND } from '../../utils/offers';
 
 const PreferredTag = () => {
   return (
-    <Tag size="sm" colorScheme="blue">
-      <TagLeftIcon boxSize="12px" as={FiStar} />
+    <Tag size="sm" colorScheme="gray">
       <TagLabel>{t.preferred}</TagLabel>
     </Tag>
   );
@@ -96,7 +95,6 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
     ...offer.tags
       .filter((tag) => tag.kind !== SPONSORED_TAG_KIND)
       .map((tag) => <AttributeTag key={tag.kind} label={tag.label} />),
-    ...(isPreferred ? [<PreferredTag key="preferred" />] : []),
     ...(isCurrentPharmacy ? [<CurrentPharmacyTag key="current" />] : [])
   ];
 
@@ -124,22 +122,17 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
 
   return (
     <VStack data-testid="pharmacy-info" align="start" w="full">
-      {offerTags.length > 0 ? (
-        <HStack spacing={2} alignItems="start" w="full">
-          {offerTags}
-        </HStack>
-      ) : null}
-
+      {isPreferred ? <PreferredTag /> : null}
       <HStack w="full" justify="space-between">
         <HStack w="full">
           {pharmacy.logo ? (
-            <Box boxSize="32px" overflow="hidden">
+            <Box boxSize="32px" borderRadius="full" overflow="hidden">
               <Image
                 src={pharmacy.logo}
                 width="auto"
                 height="32px"
                 boxSize="100%"
-                objectFit="contain"
+                objectFit="cover"
               />
             </Box>
           ) : null}
@@ -234,6 +227,12 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
           </Tooltip>
         )}
       </VStack>
+
+      {offerTags.length > 0 ? (
+        <HStack spacing={2} alignItems="start" w="full">
+          {offerTags}
+        </HStack>
+      ) : null}
     </VStack>
   );
 };

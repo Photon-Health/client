@@ -7,13 +7,12 @@ import {
   Spacer,
   Tag,
   TagLabel,
-  TagLeftIcon,
   Text,
   VStack
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { FiMapPin, FiStar } from 'react-icons/fi';
+import { FiMapPin } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
 import { Address, EnrichedPharmacy, OrderFulfillment } from '../utils/models';
 import { text as t } from '../utils/text';
@@ -268,17 +267,22 @@ export const PharmacyInfo = ({
 
   return (
     <VStack data-testid="pharmacy-info" align="start" w="full">
+      {showPreferredTag ? (
+        <Tag size="sm" colorScheme="gray">
+          <TagLabel>{t.preferred}</TagLabel>
+        </Tag>
+      ) : null}
       <HStack w="full" justify="space-between">
         <VStack w="full">
           <HStack w="full" paddingBottom="2">
             {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
-              <Box boxSize="32px" overflow="hidden">
+              <Box boxSize="32px" borderRadius="full" overflow="hidden">
                 <Image
                   src={pharmacy.logo}
                   width="auto"
                   height="32px"
                   boxSize="100%"
-                  objectFit="contain"
+                  objectFit="cover"
                 />
               </Box>
             ) : null}
@@ -333,17 +337,8 @@ export const PharmacyInfo = ({
           />
         </VStack>
       ) : null}
-      {showPreferredTag ||
-      showReadyIn30MinTag ||
-      showAvailableInYourAreaTag ||
-      showFreeDeliveryTag ? (
+      {showReadyIn30MinTag || showAvailableInYourAreaTag || showFreeDeliveryTag ? (
         <HStack spacing={2} m={0} p={0} alignItems="start" w="full">
-          {showPreferredTag ? (
-            <Tag size="sm" colorScheme="blue">
-              <TagLeftIcon boxSize="12px" as={FiStar} />
-              <TagLabel>{t.preferred}</TagLabel>
-            </Tag>
-          ) : null}
           {showReadyIn30MinTag ? (
             <Tag size="sm" bgColor="yellow.200">
               <TagLabel>Ready in 30 minutes</TagLabel>

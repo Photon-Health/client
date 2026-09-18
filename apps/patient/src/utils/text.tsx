@@ -100,7 +100,7 @@ export const text = {
       isPlural ? 'prescriptions' : 'prescription'
     } before you select a pharmacy. Reach out to your provider for any issues.`,
   pleaseRefresh: 'Please refresh and try again',
-  preferred: 'Preferred',
+  preferred: 'Your usual',
   preparing: 'Preparing',
   preparingDelivery: 'The pharmacy is preparing your order for delivery.',
   preparingOrder: 'Preparing your order',
