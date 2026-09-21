@@ -15,15 +15,22 @@ export function isDeliveryOffer(offer: PharmacyOffer): boolean {
 }
 
 export interface OfferPlacement {
-  aboveFold: PharmacyOffer[]; // all promoted offers, source-priority ordered
+  aboveFold: PharmacyOffer[]; // promoted offers, source-priority ordered
   inTab: PharmacyOffer[]; // the rest fall into their respective tabs
 }
 
 export function selectOfferPlacement(allOffers: PharmacyOffer[] | undefined): OfferPlacement {
+  const offers = allOffers ?? [];
+
+  // when there are multiple UK health offers, show all promoted offers at the top of their respective tabs
+  const hasManyUkHealthOffers =
+    offers.filter((offer) => offer.isPromoted && offer.source === OFFER_SOURCE.UK_HEALTH).length >
+    1;
+
+  const isAboveFold = (offer: PharmacyOffer) => !!offer.isPromoted && !hasManyUkHealthOffers;
+
   return {
-    aboveFold: (allOffers ?? [])
-      .filter((offer) => offer.isPromoted)
-      .sort((a, b) => sourceRank(a) - sourceRank(b)),
-    inTab: (allOffers ?? []).filter((offer) => !offer.isPromoted)
+    aboveFold: offers.filter(isAboveFold).sort((a, b) => sourceRank(a) - sourceRank(b)),
+    inTab: offers.filter((offer) => !isAboveFold(offer))
   };
 }
