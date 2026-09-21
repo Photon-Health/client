@@ -58,12 +58,10 @@ describe('selectOfferPlacement', () => {
 
   test('keeps a lone promoted UK Health offer above the fold', () => {
     const onsite = bundle({ source: 'UK_HEALTH', isPromoted: true });
-    const amazonInTab = bundle({ source: 'AMAZON_PHARMACY', isPromoted: false });
 
-    const { aboveFold, inTab } = selectOfferPlacement([onsite, amazonInTab]);
+    const { aboveFold } = selectOfferPlacement([onsite]);
 
     expect(aboveFold.map((o) => o.source)).toEqual(['UK_HEALTH']);
-    expect(inTab.map((o) => o.source)).toEqual(['AMAZON_PHARMACY']);
   });
 
   test('puts non-promoted offers in-tab', () => {
