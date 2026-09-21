@@ -1,10 +1,13 @@
 import { Box, HStack, Image, Tag, TagLabel, Text, VStack } from '@chakra-ui/react';
 import { FiInfo, FiTag } from 'react-icons/fi';
 import { Tooltip } from '../Tooltip';
+import { DistanceAddress, Hours } from '../PharmacyInfo';
 import { text as t } from '../../utils/text';
 import { PharmacyOffer, OfferPromotionTypes, Promotion } from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';
+import { derivePharmacyOpenState } from '../../utils/general';
 import { SPONSORED_TAG_KIND } from '../../utils/offers';
+import { isDeliveryOffer } from '../../utils/offerPlacement';
 
 const PreferredTag = () => {
   return (
@@ -76,8 +79,29 @@ const CouponTag = ({
   );
 };
 
+const OfferPharmacyDetails = ({ pharmacy }: { pharmacy: PharmacyOffer['pharmacy'] }) => {
+  const { is24Hr, isClosingSoon, opens, closes } = derivePharmacyOpenState(
+    pharmacy.nextEvents,
+    pharmacy.isOpen
+  );
+
+  return (
+    <VStack w="full" alignItems="start" spacing={0}>
+      <Hours
+        isOpen={pharmacy.isOpen}
+        is24Hr={is24Hr}
+        isClosingSoon={isClosingSoon}
+        opens={opens}
+        closes={closes}
+        hours={pharmacy.hours}
+      />
+      <DistanceAddress address={pharmacy.address} />
+    </VStack>
+  );
+};
+
 interface OfferInfoProps {
-  pharmacy?: Pick<PharmacyOffer['pharmacy'], 'id' | 'name' | 'logo'>;
+  pharmacy?: PharmacyOffer['pharmacy'];
   offer: PharmacyOffer;
   isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
@@ -157,6 +181,14 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
         ) : null}
       </HStack>
 
+      {offerTags.length > 0 ? (
+        <HStack spacing={2} alignItems="start" w="full">
+          {offerTags}
+        </HStack>
+      ) : null}
+
+      {!isDeliveryOffer(offer) ? <OfferPharmacyDetails pharmacy={pharmacy} /> : null}
+
       {!isMultiRx && <CouponTag size="md" promotions={singleMedPromotions} />}
 
       {isMultiRx && (
@@ -227,12 +259,6 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
           </Tooltip>
         )}
       </VStack>
-
-      {offerTags.length > 0 ? (
-        <HStack spacing={2} alignItems="start" w="full">
-          {offerTags}
-        </HStack>
-      ) : null}
     </VStack>
   );
 };

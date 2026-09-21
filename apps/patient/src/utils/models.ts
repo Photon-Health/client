@@ -47,12 +47,7 @@ export interface OfferPricing {
 export interface PharmacyOffer {
   source?: string;
   isPromoted?: boolean;
-  pharmacy: {
-    id: string;
-    name: string;
-    fulfillmentTypes?: FulfillmentType[];
-    logo?: string;
-  };
+  pharmacy: NotMaybe<OfferBundle['pharmacy']>;
   tags: OfferAttributeTag[];
   deliveryEstimate?: string;
   pricing: OfferPricing;

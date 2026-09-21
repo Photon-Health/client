@@ -21,12 +21,7 @@ export async function fetchPharmacyOffers(order: Order): Promise<PharmacyOffer[]
     return {
       source,
       isPromoted: group.some((bundle) => bundle.isPromoted),
-      pharmacy: {
-        id: pharmacy!.id,
-        name: pharmacy!.name,
-        fulfillmentTypes: pharmacy!.fulfillmentTypes,
-        logo: pharmacy!.logo
-      },
+      pharmacy: pharmacy!,
       tags: attributeTags ?? [],
       ...summarizePharmacyOffer(group.flatMap((bundle) => bundle.offers ?? []))
     };

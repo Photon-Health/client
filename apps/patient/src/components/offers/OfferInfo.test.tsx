@@ -3,12 +3,16 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { OfferInfo } from './OfferInfo';
 import { PharmacyOffer } from '../../utils/models';
 
-// Mock the text utility
-vi.mock('../../utils/text', () => ({
-  text: {
-    preferred: 'Your usual'
-  }
-}));
+// Hours reads t.open/t.closed/t.closingSoon/t.open24hrs, so keep the rest of the real text
+vi.mock('../../utils/text', async (importActual) => {
+  const actual = await importActual<typeof import('../../utils/text')>();
+  return {
+    text: {
+      ...actual.text,
+      preferred: 'Your usual'
+    }
+  };
+});
 
 describe('OfferInfo', () => {
   afterEach(() => {

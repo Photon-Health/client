@@ -22,7 +22,7 @@ export interface OfferPlacement {
 export function selectOfferPlacement(allOffers: PharmacyOffer[] | undefined): OfferPlacement {
   const offers = allOffers ?? [];
 
-  // for multiple UK health offers, show them at the top of their respective tabs
+  // when there are multiple UK health offers, show all promoted offers at the top of their respective tabs
   const hasManyUkHealthOffers =
     offers.filter((offer) => offer.isPromoted && offer.source === OFFER_SOURCE.UK_HEALTH).length >
     1;

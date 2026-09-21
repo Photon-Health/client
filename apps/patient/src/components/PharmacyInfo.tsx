@@ -94,17 +94,24 @@ const HoursRow = ({
   );
 };
 
-const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes, hours, showHours }: HoursProps) => {
+export const Hours = ({
+  is24Hr,
+  isOpen,
+  isClosingSoon,
+  opens,
+  closes,
+  hours,
+  showHours
+}: HoursProps) => {
   const color = isClosingSoon ? 'orange.500' : isOpen ? 'green.500' : 'red.500';
   const text = is24Hr ? t.open24hrs : isClosingSoon ? t.closingSoon : isOpen ? t.open : t.closed;
   const hasHours = isOpen != null;
   const [hoursOpen, setHoursOpen] = useState(false);
 
-  if (!hasHours) return null;
-
   const sortedHours = useMemo(
     () =>
-      hours?.sort((a, b) =>
+      hours &&
+      [...hours].sort((a, b) =>
         a.dayOfWeek === b.dayOfWeek
           ? a.openFrom.localeCompare(b.openFrom)
           : hoursLookup[a.dayOfWeek] - hoursLookup[b.dayOfWeek]
@@ -119,6 +126,8 @@ const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes, hours, showHours 
       ),
     [sortedHours]
   );
+
+  if (!hasHours) return null;
 
   return (
     <VStack w="full">
@@ -192,7 +201,7 @@ const handleGetDirections = (url?: string) => {
   window.open(url);
 };
 
-const DistanceAddress = ({
+export const DistanceAddress = ({
   distance,
   address,
   url,
