@@ -3,6 +3,9 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { OfferInfo } from './OfferInfo';
 import { PharmacyOffer } from '../../utils/models';
 
+// mocks the google.maps.Geocoder() call in api/external
+vi.mock('../../api', () => ({}));
+
 // Hours reads t.open/t.closed/t.closingSoon/t.open24hrs, so keep the rest of the real text
 vi.mock('../../utils/text', async (importActual) => {
   const actual = await importActual<typeof import('../../utils/text')>();
@@ -163,7 +166,7 @@ describe('OfferInfo', () => {
     expect(screen.getByText('Free Shipping')).toBeInTheDocument();
   });
 
-  test('renders attribute tags below the delivery estimate', () => {
+  test('renders attribute tags above the delivery estimate', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
@@ -173,10 +176,9 @@ describe('OfferInfo', () => {
       />
     );
 
-    const estimate = screen.getByText('Delivers in 2-3 days');
-    const tag = screen.getByText('In Stock');
+    const rendered = screen.getAllByText(/^(In Stock|Delivers in 2-3 days)$/);
 
-    expect(estimate.compareDocumentPosition(tag)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(rendered.map((el) => el.textContent)).toEqual(['In Stock', 'Delivers in 2-3 days']);
   });
 
   test('shows preferred tag when isPreferred is true', () => {

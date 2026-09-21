@@ -1,4 +1,8 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
+
+// mocks the google.maps.Geocoder() call in api/external
+vi.mock('../api', () => ({}));
+
 import { derivePharmacyOpenState } from './general';
 
 const openEvent = (datetime: string) => ({ type: 'open', datetime });
