@@ -114,46 +114,39 @@ export function isRerouteablePharmacy({ pharmacy }: { pharmacy?: Pharmacy }): bo
   return pharmacy?.id === 'phr_01GA9HPV5XYTC1NNX213VRRBZ3'; // amazon pharmacy
 }
 
-export const preparePharmacy = (
-  pharmacy: Pharmacy,
-  fulfillmentType?: ExtendedFulfillmentType
-): EnrichedPharmacy => {
+export interface PharmacyOpenState {
+  is24Hr: boolean;
+  isClosingSoon: boolean;
+  opens: string;
+  closes: string;
+}
+
+// relative to now, so derive at render time rather than caching on a pharmacy
+export const derivePharmacyOpenState = (
+  nextEvents?: Pharmacy['nextEvents'],
+  isOpen?: boolean | null
+): PharmacyOpenState => {
   let is24Hr = false;
   let isClosingSoon = false;
   let opens = '';
   let closes = '';
-  const showReadyIn30Min = false; // not being utilized currently but will revisit so not removing completely
-  const logo = pharmacy.logo ?? undefined;
 
-  // for mail-order pharmacies, use the info mapped by this branding constant
-  if (fulfillmentType && isDelivery({ pharmacy, fulfillmentType })) {
-    return {
-      ...pharmacy,
-      ...PHARMACY_BRANDING[pharmacy.id]
-    };
-  }
+  if (nextEvents) {
+    is24Hr = nextEvents[isOpen ? 'open' : 'close'].type === '24hr';
 
-  if (pharmacy.nextEvents) {
-    is24Hr = pharmacy.nextEvents[pharmacy.isOpen ? 'open' : 'close'].type === '24hr';
-
-    // Prepare opens string, ex: Opens 8AM Wed
-    const nextOpen = isOpenEvent(pharmacy.nextEvents.open)
-      ? pharmacy.nextEvents.open.datetime
-      : undefined;
+    // ex: Opens 8AM Wed
+    const nextOpen = isOpenEvent(nextEvents.open) ? nextEvents.open.datetime : undefined;
     const formatter = `${dayjs(nextOpen).minute() > 0 ? 'h:mm a' : 'h a'}${
       dayjs(nextOpen).isToday() ? '' : ' ddd'
     }`;
     const oTime = dayjs(nextOpen).format(formatter);
     opens = `Opens ${oTime}`;
 
-    // Prepare closes string, ex: Closes 6PM
-    const nextClose = isCloseEvent(pharmacy.nextEvents.close)
-      ? pharmacy.nextEvents.close.datetime
-      : undefined;
+    // ex: Closes 6PM
+    const nextClose = isCloseEvent(nextEvents.close) ? nextEvents.close.datetime : undefined;
     const cTime = dayjs(nextClose).format(dayjs(nextClose).minute() > 0 ? 'h:mm a' : 'h a');
     closes = `Closes ${cTime}`;
 
-    // Check if closing soon
     if (!is24Hr && nextClose) {
       const now = dayjs();
       const userTimezone = dayjs.tz.guess();
@@ -165,14 +158,29 @@ export const preparePharmacy = (
     }
   }
 
+  return { is24Hr, isClosingSoon, opens, closes };
+};
+
+export const preparePharmacy = (
+  pharmacy: Pharmacy,
+  fulfillmentType?: ExtendedFulfillmentType
+): EnrichedPharmacy => {
+  const showReadyIn30Min = false; // not being utilized currently but will revisit so not removing completely
+  const logo = pharmacy.logo ?? undefined;
+
+  // for mail-order pharmacies, use the info mapped by this branding constant
+  if (fulfillmentType && isDelivery({ pharmacy, fulfillmentType })) {
+    return {
+      ...pharmacy,
+      ...PHARMACY_BRANDING[pharmacy.id]
+    };
+  }
+
   return {
     ...pharmacy,
     logo,
     showReadyIn30Min,
-    is24Hr,
-    isClosingSoon,
-    opens,
-    closes
+    ...derivePharmacyOpenState(pharmacy.nextEvents, pharmacy.isOpen)
   };
 };
 

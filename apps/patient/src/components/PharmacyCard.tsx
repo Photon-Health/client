@@ -1,11 +1,10 @@
 import { memo } from 'react';
-import { Button, Card, CardBody, CardFooter, Collapse, Divider } from '@chakra-ui/react';
-import { FiStar } from 'react-icons/fi';
+import { Card, CardBody } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { text as t } from '../utils/text';
 import { PharmacyInfo } from './PharmacyInfo';
+import { SetPreferredPharmacyFooter } from './pharmacy-card/SetPreferredPharmacyFooter';
 import { PharmacyCardSentHereFrame } from './pharmacy-card/sent-here/PharmacyCardSentHereFrame';
 import {
   getPharmacyCardBorderStyle,
@@ -92,24 +91,11 @@ export const PharmacyCard = memo(function PharmacyCard({
         />
       </CardBody>
       {showDetails ? (
-        <Collapse in={selected && !preferred} animateOpacity>
-          <Divider />
-          <CardFooter p={2}>
-            {onSetPreferred ? (
-              <Button
-                mx="auto"
-                size="sm"
-                variant="ghost"
-                color="link"
-                onClick={onSetPreferred}
-                isLoading={savingPreferred}
-                leftIcon={<FiStar />}
-              >
-                {t.makePreferred}
-              </Button>
-            ) : null}
-          </CardFooter>
-        </Collapse>
+        <SetPreferredPharmacyFooter
+          show={selected && !preferred}
+          saving={savingPreferred}
+          onSetPreferred={onSetPreferred}
+        />
       ) : null}
     </Card>
   );
