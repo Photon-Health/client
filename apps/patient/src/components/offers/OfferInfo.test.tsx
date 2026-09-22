@@ -3,12 +3,19 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { OfferInfo } from './OfferInfo';
 import { PharmacyOffer } from '../../utils/models';
 
-// Mock the text utility
-vi.mock('../../utils/text', () => ({
-  text: {
-    preferred: 'Preferred'
-  }
-}));
+// mocks the google.maps.Geocoder() call in api/external
+vi.mock('../../api', () => ({}));
+
+// Hours reads t.open/t.closed/t.closingSoon/t.open24hrs, so keep the rest of the real text
+vi.mock('../../utils/text', async (importActual) => {
+  const actual = await importActual<typeof import('../../utils/text')>();
+  return {
+    text: {
+      ...actual.text,
+      preferred: 'Your usual'
+    }
+  };
+});
 
 describe('OfferInfo', () => {
   afterEach(() => {
@@ -159,6 +166,21 @@ describe('OfferInfo', () => {
     expect(screen.getByText('Free Shipping')).toBeInTheDocument();
   });
 
+  test('renders attribute tags above the delivery estimate', () => {
+    render(
+      <OfferInfo
+        pharmacy={baseOffer.pharmacy}
+        offer={baseOffer}
+        isCurrentPharmacy={false}
+        isPreferred={false}
+      />
+    );
+
+    const rendered = screen.getAllByText(/^(In Stock|Delivers in 2-3 days)$/);
+
+    expect(rendered.map((el) => el.textContent)).toEqual(['In Stock', 'Delivers in 2-3 days']);
+  });
+
   test('shows preferred tag when isPreferred is true', () => {
     render(
       <OfferInfo
@@ -169,7 +191,7 @@ describe('OfferInfo', () => {
       />
     );
 
-    expect(screen.getByText('Preferred')).toBeInTheDocument();
+    expect(screen.getByText('Your usual')).toBeInTheDocument();
   });
 
   test('shows current pharmacy tag when isCurrentPharmacy is true', () => {
@@ -292,7 +314,7 @@ describe('OfferInfo', () => {
       />
     );
 
-    expect(screen.getByText('Preferred')).toBeInTheDocument();
+    expect(screen.getByText('Your usual')).toBeInTheDocument();
     expect(screen.getByText('Current Pharmacy')).toBeInTheDocument();
     expect(screen.getByText('In Stock')).toBeInTheDocument();
     expect(screen.getByText('Free Shipping')).toBeInTheDocument();
