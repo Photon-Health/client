@@ -10,7 +10,8 @@ import {
 
 export const OFFER_SOURCE = {
   AMAZON_PHARMACY: 'AMAZON_PHARMACY',
-  NOVOCARE: 'NOVOCARE'
+  NOVOCARE: 'NOVOCARE',
+  UK_HEALTH: 'UK_HEALTH'
 } as const;
 
 // attributeTag kind marking a paid-placement (sponsored) offer

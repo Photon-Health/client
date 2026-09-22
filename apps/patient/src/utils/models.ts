@@ -47,12 +47,7 @@ export interface OfferPricing {
 export interface PharmacyOffer {
   source?: string;
   isPromoted?: boolean;
-  pharmacy: {
-    id: string;
-    name: string;
-    fulfillmentTypes?: FulfillmentType[];
-    logo?: string;
-  };
+  pharmacy: NotMaybe<OfferBundle['pharmacy']>;
   tags: OfferAttributeTag[];
   deliveryEstimate?: string;
   pricing: OfferPricing;
@@ -63,7 +58,8 @@ export const OfferTypes = {
   RxSense: 'RxSense',
   GoodRx: 'GoodRx',
   AmazonPharmacy: 'Amazon Pharmacy',
-  Novocare: 'Novocare'
+  Novocare: 'Novocare',
+  UkHealth: 'UK Health'
 } as const;
 
 export type OfferTypeKey = keyof typeof OfferTypes;

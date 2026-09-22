@@ -12,6 +12,7 @@ export function getOfferType({
 }) {
   if (offer?.source === OFFER_SOURCE.AMAZON_PHARMACY) return OfferTypes.AmazonPharmacy;
   else if (offer?.source === OFFER_SOURCE.NOVOCARE) return OfferTypes.Novocare;
+  else if (offer?.source === OFFER_SOURCE.UK_HEALTH) return OfferTypes.UkHealth;
   else if (pharmacy?.source === 'goodrx') return OfferTypes.GoodRx;
   else if (pharmacy?.source === 'rxsense') return OfferTypes.RxSense;
   return null;

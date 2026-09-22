@@ -447,16 +447,68 @@ export const GET_INFO_PAGE_DATA = gql`
   ${PHARMACY_FIELDS}
 `;
 
+// Separate from PharmacyFields: pharmacies on the offer load by id,
+// so price/source/distance are not populated on them
+const OFFER_PHARMACY_FIELDS = gql`
+  fragment OfferPharmacyFields on Pharmacy {
+    id
+    name
+    logo
+    fulfillmentTypes
+    address {
+      street1
+      street2
+      city
+      state
+      country
+      postalCode
+    }
+    isOpen
+    nextEvents {
+      open {
+        ... on PharmacyOpenEvent {
+          type
+          datetime
+        }
+        ... on PharmacyCloseEvent {
+          type
+          datetime
+        }
+        ... on PharmacyOpen24HrEvent {
+          type
+        }
+      }
+      close {
+        ... on PharmacyOpenEvent {
+          type
+          datetime
+        }
+        ... on PharmacyCloseEvent {
+          type
+          datetime
+        }
+        ... on PharmacyOpen24HrEvent {
+          type
+        }
+      }
+    }
+    hours {
+      dayOfWeek
+      is24Hr
+      openFrom
+      openUntil
+      timezone
+    }
+  }
+`;
+
 export const GET_OFFER_BUNDLES = gql`
   query GetOfferBundlesForOrder($orderId: ID!) {
     offerBundles(orderId: $orderId) {
       source
       isPromoted
       pharmacy {
-        id
-        name
-        logo
-        fulfillmentTypes
+        ...OfferPharmacyFields
       }
       attributeTags {
         kind
@@ -486,6 +538,7 @@ export const GET_OFFER_BUNDLES = gql`
       }
     }
   }
+  ${OFFER_PHARMACY_FIELDS}
 `;
 
 export const GET_FAQS = gql`
