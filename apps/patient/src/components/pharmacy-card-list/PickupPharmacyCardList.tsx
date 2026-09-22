@@ -17,7 +17,7 @@ interface PickupPharmacyCardListProps {
   handleShowMore: () => void;
   handleSetPreferred: (id: string) => void;
   loadingMore: boolean;
-  showingAllPharmacies: boolean;
+  canShowMore: boolean;
   showPrice?: boolean;
   enableOpenNow: boolean;
   enable24Hr: boolean;
@@ -42,7 +42,7 @@ export const PickupPharmacyCardList = ({
   handleShowMore,
   handleSetPreferred,
   loadingMore,
-  showingAllPharmacies,
+  canShowMore,
   showPrice = true,
   enableOpenNow,
   enable24Hr,
@@ -101,7 +101,7 @@ export const PickupPharmacyCardList = ({
           </SlideFade>
         ))}
       </VStack>
-      {!showingAllPharmacies && (pharmacies?.length > 0 || loadingMore) ? (
+      {canShowMore ? (
         <Button
           variant="link"
           loadingText=""
