@@ -20,6 +20,10 @@ describe('getOfferType', () => {
     expect(getOfferType({ offer: bundle({ source: 'NOVOCARE' }) })).toBe(OfferTypes.Novocare);
   });
 
+  test('keys UK Health off the offer source', () => {
+    expect(getOfferType({ offer: bundle({ source: 'UK_HEALTH' }) })).toBe(OfferTypes.UkHealth);
+  });
+
   test('keys GoodRx/RxSense off the pharmacy source', () => {
     expect(getOfferType({ pharmacy: { source: 'goodrx' } as EnrichedPharmacy })).toBe(
       OfferTypes.GoodRx
