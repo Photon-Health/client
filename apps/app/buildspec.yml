@@ -11,6 +11,7 @@ env:
     VITE_GRAPHQL_URI: app_build_vars:VITE_GRAPHQL_URI
     VITE_CLINICAL_GRAPHQL_URI: app_build_vars:VITE_CLINICAL_GRAPHQL_URI
     VITE_MIXPANEL_TOKEN: app_build_vars:VITE_MIXPANEL_TOKEN
+    VITE_AUTH_API_DOMAIN: app_build_vars:VITE_AUTH_API_DOMAIN
 
 phases:
   install:
