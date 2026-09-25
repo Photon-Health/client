@@ -5,3 +5,5 @@ export const auth0Config = {
   useRefreshTokens: true,
   redirectUri: window.location.origin
 };
+
+export const authApiDomain = import.meta.env.VITE_AUTH_API_DOMAIN as string;
