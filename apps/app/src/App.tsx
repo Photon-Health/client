@@ -64,7 +64,7 @@ export const App = () => {
       <PhotonProvider env={env} client={client} onRedirectCallback={onRedirectCallback}>
         <ProviderAnalyticsProvider>
           <Routes>
-            <Route path="/link" element={<LinkConfirmation />} />
+            <Route path="/link-accounts" element={<LinkConfirmation />} />
             <Route path="/" element={<Main />}>
               <Route element={<AppOverride />}>
                 <Route path="/patients">

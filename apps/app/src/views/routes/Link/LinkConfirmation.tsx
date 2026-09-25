@@ -9,13 +9,12 @@ import {
 } from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
 
+import { authApiDomain } from '../../../configs/auth';
 import { Logo } from '../../components/Logo';
 
 /**
  * Public (no login required) page that asks a user whether to link the sign-in
  * they just used with an existing account we found under the same email.
- *
- * Reached via `/link?email=...&connection=...`.
  */
 export const LinkConfirmation = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
@@ -25,11 +24,11 @@ export const LinkConfirmation = () => {
   const connection = searchParams.get('connection') ?? '';
 
   const onDenyLink = () => {
-    console.log('deny link', { email, connection });
+    window.location.assign(`https://${authApiDomain}/decline`);
   };
 
   const onLink = () => {
-    console.log('link', { email, connection });
+    window.location.assign(`https://${authApiDomain}/link`);
   };
 
   return (
