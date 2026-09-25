@@ -29,6 +29,7 @@ import { UpdatePatientForm } from './views/routes/UpdatePatientForm';
 import { Env } from '@photonhealth/sdk';
 import { SelfSignupPage } from './views/routes/SelfSignup';
 import { AppOverride } from './views/routes/AppOverride';
+import { LinkConfirmation } from './views/routes/Link';
 
 const env = import.meta.env.VITE_ENV_NAME as Env;
 
@@ -63,6 +64,7 @@ export const App = () => {
       <PhotonProvider env={env} client={client} onRedirectCallback={onRedirectCallback}>
         <ProviderAnalyticsProvider>
           <Routes>
+            <Route path="/link" element={<LinkConfirmation />} />
             <Route path="/" element={<Main />}>
               <Route element={<AppOverride />}>
                 <Route path="/patients">
