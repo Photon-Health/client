@@ -5,6 +5,14 @@ import { beforeEach, expect, test, vi } from 'vitest';
 import { setupHarness } from '../../../test-utils';
 import { LinkConfirmation } from './LinkConfirmation';
 
+// `configs/auth` reads VITE_AUTH_API_DOMAIN at module scope, so stub it before
+// any import is evaluated.
+const AUTH_API_DOMAIN = vi.hoisted(() => {
+  const domain = 'auth-api.test.health';
+  vi.stubEnv('VITE_AUTH_API_DOMAIN', domain);
+  return domain;
+});
+
 const { renderWithProviders } = setupHarness();
 
 const url = '/link-accounts?email=d%2A%2A%2A%40example.com&connection=google-oauth2';
@@ -30,7 +38,7 @@ test('deny link navigates to the auth api decline endpoint', async () => {
 
   await userEvent.click(screen.getByRole('button', { name: /deny link/i }));
 
-  expect(assign).toHaveBeenCalledWith('https://auth-api.boson.health/decline');
+  expect(assign).toHaveBeenCalledWith(`https://${AUTH_API_DOMAIN}/decline`);
 });
 
 test('link navigates to the auth api link endpoint', async () => {
@@ -38,5 +46,5 @@ test('link navigates to the auth api link endpoint', async () => {
 
   await userEvent.click(screen.getByRole('button', { name: /^link$/i }));
 
-  expect(assign).toHaveBeenCalledWith('https://auth-api.boson.health/link');
+  expect(assign).toHaveBeenCalledWith(`https://${AUTH_API_DOMAIN}/link`);
 });
