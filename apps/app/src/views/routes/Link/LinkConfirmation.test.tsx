@@ -5,8 +5,8 @@ import { beforeEach, expect, test, vi } from 'vitest';
 import { setupHarness } from '../../../test-utils';
 import { LinkConfirmation } from './LinkConfirmation';
 
-// `configs/auth` reads VITE_AUTH_API_DOMAIN at module scope, so stub it before
-// any import is evaluated.
+// `configs/auth` reads VITE_AUTH_API_DOMAIN at module scope,
+// so stub it before any import is evaluated.
 const AUTH_API_DOMAIN = vi.hoisted(() => {
   const domain = 'auth-api.test.health';
   vi.stubEnv('VITE_AUTH_API_DOMAIN', domain);
