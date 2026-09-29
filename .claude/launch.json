@@ -4,7 +4,21 @@
     {
       "name": "clinical-app",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["nx", "run", "app:dev"],
+      "runtimeArgs": [
+        "nx",
+        "run",
+        "app:dev"
+      ],
+      "port": 3000
+    },
+    {
+      "name": "clinical-app-tau",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "nx",
+        "run",
+        "app:dev:tau"
+      ],
       "port": 3000
     }
   ]
