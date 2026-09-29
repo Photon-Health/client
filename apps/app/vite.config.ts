@@ -5,8 +5,6 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
-  // PHOTON_PP_* powers the Requests inbox test build; it's only set in local/boson env files
-  envPrefix: ['VITE_', 'PHOTON_PP_'],
   server: {
     port: 3000,
     open: true

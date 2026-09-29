@@ -1,93 +1,90 @@
 import {
-  NetworkOrderMutation,
-  NetworkPatientMutation,
-  NetworkPrescriptionMutation
+  AddDraftOrderQuestionsMutation,
+  ApproveDraftOrderMutation,
+  ClaimDraftOrderMutation,
+  NetworkPrescriptionMutation,
+  PhotonPpDraftOrderCountsQuery,
+  PhotonPpDraftOrderQuery,
+  PhotonPpDraftOrdersQuery,
+  PhotonPpPatientHistoryQuery,
+  RejectDraftOrderMutation,
+  SetDraftOrderWaitingForPatientMutation
 } from '../../../network-api/documents';
 import {
   buildRequestMetadata,
-  NetworkApiError,
   getNetworkApiUrl,
+  NetworkApiError,
   networkApiRequest
 } from '../../../network-api/client';
 import {
-  NetworkChangeFieldsFragment,
-  NetworkOrderMutation as NetworkOrderResult,
-  NetworkPrescriptionFieldsFragment,
-  OrderInput,
-  OrderState,
-  PrescriptionInput,
-  ChangeSeverity,
+  DraftOrderDetailFieldsFragment,
+  DraftOrderQuestionFieldsFragment,
+  DraftOrderResultFieldsFragment,
+  DraftOrderSummaryFieldsFragment,
   DraftStatus,
+  NetworkPrescriptionFieldsFragment,
+  PhotonPpDraftOrderFilter,
+  PhotonPpDraftOrderOutcomeStatus,
+  PrescriptionInput,
   PrescriptionSigningState
 } from '../../../network-api/gql/graphql';
 
-// Requests are draft orders created under the Photon PP org and surfaced to every org as an
-// inbox. v1 is a test build: drafts are read with a hard-coded PP token that is only exposed to
-// local/boson builds, and network-api has no list query yet, so the inbox is seeded with a
-// configured list of draft order ids.
-export const requestsConfig = () => {
-  const env = import.meta.env.VITE_ENV_NAME as string;
-  const ppToken = import.meta.env.PHOTON_PP_AUTH_TOKEN as string | undefined;
-  const draftOrderIds = ((import.meta.env.PHOTON_PP_DRAFT_ORDER_IDS as string | undefined) ?? '')
-    .split(',')
-    .map((id) => id.trim())
-    .filter(Boolean);
-  const enabled = ['boson', 'tau'].includes(env) && !!getNetworkApiUrl() && !!ppToken;
-  return { enabled, ppToken: ppToken ?? '', draftOrderIds };
+// Requests are draft orders from patients who signed up directly with Photon (the Photon PP
+// org). network-api only runs in boson and tau so far.
+export const requestsEnabled = () => !!getNetworkApiUrl();
+
+export type DraftOrderSummary = DraftOrderSummaryFieldsFragment;
+export type DraftOrderDetail = DraftOrderDetailFieldsFragment;
+export type DraftOrderQuestion = DraftOrderQuestionFieldsFragment;
+type DraftOrderLike = DraftOrderSummary | DraftOrderDetail;
+
+export const REQUEST_TABS = [
+  { key: 'to-review', label: 'To review', filter: PhotonPpDraftOrderFilter.Unclaimed },
+  { key: 'my-reviews', label: 'My reviews', filter: PhotonPpDraftOrderFilter.MyReviews },
+  {
+    key: 'waiting-on-patient',
+    label: 'Waiting on patient',
+    filter: PhotonPpDraftOrderFilter.WaitingOnPatient
+  },
+  { key: 'closed', label: 'Closed', filter: PhotonPpDraftOrderFilter.Closed }
+] as const;
+
+export type RequestTabKey = (typeof REQUEST_TABS)[number]['key'];
+export type RequestCounts = Record<RequestTabKey, number>;
+
+// Keys Photon PP intake writes for the list columns rather than the intake answers card.
+const REASON_KEY = 'reason';
+const URGENCY_KEY = 'clinical_urgency';
+
+export const formatAnswer = (answer: DraftOrderQuestion['answer']): string | undefined => {
+  if (!answer) return undefined;
+  if (answer.text != null) return answer.text;
+  if (answer.boolean != null) return answer.boolean ? 'Yes' : 'No';
+  if (answer.date != null) return String(answer.date);
+  if (answer.choices?.length) return answer.choices.join(', ');
+  return undefined;
 };
 
-type OrderPayload = Extract<NetworkOrderResult['order'], { __typename: 'OrderPayload' }>;
-export type DraftOrder = NonNullable<OrderPayload['order']>;
-type DraftPatient = Extract<NonNullable<DraftOrder['patient']>, { __typename: 'Patient' }>;
+const answerFor = (questions: DraftOrderQuestion[], key: string) =>
+  formatAnswer(questions.find((question) => question.key === key)?.answer);
 
-export type IntakeAnswer = { label: string; value: string };
+const isFromClaimingOrg = (draft: DraftOrderLike, question: DraftOrderQuestion) =>
+  !!draft.claim && question.authorOrganizationId === draft.claim.organizationId;
 
-export type DraftRequest = {
-  id: string;
-  patient?: DraftPatient;
-  patientName: string;
-  age?: number;
-  state?: string;
-  medication: string;
-  reason?: string;
-  urgency?: string;
-  intakeAnswers: IntakeAnswer[];
-  prescriptions: NetworkPrescriptionFieldsFragment[];
-  pharmacy?: DraftOrder['pharmacy'];
-  order: DraftOrder;
-};
+/** Photon PP's intake questions, minus the ones shown as columns. */
+export const intakeQuestions = (draft: DraftOrderLike) =>
+  draft.order.questions.filter(
+    (question) =>
+      !isFromClaimingOrg(draft, question) &&
+      question.key !== REASON_KEY &&
+      question.key !== URGENCY_KEY
+  );
 
-// Intake answers live in notes as "Label: value" lines. `Reason` and `Clinical urgency` are
-// pulled out for the list view; everything else is shown as an intake answer.
-export const parseIntakeNotes = (notes?: string | null) => {
-  let reason: string | undefined;
-  let urgency: string | undefined;
-  const answers: IntakeAnswer[] = [];
+/** Questions the claiming organization asked the patient. */
+export const followUpQuestions = (draft: DraftOrderLike) =>
+  draft.order.questions.filter((question) => isFromClaimingOrg(draft, question));
 
-  for (const line of (notes ?? '').split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-    const separator = trimmed.indexOf(':');
-    const label = separator > 0 ? trimmed.slice(0, separator).trim() : '';
-    const value = separator > 0 ? trimmed.slice(separator + 1).trim() : trimmed;
-
-    if (/^reason$/i.test(label)) reason = value;
-    else if (/^(clinical )?urgency$/i.test(label)) urgency = value;
-    else answers.push({ label, value });
-  }
-
-  return { reason, urgency, answers };
-};
-
-export const urgencyColorScheme = (urgency?: string) => {
-  if (!urgency) return 'gray';
-  if (/left|window|urgent/i.test(urgency)) return 'red';
-  if (/symptom/i.test(urgency)) return 'orange';
-  if (/lab/i.test(urgency)) return 'blue';
-  return 'gray';
-};
-
-export const ageFromDateOfBirth = (dateOfBirth?: string | null, now = new Date()) => {
+export const ageFromDateOfBirth = (dateOfBirth?: string | Date | null, now = new Date()) => {
   if (!dateOfBirth) return undefined;
   const dob = new Date(dateOfBirth);
   if (Number.isNaN(dob.getTime())) return undefined;
@@ -99,247 +96,240 @@ export const ageFromDateOfBirth = (dateOfBirth?: string | null, now = new Date()
   return age;
 };
 
-export const toDraftRequest = (order: DraftOrder): DraftRequest => {
-  const patient = order.patient?.__typename === 'Patient' ? order.patient : undefined;
-  const demographic = patient?.demographic;
-  const notes = [...order.prescriptions.map((rx) => rx.clinical?.notes), patient?.clinical?.notes]
-    .filter(Boolean)
-    .join('\n');
-  const { reason, urgency, answers } = parseIntakeNotes(notes);
-  const lastInitial = demographic?.name.last ? ` ${demographic.name.last[0]}.` : '';
+export const formatSubmitted = (createdAt: string | Date, now = new Date()) => {
+  const minutes = Math.max(0, Math.floor((now.getTime() - new Date(createdAt).getTime()) / 60000));
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} h ago`;
+  return `${Math.floor(hours / 24)} d ago`;
+};
 
+export const urgencyColorScheme = (urgency?: string) => {
+  if (!urgency) return 'gray';
+  if (/left|window|urgent/i.test(urgency)) return 'red';
+  if (/symptom/i.test(urgency)) return 'orange';
+  if (/lab/i.test(urgency)) return 'blue';
+  return 'gray';
+};
+
+export const describeRequest = (draft: DraftOrderLike) => {
+  const patient = draft.order.patient?.__typename === 'Patient' ? draft.order.patient : undefined;
+  const demographic = patient?.demographic;
+  const lastInitial = demographic?.name.last ? ` ${demographic.name.last[0]}.` : '';
   return {
-    id: order.id,
-    patient,
+    id: draft.id,
+    photonPpPatientId: patient?.id,
     patientName: `${demographic?.name.first ?? 'Unknown'}${lastInitial}`,
     age: ageFromDateOfBirth(demographic?.dateOfBirth),
     state: demographic?.address?.state ?? undefined,
-    medication: order.prescriptions.map((rx) => rx.treatment.name).join(', '),
-    reason,
-    urgency,
-    intakeAnswers: answers,
-    prescriptions: order.prescriptions,
-    pharmacy: order.pharmacy,
-    order
+    medication: draft.order.prescriptions.map((rx) => rx.treatment.name).join(', '),
+    reason: answerFor(draft.order.questions, REASON_KEY),
+    urgency: answerFor(draft.order.questions, URGENCY_KEY),
+    submittedAt: draft.createdAt
   };
 };
 
-// Claims and handled drafts are tracked client-side only for v1.
-const CLAIMED_KEY = 'photon-requests-claimed';
-const HANDLED_KEY = 'photon-requests-handled';
+export type RequestStatus = { label: string; colorScheme: string };
 
-const readIds = (key: string): string[] => {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(key) ?? '[]');
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+export const requestStatus = (draft: DraftOrderLike): RequestStatus => {
+  if (draft.outcome?.status === PhotonPpDraftOrderOutcomeStatus.Submitted) {
+    return { label: 'Sent', colorScheme: 'green' };
   }
+  if (draft.outcome?.status === PhotonPpDraftOrderOutcomeStatus.Rejected) {
+    return { label: 'Declined', colorScheme: 'red' };
+  }
+  if (!draft.claim) return { label: 'Unclaimed', colorScheme: 'gray' };
+  if (draft.claim.waitingForPatient) return { label: 'Waiting on patient', colorScheme: 'orange' };
+  return draft.claim.claimedByMe
+    ? { label: 'Claimed by you', colorScheme: 'blue' }
+    : { label: 'Claimed by a colleague', colorScheme: 'purple' };
 };
 
-const addId = (key: string, id: string) => {
-  try {
-    localStorage.setItem(key, JSON.stringify([...new Set([...readIds(key), id])]));
-  } catch {
-    // Storage unavailable — state just won't persist across reloads
-  }
+const unwrapDraftOrder = (result: DraftOrderResultFieldsFragment, action: string) => {
+  if (result.__typename === 'PhotonPpDraftOrderPayload') return result.draftOrder;
+  throw new NetworkApiError(`${action}: ${result.message}`);
 };
 
-export const getClaimedIds = () => readIds(CLAIMED_KEY);
-export const claimRequest = (id: string) => addId(CLAIMED_KEY, id);
-export const getHandledIds = () => readIds(HANDLED_KEY);
-export const markRequestHandled = (id: string) => addId(HANDLED_KEY, id);
-
-const assertNoBlockingChanges = (changes: NetworkChangeFieldsFragment[], step: string) => {
-  const blocking = changes.filter(
-    (change) => change.severity === ChangeSeverity.Blocking || change.status === 'REJECTED'
-  );
-  if (blocking.length) {
-    throw new NetworkApiError(
-      `${step}: ${blocking.map((c) => c.reason ?? `${c.label} was not applied`).join('; ')}`
-    );
-  }
-};
-
-const orderMutation = async (input: OrderInput, token: string, step: string) => {
-  const { order: result } = await networkApiRequest(
-    NetworkOrderMutation,
-    { input, metadata: buildRequestMetadata() },
+export const fetchRequests = async (tab: RequestTabKey, token: string, after?: string | null) => {
+  const filter = REQUEST_TABS.find((t) => t.key === tab)!.filter;
+  const { photonPpDraftOrders: result } = await networkApiRequest(
+    PhotonPpDraftOrdersQuery,
+    { filter, first: 25, after },
     token
   );
-  if (result.__typename !== 'OrderPayload') {
-    throw new NetworkApiError(`${step}: ${'message' in result ? result.message : result.reason}`);
+  if (result.__typename !== 'PhotonPpDraftOrderConnection') {
+    throw new NetworkApiError(`Loading requests: ${result.message}`);
   }
-  if (!result.order) throw new NetworkApiError(`${step}: no order returned`);
   return result;
 };
+
+export const fetchRequestCounts = async (token: string): Promise<RequestCounts> => {
+  const data = await networkApiRequest(PhotonPpDraftOrderCountsQuery, {}, token);
+  const count = (result: { totalCount?: number } | object) =>
+    'totalCount' in result ? result.totalCount ?? 0 : 0;
+  return {
+    'to-review': count(data.toReview),
+    'my-reviews': count(data.myReviews),
+    'waiting-on-patient': count(data.waitingOnPatient),
+    closed: count(data.closed)
+  };
+};
+
+export const fetchRequest = async (id: string, token: string) => {
+  const { photonPpDraftOrder } = await networkApiRequest(PhotonPpDraftOrderQuery, { id }, token);
+  return unwrapDraftOrder(photonPpDraftOrder, 'Loading request');
+};
+
+export const fetchPatientHistory = async (photonPpPatientId: string, token: string) => {
+  const { photonPpPatientOrders: result } = await networkApiRequest(
+    PhotonPpPatientHistoryQuery,
+    { patientId: photonPpPatientId },
+    token
+  );
+  if (result.__typename !== 'PhotonPpPatientOrderConnection') {
+    throw new NetworkApiError(`Loading patient history: ${result.message}`);
+  }
+  return result.nodes;
+};
+
+export const claimRequest = async (id: string, token: string) => {
+  const { claimDraftOrder } = await networkApiRequest(
+    ClaimDraftOrderMutation,
+    { id, metadata: buildRequestMetadata() },
+    token
+  );
+  return unwrapDraftOrder(claimDraftOrder, 'Claiming request');
+};
+
+export const declineRequest = async (id: string, reason: string, token: string) => {
+  const { rejectDraftOrder } = await networkApiRequest(
+    RejectDraftOrderMutation,
+    { id, reason, metadata: buildRequestMetadata() },
+    token
+  );
+  return unwrapDraftOrder(rejectDraftOrder, 'Declining request');
+};
+
+export type PatientQuestion = { key: string | null; text: string; reason: string | null };
+
+export const askPatient = async (id: string, question: PatientQuestion, token: string) => {
+  const { addDraftOrderQuestions: asked } = await networkApiRequest(
+    AddDraftOrderQuestionsMutation,
+    { id, questions: [question], metadata: buildRequestMetadata() },
+    token
+  );
+  if (asked.__typename !== 'DraftOrderQuestionsPayload') {
+    throw new NetworkApiError(`Asking the patient: ${asked.message}`);
+  }
+  const { setDraftOrderWaitingForPatient } = await networkApiRequest(
+    SetDraftOrderWaitingForPatientMutation,
+    { id, waitingForPatient: true, metadata: buildRequestMetadata() },
+    token
+  );
+  return unwrapDraftOrder(setDraftOrderWaitingForPatient, 'Asking the patient');
+};
+
+export type PrescriptionEdit = {
+  quantity?: number;
+  instructions?: string;
+  refillsAllowed?: number;
+};
+export type PrescriptionEdits = Record<string, PrescriptionEdit>;
 
 const prescriptionMutation = async (
   prescription: PrescriptionInput,
   token: string,
-  step: string
-) => {
+  action: string
+): Promise<NetworkPrescriptionFieldsFragment> => {
   const { prescription: result } = await networkApiRequest(
     NetworkPrescriptionMutation,
     { prescription, metadata: buildRequestMetadata() },
     token
   );
-  if (result.__typename !== 'PrescriptionPayload') {
-    throw new NetworkApiError(`${step}: ${'message' in result ? result.message : result.reason}`);
+  if (result.__typename === 'AmbiguousPrescriptionMatch') {
+    throw new NetworkApiError(`${action}: ${result.reason}`);
   }
-  if (!result.prescription) throw new NetworkApiError(`${step}: no prescription returned`);
-  assertNoBlockingChanges(result.unappliedChanges, step);
+  if (result.__typename !== 'PrescriptionPayload') {
+    throw new NetworkApiError(`${action}: ${result.message}`);
+  }
+  const blocking = result.unappliedChanges.filter((change) => change.severity === 'BLOCKING');
+  if (blocking.length || !result.prescription) {
+    const reasons = blocking.map((change) => change.reason ?? change.label).join('; ');
+    throw new NetworkApiError(`${action}: ${reasons || 'no prescription returned'}`);
+  }
   return result.prescription;
 };
 
-// Reading a draft is a no-op `order` mutation — network-api echoes the current state.
-export const fetchDraftRequest = async (id: string, token: string) => {
-  const { order } = await orderMutation({ order: { id } }, token, 'Loading request');
-  return toDraftRequest(order!);
-};
-
-export const fetchDraftRequests = async (ids: string[], token: string) => {
-  const handled = new Set(getHandledIds());
-  const results = await Promise.allSettled(
-    ids.filter((id) => !handled.has(id)).map((id) => fetchDraftRequest(id, token))
-  );
-  const requests = results
-    .filter((r): r is PromiseFulfilledResult<DraftRequest> => r.status === 'fulfilled')
-    .map((r) => r.value)
-    .filter((request) => request.order.state === OrderState.Draft);
-  const failures = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
-  return { requests, failures: failures.map((f) => String(f.reason?.message ?? f.reason)) };
-};
-
 /**
- * Recreates the PP draft under the provider's own org and sends it:
- * resolve/create patient → draft prescriptions → sign → draft order → submit.
- * The PP draft can't be canceled (DRAFT → CANCELED isn't allowed), so it's marked handled
- * client-side instead.
+ * Writes and signs the draft's prescriptions for the claiming organization's own patient
+ * (with any edits), then sends the draft with them in place of the intake prescriptions.
  */
-export const approveDraftRequest = async (
-  request: DraftRequest,
-  providerToken: string,
+export const approveRequest = async (
+  draft: DraftOrderDetail,
+  edits: PrescriptionEdits,
+  token: string,
   signingMessage: string
 ) => {
-  const demographic = request.patient?.demographic;
-  if (!demographic) throw new NetworkApiError('The request has no patient details');
-  if (!request.prescriptions.length) throw new NetworkApiError('The request has no prescriptions');
-
-  const { patient: patientResult } = await networkApiRequest(
-    NetworkPatientMutation,
-    {
-      patient: {
-        demographic: {
-          name: { first: demographic.name.first, last: demographic.name.last },
-          dateOfBirth: demographic.dateOfBirth,
-          sex: demographic.sex,
-          gender: demographic.gender,
-          email: demographic.email,
-          phone: demographic.phone,
-          address: demographic.address
-            ? {
-                street1: demographic.address.street1,
-                street2: demographic.address.street2,
-                city: demographic.address.city,
-                state: demographic.address.state,
-                postalCode: demographic.address.postalCode,
-                country: demographic.address.country
-              }
-            : undefined
-        }
-      },
-      metadata: buildRequestMetadata()
-    },
-    providerToken
-  );
-  if (patientResult.__typename === 'AmbiguousPatientMatch') {
-    throw new NetworkApiError(
-      `Creating patient: multiple possible matches in your organization (${patientResult.reason})`
-    );
+  const patientId = draft.claim?.patientId;
+  if (!patientId) throw new NetworkApiError('Claim this request before approving it');
+  if (!draft.order.prescriptions.length) {
+    throw new NetworkApiError('The request has no prescriptions');
   }
-  if (patientResult.__typename !== 'PatientPayload') {
-    throw new NetworkApiError(`Creating patient: ${patientResult.message}`);
-  }
-  assertNoBlockingChanges(patientResult.unappliedChanges, 'Creating patient');
-  if (patientResult.patient?.__typename !== 'Patient') {
-    throw new NetworkApiError('Creating patient: no patient returned');
-  }
-  const patientId = patientResult.patient.id;
 
   const prescriptionIds: string[] = [];
-  for (const source of request.prescriptions) {
-    const draft = await prescriptionMutation(
+  for (const source of draft.order.prescriptions) {
+    const edit = edits[source.id] ?? {};
+    const name = source.treatment.name;
+    const written = await prescriptionMutation(
       {
         patient: { id: patientId },
         treatment: { id: source.treatment.id },
-        instructions: source.instructions,
-        dispense: source.dispense
+        instructions: edit.instructions ?? source.instructions,
+        dispense: {
+          quantity: edit.quantity ?? source.dispense?.quantity,
+          unit: source.dispense?.unit,
+          daysSupply: source.dispense?.daysSupply,
+          refillsAllowed: edit.refillsAllowed ?? source.dispense?.refillsAllowed,
+          dispenseAsWritten: source.dispense?.dispenseAsWritten
+        },
+        clinical: source.clinical?.diagnoses.length
           ? {
-              quantity: source.dispense.quantity,
-              unit: source.dispense.unit,
-              daysSupply: source.dispense.daysSupply,
-              refillsAllowed: source.dispense.refillsAllowed,
-              dispenseAsWritten: source.dispense.dispenseAsWritten
-            }
-          : undefined,
-        clinical: {
-          notes: source.clinical?.notes,
-          diagnoses: source.clinical?.diagnoses.length
-            ? {
+              diagnoses: {
                 add: source.clinical.diagnoses
                   .filter((d) => d.icd10Code)
                   .map((d) => ({ icd10Code: d.icd10Code }))
               }
-            : undefined
-        }
+            }
+          : undefined
       },
-      providerToken,
-      `Creating prescription for ${source.treatment.name}`
+      token,
+      `Writing ${name}`
     );
-    if (draft.status === DraftStatus.Blocked) {
-      const alerts = (draft.screeningAlerts ?? []).map((a) => a.description).join('; ');
-      throw new NetworkApiError(`${source.treatment.name} is blocked by screening: ${alerts}`);
+    if (written.status === DraftStatus.Blocked) {
+      const alerts = (written.screeningAlerts ?? []).map((a) => a.description).join('; ');
+      throw new NetworkApiError(`${name} is blocked by screening: ${alerts}`);
     }
 
     // Signing is a separate call — combining it with edits would invalidate the hash.
     const signed = await prescriptionMutation(
-      { id: draft.id, signing: { signedHash: draft.signing.contentHash, message: signingMessage } },
-      providerToken,
-      `Signing ${source.treatment.name}`
+      {
+        id: written.id,
+        signing: { signedHash: written.signing.contentHash, message: signingMessage }
+      },
+      token,
+      `Signing ${name}`
     );
     if (signed.signing.state !== PrescriptionSigningState.Signed) {
-      throw new NetworkApiError(`Signing ${source.treatment.name}: signature was not accepted`);
+      throw new NetworkApiError(`Signing ${name}: the signature was not accepted`);
     }
     prescriptionIds.push(signed.id);
   }
 
-  const created = await orderMutation(
-    {
-      patient: { id: patientId },
-      prescriptions: { add: prescriptionIds.map((id) => ({ id })) },
-      ...(request.pharmacy ? { pharmacy: { id: request.pharmacy.id } } : {})
-    },
-    providerToken,
-    'Creating order'
+  const { approveDraftOrder } = await networkApiRequest(
+    ApproveDraftOrderMutation,
+    { id: draft.id, prescriptionIds, metadata: buildRequestMetadata() },
+    token
   );
-  assertNoBlockingChanges(created.unappliedChanges, 'Creating order');
-  const orderId = created.order!.id;
-
-  const submitted = await orderMutation(
-    { order: { id: orderId }, state: OrderState.Submitted },
-    providerToken,
-    'Sending order'
-  );
-  if (submitted.order!.state !== OrderState.Submitted) {
-    const reasons = submitted.unappliedChanges.map((c) => c.reason).filter(Boolean);
-    throw new NetworkApiError(
-      `Sending order: the order was created but not sent${
-        reasons.length ? ` (${reasons.join('; ')})` : ''
-      }`
-    );
-  }
-
-  markRequestHandled(request.id);
-  return orderId;
+  return unwrapDraftOrder(approveDraftOrder, 'Sending');
 };
