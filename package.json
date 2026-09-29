@@ -97,6 +97,8 @@
     "@felte/validator-zod": "^1.0.17",
     "@nanostores/persistent": "^0.7.0",
     "@nanostores/react": "^0.4.1",
+    "@photon-health/tokens": "^0.2.2",
+    "@photon-health/ui": "^0.2.3",
     "@solid-primitives/scheduled": "^1.4.1",
     "@tanstack/react-table": "^8.10.3",
     "@tanstack/virtual-core": "^3.0.0-alpha.1",

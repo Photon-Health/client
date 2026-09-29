@@ -8,9 +8,11 @@ import { Canceled } from './views/Canceled';
 import { NoMatch } from './views/NoMatch';
 import { InfoPage } from './views/Info';
 import { PatientAnalyticsProvider } from './hooks/usePatientAnalytics';
+import { intakeRouteElements } from './intake/routes';
 
 export const routeElements = (
   <Route>
+    {intakeRouteElements}
     <Route
       path="/"
       element={

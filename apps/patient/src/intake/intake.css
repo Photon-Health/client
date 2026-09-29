@@ -1,0 +1,157 @@
+/**
+ * Only what @photon-health/ui does not provide: the page shell, the step
+ * meter, the one-time-code boxes, and the request timeline. Anything with a
+ * component in the design system is built from that component instead of a
+ * class here. Every value is a semantic token — see the gaps listed in
+ * README.md.
+ */
+
+.intake {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--surface-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.intake *,
+.intake *::before,
+.intake *::after {
+  box-sizing: inherit;
+}
+
+/* GAP: `Button` is the one system component that sets no font-family — its
+   base is `font-medium text-[14px]` and nothing else — and a <button> does not
+   inherit one from an ancestor. Left alone, every button in the flow renders
+   in the UA's Arial while the prose around it is Acid Grotesk. Input, Select
+   and Tag carry `type-app-*` classes, which do set the family, so this only
+   has to reach the elements the UA fonts itself. */
+.intake button,
+.intake input,
+.intake select,
+.intake textarea {
+  font-family: inherit;
+}
+
+.intake__container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-8);
+}
+
+/* Lets a screen push its call to action to the bottom of the viewport. */
+.intake__column,
+.intake__spacer {
+  flex: 1;
+}
+
+/* GAP: the design system has no step meter. */
+.intake__progress {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.intake__progress span {
+  flex: 1;
+  height: var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--border-subtle);
+}
+
+.intake__progress span[data-on='true'] {
+  background: var(--surface-accent-solid);
+}
+
+/* GAP: the design system has no one-time-code field. Chrome mirrors Input. */
+.intake__code {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.intake__code-box {
+  flex: 1;
+  min-width: 0;
+  aspect-ratio: 4 / 5;
+  padding: var(--space-0);
+  text-align: center;
+  color: var(--text-primary);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius-md);
+  transition: border-color var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard);
+}
+
+.intake__code-box:focus-visible {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--elevation-focus-ring);
+}
+
+/* GAP: the design system has no timeline or stepper. */
+.intake__timeline-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-tertiary);
+}
+
+.intake__timeline-step[data-current='true'] {
+  color: var(--text-primary);
+}
+
+.intake__timeline-dot {
+  flex: none;
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--border-default);
+}
+
+.intake__timeline-step[data-current='true'] .intake__timeline-dot {
+  background: var(--surface-accent-solid);
+}
+
+/* GAP: the app type scale has no eyebrow step. Since there is no step to
+   match, the eyebrow is built from the token layer directly rather than
+   guessed: --font-mono is GT Pressura Mono, which is what the comps set an
+   eyebrow in and the only place the app scale gives the licensed mono face
+   anything to do. Size and weight still come from a real app step
+   (`type-app-small-semibold`); this overrides family, case and tracking. */
+.intake__eyebrow {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* GAP: PharmacyCard takes no onClick or className, so a collapsed card is
+   wrapped to become the tap target. A real button keeps focus and Enter/Space
+   without hand-rolled key handling. */
+.intake__card-button {
+  display: block;
+  width: 100%;
+  padding: var(--space-0);
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: var(--radius-lg);
+}
+
+.intake__card-button:focus-visible {
+  outline: none;
+  box-shadow: var(--elevation-focus-ring);
+}
+
+/* GAP: no numbered-list component, and an <ol> marker takes no type class or
+   colour — so the how-it-works ordinal is its own fixed-width gutter. */
+.intake__ordinal {
+  flex: none;
+  width: var(--space-6);
+}
