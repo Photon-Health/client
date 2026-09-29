@@ -10,8 +10,10 @@ const schemaByEnv: Record<string, string> = {
 
 const env = process.env.VITE_ENV_NAME ?? 'boson';
 
+// NETWORK_API_SCHEMA points at a schema file (e.g. the services repo's
+// contexts/gql-schemas/network/schema.graphql) when no network-api is running.
 const config: CodegenConfig = {
-  schema: schemaByEnv[env],
+  schema: process.env.NETWORK_API_SCHEMA ?? schemaByEnv[env],
   documents: ['src/network-api/documents.ts'],
   ignoreNoDocuments: true,
   generates: {

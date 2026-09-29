@@ -1,162 +1,115 @@
-import { HttpResponse } from 'msw';
-import { setupServer } from 'msw/node';
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
+import { PhotonPpDraftOrderOutcomeStatus } from '../../../network-api/gql/graphql';
 import {
   ageFromDateOfBirth,
-  approveDraftRequest,
-  getHandledIds,
-  parseIntakeNotes,
-  requestsConfig,
-  toDraftRequest,
-  urgencyColorScheme
+  describeRequest,
+  followUpQuestions,
+  formatAnswer,
+  formatSubmitted,
+  intakeQuestions,
+  requestStatus
 } from './requests';
-import { DRAFT_ID, makeDraftOrder, networkApiHandlers, networkGql } from './testFixtures';
+import { makeDraft } from './testFixtures';
 
-const calls: { operation: string; variables: Record<string, any> }[] = [];
-const server = setupServer(...networkApiHandlers(calls));
+const claim = {
+  __typename: 'PhotonPpDraftOrderClaim' as const,
+  organizationId: 'org_mine',
+  claimedAt: '2026-09-29T10:00:00.000Z',
+  waitingForPatient: false,
+  patientId: 'pat_mine',
+  claimedByUserId: 'auth0|me',
+  claimedByMe: true
+};
 
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
-beforeEach(() => {
-  vi.stubEnv('VITE_ENV_NAME', 'boson');
-  vi.stubEnv('PHOTON_PP_AUTH_TOKEN', 'pp-token');
-  calls.length = 0;
-  localStorage.clear();
-});
-afterEach(() => {
-  server.resetHandlers();
-  vi.unstubAllEnvs();
-});
-afterAll(() => server.close());
-
-describe('parseIntakeNotes', () => {
-  test('pulls out reason and urgency', () => {
-    expect(parseIntakeNotes('Reason: UTI\nClinical urgency: Symptoms 2 days')).toMatchObject({
-      reason: 'UTI',
-      urgency: 'Symptoms 2 days'
-    });
-  });
-
-  test('keeps other lines as answers, splitting on the first colon', () => {
-    expect(parseIntakeNotes('Started at: 10:30\nno label here').answers).toEqual([
-      { label: 'Started at', value: '10:30' },
-      { label: '', value: 'no label here' }
-    ]);
-  });
-
-  test('handles missing notes', () => {
-    expect(parseIntakeNotes(null)).toEqual({ answers: [] });
-  });
-});
-
-test.each([
-  ['52 h left in window', 'red'],
-  ['Symptoms 2 days', 'orange'],
-  ['Labs attached', 'blue'],
-  [undefined, 'gray']
-])('urgencyColorScheme(%s) is %s', (urgency, color) => {
-  expect(urgencyColorScheme(urgency)).toBe(color);
-});
-
-test('ageFromDateOfBirth accounts for birthdays not yet reached', () => {
-  expect(ageFromDateOfBirth('1997-04-12', new Date('2026-04-11T12:00:00Z'))).toBe(28);
-  expect(ageFromDateOfBirth('1997-04-12', new Date('2026-04-12T12:00:00Z'))).toBe(29);
-});
-
-test('toDraftRequest builds the list view from the draft order', () => {
-  expect(toDraftRequest(makeDraftOrder())).toMatchObject({
-    patientName: 'Achilles R.',
-    state: 'CO',
-    medication: 'Ella',
-    reason: 'Emergency contraception',
-    urgency: '52 h left in window'
-  });
-});
-
-describe('requestsConfig', () => {
-  test('is enabled on boson with a PP token', () => {
-    expect(requestsConfig().enabled).toBe(true);
-  });
-
-  test('is disabled outside boson/tau', () => {
-    vi.stubEnv('VITE_ENV_NAME', 'photon');
-    expect(requestsConfig().enabled).toBe(false);
-  });
-});
-
-describe('approveDraftRequest', () => {
-  const request = () => toDraftRequest(makeDraftOrder());
-
-  test('creates patient, drafts + signs prescription, then creates and submits the order', async () => {
-    await expect(approveDraftRequest(request(), 'provider-token', 'ok')).resolves.toBe('ordd_new');
-
-    expect(calls.map((c) => c.operation)).toEqual([
-      'NetworkPatient',
-      'NetworkPrescription',
-      'NetworkPrescription',
-      'NetworkOrder',
-      'NetworkOrder'
-    ]);
-    expect(calls[1].variables.prescription).toMatchObject({
-      patient: { id: 'pat_mine' },
-      treatment: { id: 'med_ella' }
-    });
-    expect(calls[2].variables.prescription).toEqual({
-      id: 'rx_mine',
-      signing: { signedHash: 'hash_mine', message: 'ok' }
-    });
-    expect(calls[3].variables.input).toMatchObject({
-      patient: { id: 'pat_mine' },
-      prescriptions: { add: [{ id: 'rx_mine' }] },
-      pharmacy: { id: 'phr_cvs' }
-    });
-    expect(calls[4].variables.input).toEqual({ order: { id: 'ordd_new' }, state: 'SUBMITTED' });
-    expect(getHandledIds()).toEqual([DRAFT_ID]);
-  });
-
-  test('stops on an ambiguous patient match without creating anything else', async () => {
-    server.use(
-      networkGql.mutation('NetworkPatient', () =>
-        HttpResponse.json({
-          data: {
-            patient: { __typename: 'AmbiguousPatientMatch', reason: 'name + DOB', candidates: [] }
-          }
-        })
-      )
-    );
-
-    await expect(approveDraftRequest(request(), 'provider-token', 'ok')).rejects.toThrow(
-      /multiple possible matches/
-    );
-    expect(calls).toHaveLength(0);
-    expect(getHandledIds()).toEqual([]);
-  });
-
-  test('does not sign a prescription blocked by screening', async () => {
-    server.use(
-      networkGql.mutation('NetworkPrescription', ({ variables }) => {
-        calls.push({ operation: 'NetworkPrescription', variables });
-        return HttpResponse.json({
-          data: {
-            prescription: {
-              __typename: 'PrescriptionPayload',
-              prescription: {
-                ...makeDraftOrder().prescriptions[0],
-                status: 'BLOCKED',
-                screeningAlerts: [
-                  { severity: 'MAJOR', type: 'DRUG', description: 'Interacts with X' }
-                ]
-              },
-              unappliedChanges: []
-            }
-          }
-        });
+describe('describeRequest', () => {
+  test('summarizes the patient, medication, and the intake reason and urgency', () => {
+    expect(describeRequest(makeDraft())).toEqual(
+      expect.objectContaining({
+        id: 'ordd_test',
+        patientName: 'Achilles R.',
+        state: 'CO',
+        medication: 'ella 30 mg',
+        reason: 'Emergency contraception',
+        urgency: '52 h left in window'
       })
     );
+  });
+});
 
-    await expect(approveDraftRequest(request(), 'provider-token', 'ok')).rejects.toThrow(
-      /blocked by screening: Interacts with X/
-    );
-    expect(calls.filter((c) => c.variables.prescription?.signing)).toHaveLength(0);
+describe('intake and follow-up questions', () => {
+  test('keeps reason and urgency out of the intake answers', () => {
+    expect(intakeQuestions(makeDraft()).map((q) => q.key)).toEqual([
+      'time_since_unprotected_sex',
+      'breastfeeding'
+    ]);
+  });
+
+  test('treats questions from the claiming organization as follow-ups', () => {
+    const draft = makeDraft({ claim });
+    const followUp = {
+      ...draft.order.questions[3],
+      id: 'ordq_mine',
+      authorOrganizationId: 'org_mine'
+    };
+    const withFollowUp = makeDraft({
+      claim,
+      order: { ...draft.order, questions: [...draft.order.questions, followUp] }
+    });
+
+    expect(followUpQuestions(withFollowUp).map((q) => q.id)).toEqual(['ordq_mine']);
+    expect(intakeQuestions(withFollowUp).map((q) => q.id)).not.toContain('ordq_mine');
+  });
+});
+
+describe('requestStatus', () => {
+  test.each([
+    [makeDraft(), 'Unclaimed'],
+    [makeDraft({ claim }), 'Claimed by you'],
+    [makeDraft({ claim: { ...claim, claimedByMe: false } }), 'Claimed by a colleague'],
+    [makeDraft({ claim: { ...claim, waitingForPatient: true } }), 'Waiting on patient'],
+    [
+      makeDraft({
+        claim,
+        outcome: {
+          __typename: 'PhotonPpDraftOrderOutcome',
+          status: PhotonPpDraftOrderOutcomeStatus.Rejected,
+          closedAt: '2026-09-29T11:00:00.000Z',
+          orderId: null,
+          rejectionReason: 'No'
+        }
+      }),
+      'Declined'
+    ]
+  ])('labels the request', (draft, label) => {
+    expect(requestStatus(draft).label).toBe(label);
+  });
+});
+
+describe('formatting', () => {
+  test('formats each kind of answer', () => {
+    const base = {
+      __typename: 'OrderQuestionAnswer' as const,
+      text: null,
+      boolean: null,
+      date: null,
+      choices: null
+    };
+    expect(formatAnswer({ ...base, boolean: false })).toBe('No');
+    expect(formatAnswer({ ...base, date: '2026-09-01' })).toBe('2026-09-01');
+    expect(formatAnswer({ ...base, choices: ['a', 'b'] })).toBe('a, b');
+    expect(formatAnswer(null)).toBeUndefined();
+  });
+
+  test('describes how long ago a request was submitted', () => {
+    const now = new Date('2026-09-29T12:00:00.000Z');
+    expect(formatSubmitted('2026-09-29T11:48:00.000Z', now)).toBe('12 min ago');
+    expect(formatSubmitted('2026-09-29T09:00:00.000Z', now)).toBe('3 h ago');
+    expect(formatSubmitted('2026-09-27T12:00:00.000Z', now)).toBe('2 d ago');
+  });
+
+  test('computes age from a date of birth, in UTC', () => {
+    expect(ageFromDateOfBirth('1997-04-12', new Date('2026-04-11T12:00:00Z'))).toBe(28);
+    expect(ageFromDateOfBirth('1997-04-12', new Date('2026-04-12T12:00:00Z'))).toBe(29);
   });
 });
