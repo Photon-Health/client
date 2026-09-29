@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "clinical-app",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["nx", "run", "app:dev"],
+      "port": 3000
+    }
+  ]
+}

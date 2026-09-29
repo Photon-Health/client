@@ -9,6 +9,7 @@ storybook-static
 
 # gql codegen
 /apps/app/src/gql
+/apps/app/src/network-api/gql
 __generated__
 
 # System files

@@ -30,6 +30,9 @@ import { Env } from '@photonhealth/sdk';
 import { SelfSignupPage } from './views/routes/SelfSignup';
 import { AppOverride } from './views/routes/AppOverride';
 import { LinkConfirmation } from './views/routes/Link';
+import { Requests } from './views/routes/Requests';
+import { RequestDetail } from './views/routes/Requests/RequestDetail';
+import { requestsConfig } from './views/routes/Requests/requests';
 
 const env = import.meta.env.VITE_ENV_NAME as Env;
 
@@ -83,6 +86,12 @@ export const App = () => {
                   <Route path="new" element={<NewOrder />} />
                   <Route path=":orderId" element={<OrderDetailPage />} />
                 </Route>
+                {requestsConfig().enabled && (
+                  <Route path="/requests">
+                    <Route path="/requests" element={<Requests />} />
+                    <Route path=":requestId" element={<RequestDetail />} />
+                  </Route>
+                )}
               </Route>
               <Route path="/support" element={<Support />} />
               <Route path="/playground" element={<Playground />} />={' '}

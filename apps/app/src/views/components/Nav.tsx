@@ -32,6 +32,7 @@ import {
   FiLogOut,
   FiMenu,
   FiSettings,
+  FiInbox,
   FiShoppingCart,
   FiUsers,
   FiRepeat
@@ -44,6 +45,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Logo } from './Logo';
 import { NavButton } from './NavButton';
 import { UserProfile } from './UserProfile';
+import { requestsConfig } from '../routes/Requests/requests';
 
 import { graphql } from 'apps/app/src/gql';
 import { useQuery } from '@apollo/client';
@@ -71,6 +73,7 @@ export const Nav = () => {
 
   const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
   const federated = data?.organization?.settings?.providerUx?.federatedAuth ?? false;
+  const requestsEnabled = requestsConfig().enabled;
 
   const onLogout = useCallback(() => {
     logout({ returnTo: window.location.origin, federated });
@@ -93,6 +96,7 @@ export const Nav = () => {
                 <NavButton label="Prescriptions" icon={TbPrescription} link="/prescriptions" />
                 <NavButton label="Patients" icon={FiUsers} link="/patients" />
                 <NavButton label="Orders" icon={FiShoppingCart} link="/orders" />
+                {requestsEnabled && <NavButton label="Requests" icon={FiInbox} link="/requests" />}
               </ButtonGroup>
             )}
           </HStack>
@@ -202,6 +206,15 @@ export const Nav = () => {
                               onClick={onToggle}
                               bgIsWhite
                             />
+                            {requestsEnabled && (
+                              <NavButton
+                                label="Requests"
+                                icon={FiInbox}
+                                link="/requests"
+                                onClick={onToggle}
+                                bgIsWhite
+                              />
+                            )}
                           </Stack>
                         </Stack>
                         <Stack spacing={{ base: '5', sm: '6' }}>

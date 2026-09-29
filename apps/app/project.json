@@ -40,6 +40,13 @@
         "command": "VITE_ENV_NAME=photon npx graphql-codegen"
       }
     },
+    "codegen:network-api": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "VITE_ENV_NAME=boson npx graphql-codegen --config codegen.network-api.ts"
+      }
+    },
     "codegen:watch": {
       "executor": "nx:run-commands",
       "options": {
