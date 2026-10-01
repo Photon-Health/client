@@ -56,7 +56,7 @@ import { OffersList } from '../components/offers/OffersList';
 import { MailOrderSelectList } from '../components/mail-order-select';
 import { MailOrderPharmacyOption } from '../components/mail-order-select/MailOrderSelectCard';
 import { PharmacyTabKey, PharmacyTypeTabBar, TabPanel } from '../components/pharmacy-tabs';
-import { deriveCostType, getOfferType } from '../utils/offerAnalytics';
+import { deriveCostType, getOfferType, toWaysToPay } from '../utils/offerAnalytics';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 import { MarketplaceSummary } from '../components/marketplace/summary/MarketplaceSummary';
 import { LocationSelection } from '../components/marketplace/summary/LocationSelection';
@@ -755,7 +755,11 @@ export const Pharmacy = () => {
       hasInitialRoute: !!order.metadata?.routingHistory.length,
       initialRouteType: getInitialRouteType(order),
       enablePrice: enablePrice,
-      hasPrice: selectedPharmacy?.price !== undefined
+      hasPrice: selectedPharmacy?.price !== undefined,
+      waysToPay: toWaysToPay({
+        pharmacy: selectedPharmacy,
+        offerGroup: filteredOffers.find((o) => o.pharmacy.id === pharmacyId)
+      })
     });
   };
 
@@ -833,7 +837,9 @@ export const Pharmacy = () => {
       enablePrice,
       hasPrice: selectedPharmacy.price !== undefined,
       price: selectedPharmacy.price || cheapestPricing(selectedOfferGroup)?.costAmount,
-      retailPrice: selectedPharmacy.retailPrice || cheapestPricing(selectedOfferGroup)?.retailAmount
+      retailPrice:
+        selectedPharmacy.retailPrice || cheapestPricing(selectedOfferGroup)?.retailAmount,
+      waysToPay: toWaysToPay({ pharmacy: selectedPharmacy, offerGroup: selectedOfferGroup })
     });
 
     if (isDemo) {

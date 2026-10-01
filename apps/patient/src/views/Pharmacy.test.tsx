@@ -376,6 +376,15 @@ describe('Pharmacy page', () => {
           .map(([, , properties]) => properties?.offerType);
         expect(selectedTypes).toEqual(['UK Health', 'Arrive']);
       });
+
+      // every price the patient could have picked rides along on the submit event
+      const [, , submitted] = vi
+        .mocked(getPatientAnalytics().track)
+        .mock.calls.find(([event]) => event === 'Pharmacy Selection Submitted')!;
+      expect(submitted?.waysToPay).toEqual([
+        { source: 'UK Health', price: 30 },
+        { source: 'Arrive', price: 12 }
+      ]);
     }, 15_000);
 
     test('tracks an impression for a priceless offer, which still shows its tags', async () => {
