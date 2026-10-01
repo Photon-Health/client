@@ -24,6 +24,12 @@ export const OFFER_SOURCE = {
 // attributeTag kind marking a paid-placement (sponsored) offer
 export const SPONSORED_TAG_KIND = 'SPONSORED';
 
+// promoted offers don't have rank (yet) so we enforce that here for now
+export const CLIENT_SOURCE_PRIORITY: string[] = [
+  OFFER_SOURCE.AMAZON_PHARMACY,
+  OFFER_SOURCE.NOVOCARE
+];
+
 // Display titles for price types. Currently, only Amazon Pharmacy has potential to serve MEMBERSHIP offers
 const PRICE_TYPE_TITLES: Record<OfferPriceType, string> = {
   MEMBERSHIP: 'Prime Member Price',
@@ -225,12 +231,51 @@ export function buildPaymentOptions({
   ].filter((option): option is PaymentOption => !!option);
 }
 
+function sourceRank(offer: PharmacyOffer): number {
+  const index = CLIENT_SOURCE_PRIORITY.indexOf(offer.source ?? '');
+  return index === -1 ? CLIENT_SOURCE_PRIORITY.length : index;
+}
+
+// Promoted first, then by source priority, so the card doesn't depend on the order the API
+// returned bundles in. Sort is stable, so offers that rank the same keep that order.
+function byPrecedence(a: PharmacyOffer, b: PharmacyOffer): number {
+  return Number(!!b.isPromoted) - Number(!!a.isPromoted) || sourceRank(a) - sourceRank(b);
+}
+
 // one group per pharmacy, in the order each pharmacy's first offer appears
 export function groupOffersByPharmacy(offers: PharmacyOffer[]): PharmacyOfferGroup[] {
   return Object.values(_.groupBy(offers, (offer) => offer.pharmacy.id)).map((pharmacyOffers) => ({
     pharmacy: pharmacyOffers[0].pharmacy,
-    offers: pharmacyOffers
+    offers: [...pharmacyOffers].sort(byPrecedence)
   }));
+}
+
+// The offer whose attributes stand for the whole card — its tags, delivery estimate, other attributes.
+// One offer rather than a merge, until there's UI for showing each offer's own.
+export function representativeOffer(group?: PharmacyOfferGroup): PharmacyOffer | undefined {
+  return group?.offers[0];
+}
+
+// the best-priced offer's pricing, so cost and retail always come from the same offer
+export function cheapestPricing(group?: PharmacyOfferGroup): OfferPricing | undefined {
+  return (group?.offers ?? [])
+    .filter((offer) => offer.pricing.costAmount != null)
+    .sort((a, b) => a.pricing.costAmount! - b.pricing.costAmount!)[0]?.pricing;
+}
+
+// because offers aren't actually pharmacies
+// we'll transform them into things that resemble pharamcy objects
+export function toPharmacyLike(group: PharmacyOfferGroup) {
+  const pricing = cheapestPricing(group);
+
+  return {
+    id: group.pharmacy.id,
+    name: group.pharmacy.name,
+    fulfillmentTypes: group.pharmacy.fulfillmentTypes,
+    logo: group.pharmacy.logo,
+    price: pricing?.costAmount,
+    retailPrice: pricing?.retailAmount
+  };
 }
 
 // tags across a pharmacy's offers, deduped by kind

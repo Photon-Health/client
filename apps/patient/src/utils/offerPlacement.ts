@@ -1,8 +1,5 @@
 import { PharmacyOffer, PharmacyOfferGroup } from './models';
-import { OFFER_SOURCE, groupOffersByPharmacy } from './offers';
-
-// promoted offers don't have rank (yet) so we enforce that here for now
-const CLIENT_SOURCE_PRIORITY: string[] = [OFFER_SOURCE.AMAZON_PHARMACY, OFFER_SOURCE.NOVOCARE];
+import { CLIENT_SOURCE_PRIORITY, OFFER_SOURCE, groupOffersByPharmacy } from './offers';
 
 // a group ranks by its best-ranked source
 function sourceRank(group: PharmacyOfferGroup): number {

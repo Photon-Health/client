@@ -41,6 +41,7 @@ import {
 } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchPharmacyOffers, getPharmacy } from './pharmacy.utils';
+import { cheapestPricing, toPharmacyLike } from '../utils/offers';
 import { isDeliveryOffer, selectOfferPlacement } from '../utils/offerPlacement';
 import _ from 'lodash';
 import {
@@ -727,16 +728,7 @@ export const Pharmacy = () => {
       clearAutoroutedPharmacyConfirmation(order.id);
     }
 
-    // because offers aren't actually pharmacies
-    // we'll transform them into things that resemble pharamcy objects
-    const pharmaciesFromOffers = (filteredOffers || []).map((o) => ({
-      id: o.pharmacy.id,
-      name: o.pharmacy.name,
-      fulfillmentTypes: o.pharmacy.fulfillmentTypes,
-      logo: o.pharmacy.logo,
-      price: o.offers[0].pricing.costAmount ?? 0,
-      retailPrice: o.offers[0].pricing.retailAmount ?? 0
-    }));
+    const pharmaciesFromOffers = (filteredOffers || []).map(toPharmacyLike);
 
     const selectedPharmacy: EnrichedPharmacy | undefined = [
       ...pickupPharmacies,
@@ -840,9 +832,8 @@ export const Pharmacy = () => {
       initialRouteType: getInitialRouteType(order),
       enablePrice,
       hasPrice: selectedPharmacy.price !== undefined,
-      price: selectedPharmacy.price || selectedOfferGroup?.offers[0].pricing.costAmount,
-      retailPrice:
-        selectedPharmacy.retailPrice || selectedOfferGroup?.offers[0].pricing.retailAmount
+      price: selectedPharmacy.price || cheapestPricing(selectedOfferGroup)?.costAmount,
+      retailPrice: selectedPharmacy.retailPrice || cheapestPricing(selectedOfferGroup)?.retailAmount
     });
 
     if (isDemo) {
@@ -850,16 +841,7 @@ export const Pharmacy = () => {
       return;
     }
 
-    // because offers aren't actually pharmacies
-    // we'll transform them into things that resemble pharamcy objects
-    const pharmaciesFromOffers = (filteredOffers || []).map((o) => ({
-      id: o.pharmacy.id,
-      name: o.pharmacy.name,
-      fulfillmentTypes: o.pharmacy.fulfillmentTypes,
-      logo: o.pharmacy.logo,
-      price: o.offers[0].pricing.costAmount ?? 0,
-      retailPrice: o.offers[0].pricing.retailAmount ?? 0
-    }));
+    const pharmaciesFromOffers = (filteredOffers || []).map(toPharmacyLike);
 
     const allPharmaciesIncludingOffers = [...pharmaciesFromOffers, ...pickupPharmacies];
 
@@ -1359,16 +1341,7 @@ export const Pharmacy = () => {
             onClick={async () => {
               if (orderRouted) return;
 
-              // because offers aren't actually pharmacies
-              // we'll transform them into things that resemble pharamcy objects
-              const pharmaciesFromOffers = (filteredOffers || []).map((o) => ({
-                id: o.pharmacy.id,
-                name: o.pharmacy.name,
-                fulfillmentTypes: o.pharmacy.fulfillmentTypes,
-                logo: o.pharmacy.logo,
-                price: o.offers[0].pricing.costAmount ?? 0,
-                retailPrice: o.offers[0].pricing.retailAmount ?? 0
-              }));
+              const pharmaciesFromOffers = (filteredOffers || []).map(toPharmacyLike);
 
               const allPharmaciesIncludingOffers = [
                 ...pharmaciesFromOffers,

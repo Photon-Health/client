@@ -11,7 +11,12 @@ import {
 } from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';
 import { derivePharmacyOpenState } from '../../utils/general';
-import { SPONSORED_TAG_KIND, buildPaymentOptions, getOfferTags } from '../../utils/offers';
+import {
+  SPONSORED_TAG_KIND,
+  buildPaymentOptions,
+  getOfferTags,
+  representativeOffer
+} from '../../utils/offers';
 import { isDeliveryOffer } from '../../utils/offerPlacement';
 import { PaymentOptions } from '../pharmacy-card/PaymentOptions';
 
@@ -136,13 +141,12 @@ export const OfferInfo = ({
 
   const paymentOptions = buildPaymentOptions({ offerGroup });
 
-  // breakdown, coupon and delivery estimate come from the first offer for now
-  const offer = offerGroup.offers[0];
+  const offer = representativeOffer(offerGroup);
 
-  const isMultiRx = (offer.prescriptions?.length ?? 0) > 1;
+  const isMultiRx = (offer?.prescriptions?.length ?? 0) > 1;
 
   const singleMedPromotions = !isMultiRx
-    ? offer.prescriptions?.[0]?.promotions?.filter(
+    ? offer?.prescriptions?.[0]?.promotions?.filter(
         (promo) => promo.type === OfferPromotionTypes.AmazonPharmacyRXCoupon
       )
     : undefined;
@@ -181,7 +185,7 @@ export const OfferInfo = ({
 
       {isMultiRx && (
         <VStack w="full" bg="gray.50" borderRadius="md" p={3}>
-          {offer.prescriptions?.map((med) => (
+          {offer?.prescriptions?.map((med) => (
             <HStack key={med.name} w="full" justify="space-between" align="start">
               <VStack align="flex-start">
                 <Tooltip
@@ -223,9 +227,9 @@ export const OfferInfo = ({
       )}
 
       <VStack w="full" alignItems="start">
-        {offer.deliveryEstimate ? (
+        {offer?.deliveryEstimate ? (
           <Text fontSize="sm" fontWeight="semibold">
-            {offer.deliveryEstimate}
+            {offer?.deliveryEstimate}
           </Text>
         ) : null}
         {sponsoredTag && (

@@ -21,7 +21,7 @@ import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import { formatAddress, titleCase } from '../utils/formatters';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
-import { SPONSORED_TAG_KIND, buildPaymentOptions } from '../utils/offers';
+import { SPONSORED_TAG_KIND, buildPaymentOptions, representativeOffer } from '../utils/offers';
 import { PaymentOptions } from './pharmacy-card/PaymentOptions';
 
 dayjs.extend(customParseFormat);
@@ -277,7 +277,7 @@ export const PharmacyInfo = ({
   const paymentOptions = buildPaymentOptions({ pharmacy, offerGroup, showPrice });
   // one offer's tags rather than a merge across sources — showing them all needs per-offer tag UI.
   // sponsored offers are never pickup, so the paid-placement tooltip lives only in OfferInfo
-  const offerTags = (offerGroup?.offers[0]?.tags ?? []).filter(
+  const offerTags = (representativeOffer(offerGroup)?.tags ?? []).filter(
     (tag) => tag.kind !== SPONSORED_TAG_KIND
   );
 
