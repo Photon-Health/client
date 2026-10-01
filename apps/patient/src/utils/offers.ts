@@ -1,17 +1,24 @@
 import _ from 'lodash';
 import { OfferPriceType } from '../__generated__/graphql';
 import {
+  EnrichedPharmacy,
+  OfferAttributeTag,
   OfferPrescriptionView,
   OfferPrescription,
+  PaymentOption,
   PharmacyOffer,
+  PharmacyOfferGroup,
+  OfferPricing,
   OfferPromotionTypes,
   Promotion
 } from './models';
+import { text as t } from './text';
 
 export const OFFER_SOURCE = {
   AMAZON_PHARMACY: 'AMAZON_PHARMACY',
   NOVOCARE: 'NOVOCARE',
-  UK_HEALTH: 'UK_HEALTH'
+  UK_HEALTH: 'UK_HEALTH',
+  ARRIVE: 'ARRIVE'
 } as const;
 
 // attributeTag kind marking a paid-placement (sponsored) offer
@@ -21,7 +28,7 @@ export const SPONSORED_TAG_KIND = 'SPONSORED';
 const PRICE_TYPE_TITLES: Record<OfferPriceType, string> = {
   MEMBERSHIP: 'Prime Member Price',
   CASH: 'Cash Price',
-  INSURANCE: 'Insurance Estimate'
+  INSURANCE: 'With insurance'
 };
 // Display title for a mix of offers that span more than one price type
 const MIXED_PRICE_TITLE = 'Total Price';
@@ -146,12 +153,16 @@ function getCostAmountTitle(prescriptions: OfferPrescriptionView[]): string | un
 // The pricing, delivery estimate and per-prescription breakdown for one pharmacy's offer,
 // chosen by taking the cheapest offer per prescription and summing them.
 export function summarizePharmacyOffer(
-  offers: OfferPrescription[] | undefined
+  offers: OfferPrescription[] | undefined,
+  source?: string | null
 ): Pick<PharmacyOffer, 'deliveryEstimate' | 'pricing' | 'prescriptions'> {
+  // Insurance estimates are only trusted from ARRIVE (not Amazon's yet), which sends nothing else
+  const priceTypes: OfferPriceType[] =
+    source === OFFER_SOURCE.ARRIVE ? ['INSURANCE'] : BEST_PRICE_TYPES;
   const candidates = (offers ?? []).filter(
     (offer) =>
       offer.priceType != null &&
-      BEST_PRICE_TYPES.includes(offer.priceType) &&
+      priceTypes.includes(offer.priceType) &&
       offer.prescription?.id != null
   );
 
@@ -175,4 +186,54 @@ export function summarizePharmacyOffer(
     },
     prescriptions
   };
+}
+
+export function toPaymentOption(pricing?: OfferPricing): PaymentOption | undefined {
+  // if we aren't explicitly given the cost amount, we'll expect patients to pay the retail amount
+  const amount = pricing?.costAmount ?? pricing?.retailAmount;
+  if (!pricing || amount == null) {
+    return undefined;
+  }
+
+  return {
+    label: pricing.costAmountTitle ?? pricing.retailAmountTitle ?? '',
+    amount,
+    retailAmount: pricing.retailAmount
+  };
+}
+
+// every price shown on one pharmacy's card, from its offers and its own coupon price
+export function buildPaymentOptions({
+  pharmacy,
+  offerGroup,
+  showPrice
+}: {
+  pharmacy?: Pick<EnrichedPharmacy, 'price' | 'retailPrice'>;
+  offerGroup?: PharmacyOfferGroup;
+  showPrice?: boolean;
+}): PaymentOption[] {
+  // GoodRx/RxSense prices come from the pharmacy search, so we shape one into an option here
+  // until coupons are offers too
+  const couponOption: PaymentOption | undefined =
+    showPrice && pharmacy?.price != null
+      ? { label: t.couponPrice, amount: pharmacy.price, retailAmount: pharmacy.retailPrice }
+      : undefined;
+
+  return [
+    ...(offerGroup?.offers.map((offer) => toPaymentOption(offer.pricing)) ?? []),
+    couponOption
+  ].filter((option): option is PaymentOption => !!option);
+}
+
+// one group per pharmacy, in the order each pharmacy's first offer appears
+export function groupOffersByPharmacy(offers: PharmacyOffer[]): PharmacyOfferGroup[] {
+  return Object.values(_.groupBy(offers, (offer) => offer.pharmacy.id)).map((pharmacyOffers) => ({
+    pharmacy: pharmacyOffers[0].pharmacy,
+    offers: pharmacyOffers
+  }));
+}
+
+// tags across a pharmacy's offers, deduped by kind
+export function getOfferTags(offers: PharmacyOffer[]): OfferAttributeTag[] {
+  return [...new Map(offers.flatMap((offer) => offer.tags).map((tag) => [tag.kind, tag])).values()];
 }

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { summarizePharmacyOffer } from './offers';
-import { OfferPrescription } from './models';
+import { getOfferTags, groupOffersByPharmacy, summarizePharmacyOffer } from './offers';
+import { OfferPrescription, PharmacyOffer } from './models';
 
 const SAME_DAY = 'Same-Day';
 const ONE_DAY = 'Delivery in 1 day, after you place your order';
@@ -246,5 +246,41 @@ describe('delivery estimate', () => {
 
   test('is undefined when no medication has a delivery promise', () => {
     expect(withPromises(undefined, undefined)).toBeUndefined();
+  });
+});
+
+describe('groupOffersByPharmacy', () => {
+  const offer = (overrides: Partial<PharmacyOffer>): PharmacyOffer => ({
+    pharmacy: { id: 'phr_1', name: 'Pharmacy' },
+    tags: [],
+    pricing: {},
+    ...overrides
+  });
+
+  test('puts every offer for a pharmacy in one group', () => {
+    const groups = groupOffersByPharmacy([
+      offer({ source: 'UK_HEALTH' }),
+      offer({ source: 'ARRIVE' }),
+      offer({ source: 'NOVOCARE', pharmacy: { id: 'phr_2', name: 'Other' } })
+    ]);
+
+    expect(groups.map((group) => group.offers.map((o) => o.source))).toEqual([
+      ['UK_HEALTH', 'ARRIVE'],
+      ['NOVOCARE']
+    ]);
+  });
+
+  test('getOfferTags merges tags by kind', () => {
+    const tags = getOfferTags([
+      offer({ tags: [{ kind: 'IN_NETWORK', label: 'In network' }] }),
+      offer({
+        tags: [
+          { kind: 'IN_NETWORK', label: 'In network' },
+          { kind: 'IN_STOCK', label: 'In Stock' }
+        ]
+      })
+    ]);
+
+    expect(tags.map((tag) => tag.kind)).toEqual(['IN_NETWORK', 'IN_STOCK']);
   });
 });

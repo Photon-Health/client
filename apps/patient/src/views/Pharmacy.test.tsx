@@ -1,7 +1,7 @@
 // Set environment variable BEFORE any imports
 import.meta.env.VITE_AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, MockedFunction, vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import {
@@ -23,6 +23,48 @@ import {
   markAutoroutedPharmacyConfirmed
 } from '../utils/autoroutedPharmacyConfirmationStorage';
 import { text } from '../utils/text';
+import { getPatientAnalytics } from '../configs/analytics';
+
+// react-intersection-observer's test-utils swaps in a vi.fn whose arrow implementation can't be
+// constructed, so we drive a real observer stub instead
+const observers = new Set<{ cb: IntersectionObserverCallback; elements: Set<Element> }>();
+
+class MockIntersectionObserver {
+  private entry = {
+    cb: (() => undefined) as IntersectionObserverCallback,
+    elements: new Set<Element>()
+  };
+
+  constructor(cb: IntersectionObserverCallback) {
+    this.entry.cb = cb;
+    observers.add(this.entry);
+  }
+  observe(element: Element) {
+    this.entry.elements.add(element);
+  }
+  unobserve(element: Element) {
+    this.entry.elements.delete(element);
+  }
+  disconnect() {
+    observers.delete(this.entry);
+  }
+  takeRecords() {
+    return [];
+  }
+}
+vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
+
+const scrollCardsIntoView = () =>
+  act(() => {
+    observers.forEach(({ cb, elements }) =>
+      elements.forEach((target) =>
+        cb(
+          [{ target, isIntersecting: true, intersectionRatio: 1 } as IntersectionObserverEntry],
+          null as never
+        )
+      )
+    );
+  });
 
 // Mock the settings and pharmacy utils before any imports
 vi.mock('@client/settings', () => ({
@@ -195,6 +237,195 @@ describe('Pharmacy page', () => {
       expect(await screen.findByText('$19.99')).toBeInTheDocument();
       expect(await screen.findByText('Prime Rx Price')).toBeInTheDocument();
     }, 10_000);
+
+    test('shows insurance and coupon prices on one card with separate impressions', async () => {
+      getOrderMock.mockResolvedValue(
+        generateOrder({
+          id: 'ord_testId777',
+          state: 'ROUTING',
+          patient: generatePatient(),
+          fills: [generateFill('test-treatment')],
+          address: {
+            street1: '123 Main St',
+            street2: undefined,
+            city: 'New York',
+            state: 'NY',
+            postalCode: '10001',
+            country: 'US'
+          }
+        })
+      );
+      fetchPharmacyOffersMock.mockResolvedValue([
+        {
+          source: 'ARRIVE',
+          isPromoted: false,
+          pricing: { costAmount: 12, costAmountTitle: 'With insurance' },
+          pharmacy: {
+            id: 'phr_insured',
+            name: 'Northside Pharmacy',
+            fulfillmentTypes: ['PICK_UP']
+          },
+          tags: [],
+          prescriptions: []
+        }
+      ]);
+
+      vi.mocked(getPharmaciesByLocation).mockResolvedValue({
+        pharmaciesByLocation: [
+          generatePharmacy({
+            id: 'phr_insured',
+            name: 'Northside Pharmacy',
+            price: 16.25,
+            retailPrice: 40,
+            source: 'goodrx'
+          })
+        ]
+      });
+      vi.mocked(setOrderPharmacy).mockResolvedValue(true);
+
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      expect(await screen.findByText('Ways to pay')).toBeInTheDocument();
+      expect(await screen.findByText('With insurance')).toBeInTheDocument();
+      expect(await screen.findByText('$12')).toBeInTheDocument();
+      expect(await screen.findByText('Coupon price')).toBeInTheDocument();
+      expect(await screen.findByText('$16.25')).toBeInTheDocument();
+
+      await scrollCardsIntoView();
+      await waitFor(() => {
+        const impressionTypes = vi
+          .mocked(getPatientAnalytics().track)
+          .mock.calls.filter(([event]) => event === 'Offer Impression')
+          .map(([, , properties]) => properties?.offerType);
+        expect(impressionTypes).toEqual(expect.arrayContaining(['Arrive', 'GoodRx']));
+      });
+
+      getPharmacyMock.mockReturnValue({ type: 'PICK_UP', selectedPharmacy: undefined });
+      await userEvent.click(await screen.findByRole('radio', { name: 'Northside Pharmacy' }));
+      await userEvent.click(await screen.findByText(text.selectPharmacy));
+
+      await waitFor(() => {
+        const selectedTypes = vi
+          .mocked(getPatientAnalytics().track)
+          .mock.calls.filter(([event]) => event === 'Offer Selected')
+          .map(([, , properties]) => properties?.offerType);
+        expect(selectedTypes).toEqual(['Arrive', 'GoodRx']);
+      });
+    }, 15_000);
+
+    test('shows every offer on one card and tracks a selection per offer', async () => {
+      getOrderMock.mockResolvedValue(
+        generateOrder({
+          id: 'ord_testId777',
+          state: 'ROUTING',
+          patient: generatePatient(),
+          fills: [generateFill('test-treatment')],
+          address: {
+            street1: '123 Main St',
+            street2: undefined,
+            city: 'New York',
+            state: 'NY',
+            postalCode: '10001',
+            country: 'US'
+          }
+        })
+      );
+      const pharmacy = {
+        id: 'phr_clinic',
+        name: 'Clinic Pharmacy',
+        fulfillmentTypes: ['PICK_UP' as const]
+      };
+      fetchPharmacyOffersMock.mockResolvedValue([
+        {
+          source: 'UK_HEALTH',
+          isPromoted: false,
+          pricing: { costAmount: 30, costAmountTitle: 'Cash Price' },
+          pharmacy,
+          tags: [],
+          prescriptions: []
+        },
+        {
+          source: 'ARRIVE',
+          isPromoted: false,
+          pricing: { costAmount: 12, costAmountTitle: 'With insurance' },
+          pharmacy,
+          tags: [],
+          prescriptions: []
+        }
+      ]);
+      getPharmacyMock.mockReturnValue({ type: 'PICK_UP', selectedPharmacy: undefined });
+      vi.mocked(getPharmaciesByLocation).mockResolvedValue({
+        pharmaciesByLocation: [generatePharmacy({ id: 'phr_clinic', name: 'Clinic Pharmacy' })]
+      });
+      vi.mocked(setOrderPharmacy).mockResolvedValue(true);
+
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      expect(await screen.findByText('Cash Price')).toBeInTheDocument();
+      expect(await screen.findByText('With insurance')).toBeInTheDocument();
+
+      await userEvent.click(await screen.findByRole('radio', { name: 'Clinic Pharmacy' }));
+      await userEvent.click(await screen.findByText(text.selectPharmacy));
+
+      await waitFor(() => {
+        const selectedTypes = vi
+          .mocked(getPatientAnalytics().track)
+          .mock.calls.filter(([event]) => event === 'Offer Selected')
+          .map(([, , properties]) => properties?.offerType);
+        expect(selectedTypes).toEqual(['UK Health', 'Arrive']);
+      });
+    }, 15_000);
+
+    test('tracks an impression for a priceless offer, which still shows its tags', async () => {
+      getOrderMock.mockResolvedValue(
+        generateOrder({
+          id: 'ord_testId777',
+          state: 'ROUTING',
+          patient: generatePatient(),
+          fills: [generateFill('test-treatment')],
+          address: {
+            street1: '123 Main St',
+            street2: undefined,
+            city: 'New York',
+            state: 'NY',
+            postalCode: '10001',
+            country: 'US'
+          }
+        })
+      );
+      fetchPharmacyOffersMock.mockResolvedValue([
+        {
+          source: 'UK_HEALTH',
+          isPromoted: false,
+          pricing: {},
+          pharmacy: { id: 'phr_uk', name: 'Boots Pharmacy', fulfillmentTypes: ['PICK_UP'] },
+          tags: [{ kind: 'IN_NETWORK', label: 'In network' }],
+          prescriptions: []
+        }
+      ]);
+      getPharmacyMock.mockReturnValue({ type: 'PICK_UP', selectedPharmacy: undefined });
+      vi.mocked(getPharmaciesByLocation).mockResolvedValue({
+        pharmaciesByLocation: [generatePharmacy({ id: 'phr_uk', name: 'Boots Pharmacy' })]
+      });
+
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      // no price to put in Ways to pay, but the offer is on the card either way
+      expect(await screen.findByText('In network')).toBeInTheDocument();
+      expect(screen.queryByTestId('payment-options')).not.toBeInTheDocument();
+
+      await scrollCardsIntoView();
+      await waitFor(() => {
+        const impressions = vi
+          .mocked(getPatientAnalytics().track)
+          .mock.calls.filter(([event]) => event === 'Offer Impression')
+          .map(([, , properties]) => [properties?.offerType, properties?.offerShown]);
+        expect(impressions).toEqual([['UK Health', false]]);
+      });
+    }, 15_000);
 
     test('shows offers when they are available and price is enabled - doing the same thing again', async () => {
       const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');

@@ -3,6 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
 import { OfferCard } from './OfferCard';
 import { PharmacyOffer } from '../../utils/models';
+import { groupOffersByPharmacy } from '../../utils/offers';
+
+// one offer's card
+const toGroup = (offer: PharmacyOffer) => groupOffersByPharmacy([offer])[0];
 
 vi.mock('./OfferInfo', () => ({
   OfferInfo: ({ isCurrentPharmacy }: { isCurrentPharmacy?: boolean }) => (
@@ -30,7 +34,7 @@ describe('OfferCard', () => {
   test('OfferCard renders sent here badge when pharmacy is fulfilling current order', () => {
     render(
       <OfferCard
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isAutoroutedPharmacy={true}
         isPharmacyFulfillingCurrentOrder={false}
         selected={false}
@@ -45,7 +49,7 @@ describe('OfferCard', () => {
   test('OfferCard does not render sent here badge for selectable pharmacies', () => {
     render(
       <OfferCard
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isAutoroutedPharmacy={false}
         isPharmacyFulfillingCurrentOrder={false}
         selected={false}
@@ -60,7 +64,7 @@ describe('OfferCard', () => {
   test('OfferCard shows current pharmacy tag when pharmacy is current regardless of selected', () => {
     render(
       <OfferCard
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isAutoroutedPharmacy={false}
         isPharmacyFulfillingCurrentOrder={true}
         selected={false}
@@ -77,7 +81,7 @@ describe('OfferCard', () => {
 
     const { container } = render(
       <OfferCard
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isAutoroutedPharmacy={false}
         isPharmacyFulfillingCurrentOrder={true}
         selected={false}

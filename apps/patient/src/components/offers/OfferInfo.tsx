@@ -3,11 +3,17 @@ import { FiInfo, FiTag } from 'react-icons/fi';
 import { Tooltip } from '../Tooltip';
 import { DistanceAddress, Hours } from '../PharmacyInfo';
 import { text as t } from '../../utils/text';
-import { PharmacyOffer, OfferPromotionTypes, Promotion } from '../../utils/models';
+import {
+  PharmacyOffer,
+  PharmacyOfferGroup,
+  OfferPromotionTypes,
+  Promotion
+} from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';
 import { derivePharmacyOpenState } from '../../utils/general';
-import { SPONSORED_TAG_KIND } from '../../utils/offers';
+import { SPONSORED_TAG_KIND, buildPaymentOptions, getOfferTags } from '../../utils/offers';
 import { isDeliveryOffer } from '../../utils/offerPlacement';
+import { PaymentOptions } from '../pharmacy-card/PaymentOptions';
 
 const PreferredTag = () => {
   return (
@@ -102,39 +108,36 @@ const OfferPharmacyDetails = ({ pharmacy }: { pharmacy: PharmacyOffer['pharmacy'
 
 interface OfferInfoProps {
   pharmacy?: PharmacyOffer['pharmacy'];
-  offer: PharmacyOffer;
+  offerGroup: PharmacyOfferGroup;
   isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
 }
 
-export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: OfferInfoProps) => {
+export const OfferInfo = ({
+  pharmacy,
+  offerGroup,
+  isCurrentPharmacy,
+  isPreferred
+}: OfferInfoProps) => {
   if (!pharmacy) {
     return null;
   }
 
   // Sponsored is a special type of Promoted offer that we have to display alongside a tooltip (identified by `tag.kind`)
-  const sponsoredTag = offer.tags.find((tag) => tag.kind === SPONSORED_TAG_KIND);
+  const tags = getOfferTags(offerGroup.offers);
+  const sponsoredTag = tags.find((tag) => tag.kind === SPONSORED_TAG_KIND);
 
   const offerTags = [
-    ...offer.tags
+    ...tags
       .filter((tag) => tag.kind !== SPONSORED_TAG_KIND)
       .map((tag) => <AttributeTag key={tag.kind} label={tag.label} />),
     ...(isCurrentPharmacy ? [<CurrentPharmacyTag key="current" />] : [])
   ];
 
-  // if we aren't explicitly given the cost amount
-  // we'll expect patients to pay the retail amount
-  const costAmount = offer.pricing.costAmount ?? offer.pricing.retailAmount;
-  const costAmountTitle = offer.pricing.costAmountTitle ?? offer.pricing.retailAmountTitle;
+  const paymentOptions = buildPaymentOptions({ offerGroup });
 
-  // if they cost is higher than the retail amount
-  // there's no point in showing what the strike price because it will be clear they're paying more
-  const retailIsSameOrLower =
-    offer.pricing.retailAmount != null &&
-    costAmount != null &&
-    offer.pricing.retailAmount <= costAmount;
-  const retailAmount = retailIsSameOrLower ? undefined : offer.pricing.retailAmount;
-  const retailAmountTitle = retailIsSameOrLower ? undefined : offer.pricing.retailAmountTitle;
+  // breakdown, coupon and delivery estimate come from the first offer for now
+  const offer = offerGroup.offers[0];
 
   const isMultiRx = (offer.prescriptions?.length ?? 0) > 1;
 
@@ -164,21 +167,6 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
             {pharmacy.name}
           </Text>
         </HStack>
-
-        {costAmount ? ( // only show the price if we have one
-          <VStack spacing={0} align="flex-end" minW="fit-content">
-            <Text fontSize="sm">{costAmountTitle}</Text>
-            <Text fontWeight="bold">${formatPrice(costAmount)}</Text>
-            {retailAmount && retailAmount > costAmount ? (
-              <Text fontSize="sm" color="gray.500">
-                {retailAmountTitle}{' '}
-                <Text as="span" textDecoration="line-through">
-                  ${formatPrice(retailAmount)}
-                </Text>
-              </Text>
-            ) : null}
-          </VStack>
-        ) : null}
       </HStack>
 
       {offerTags.length > 0 ? (
@@ -187,7 +175,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
         </HStack>
       ) : null}
 
-      {!isDeliveryOffer(offer) ? <OfferPharmacyDetails pharmacy={pharmacy} /> : null}
+      {!isDeliveryOffer(offerGroup) ? <OfferPharmacyDetails pharmacy={pharmacy} /> : null}
 
       {!isMultiRx && <CouponTag size="md" promotions={singleMedPromotions} />}
 
@@ -259,6 +247,8 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
           </Tooltip>
         )}
       </VStack>
+
+      <PaymentOptions options={paymentOptions} />
     </VStack>
   );
 };
