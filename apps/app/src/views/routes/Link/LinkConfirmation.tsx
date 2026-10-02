@@ -53,9 +53,6 @@ export const LinkConfirmation = () => {
             . Linking this sign-in with that account is required to continue.
           </Text>
           <Text color="gray.500" fontSize="sm">
-            If you do not want to link your accounts, you can log out instead.
-          </Text>
-          <Text color="gray.500" fontSize="sm">
             If you no longer have access to this account, sign up with a different email or reach
             out to{' '}
             <Link href="mailto:support@photon.health" color="blue.500">
