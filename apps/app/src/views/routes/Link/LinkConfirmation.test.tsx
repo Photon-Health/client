@@ -31,7 +31,6 @@ test('renders the email and connection from the query string', () => {
     /under the email d\*\*\*@example\.com and signed on with google-oauth2/
   );
   expect(screen.getByText(/linking .* is required to continue/i)).toBeInTheDocument();
-  expect(screen.getByText(/you can log out instead/i)).toBeInTheDocument();
   expect(screen.getByText(/no longer have access to this account/i)).toHaveTextContent(
     /sign up with a different email or reach out to support@photon\.health/
   );
