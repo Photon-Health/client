@@ -25,7 +25,7 @@ describe('selectOfferPlacement', () => {
     // Input order is Novocare-first; Amazon should still sort ahead of Novocare above the fold.
     const { aboveFold, inTab } = selectOfferPlacement([novocare, amazon]);
 
-    expect(aboveFold.map((o) => o.source)).toEqual(['AMAZON_PHARMACY', 'NOVOCARE']);
+    expect(aboveFold.map((o) => o.offers[0].source)).toEqual(['AMAZON_PHARMACY', 'NOVOCARE']);
     expect(inTab).toHaveLength(0);
   });
 
@@ -61,7 +61,7 @@ describe('selectOfferPlacement', () => {
 
     const { aboveFold } = selectOfferPlacement([onsite]);
 
-    expect(aboveFold.map((o) => o.source)).toEqual(['UK_HEALTH']);
+    expect(aboveFold.map((o) => o.offers[0].source)).toEqual(['UK_HEALTH']);
   });
 
   test('puts non-promoted offers in-tab', () => {
@@ -79,6 +79,17 @@ describe('selectOfferPlacement', () => {
 
     expect(aboveFold.map((o) => o.pharmacy.id)).toEqual(['phr_amazon']);
     expect(inTab.map((o) => o.pharmacy.id)).toEqual(['phr_local']);
+  });
+
+  test('puts a pharmacy above the fold with all its offers when any offer is promoted', () => {
+    const pharmacy = { id: 'phr_clinic', name: 'Clinic', fulfillmentTypes: ['PICK_UP' as const] };
+    const ukHealth = bundle({ source: 'UK_HEALTH', isPromoted: true, pharmacy });
+    const arrive = bundle({ source: 'ARRIVE', isPromoted: false, pharmacy });
+
+    const { aboveFold, inTab } = selectOfferPlacement([ukHealth, arrive]);
+
+    expect(aboveFold.map((group) => group.offers)).toEqual([[ukHealth, arrive]]);
+    expect(inTab).toHaveLength(0);
   });
 
   test('puts no offers above the fold when nothing is promoted', () => {

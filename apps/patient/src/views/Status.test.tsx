@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 import type { ReactNode } from 'react';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import { routeElements } from '../Routes';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   generateDiscountCard,
@@ -11,8 +11,8 @@ import {
   generatePatient,
   generatePharmacy
 } from '../test-utils/generators';
-import { Order } from '../utils/models';
-import { getOrder } from '../api';
+import { OfferBundle, Order } from '../utils/models';
+import { getOfferBundles, getOrder } from '../api';
 import { FEATURE_FLAG_DEFAULTS } from '../configs/featureFlags';
 
 vi.mock('../api', () => ({
@@ -112,6 +112,42 @@ describe('Status page Coupon cards', () => {
     expect(await screen.findByText('Order is likely ready')).toBeInTheDocument();
 
     expect(screen.queryByText('Coupon card')).not.toBeInTheDocument();
+  });
+});
+
+describe('Status page Ways to pay', () => {
+  const PHARMACY_ID = 'phr_waysToPayTest';
+
+  beforeEach(() => {
+    vi.mocked(getOfferBundles).mockClear();
+  });
+
+  const insuranceBundle = (pharmacyId = PHARMACY_ID): OfferBundle => ({
+    source: 'ARRIVE',
+    isPromoted: false,
+    pharmacy: { id: pharmacyId, name: 'Ways To Pay Pharmacy' },
+    attributeTags: [],
+    offers: [
+      {
+        priceType: 'INSURANCE',
+        prescription: { id: 'rx_1', treatment: { id: 'trt_1', name: 'Metformin 500mg' } },
+        prescriptionPrice: { amount: 42 }
+      }
+    ]
+  });
+
+  test('shows insurance estimate and coupon price for the selected pharmacy', async () => {
+    vi.mocked(getOfferBundles).mockResolvedValueOnce([insuranceBundle()]);
+    renderAppAtStatusView({
+      pharmacy: generatePharmacy({ id: PHARMACY_ID }),
+      discountCards: [generateDiscountCard({ pharmacyId: PHARMACY_ID, price: 13 })]
+    });
+
+    const waysToPay = await screen.findByTestId('ways-to-pay');
+    expect(waysToPay).toHaveTextContent('Insurance estimate');
+    expect(waysToPay).toHaveTextContent('$42');
+    expect(waysToPay).toHaveTextContent('Coupon price');
+    expect(waysToPay).toHaveTextContent('$13');
   });
 });
 

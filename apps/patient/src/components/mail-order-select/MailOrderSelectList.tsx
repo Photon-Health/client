@@ -33,7 +33,6 @@ export function MailOrderSelectList({
           ordinalPosition={index + numberOfPrecedingOptions}
           isAlreadySelected={selectedId === option.id}
           enabled={shouldTrackOfferImpressionsAndSelections}
-          offer={undefined}
         >
           <MailOrderSelectCard
             {...option}

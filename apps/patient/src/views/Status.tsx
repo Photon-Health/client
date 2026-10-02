@@ -1,4 +1,13 @@
-import { Box, Button, Container, Heading, useDisclosure, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Center,
+  CircularProgress,
+  Container,
+  Heading,
+  useDisclosure,
+  VStack
+} from '@chakra-ui/react';
 import queryString from 'query-string';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
@@ -24,6 +33,10 @@ import { CouponCardList } from '../components/coupons';
 import { Pharmacy } from '../utils/models';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 import { OrderState } from 'packages/sdk/src/types';
+import { getCurrentDiscountCard } from '../utils/discountCards';
+import { WaysToPay } from '../components/status/WaysToPay';
+import { fetchPharmacyOffers } from './pharmacy.utils';
+import { OFFER_SOURCE } from '../utils/offers';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -38,6 +51,31 @@ export const Status = () => {
   const phone = searchParams.get('phone') ?? undefined;
 
   const { fulfillment, pharmacy, readyBy, readyByTime } = order;
+
+  // the insurance estimate isn't on the order, so read it from the current pharmacy's offer
+  const [insuranceEstimate, setInsuranceEstimate] = useState<number>();
+  const pharmacyId = pharmacy?.id;
+  // hold the page until Ways to pay is known so it doesn't jump in after render
+  const [loadingInsuranceEstimate, setLoadingInsuranceEstimate] = useState(!isDemo && !!pharmacyId);
+  useEffect(() => {
+    setInsuranceEstimate(undefined);
+    if (isDemo || !pharmacyId) {
+      setLoadingInsuranceEstimate(false);
+      return;
+    }
+
+    setLoadingInsuranceEstimate(true);
+    fetchPharmacyOffers(order)
+      .then((offers) => {
+        const insuranceOffer = offers.find(
+          (offer) => offer.source === OFFER_SOURCE.ARRIVE && offer.pharmacy.id === pharmacyId
+        );
+        setInsuranceEstimate(insuranceOffer?.pricing.costAmount);
+      })
+      .catch(() => undefined)
+      .finally(() => setLoadingInsuranceEstimate(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order.id, pharmacyId, isDemo]);
 
   const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
 
@@ -279,6 +317,15 @@ export const Status = () => {
     ? 'PHARMACY_CLOSED'
     : fulfillments.map((f) => f.exceptions[0]?.exceptionType).find((e) => e != null) ?? undefined;
 
+  // matches Main's loading state so the spinner carries straight through
+  if (loadingInsuranceEstimate) {
+    return (
+      <Center h="100vh">
+        <CircularProgress isIndeterminate color="gray.800" />
+      </Center>
+    );
+  }
+
   return (
     <VStack flex={1}>
       <OrderDetailsModal
@@ -326,6 +373,13 @@ export const Status = () => {
                 });
               }}
             />
+
+            {insuranceEstimate != null && (
+              <WaysToPay
+                insuranceAmount={insuranceEstimate}
+                couponPrice={getCurrentDiscountCard(order)?.price}
+              />
+            )}
 
             <CouponCardList />
 
