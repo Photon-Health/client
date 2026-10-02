@@ -1,11 +1,11 @@
 import { SlideFade } from '@chakra-ui/react';
 import { OfferImpressionTracker } from '../../utils/tracking/OfferImpressionTracker';
 import { OfferCard } from './OfferCard';
-import { PharmacyOffer } from '../../utils/models';
+import { PharmacyOfferGroup } from '../../utils/models';
 import { isDeliveryOffer } from '../../utils/offerPlacement';
 
 export const OffersList = ({
-  offers,
+  offerGroups,
   shouldTrackOfferImpressionsAndSelections,
   selectedPharmacyId,
   preferredPharmacyId,
@@ -16,7 +16,7 @@ export const OffersList = ({
   savingPreferred = false,
   numberOfPrecedingOptions = 0
 }: {
-  offers: PharmacyOffer[];
+  offerGroups: PharmacyOfferGroup[];
   shouldTrackOfferImpressionsAndSelections: boolean;
   selectedPharmacyId: string;
   preferredPharmacyId: string;
@@ -29,29 +29,29 @@ export const OffersList = ({
 }) => {
   return (
     <>
-      {offers.map((offer, index) => (
-        <SlideFade offsetY="60px" in={true} key={`pharmacy-${offer.pharmacy.id}`}>
+      {offerGroups.map((offerGroup, index) => (
+        <SlideFade offsetY="60px" in={true} key={`pharmacy-${offerGroup.pharmacy.id}`}>
           <OfferImpressionTracker
-            key={offer.pharmacy.id}
-            pharmacy={offer.pharmacy}
+            key={offerGroup.pharmacy.id}
+            pharmacy={offerGroup.pharmacy}
             ordinalPosition={index + numberOfPrecedingOptions}
-            isAlreadySelected={selectedPharmacyId === offer.pharmacy.id}
+            isAlreadySelected={selectedPharmacyId === offerGroup.pharmacy.id}
             enabled={shouldTrackOfferImpressionsAndSelections}
-            offer={offer}
+            offerGroup={offerGroup}
           >
             <OfferCard
-              key={offer.pharmacy.id}
-              offer={offer}
-              isAutoroutedPharmacy={autoroutedPharmacyId === offer.pharmacy.id}
-              isPharmacyFulfillingCurrentOrder={currentPharmacyId === offer.pharmacy.id}
-              selected={selectedPharmacyId === offer.pharmacy.id}
-              isPreferred={preferredPharmacyId === offer.pharmacy.id}
+              key={offerGroup.pharmacy.id}
+              offerGroup={offerGroup}
+              isAutoroutedPharmacy={autoroutedPharmacyId === offerGroup.pharmacy.id}
+              isPharmacyFulfillingCurrentOrder={currentPharmacyId === offerGroup.pharmacy.id}
+              selected={selectedPharmacyId === offerGroup.pharmacy.id}
+              isPreferred={preferredPharmacyId === offerGroup.pharmacy.id}
               handleSelect={handleSelect}
               savingPreferred={savingPreferred}
               // delivery pharmacies can't be a preferred pickup pharmacy
               onSetPreferred={
-                handleSetPreferred && !isDeliveryOffer(offer)
-                  ? () => handleSetPreferred(offer.pharmacy.id)
+                handleSetPreferred && !isDeliveryOffer(offerGroup)
+                  ? () => handleSetPreferred(offerGroup.pharmacy.id)
                   : undefined
               }
             />

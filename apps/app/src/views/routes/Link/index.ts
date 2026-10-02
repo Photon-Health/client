@@ -1,0 +1,1 @@
+export { LinkConfirmation } from './LinkConfirmation';
