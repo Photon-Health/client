@@ -1,7 +1,9 @@
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, test } from 'vitest';
-import { DistanceAddress, Hours } from './PharmacyInfo';
-import { EnrichedPharmacy } from '../utils/models';
+import { DistanceAddress, Hours, PharmacyInfo } from './PharmacyInfo';
+import { EnrichedPharmacy, PharmacyOffer } from '../utils/models';
+import { groupOffersByPharmacy } from '../utils/offers';
 
 const hours: NonNullable<EnrichedPharmacy['hours']> = [
   {
@@ -54,5 +56,25 @@ describe('DistanceAddress', () => {
 
     expect(screen.getByText(/1 Main St/)).toBeInTheDocument();
     expect(screen.queryByText(/mi/)).not.toBeInTheDocument();
+  });
+});
+
+describe('PharmacyInfo', () => {
+  const pharmacy = { id: 'phr_1', name: 'Walgreens', showReadyIn30Min: true } as EnrichedPharmacy;
+  const offer = (overrides: Partial<PharmacyOffer>) =>
+    ({ pharmacy: { id: 'phr_1' }, tags: [], pricing: {}, ...overrides } as PharmacyOffer);
+
+  test('offer tags replace pharmacy tags', () => {
+    const [offerGroup] = groupOffersByPharmacy([
+      offer({ tags: [{ kind: 'IN_NETWORK', label: 'In network' }] })
+    ]);
+    render(
+      <MemoryRouter>
+        <PharmacyInfo pharmacy={pharmacy} offerGroup={offerGroup} />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('In network')).toBeInTheDocument();
+    expect(screen.queryByText('Ready in 30 minutes')).not.toBeInTheDocument();
   });
 });

@@ -28,7 +28,7 @@ export { harness } from '../setupTests';
  *
  * Per-test isolation:
  *   - Apollo caches (lambdas + clinical) cleared before each test
- *   - `trackSpy`/`identifySpy` cleared before each test
+ *   - `trackSpy`/`identifySpy`/`logoutSpy` cleared before each test
  *   - Mutable `harness.user`/`isAuthenticated`/`isLoading` reset to defaults
  *   - MSW handlers reset after each test (use `server.use(...)` in a
  *     `beforeEach` block to add per-test handlers)
@@ -47,6 +47,7 @@ export function setupHarness(...initialHandlers: RequestHandler[]) {
     await harness.photonClient.apolloClinical.clearStore();
     harness.trackSpy.mockClear();
     harness.identifySpy.mockClear();
+    harness.logoutSpy.mockClear();
     harness.user = DEFAULT_USER;
     harness.isAuthenticated = true;
     harness.isLoading = false;
@@ -62,6 +63,7 @@ export function setupHarness(...initialHandlers: RequestHandler[]) {
     photonClient: harness.photonClient,
     trackSpy: harness.trackSpy,
     identifySpy: harness.identifySpy,
+    logoutSpy: harness.logoutSpy,
     renderWithProviders
   };
 }

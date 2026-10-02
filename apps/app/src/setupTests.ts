@@ -85,6 +85,7 @@ export const harness: {
   featureFlags: Record<string, boolean>;
   trackSpy: Mock<(...args: unknown[]) => void>;
   identifySpy: Mock<(...args: unknown[]) => void>;
+  logoutSpy: Mock<(...args: unknown[]) => void>;
 } = {
   photonClient,
   // Mocked usePhoton return — mutable so tests can adjust auth/user state.
@@ -97,7 +98,8 @@ export const harness: {
   // the vi.mock factories stay valid across tests; `.mockClear()` rather
   // than reassign.
   trackSpy: vi.fn(),
-  identifySpy: vi.fn()
+  identifySpy: vi.fn(),
+  logoutSpy: vi.fn()
 };
 
 // Sync vi.mock factories that read directly from the module-scope `harness`.
@@ -111,7 +113,8 @@ vi.mock('@photonhealth/react', async (importOriginal) => {
       isLoading: harness.isLoading,
       user: harness.user,
       clinicalClient: harness.photonClient.apolloClinical,
-      getToken: async () => 'test-token'
+      getToken: async () => 'test-token',
+      logout: harness.logoutSpy
     })
   };
 });

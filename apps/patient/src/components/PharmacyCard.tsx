@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { Card, CardBody } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { Pharmacy as EnrichedPharmacy, PharmacyOfferGroup } from '../utils/models';
 import { PharmacyInfo } from './PharmacyInfo';
 import { SetPreferredPharmacyFooter } from './pharmacy-card/SetPreferredPharmacyFooter';
 import { PharmacyCardSentHereFrame } from './pharmacy-card/sent-here/PharmacyCardSentHereFrame';
@@ -25,6 +25,7 @@ interface PharmacyCardProps {
   showPrice?: boolean;
   isAutoroutedPharmacy?: boolean;
   isCurrentPharmacy?: boolean;
+  offerGroup?: PharmacyOfferGroup;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
@@ -38,7 +39,8 @@ export const PharmacyCard = memo(function PharmacyCard({
   showDetails = true,
   showPrice = false,
   isAutoroutedPharmacy = false,
-  isCurrentPharmacy = false
+  isCurrentPharmacy = false,
+  offerGroup
 }: PharmacyCardProps) {
   if (!pharmacy) return null;
 
@@ -88,6 +90,7 @@ export const PharmacyCard = memo(function PharmacyCard({
           selected={selected}
           isCurrentPharmacy={isCurrentPharmacy}
           isStatus={false}
+          offerGroup={offerGroup}
         />
       </CardBody>
       {showDetails ? (

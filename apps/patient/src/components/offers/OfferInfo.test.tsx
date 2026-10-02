@@ -2,6 +2,10 @@ import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { OfferInfo } from './OfferInfo';
 import { PharmacyOffer } from '../../utils/models';
+import { groupOffersByPharmacy } from '../../utils/offers';
+
+// one offer's card
+const toGroup = (offer: PharmacyOffer) => groupOffersByPharmacy([offer])[0];
 
 // mocks the google.maps.Geocoder() call in api/external
 vi.mock('../../api', () => ({}));
@@ -47,7 +51,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -63,7 +67,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={pharmacyWithoutLogo}
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -77,7 +81,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -85,7 +89,6 @@ describe('OfferInfo', () => {
 
     expect(screen.getByText('Insurance Price')).toBeInTheDocument();
     expect(screen.getByText('$25.99')).toBeInTheDocument();
-    expect(screen.getByText('Retail')).toBeInTheDocument();
     expect(screen.getByText('$150')).toBeInTheDocument();
   });
 
@@ -93,7 +96,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -117,33 +120,32 @@ describe('OfferInfo', () => {
     const { unmount } = render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={offerWithSameCost}
+        offerGroup={toGroup(offerWithSameCost)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
     );
-    expect(screen.getByText('$150')).toBeInTheDocument();
-    expect(screen.queryByText('Retail')).not.toBeInTheDocument();
+    expect(screen.getAllByText('$150')).toHaveLength(1);
 
     unmount();
 
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={offerWithLowerRetail}
+        offerGroup={toGroup(offerWithLowerRetail)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
     );
-    expect(screen.getByText('$150')).toBeInTheDocument();
-    expect(screen.queryByText('Retail')).not.toBeInTheDocument();
+    expect(screen.getAllByText('$150')).toHaveLength(1);
+    expect(screen.queryByText('$100')).not.toBeInTheDocument();
   });
 
   test('renders delivery estimate', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -156,7 +158,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -170,7 +172,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -185,7 +187,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isCurrentPharmacy={false}
         isPreferred={true}
       />
@@ -198,7 +200,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isCurrentPharmacy={true}
         isPreferred={false}
       />
@@ -221,7 +223,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={offerWithoutCost}
+        offerGroup={toGroup(offerWithoutCost)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -246,7 +248,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={offerWithOnlyRetail}
+        offerGroup={toGroup(offerWithOnlyRetail)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -262,7 +264,7 @@ describe('OfferInfo', () => {
     const { container } = render(
       <OfferInfo
         pharmacy={null as any}
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -275,7 +277,7 @@ describe('OfferInfo', () => {
     const { container } = render(
       <OfferInfo
         pharmacy={undefined}
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -293,7 +295,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={offerWithoutTags}
+        offerGroup={toGroup(offerWithoutTags)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -308,7 +310,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isCurrentPharmacy={true}
         isPreferred={true}
       />
@@ -332,7 +334,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={sponsoredOffer.pharmacy}
-        offer={sponsoredOffer}
+        offerGroup={toGroup(sponsoredOffer)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -348,7 +350,7 @@ describe('OfferInfo', () => {
     render(
       <OfferInfo
         pharmacy={baseOffer.pharmacy}
-        offer={baseOffer}
+        offerGroup={toGroup(baseOffer)}
         isCurrentPharmacy={false}
         isPreferred={false}
       />
@@ -385,7 +387,7 @@ describe('OfferInfo', () => {
       render(
         <OfferInfo
           pharmacy={emptyMedsBundle.pharmacy}
-          offer={emptyMedsBundle}
+          offerGroup={toGroup(emptyMedsBundle)}
           isCurrentPharmacy={false}
           isPreferred={false}
         />
@@ -404,7 +406,7 @@ describe('OfferInfo', () => {
       render(
         <OfferInfo
           pharmacy={singleMedBundle.pharmacy}
-          offer={singleMedBundle}
+          offerGroup={toGroup(singleMedBundle)}
           isCurrentPharmacy={false}
           isPreferred={false}
         />
@@ -426,7 +428,7 @@ describe('OfferInfo', () => {
       render(
         <OfferInfo
           pharmacy={bundle.pharmacy}
-          offer={bundle}
+          offerGroup={toGroup(bundle)}
           isCurrentPharmacy={false}
           isPreferred={false}
         />
@@ -468,7 +470,7 @@ describe('OfferInfo', () => {
       render(
         <OfferInfo
           pharmacy={baseSingleMedBundle.pharmacy}
-          offer={baseSingleMedBundle}
+          offerGroup={toGroup(baseSingleMedBundle)}
           isCurrentPharmacy={false}
           isPreferred={false}
         />
@@ -491,7 +493,7 @@ describe('OfferInfo', () => {
       render(
         <OfferInfo
           pharmacy={offerWithCoupon.pharmacy}
-          offer={offerWithCoupon}
+          offerGroup={toGroup(offerWithCoupon)}
           isCurrentPharmacy={false}
           isPreferred={false}
         />
@@ -515,7 +517,7 @@ describe('OfferInfo', () => {
       render(
         <OfferInfo
           pharmacy={offerWithZeroCoupon.pharmacy}
-          offer={offerWithZeroCoupon}
+          offerGroup={toGroup(offerWithZeroCoupon)}
           isCurrentPharmacy={false}
           isPreferred={false}
         />
@@ -545,7 +547,7 @@ describe('OfferInfo', () => {
       render(
         <OfferInfo
           pharmacy={multiMedWithCoupons.pharmacy}
-          offer={multiMedWithCoupons}
+          offerGroup={toGroup(multiMedWithCoupons)}
           isCurrentPharmacy={false}
           isPreferred={false}
         />
@@ -571,7 +573,7 @@ describe('OfferInfo', () => {
       render(
         <OfferInfo
           pharmacy={multiMedPartialCoupons.pharmacy}
-          offer={multiMedPartialCoupons}
+          offerGroup={toGroup(multiMedPartialCoupons)}
           isCurrentPharmacy={false}
           isPreferred={false}
         />
