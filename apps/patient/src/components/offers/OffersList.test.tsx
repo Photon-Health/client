@@ -3,6 +3,7 @@ import { describe, expect, test, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { OffersList } from './OffersList';
 import { PharmacyOffer } from '../../utils/models';
+import { groupOffersByPharmacy } from '../../utils/offers';
 
 // Mock the OfferImpressionTracker component
 vi.mock('../../utils/tracking/OfferImpressionTracker', () => ({
@@ -14,7 +15,9 @@ vi.mock('../../utils/tracking/OfferImpressionTracker', () => ({
 // Mock the OfferCard component
 vi.mock('./OfferCard', () => ({
   OfferCard: ({
-    offer,
+    offerGroup: {
+      offers: [offer]
+    },
     selected,
     isPreferred,
     isAutoroutedPharmacy,
@@ -27,7 +30,7 @@ vi.mock('./OfferCard', () => ({
       data-preferred={isPreferred}
       data-autorouted-pharmacy={isAutoroutedPharmacy}
       data-fulfilling-current-order={isPharmacyFulfillingCurrentOrder}
-      onClick={() => handleSelect(offer.pharmacy.id, offer)}
+      onClick={() => handleSelect(offer.pharmacy.id)}
     >
       <div data-testid="pharmacy-info">
         <div data-testid="pharmacy-info-name">{offer.pharmacy.name}</div>
@@ -78,7 +81,7 @@ describe('OffersList', () => {
   ];
 
   const defaultProps = {
-    offers: mockOffers,
+    offerGroups: groupOffersByPharmacy(mockOffers),
     shouldTrackOfferImpressionsAndSelections: true,
     selectedPharmacyId: '',
     preferredPharmacyId: '',
@@ -157,7 +160,7 @@ describe('OffersList', () => {
     const amazonCard = screen.getByTestId('offer-card-amazon-pharmacy');
     await userEvent.click(amazonCard);
 
-    expect(handleSelect).toHaveBeenCalledWith('amazon-pharmacy', mockOffers[0]);
+    expect(handleSelect).toHaveBeenCalledWith('amazon-pharmacy');
   });
 
   test('renders with impression tracking when enabled', () => {
@@ -175,7 +178,7 @@ describe('OffersList', () => {
   });
 
   test('handles empty offers array', () => {
-    render(<OffersList {...defaultProps} offers={[]} />);
+    render(<OffersList {...defaultProps} offerGroups={[]} />);
 
     expect(screen.queryByTestId('offer-card-amazon-pharmacy')).not.toBeInTheDocument();
     expect(screen.queryByTestId('offer-card-novocare-pharmacy')).not.toBeInTheDocument();

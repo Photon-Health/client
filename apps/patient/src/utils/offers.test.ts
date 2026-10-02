@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'vitest';
-import { summarizePharmacyOffer } from './offers';
-import { OfferPrescription } from './models';
+import {
+  cheapestPricing,
+  getOfferTags,
+  groupOffersByPharmacy,
+  representativeOffer,
+  summarizePharmacyOffer
+} from './offers';
+import { OfferPrescription, PharmacyOffer } from './models';
 
 const SAME_DAY = 'Same-Day';
 const ONE_DAY = 'Delivery in 1 day, after you place your order';
@@ -246,5 +252,75 @@ describe('delivery estimate', () => {
 
   test('is undefined when no medication has a delivery promise', () => {
     expect(withPromises(undefined, undefined)).toBeUndefined();
+  });
+});
+
+describe('groupOffersByPharmacy', () => {
+  const offer = (overrides: Partial<PharmacyOffer>): PharmacyOffer => ({
+    pharmacy: { id: 'phr_1', name: 'Pharmacy' },
+    tags: [],
+    pricing: {},
+    ...overrides
+  });
+
+  test('puts every offer for a pharmacy in one group', () => {
+    const groups = groupOffersByPharmacy([
+      offer({ source: 'UK_HEALTH' }),
+      offer({ source: 'ARRIVE' }),
+      offer({ source: 'NOVOCARE', pharmacy: { id: 'phr_2', name: 'Other' } })
+    ]);
+
+    expect(groups.map((group) => group.offers.map((o) => o.source))).toEqual([
+      ['UK_HEALTH', 'ARRIVE'],
+      ['NOVOCARE']
+    ]);
+  });
+
+  test('orders a group promoted first, then by source priority', () => {
+    const [group] = groupOffersByPharmacy([
+      offer({ source: 'ARRIVE' }),
+      offer({ source: 'AMAZON_PHARMACY' }),
+      offer({ source: 'UK_HEALTH', isPromoted: true })
+    ]);
+
+    expect(group.offers.map((o) => o.source)).toEqual(['UK_HEALTH', 'AMAZON_PHARMACY', 'ARRIVE']);
+  });
+
+  test('representativeOffer prefers a promoted offer over a higher-priority source', () => {
+    const [group] = groupOffersByPharmacy([
+      offer({ source: 'AMAZON_PHARMACY' }),
+      offer({ source: 'UK_HEALTH', isPromoted: true })
+    ]);
+
+    expect(representativeOffer(group)?.source).toBe('UK_HEALTH');
+  });
+
+  test('cheapestPricing takes cost and retail from the same offer', () => {
+    const [group] = groupOffersByPharmacy([
+      offer({ source: 'UK_HEALTH', pricing: { costAmount: 30, retailAmount: 90 } }),
+      offer({ source: 'ARRIVE', pricing: { costAmount: 12, retailAmount: 40 } })
+    ]);
+
+    expect(cheapestPricing(group)).toMatchObject({ costAmount: 12, retailAmount: 40 });
+  });
+
+  test('cheapestPricing is undefined when no offer has a price', () => {
+    const [group] = groupOffersByPharmacy([offer({ source: 'UK_HEALTH' })]);
+
+    expect(cheapestPricing(group)).toBeUndefined();
+  });
+
+  test('getOfferTags merges tags by kind', () => {
+    const tags = getOfferTags([
+      offer({ tags: [{ kind: 'IN_NETWORK', label: 'In network' }] }),
+      offer({
+        tags: [
+          { kind: 'IN_NETWORK', label: 'In network' },
+          { kind: 'IN_STOCK', label: 'In Stock' }
+        ]
+      })
+    ]);
+
+    expect(tags.map((tag) => tag.kind)).toEqual(['IN_NETWORK', 'IN_STOCK']);
   });
 });

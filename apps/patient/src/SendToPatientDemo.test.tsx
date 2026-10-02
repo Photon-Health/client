@@ -96,7 +96,7 @@ describe('Send To Patient Demo', () => {
     expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
 
-    expect(await screen.getAllByText('Coupon Price')).toHaveLength(expectedNumberOfCouponPrices);
+    expect(await screen.getAllByText('Coupon price')).toHaveLength(expectedNumberOfCouponPrices);
   }, 10_000);
 });
 

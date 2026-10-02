@@ -240,6 +240,12 @@ export const text = {
   tracking: 'Tracking #:',
   learnMore: 'Learn More',
   useLoc: 'Use my current location',
+  waysToPay: 'Ways to pay',
+  waysToPaySubtitle: 'You choose how to pay at the pharmacy.',
+  insuranceEstimate: 'Insurance estimate',
+  insuranceEstimateDescription: 'Your plan sets the final amount.',
+  couponPrice: 'Coupon price',
+  couponPriceDescription: 'Show the coupon below at the pharmacy.',
   usingWithInsurance: (
     <>
       Anyone can use the coupon. The coupon may be lower than your health insurance co-pay. You can

@@ -35,6 +35,13 @@ export type OfferPrescriptionView = {
   promotions?: Array<OfferPromotion>;
 };
 
+// one way to pay, shown on a pharmacy card
+export interface PaymentOption {
+  label: string;
+  amount: number;
+  retailAmount?: number;
+}
+
 // what the patient pays for the whole offer, with the labels to show
 export interface OfferPricing {
   costAmount?: number;
@@ -43,7 +50,7 @@ export interface OfferPricing {
   retailAmountTitle?: string;
 }
 
-// one pharmacy's offer, merged from the bundles that pharmacy returned
+// one source's offer at a pharmacy, merged from the bundles that source returned
 export interface PharmacyOffer {
   source?: string;
   isPromoted?: boolean;
@@ -54,12 +61,20 @@ export interface PharmacyOffer {
   prescriptions?: Array<OfferPrescriptionView>;
 }
 
+// every offer one pharmacy has across all sources, rendered as one card
+export interface PharmacyOfferGroup {
+  pharmacy: PharmacyOffer['pharmacy'];
+  offers: PharmacyOffer[];
+}
+
+// merge with OFFER_SOURCE once discount cards become offers
 export const OfferTypes = {
   RxSense: 'RxSense',
   GoodRx: 'GoodRx',
   AmazonPharmacy: 'Amazon Pharmacy',
   Novocare: 'Novocare',
-  UkHealth: 'UK Health'
+  UkHealth: 'UK Health',
+  Arrive: 'Arrive'
 } as const;
 
 export type OfferTypeKey = keyof typeof OfferTypes;
