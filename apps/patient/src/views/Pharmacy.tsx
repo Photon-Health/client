@@ -320,21 +320,27 @@ export const Pharmacy = () => {
     topRankedPharmacies
   ]);
 
-  // a non-promoted pickup offer rides on its pharmacy's card, so it waits until that pharmacy lists
   const pickupOffersByPharmacyId = new Map(
     placement.inTab
       .filter((offer) => !isDeliveryOffer(offer))
       .map((offer) => [offer.pharmacy.id, offer])
   );
 
+  // pickup offers lead the tab like delivery offers do, even when the nearby search doesn't return their pharmacy
+  const pickupOfferPharmacies = [...pickupOffersByPharmacyId.values()].map(
+    ({ pharmacy }) =>
+      pickupPharmacies.find((nearby) => nearby.id === pharmacy.id) ??
+      (isDemo ? pharmacy : preparePharmacy(pharmacy))
+  );
+
   // held until offers land, or a plain card would swap for its pharmacy's offer card
   const visiblePickupPharmacies =
     offers === undefined
       ? []
-      : pickupPharmacies.filter(
-          (pharmacy) =>
-            !offerPharmacyIds.has(pharmacy.id) || pickupOffersByPharmacyId.has(pharmacy.id)
-        );
+      : [
+          ...pickupOfferPharmacies,
+          ...pickupPharmacies.filter((pharmacy) => !offerPharmacyIds.has(pharmacy.id))
+        ];
 
   // Non-integrated patient mail order pharmacies
   const [patientMailOrderOptions, setPatientMailOrderOptions] = useState<
