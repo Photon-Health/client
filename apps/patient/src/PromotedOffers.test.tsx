@@ -176,6 +176,31 @@ describe('Pickup offer placement', () => {
     expect(screen.getByText('Free delivery')).toBeInTheDocument();
   }, 10_000);
 
+  it('shows a lone promoted offer above the tabs instead of in the Pick up list', async () => {
+    vi.mocked(getOfferBundles).mockResolvedValue([
+      {
+        source: 'TEST_SOURCE',
+        isPromoted: true,
+        pharmacy: offerPickupPharmacy,
+        attributeTags: [{ kind: 'ONSITE_PICKUP', label: 'On-site pick up' }],
+        offers: []
+      }
+    ] as unknown as OfferBundles);
+    vi.mocked(getPharmaciesByLocation).mockResolvedValue({
+      pharmaciesByLocation: [...nearbyPharmacies, offerPickupPharmacy]
+    });
+
+    renderApp();
+    await navigateToPharmacyScreen();
+    expect(await screen.findByText('Nearby Pharmacy 1')).toBeInTheDocument();
+
+    const aboveTabsCardNames = within(screen.getByRole('radiogroup', { name: 'Select a pharmacy' }))
+      .getAllByRole('radio')
+      .map((card) => card.getAttribute('aria-label'));
+    expect(aboveTabsCardNames).toEqual(['Offer Pickup Pharmacy']);
+    expect(pickupCardNames()).not.toContain('Offer Pickup Pharmacy');
+  }, 10_000);
+
   it('keeps the nearby results in order when there are no offer bundles', async () => {
     vi.mocked(getOfferBundles).mockResolvedValue([]);
     vi.mocked(getPharmaciesByLocation).mockResolvedValue({
