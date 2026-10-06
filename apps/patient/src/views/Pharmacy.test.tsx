@@ -442,6 +442,63 @@ describe('Pharmacy page', () => {
       });
     }, 15_000);
 
+    test('shows and tracks a promoted offer when prices are disabled', async () => {
+      getOrderMock.mockResolvedValue(
+        generateOrder({
+          id: 'ord_pricesDisabled',
+          state: 'ROUTING',
+          patient: generatePatient(),
+          fills: [generateFill('test-treatment')],
+          address: {
+            street1: '123 Main St',
+            street2: undefined,
+            city: 'Lexington',
+            state: 'KY',
+            postalCode: '40503',
+            country: 'US'
+          }
+        })
+      );
+      fetchPharmacyOffersMock.mockResolvedValue([
+        {
+          source: 'UK_HEALTH',
+          isPromoted: true,
+          pricing: {},
+          pharmacy: {
+            id: 'phr_01K7YX6BQ894T8800BZAQSR57S',
+            name: 'UK Fountain Court Clinic Pharmacy',
+            fulfillmentTypes: ['PICK_UP']
+          },
+          tags: [{ kind: 'ONSITE_PICKUP', label: 'Onsite pickup' }],
+          prescriptions: []
+        }
+      ]);
+      getPharmacyMock.mockReturnValue({ type: 'PICK_UP', selectedPharmacy: undefined });
+      // no priced pharmacies on the first search, so the page falls back to distance without prices
+      vi.mocked(getPharmaciesByLocation)
+        .mockResolvedValueOnce({ pharmaciesByLocation: [] })
+        .mockResolvedValue({
+          pharmaciesByLocation: [generatePharmacy({ id: 'phr_nearby', name: 'Nearby Pharmacy' })]
+        });
+
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      expect(await screen.findByText('UK Fountain Court Clinic Pharmacy')).toBeInTheDocument();
+
+      await scrollCardsIntoView();
+      await waitFor(() => {
+        expect(getPatientAnalytics().track).toHaveBeenCalledWith(
+          'Offer Impression',
+          expect.anything(),
+          expect.objectContaining({
+            offerType: 'UK Health',
+            pharmacy_name: 'UK Fountain Court Clinic Pharmacy'
+          })
+        );
+      });
+    }, 15_000);
+
     test('tracks the pharmacy name for a single promoted UK Health offer', async () => {
       getOrderMock.mockResolvedValue(
         generateOrder({
