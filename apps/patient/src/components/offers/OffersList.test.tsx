@@ -82,7 +82,6 @@ describe('OffersList', () => {
 
   const defaultProps = {
     offerGroups: groupOffersByPharmacy(mockOffers),
-    shouldTrackOfferImpressionsAndSelections: true,
     selectedPharmacyId: '',
     preferredPharmacyId: '',
     handleSelect: vi.fn()
@@ -163,18 +162,11 @@ describe('OffersList', () => {
     expect(handleSelect).toHaveBeenCalledWith('amazon-pharmacy');
   });
 
-  test('renders with impression tracking when enabled', () => {
+  test('wraps each offer card in impression tracking', () => {
     render(<OffersList {...defaultProps} />);
 
     const impressionTrackers = screen.getAllByTestId('offer-impression-tracker');
     expect(impressionTrackers).toHaveLength(2);
-  });
-
-  test('renders without impression tracking when disabled', () => {
-    render(<OffersList {...defaultProps} shouldTrackOfferImpressionsAndSelections={false} />);
-
-    const impressionTrackers = screen.getAllByTestId('offer-impression-tracker');
-    expect(impressionTrackers).toHaveLength(2); // Still renders but tracking is disabled
   });
 
   test('handles empty offers array', () => {

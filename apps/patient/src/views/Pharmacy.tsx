@@ -1209,9 +1209,6 @@ export const Pharmacy = () => {
               >
                 <OffersList
                   offerGroups={aboveFoldOffers}
-                  shouldTrackOfferImpressionsAndSelections={
-                    shouldTrackOfferImpressionsAndSelections
-                  }
                   selectedPharmacyId={selectedId}
                   preferredPharmacyId={effectivePreferredPharmacyId}
                   autoroutedPharmacyId={autoroutedPharmacyId}
@@ -1245,9 +1242,6 @@ export const Pharmacy = () => {
                 {deliveryOffers.length > 0 && (
                   <OffersList
                     offerGroups={deliveryOffers}
-                    shouldTrackOfferImpressionsAndSelections={
-                      shouldTrackOfferImpressionsAndSelections
-                    }
                     selectedPharmacyId={selectedId}
                     preferredPharmacyId={effectivePreferredPharmacyId}
                     autoroutedPharmacyId={autoroutedPharmacyId}
@@ -1258,16 +1252,12 @@ export const Pharmacy = () => {
                 )}
                 {showBrandedOptions && (
                   <BrandedOptions
-                    numberOfOffers={optionsAboveTabs + deliveryOffers.length}
                     options={brandedOptions}
                     location={patientLocation}
                     selectedId={selectedId}
                     handleSelect={handleSelect}
                     autoroutedPharmacyId={autoroutedPharmacyId}
                     currentPharmacyId={currentPharmacyId}
-                    shouldTrackOfferImpressionsAndSelections={
-                      shouldTrackOfferImpressionsAndSelections
-                    }
                   />
                 )}
                 {inlineMailOrderOptions.length > 0 ? (
@@ -1276,12 +1266,6 @@ export const Pharmacy = () => {
                     selectedId={selectedId}
                     autoroutedPharmacyId={autoroutedPharmacyId}
                     onSelect={(option) => handleSelect(option.id)}
-                    shouldTrackOfferImpressionsAndSelections={
-                      shouldTrackOfferImpressionsAndSelections
-                    }
-                    numberOfPrecedingOptions={
-                      optionsAboveTabs + deliveryOffers.length + brandedOptions.length
-                    }
                   />
                 ) : brandedOptions.length === 0 && deliveryOffers.length === 0 ? (
                   <Text fontSize="sm" color="gray.600" py={4}>
@@ -1328,9 +1312,6 @@ export const Pharmacy = () => {
                   currentPharmacyId={currentPharmacyId}
                   setCouponModalOpen={setCouponModalOpen}
                   numberOfBrandedOptions={optionsAboveTabs + brandedOptions.length}
-                  shouldTrackOfferImpressionsAndSelections={
-                    shouldTrackOfferImpressionsAndSelections
-                  }
                 />
               </VStack>
             </TabPanel>

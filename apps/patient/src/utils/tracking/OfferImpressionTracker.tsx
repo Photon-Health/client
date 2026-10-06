@@ -21,8 +21,7 @@ const OfferImpressionTracker = ({
   showPrice,
   pharmacy,
   ordinalPosition,
-  isAlreadySelected,
-  enabled
+  isAlreadySelected
 }: {
   children: React.ReactNode;
   offerGroup?: PharmacyOfferGroup;
@@ -30,7 +29,6 @@ const OfferImpressionTracker = ({
   pharmacy: EnrichedPharmacy;
   ordinalPosition: number;
   isAlreadySelected: boolean;
-  enabled: boolean;
 }) => {
   const patientAnalytics = usePatientAnalytics();
   const { order } = useOrderContext();
@@ -106,16 +104,13 @@ const OfferImpressionTracker = ({
         return;
       }
 
-      // offers show whether or not prices do (e.g. UK orgs), and a priceless one still shows its tags
+      // a card is an impression for each offer on it, priced or not (e.g. UK Health),
+      // and for its coupon price when one is visible; a card with neither is just a pharmacy
       offerGroup?.offers.forEach(trackImpression);
 
-      if (enabled) {
-        // asking buildPaymentOptions keeps one answer to whether the coupon row is rendered
-        const showsCouponPrice = buildPaymentOptions({ pharmacy, showPrice }).length > 0;
-        // a pharmacy with neither is still worth recording as seen
-        if (showsCouponPrice || !offerGroup?.offers.length) {
-          trackImpression();
-        }
+      // asking buildPaymentOptions keeps one answer to whether the coupon row is rendered
+      if (buildPaymentOptions({ pharmacy, showPrice }).length > 0) {
+        trackImpression();
       }
     }
   });

@@ -31,7 +31,6 @@ interface PickupPharmacyCardListProps {
   currentPharmacyId?: string;
   setCouponModalOpen: (isOpen: boolean) => void;
   numberOfBrandedOptions: number;
-  shouldTrackOfferImpressionsAndSelections: boolean;
 }
 
 export const PickupPharmacyCardList = ({
@@ -54,7 +53,6 @@ export const PickupPharmacyCardList = ({
   autoroutedPharmacyId,
   currentPharmacyId,
   numberOfBrandedOptions = 0,
-  shouldTrackOfferImpressionsAndSelections,
   children
 }: PropsWithChildren<PickupPharmacyCardListProps>) => {
   return (
@@ -86,7 +84,6 @@ export const PickupPharmacyCardList = ({
                 pharmacy={pharmacy}
                 ordinalPosition={i + numberOfBrandedOptions}
                 isAlreadySelected={selectedId === pharmacy.id}
-                enabled={shouldTrackOfferImpressionsAndSelections}
                 offerGroup={offerGroup}
                 showPrice={showPrice}
               >

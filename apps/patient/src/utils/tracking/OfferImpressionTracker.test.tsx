@@ -41,10 +41,11 @@ describe('OfferImpressionTracker', () => {
   });
 
   const defaultProps = {
-    pharmacy: generatePharmacy({ id: 'phr_test', name: 'Test Pharmacy' }),
+    // a visible coupon price is what makes a card without offers worth an impression
+    pharmacy: generatePharmacy({ id: 'phr_test', name: 'Test Pharmacy', price: 16.25 }),
+    showPrice: true,
     ordinalPosition: 2,
     isAlreadySelected: false,
-    enabled: true,
     children: <div>child</div>
   };
 
@@ -59,7 +60,7 @@ describe('OfferImpressionTracker', () => {
   const trackedOfferTypes = () =>
     mockTrack.mock.calls.map(([, , properties]) => properties?.offerType);
 
-  test('tracks Offer Impression when element enters view and tracking is enabled', () => {
+  test('tracks Offer Impression for a visible coupon price when the card enters view', () => {
     render(<OfferImpressionTracker {...defaultProps} />);
     triggerInView?.(true);
 
@@ -84,7 +85,8 @@ describe('OfferImpressionTracker', () => {
         pharmacy={generatePharmacy({
           id: 'phr_mail',
           name: 'Mail Pharmacy',
-          fulfillmentTypes: ['MAIL_ORDER']
+          fulfillmentTypes: ['MAIL_ORDER'],
+          price: 10
         })}
       />
     );
@@ -99,8 +101,13 @@ describe('OfferImpressionTracker', () => {
     );
   });
 
-  test('does not track a plain pharmacy when tracking is disabled', () => {
-    render(<OfferImpressionTracker {...defaultProps} enabled={false} />);
+  test('does not track a pharmacy with no offer or visible price', () => {
+    render(
+      <OfferImpressionTracker
+        {...defaultProps}
+        pharmacy={generatePharmacy({ id: 'phr_plain', name: 'Plain Pharmacy' })}
+      />
+    );
     triggerInView?.(true);
 
     expect(mockTrack).not.toHaveBeenCalled();
@@ -133,6 +140,7 @@ describe('OfferImpressionTracker', () => {
           pharmacy: offer('ARRIVE').pharmacy,
           offers: [offer('UK_HEALTH', 30), offer('ARRIVE', 12)]
         }}
+        showPrice={false}
       />
     );
     triggerInView?.(true);
@@ -145,6 +153,7 @@ describe('OfferImpressionTracker', () => {
       <OfferImpressionTracker
         {...defaultProps}
         offerGroup={{ pharmacy: offer('UK_HEALTH').pharmacy, offers: [offer('UK_HEALTH')] }}
+        showPrice={false}
       />
     );
     triggerInView?.(true);
@@ -193,7 +202,7 @@ describe('OfferImpressionTracker', () => {
     render(
       <OfferImpressionTracker
         {...defaultProps}
-        pharmacy={generatePharmacy({ id: 'phr_other', name: 'Other Pharmacy' })}
+        pharmacy={generatePharmacy({ id: 'phr_other', name: 'Other Pharmacy', price: 12 })}
       />
     );
     triggerInView?.(true);
