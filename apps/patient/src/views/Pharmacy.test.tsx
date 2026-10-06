@@ -1,7 +1,7 @@
 // Set environment variable BEFORE any imports
 import.meta.env.VITE_AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, MockedFunction, vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import {
@@ -12,6 +12,7 @@ import {
   generatePatient,
   generatePharmacy
 } from '../test-utils/generators';
+import { mockIntersectionObserver, scrollCardsIntoView } from '../test-utils/intersectionObserver';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
 import {
@@ -31,46 +32,7 @@ import {
 import { text } from '../utils/text';
 import { getPatientAnalytics } from '../configs/analytics';
 
-// react-intersection-observer's test-utils swaps in a vi.fn whose arrow implementation can't be
-// constructed, so we drive a real observer stub instead
-const observers = new Set<{ cb: IntersectionObserverCallback; elements: Set<Element> }>();
-
-class MockIntersectionObserver {
-  private entry = {
-    cb: (() => undefined) as IntersectionObserverCallback,
-    elements: new Set<Element>()
-  };
-
-  constructor(cb: IntersectionObserverCallback) {
-    this.entry.cb = cb;
-    observers.add(this.entry);
-  }
-  observe(element: Element) {
-    this.entry.elements.add(element);
-  }
-  unobserve(element: Element) {
-    this.entry.elements.delete(element);
-  }
-  disconnect() {
-    observers.delete(this.entry);
-  }
-  takeRecords() {
-    return [];
-  }
-}
-vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
-
-const scrollCardsIntoView = () =>
-  act(() => {
-    observers.forEach(({ cb, elements }) =>
-      elements.forEach((target) =>
-        cb(
-          [{ target, isIntersecting: true, intersectionRatio: 1 } as IntersectionObserverEntry],
-          null as never
-        )
-      )
-    );
-  });
+mockIntersectionObserver();
 
 const offerImpressions = () =>
   vi
