@@ -1,7 +1,7 @@
 // Set environment variable BEFORE any imports
 import.meta.env.VITE_AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, MockedFunction, vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import {
@@ -12,12 +12,19 @@ import {
   generatePatient,
   generatePharmacy
 } from '../test-utils/generators';
+import { mockIntersectionObserver, scrollCardsIntoView } from '../test-utils/intersectionObserver';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
-import { getOrder, getPharmaciesByLocation, rerouteOrder, setOrderPharmacy } from '../api';
+import {
+  getOrder,
+  getPharmacies,
+  getPharmaciesByLocation,
+  rerouteOrder,
+  setOrderPharmacy
+} from '../api';
 import { fetchPharmacyOffers, getPharmacy } from './pharmacy.utils';
 import { FulfillmentType, Pharmacy } from '../__generated__/graphql';
-import { PharmacyOffer } from '../utils/models';
+import { Order, PharmacyOffer } from '../utils/models';
 import {
   hasConfirmedAutoroutedPharmacy,
   markAutoroutedPharmacyConfirmed
@@ -25,46 +32,13 @@ import {
 import { text } from '../utils/text';
 import { getPatientAnalytics } from '../configs/analytics';
 
-// react-intersection-observer's test-utils swaps in a vi.fn whose arrow implementation can't be
-// constructed, so we drive a real observer stub instead
-const observers = new Set<{ cb: IntersectionObserverCallback; elements: Set<Element> }>();
+mockIntersectionObserver();
 
-class MockIntersectionObserver {
-  private entry = {
-    cb: (() => undefined) as IntersectionObserverCallback,
-    elements: new Set<Element>()
-  };
-
-  constructor(cb: IntersectionObserverCallback) {
-    this.entry.cb = cb;
-    observers.add(this.entry);
-  }
-  observe(element: Element) {
-    this.entry.elements.add(element);
-  }
-  unobserve(element: Element) {
-    this.entry.elements.delete(element);
-  }
-  disconnect() {
-    observers.delete(this.entry);
-  }
-  takeRecords() {
-    return [];
-  }
-}
-vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
-
-const scrollCardsIntoView = () =>
-  act(() => {
-    observers.forEach(({ cb, elements }) =>
-      elements.forEach((target) =>
-        cb(
-          [{ target, isIntersecting: true, intersectionRatio: 1 } as IntersectionObserverEntry],
-          null as never
-        )
-      )
-    );
-  });
+const offerImpressions = () =>
+  vi
+    .mocked(getPatientAnalytics().track)
+    .mock.calls.filter(([event]) => event === 'Offer Impression')
+    .map(([, , properties]) => properties ?? {});
 
 // Mock the settings and pharmacy utils before any imports
 vi.mock('@client/settings', () => ({
@@ -294,12 +268,15 @@ describe('Pharmacy page', () => {
 
       await scrollCardsIntoView();
       await waitFor(() => {
-        const impressionTypes = vi
-          .mocked(getPatientAnalytics().track)
-          .mock.calls.filter(([event]) => event === 'Offer Impression')
-          .map(([, , properties]) => properties?.offerType);
-        expect(impressionTypes).toEqual(expect.arrayContaining(['Arrive', 'GoodRx']));
+        expect(offerImpressions().map((properties) => properties.offerType)).toEqual(
+          expect.arrayContaining(['Arrive', 'GoodRx'])
+        );
       });
+
+      expect(offerImpressions().map((properties) => properties.pharmacyName)).toEqual([
+        'Northside Pharmacy',
+        'Northside Pharmacy'
+      ]);
 
       getPharmacyMock.mockReturnValue({ type: 'PICK_UP', selectedPharmacy: undefined });
       await userEvent.click(await screen.findByRole('radio', { name: 'Northside Pharmacy' }));
@@ -428,12 +405,188 @@ describe('Pharmacy page', () => {
 
       await scrollCardsIntoView();
       await waitFor(() => {
-        const impressions = vi
-          .mocked(getPatientAnalytics().track)
-          .mock.calls.filter(([event]) => event === 'Offer Impression')
-          .map(([, , properties]) => [properties?.offerType, properties?.offerShown]);
-        expect(impressions).toEqual([['UK Health', false]]);
+        expect(
+          offerImpressions().map((properties) => [properties.offerType, properties.offerShown])
+        ).toEqual([['UK Health', false]]);
       });
+    }, 15_000);
+
+    // the UK Health strategy builds a static, priceless bundle for its configured pharmacy
+    const promotedUkHealthOffer = (id: string, name: string): PharmacyOffer => ({
+      source: 'UK_HEALTH',
+      isPromoted: true,
+      pricing: {},
+      pharmacy: { id, name, fulfillmentTypes: ['PICK_UP'] },
+      tags: [{ kind: 'ONSITE_PICKUP', label: 'Onsite pickup' }],
+      prescriptions: []
+    });
+
+    // UK org orders get no priced pharmacies, so the page falls back to distance without prices
+    const renderWithPricesDisabled = async (
+      orderId: string,
+      offers: PharmacyOffer[],
+      orderOverrides: Partial<Order> = {}
+    ) => {
+      getOrderMock.mockResolvedValue(
+        generateOrder({
+          ...orderOverrides,
+          id: orderId,
+          state: 'ROUTING',
+          patient: generatePatient(),
+          fills: [generateFill('test-treatment')],
+          address: {
+            street1: '123 Main St',
+            street2: undefined,
+            city: 'Lexington',
+            state: 'KY',
+            postalCode: '40503',
+            country: 'US'
+          }
+        })
+      );
+      fetchPharmacyOffersMock.mockResolvedValue(offers);
+      getPharmacyMock.mockReturnValue({ type: 'PICK_UP', selectedPharmacy: undefined });
+      vi.mocked(getPharmaciesByLocation)
+        .mockResolvedValueOnce({ pharmaciesByLocation: [] })
+        .mockResolvedValue({
+          pharmaciesByLocation: [generatePharmacy({ id: 'phr_nearby', name: 'Nearby Pharmacy' })]
+        });
+
+      renderApp();
+      await navigateToPharmacyScreen();
+    };
+
+    const trackedImpressionPharmacyIds = () =>
+      offerImpressions().map((properties) => properties.pharmacy_id);
+
+    test('tracks a single promoted offer above the tabs when prices are disabled', async () => {
+      await renderWithPricesDisabled('ord_pricesDisabled', [
+        promotedUkHealthOffer('phr_01K7YX6BQ894T8800BZAQSR57S', 'UK Fountain Court Clinic Pharmacy')
+      ]);
+
+      expect(await screen.findByText('UK Fountain Court Clinic Pharmacy')).toBeInTheDocument();
+
+      await scrollCardsIntoView();
+      await waitFor(() => {
+        expect(getPatientAnalytics().track).toHaveBeenCalledWith(
+          'Offer Impression',
+          expect.anything(),
+          expect.objectContaining({
+            offerType: 'UK Health',
+            pharmacy_id: 'phr_01K7YX6BQ894T8800BZAQSR57S',
+            pharmacy_name: 'UK Fountain Court Clinic Pharmacy'
+          })
+        );
+      });
+    }, 15_000);
+
+    test('tracks promoted offers in the pickup tab when prices are disabled', async () => {
+      // more than one promoted UK Health offer sends them all into their tabs
+      await renderWithPricesDisabled('ord_pricesDisabledTabs', [
+        promotedUkHealthOffer(
+          'phr_01K7YX6BQ894T8800BZAQSR57S',
+          'UK Fountain Court Clinic Pharmacy'
+        ),
+        promotedUkHealthOffer('phr_01K7YX6BH8T8EMXQZ5NY69F22V', 'UK The Apothecary')
+      ]);
+
+      expect(await screen.findByText('UK Fountain Court Clinic Pharmacy')).toBeInTheDocument();
+      expect(await screen.findByText('UK The Apothecary')).toBeInTheDocument();
+
+      await scrollCardsIntoView();
+      await waitFor(() => {
+        expect(trackedImpressionPharmacyIds()).toEqual(
+          expect.arrayContaining([
+            'phr_01K7YX6BQ894T8800BZAQSR57S',
+            'phr_01K7YX6BH8T8EMXQZ5NY69F22V'
+          ])
+        );
+      });
+    }, 15_000);
+
+    test('tracks clicking and selecting a promoted offer when prices are disabled', async () => {
+      vi.mocked(setOrderPharmacy).mockResolvedValue(true);
+      await renderWithPricesDisabled('ord_pricesDisabledSelect', [
+        promotedUkHealthOffer('phr_01K7YX6BQ894T8800BZAQSR57S', 'UK Fountain Court Clinic Pharmacy')
+      ]);
+
+      await userEvent.click(
+        await screen.findByRole('radio', { name: 'UK Fountain Court Clinic Pharmacy' })
+      );
+      await userEvent.click(await screen.findByText(text.selectPharmacy));
+
+      await waitFor(() => {
+        expect(getPatientAnalytics().track).toHaveBeenCalledWith(
+          'Offer Selected',
+          expect.anything(),
+          expect.objectContaining({
+            offerType: 'UK Health',
+            pharmacyId: 'phr_01K7YX6BQ894T8800BZAQSR57S'
+          })
+        );
+      });
+      expect(getPatientAnalytics().track).toHaveBeenCalledWith(
+        'Offer Clicked',
+        expect.anything(),
+        expect.objectContaining({ pharmacyId: 'phr_01K7YX6BQ894T8800BZAQSR57S' })
+      );
+    }, 15_000);
+
+    test('does not track selecting a plain pharmacy card when prices are disabled', async () => {
+      vi.mocked(setOrderPharmacy).mockResolvedValue(true);
+      await renderWithPricesDisabled('ord_pricesDisabledSelectPlain', []);
+
+      await userEvent.click(await screen.findByRole('radio', { name: 'Nearby Pharmacy' }));
+      await userEvent.click(await screen.findByText(text.selectPharmacy));
+
+      await waitFor(() =>
+        expect(getPatientAnalytics().track).toHaveBeenCalledWith(
+          'Pharmacy Selection Submitted',
+          expect.anything(),
+          expect.anything()
+        )
+      );
+      const offerSelectionEvents = vi
+        .mocked(getPatientAnalytics().track)
+        .mock.calls.map(([event]) => event)
+        .filter((event) => event === 'Offer Selected' || event === 'Offer Clicked');
+      expect(offerSelectionEvents).toEqual([]);
+    }, 15_000);
+
+    test('does not track plain pickup pharmacy cards when prices are disabled', async () => {
+      await renderWithPricesDisabled('ord_pricesDisabledPlainPickup', []);
+
+      expect(await screen.findByText('Nearby Pharmacy')).toBeInTheDocument();
+
+      await scrollCardsIntoView();
+      expect(trackedImpressionPharmacyIds()).toEqual([]);
+    }, 15_000);
+
+    test('does not track plain delivery pharmacy cards when prices are disabled', async () => {
+      vi.mocked(getPharmacies).mockResolvedValue({
+        pharmacies: [
+          {
+            id: 'test-mail-order-1',
+            name: 'Testpill',
+            logo: 'https://logos.boson.health/pharmacies/capsule-logo.png',
+            fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
+          }
+        ]
+      });
+      // delivery pharmacies only show when the org enables them and prices are disabled
+      await renderWithPricesDisabled('ord_pricesDisabledPlainDelivery', [], {
+        organization: {
+          id: 'org_test_defaultId',
+          name: 'Test Org',
+          settings: { patientUx: { enablePatientDeliveryPharmacies: true } }
+        } as Order['organization']
+      });
+
+      await userEvent.click(screen.getByRole('tab', { name: 'Delivery' }));
+      expect(await screen.findByText('Testpill')).toBeInTheDocument();
+
+      await scrollCardsIntoView();
+      expect(trackedImpressionPharmacyIds()).toEqual([]);
     }, 15_000);
 
     test('shows offers when they are available and price is enabled - doing the same thing again', async () => {

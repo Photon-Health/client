@@ -5,6 +5,41 @@ import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
 import { triggerDemoNotification } from './api';
 import { demoPharmacies } from './data/demoPharmacies';
+import { getPatientAnalytics } from './configs/analytics';
+import { mockIntersectionObserver, scrollCardsIntoView } from './test-utils/intersectionObserver';
+
+mockIntersectionObserver();
+
+// unlike the global mock, hand demo mode its own no-op client the way production does,
+// so getPatientAnalytics() here is the live client that real events would reach
+vi.mock('./configs/analytics', async () => {
+  const { FEATURE_FLAG_DEFAULTS } = await import('./configs/featureFlags');
+  const createAnalytics = () => ({
+    page: vi.fn(),
+    identify: vi.fn(),
+    track: vi.fn(),
+    getFlagValue: vi.fn(
+      async (flag: keyof typeof FEATURE_FLAG_DEFAULTS, fallback?: unknown) =>
+        fallback ?? FEATURE_FLAG_DEFAULTS[flag]
+    ),
+    getFlagValueSync: vi.fn(
+      (flag: keyof typeof FEATURE_FLAG_DEFAULTS, fallback?: unknown) =>
+        fallback ?? FEATURE_FLAG_DEFAULTS[flag]
+    )
+  });
+  const liveAnalytics = createAnalytics();
+  const noopAnalytics = createAnalytics();
+  return {
+    getPatientAnalytics: (opts?: { noop: boolean }) => (opts?.noop ? noopAnalytics : liveAnalytics)
+  };
+});
+
+const OFFER_EVENTS = ['Offer Impression', 'Offer Clicked', 'Offer Selected'];
+const sentOfferEvents = () =>
+  vi
+    .mocked(getPatientAnalytics().track)
+    .mock.calls.filter(([event]) => OFFER_EVENTS.includes(event))
+    .map(([event, , properties]) => `${event}: ${properties?.offerType}`);
 
 vi.mock('./api', () => ({
   geocode: vi.fn().mockResolvedValue({
@@ -87,6 +122,23 @@ describe('Send To Patient Demo', () => {
 
     expect(await screen.findByText(/Order placed/i, {}, { timeout: 2500 })).toBeInTheDocument();
     expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
+  }, 10_000);
+
+  test('sends no offer analytics when offers and coupon prices are seen and selected', async () => {
+    renderDemoApp();
+
+    expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
+    // an offer card and coupon-priced cards are both on screen
+    expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
+    expect(screen.getAllByText('Coupon price').length).toBeGreaterThan(0);
+
+    await scrollCardsIntoView();
+    await userEvent.click(screen.getByText('Amazon Pharmacy'));
+    await userEvent.click(screen.getByText('Select pharmacy'));
+    expect(await screen.findByText(/Order placed/i, {}, { timeout: 2500 })).toBeInTheDocument();
+
+    expect(sentOfferEvents()).toEqual([]);
   }, 10_000);
 
   test('displays coupon prices for non-offer pharmacies', async () => {

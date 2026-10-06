@@ -6,7 +6,6 @@ import { isDeliveryOffer } from '../../utils/offerPlacement';
 
 export const OffersList = ({
   offerGroups,
-  shouldTrackOfferImpressionsAndSelections,
   selectedPharmacyId,
   preferredPharmacyId,
   autoroutedPharmacyId,
@@ -17,7 +16,6 @@ export const OffersList = ({
   numberOfPrecedingOptions = 0
 }: {
   offerGroups: PharmacyOfferGroup[];
-  shouldTrackOfferImpressionsAndSelections: boolean;
   selectedPharmacyId: string;
   preferredPharmacyId: string;
   autoroutedPharmacyId?: string;
@@ -36,7 +34,6 @@ export const OffersList = ({
             pharmacy={offerGroup.pharmacy}
             ordinalPosition={index + numberOfPrecedingOptions}
             isAlreadySelected={selectedPharmacyId === offerGroup.pharmacy.id}
-            enabled={shouldTrackOfferImpressionsAndSelections}
             offerGroup={offerGroup}
           >
             <OfferCard

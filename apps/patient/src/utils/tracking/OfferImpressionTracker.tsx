@@ -21,8 +21,7 @@ const OfferImpressionTracker = ({
   showPrice,
   pharmacy,
   ordinalPosition,
-  isAlreadySelected,
-  enabled
+  isAlreadySelected
 }: {
   children: React.ReactNode;
   offerGroup?: PharmacyOfferGroup;
@@ -30,7 +29,6 @@ const OfferImpressionTracker = ({
   pharmacy: EnrichedPharmacy;
   ordinalPosition: number;
   isAlreadySelected: boolean;
-  enabled: boolean;
 }) => {
   const patientAnalytics = usePatientAnalytics();
   const { order } = useOrderContext();
@@ -64,6 +62,9 @@ const OfferImpressionTracker = ({
       offerType,
       offerShown: !!price,
       pharmacyFulfillmentType: pharmacy.fulfillmentTypes?.[0] ?? 'None',
+      pharmacyId: pharmacy.id,
+      pharmacyName: pharmacy.name,
+      // legacy keys, kept so existing dashboards keep working
       pharmacy_id: pharmacy.id,
       pharmacy_name: pharmacy.name,
       ordinal_position: ordinalPosition,
@@ -99,16 +100,17 @@ const OfferImpressionTracker = ({
     triggerOnce: true,
     rootMargin: '-100px',
     onChange: (inView) => {
-      if (inView && enabled) {
-        // a priceless offer is still shown, via its tags
-        offerGroup?.offers.forEach(trackImpression);
+      if (!inView) {
+        return;
+      }
 
-        // asking buildPaymentOptions keeps one answer to whether the coupon row is rendered
-        const showsCouponPrice = buildPaymentOptions({ pharmacy, showPrice }).length > 0;
-        // a pharmacy with neither is still worth recording as seen
-        if (showsCouponPrice || !offerGroup?.offers.length) {
-          trackImpression();
-        }
+      // a card is an impression for each offer on it, priced or not (e.g. UK Health),
+      // and for its coupon price when one is visible; a card with neither is just a pharmacy
+      offerGroup?.offers.forEach(trackImpression);
+
+      // asking buildPaymentOptions keeps one answer to whether the coupon row is rendered
+      if (buildPaymentOptions({ pharmacy, showPrice }).length > 0) {
+        trackImpression();
       }
     }
   });
