@@ -260,8 +260,6 @@ export const Pharmacy = () => {
   const orderIsMultiRx = flattenedFills.length > 1;
 
   // pricing
-  const shouldTrackOfferImpressionsAndSelections = enablePrice && !isDemo;
-
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
@@ -780,7 +778,8 @@ export const Pharmacy = () => {
 
   const trackSelectedPharmacyRank = (
     selectedPharmacyId: string,
-    pharmacies: EnrichedPharmacy[]
+    pharmacies: EnrichedPharmacy[],
+    isOfferSelection: boolean
   ): void => {
     // Get pharmacy index in list
     const index = pharmacies.findIndex((p) => p.id === selectedPharmacyId);
@@ -792,7 +791,7 @@ export const Pharmacy = () => {
         value: index + 1
       });
 
-      if (shouldTrackOfferImpressionsAndSelections) {
+      if (isOfferSelection) {
         patientAnalytics.track('Offer Clicked', order, {
           clickedPharmacy: pharmacies[index],
           orderId: order.id,
@@ -865,15 +864,13 @@ export const Pharmacy = () => {
       ? override.type
       : selectedPharmacy.fulfillmentTypes?.[0];
 
-    // mirrors impressions: each offer on the card is a selection, plus its coupon price if shown
+    // mirrors impressions: each offer on the card is a selection, plus its coupon price if shown;
+    // a card with neither is just a pharmacy
     const selectedOffers = offers?.filter((o) => o.pharmacy.id === overridePharmacy.id) ?? [];
     const hasCouponPrice = pickupPharmacies.some(
       (p) => p.id === overridePharmacy.id && p.price != null
     );
-    [
-      ...selectedOffers,
-      ...(selectedOffers.length === 0 || hasCouponPrice ? [undefined] : [])
-    ].forEach((selectedOffer) =>
+    [...selectedOffers, ...(hasCouponPrice ? [undefined] : [])].forEach((selectedOffer) =>
       handleSubmitSuccessAnalytics({
         selectedPharmacy: overridePharmacy,
         selectedOffer,
@@ -895,7 +892,11 @@ export const Pharmacy = () => {
       return navigate(`/status?${query}`);
     }
 
-    trackSelectedPharmacyRank(selectedPharmacy.id, allPharmaciesIncludingOffers);
+    trackSelectedPharmacyRank(
+      selectedPharmacy.id,
+      allPharmaciesIncludingOffers,
+      selectedOffers.length > 0 || hasCouponPrice
+    );
 
     const showSubmitWarning = () =>
       toast({
@@ -1094,41 +1095,39 @@ export const Pharmacy = () => {
       extraOfferMetadata.priceType = deriveCostType(selectedOffer);
     }
 
-    if (shouldTrackOfferImpressionsAndSelections) {
-      const brandedOptionObjects = brandedOptions.map((id) => ({
-        id
-      }));
+    const brandedOptionObjects = brandedOptions.map((id) => ({
+      id
+    }));
 
-      const offerIds = (groups: PharmacyOfferGroup[]) => groups.map((g) => ({ id: g.pharmacy.id }));
+    const offerIds = (groups: PharmacyOfferGroup[]) => groups.map((g) => ({ id: g.pharmacy.id }));
 
-      extraOfferMetadata.offerType = offerType;
-      extraOfferMetadata.buttonText = t.selectPharmacy;
-      extraOfferMetadata.numPrescriptions = medCount;
-      extraOfferMetadata.multiMedOffer = medCount > 1;
-      extraOfferMetadata.hasRefills = medCount < order.fills.length;
-      extraOfferMetadata.selectedFrom = selectedFrom;
-      extraOfferMetadata.buttonText = buttonText;
+    extraOfferMetadata.offerType = offerType;
+    extraOfferMetadata.buttonText = t.selectPharmacy;
+    extraOfferMetadata.numPrescriptions = medCount;
+    extraOfferMetadata.multiMedOffer = medCount > 1;
+    extraOfferMetadata.hasRefills = medCount < order.fills.length;
+    extraOfferMetadata.selectedFrom = selectedFrom;
+    extraOfferMetadata.buttonText = buttonText;
 
-      // mirrors what each tab renders, so a pharmacy carrying an offer is counted once
-      const visiblePharmacyList =
-        activeTab === 'delivery'
-          ? [
-              ...offerIds(aboveFoldOffers),
-              ...offerIds(deliveryOffers),
-              ...brandedOptionObjects,
-              ...inlineMailOrderOptions
-            ]
-          : [...offerIds(aboveFoldOffers), ...visiblePickupPharmacies];
+    // mirrors what each tab renders, so a pharmacy carrying an offer is counted once
+    const visiblePharmacyList =
+      activeTab === 'delivery'
+        ? [
+            ...offerIds(aboveFoldOffers),
+            ...offerIds(deliveryOffers),
+            ...brandedOptionObjects,
+            ...inlineMailOrderOptions
+          ]
+        : [...offerIds(aboveFoldOffers), ...visiblePickupPharmacies];
 
-      patientAnalytics.track('Offer Selected', order, {
-        ...selectedPharmacy,
-        ...extraOfferMetadata,
-        pharmacyId: selectedId,
-        pharmacyType: selectedOfferPharmacy?.fulfillmentTypes?.[0],
-        activeTab,
-        ordinalPosition: visiblePharmacyList.findIndex((p) => p.id === selectedId) + 1
-      });
-    }
+    patientAnalytics.track('Offer Selected', order, {
+      ...selectedPharmacy,
+      ...extraOfferMetadata,
+      pharmacyId: selectedId,
+      pharmacyType: selectedOfferPharmacy?.fulfillmentTypes?.[0],
+      activeTab,
+      ordinalPosition: visiblePharmacyList.findIndex((p) => p.id === selectedId) + 1
+    });
   };
 
   if (!order) {

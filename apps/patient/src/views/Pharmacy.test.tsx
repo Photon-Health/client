@@ -542,6 +542,55 @@ describe('Pharmacy page', () => {
       });
     }, 15_000);
 
+    test('tracks clicking and selecting a promoted offer when prices are disabled', async () => {
+      vi.mocked(setOrderPharmacy).mockResolvedValue(true);
+      await renderWithPricesDisabled('ord_pricesDisabledSelect', [
+        promotedUkHealthOffer('phr_01K7YX6BQ894T8800BZAQSR57S', 'UK Fountain Court Clinic Pharmacy')
+      ]);
+
+      await userEvent.click(
+        await screen.findByRole('radio', { name: 'UK Fountain Court Clinic Pharmacy' })
+      );
+      await userEvent.click(await screen.findByText(text.selectPharmacy));
+
+      await waitFor(() => {
+        expect(getPatientAnalytics().track).toHaveBeenCalledWith(
+          'Offer Selected',
+          expect.anything(),
+          expect.objectContaining({
+            offerType: 'UK Health',
+            pharmacyId: 'phr_01K7YX6BQ894T8800BZAQSR57S'
+          })
+        );
+      });
+      expect(getPatientAnalytics().track).toHaveBeenCalledWith(
+        'Offer Clicked',
+        expect.anything(),
+        expect.objectContaining({ pharmacyId: 'phr_01K7YX6BQ894T8800BZAQSR57S' })
+      );
+    }, 15_000);
+
+    test('does not track selecting a plain pharmacy card when prices are disabled', async () => {
+      vi.mocked(setOrderPharmacy).mockResolvedValue(true);
+      await renderWithPricesDisabled('ord_pricesDisabledSelectPlain', []);
+
+      await userEvent.click(await screen.findByRole('radio', { name: 'Nearby Pharmacy' }));
+      await userEvent.click(await screen.findByText(text.selectPharmacy));
+
+      await waitFor(() =>
+        expect(getPatientAnalytics().track).toHaveBeenCalledWith(
+          'Pharmacy Selection Submitted',
+          expect.anything(),
+          expect.anything()
+        )
+      );
+      const offerSelectionEvents = vi
+        .mocked(getPatientAnalytics().track)
+        .mock.calls.map(([event]) => event)
+        .filter((event) => event === 'Offer Selected' || event === 'Offer Clicked');
+      expect(offerSelectionEvents).toEqual([]);
+    }, 15_000);
+
     test('does not track plain pickup pharmacy cards when prices are disabled', async () => {
       await renderWithPricesDisabled('ord_pricesDisabledPlainPickup', []);
 
