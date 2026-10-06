@@ -1,6 +1,34 @@
 import { PhotonClient } from '@photonhealth/sdk';
-import { vi } from 'vitest';
+import { vi, type Mock } from 'vitest';
 import { DISPENSE_UNIT, PATIENT } from '@photonhealth/sdk/test-utils';
+
+interface TestClientStore {
+  sdk: PhotonClient;
+  getSDK: () => PhotonClient;
+  autoLogin: boolean;
+  authentication: {
+    state: {
+      isAuthenticated: boolean;
+      isLoading: boolean;
+      isInOrg: boolean;
+      permissions: string[];
+      error: undefined;
+    };
+    login: Mock;
+    logout: Mock;
+    handleRedirect: Mock;
+    checkSession: Mock;
+  };
+  clinical: {
+    dispenseUnits: {
+      state: {
+        isLoading: boolean;
+        dispenseUnits: (typeof DISPENSE_UNIT)[];
+      };
+      getDispenseUnits: Mock;
+    };
+  };
+}
 
 /**
  * Creates a PhotonClient for testing.
@@ -39,7 +67,7 @@ export function createTestClient() {
  * Network calls triggered by store methods (getDispenseUnits, etc.) are handled by MSW,
  * but the initial auth/loading state must be set here.
  */
-export function createTestClientStore(client: PhotonClient) {
+export function createTestClientStore(client: PhotonClient): TestClientStore {
   return {
     sdk: client,
     getSDK: () => client,

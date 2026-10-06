@@ -1,20 +1,20 @@
 // src/test/mocks/photonSdkMock.ts
 import { PhotonClient } from '@photonhealth/sdk';
 import { createContext, JSXElement } from 'solid-js';
-import { vi } from 'vitest';
+import { vi, type Mock } from 'vitest';
 
 export class MockPhotonClient {
-  apollo = {
+  apollo: { query: Mock; mutate: Mock } = {
     query: vi.fn().mockImplementation(() => Promise.resolve({ data: {} })),
     mutate: vi.fn().mockImplementation(() => Promise.resolve({ data: {} }))
   };
 
-  apolloClinical = {
+  apolloClinical: { query: Mock; mutate: Mock } = {
     query: vi.fn().mockImplementation(() => Promise.resolve({ data: {} })),
     mutate: vi.fn().mockImplementation(() => Promise.resolve({ data: {} }))
   };
 
-  clinical = {
+  clinical: { pharmacy: { getPharmacy: Mock } } = {
     pharmacy: {
       getPharmacy: vi.fn().mockImplementation(() =>
         Promise.resolve({
@@ -27,13 +27,13 @@ export class MockPhotonClient {
   };
 
   // Add any other methods used in your components
-  authentication = {
+  authentication: { getAccessToken: Mock; state: object } = {
     getAccessToken: vi.fn().mockImplementation(() => Promise.resolve('mock-token')),
     state: {}
   };
 
-  setOrganization = vi.fn().mockReturnThis();
-  clearOrganization = vi.fn().mockReturnThis();
+  setOrganization: Mock = vi.fn().mockReturnThis();
+  clearOrganization: Mock = vi.fn().mockReturnThis();
 }
 
 export const MockSDKContext = createContext<PhotonClient>();

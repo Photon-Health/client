@@ -10,7 +10,12 @@ import { FixedFooter, LocationModal, PoweredBy } from '../components';
 import { CouponModal } from '../components/coupons';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy, wait } from '../utils/general';
-import { Pharmacy as EnrichedPharmacy, PharmacyOffer, Order } from '../utils/models';
+import {
+  Pharmacy as EnrichedPharmacy,
+  PharmacyOffer,
+  PharmacyOfferGroup,
+  Order
+} from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -36,6 +41,7 @@ import {
 } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchPharmacyOffers, getPharmacy } from './pharmacy.utils';
+import { cheapestPricing, toPharmacyLike } from '../utils/offers';
 import { isDeliveryOffer, selectOfferPlacement } from '../utils/offerPlacement';
 import _ from 'lodash';
 import {
@@ -50,7 +56,7 @@ import { OffersList } from '../components/offers/OffersList';
 import { MailOrderSelectList } from '../components/mail-order-select';
 import { MailOrderPharmacyOption } from '../components/mail-order-select/MailOrderSelectCard';
 import { PharmacyTabKey, PharmacyTypeTabBar, TabPanel } from '../components/pharmacy-tabs';
-import { deriveCostType, getOfferType } from '../utils/offerAnalytics';
+import { deriveCostType, getOfferType, toWaysToPay } from '../utils/offerAnalytics';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 import { MarketplaceSummary } from '../components/marketplace/summary/MarketplaceSummary';
 import { LocationSelection } from '../components/marketplace/summary/LocationSelection';
@@ -243,11 +249,14 @@ export const Pharmacy = () => {
   const [cleanAddress, setCleanAddress] = useState<string>();
   const [loadingLocation, setLoadingLocation] = useState(false);
 
+  const [offers, setOffers] = useState<PharmacyOffer[] | undefined>(undefined);
+
   // loading state
   const [initialLoad, setInitialLoad] = useState(true);
   const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(true);
-  const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
-  const isLoading = loadingLocation || loadingPharmacies;
+  const [allPharmaciesLoaded, setAllPharmaciesLoaded] = useState<boolean>(false);
+  // wait on offers too, so offer and plain cards appear together
+  const isLoading = loadingLocation || loadingPharmacies || offers === undefined;
   const orderIsMultiRx = flattenedFills.length > 1;
 
   // pricing
@@ -259,11 +268,10 @@ export const Pharmacy = () => {
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
 
-  const [offers, setOffers] = useState<PharmacyOffer[] | undefined>(undefined);
-
   const placement = useMemo(() => selectOfferPlacement(offers), [offers]);
   // All offer-derived pharmacies (top slot + tabs) — feeds pharmacy resolution + analytics.
   const filteredOffers = [...placement.aboveFold, ...placement.inTab];
+  const offerPharmacyIds = new Set(filteredOffers.map((offer) => offer.pharmacy.id));
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
@@ -312,6 +320,28 @@ export const Pharmacy = () => {
     topRankedPharmacies
   ]);
 
+  const pickupOffersByPharmacyId = new Map(
+    placement.inTab
+      .filter((offer) => !isDeliveryOffer(offer))
+      .map((offer) => [offer.pharmacy.id, offer])
+  );
+
+  // pickup offers lead the tab like delivery offers do, even when the nearby search doesn't return their pharmacy
+  const pickupOfferPharmacies = [...pickupOffersByPharmacyId.values()].map(
+    ({ pharmacy }) =>
+      pickupPharmacies.find((nearby) => nearby.id === pharmacy.id) ??
+      (isDemo ? pharmacy : preparePharmacy(pharmacy))
+  );
+
+  // held until offers land, or a plain card would swap for its pharmacy's offer card
+  const visiblePickupPharmacies =
+    offers === undefined
+      ? []
+      : [
+          ...pickupOfferPharmacies,
+          ...pickupPharmacies.filter((pharmacy) => !offerPharmacyIds.has(pharmacy.id))
+        ];
+
   // Non-integrated patient mail order pharmacies
   const [patientMailOrderOptions, setPatientMailOrderOptions] = useState<
     MailOrderPharmacyOption[] | undefined
@@ -343,10 +373,16 @@ export const Pharmacy = () => {
     const getOffers = async () => {
       // only fetch offers if we don't have any
       if (!offers) {
-        const fetchedOffers = await fetchPharmacyOffers(order);
+        try {
+          const fetchedOffers = await fetchPharmacyOffers(order);
 
-        if (JSON.stringify(fetchedOffers) !== JSON.stringify(offers)) {
-          setOffers(fetchedOffers);
+          if (JSON.stringify(fetchedOffers) !== JSON.stringify(offers)) {
+            setOffers(fetchedOffers);
+          }
+        } catch (error) {
+          // pharmacy cards wait on offers, so a failed fetch mustn't leave them loading
+          console.error('Get offers error: ', error);
+          setOffers([]);
         }
       }
     };
@@ -364,7 +400,7 @@ export const Pharmacy = () => {
     setPageOffset(0);
     setSelectedId('');
     setShowFooter(false);
-    setShowingAllPharmacies(false);
+    setAllPharmaciesLoaded(false);
   };
 
   const handleModalClose = ({ loc = undefined }: { loc?: string | undefined }) => {
@@ -406,7 +442,7 @@ export const Pharmacy = () => {
       setPharmacyResults(pharmacies);
 
       if (pharmacies.length < 5) {
-        setShowingAllPharmacies(true);
+        setAllPharmaciesLoaded(true);
       }
     }
   }, [enable24Hr, enableOpenNow, enablePrice, isDemo]);
@@ -429,7 +465,7 @@ export const Pharmacy = () => {
           description: 'Please update your location and try again.',
           ...TOAST_CONFIG.ERROR
         });
-        setShowingAllPharmacies(true);
+        setAllPharmaciesLoaded(true);
 
         console.warn('Geocoding error:', e);
       }
@@ -588,7 +624,7 @@ export const Pharmacy = () => {
               setPharmacyResults(pharmaciesReSearch);
             } else {
               toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
-              setShowingAllPharmacies(true);
+              setAllPharmaciesLoaded(true);
             }
           } else {
             toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
@@ -663,7 +699,7 @@ export const Pharmacy = () => {
       setLoadingPharmacies(false);
 
       if (totalPharmacyOptions.length === pharmacies.length) {
-        setShowingAllPharmacies(true);
+        setAllPharmaciesLoaded(true);
       }
 
       return;
@@ -676,7 +712,7 @@ export const Pharmacy = () => {
     });
     setPharmacyResults([...pharmacyResults, ...newPharmacies]);
     if (newPharmacies.length < GET_PHARMACIES_COUNT) {
-      setShowingAllPharmacies(true);
+      setAllPharmaciesLoaded(true);
     }
 
     setLoadingPharmacies(false);
@@ -698,16 +734,7 @@ export const Pharmacy = () => {
       clearAutoroutedPharmacyConfirmation(order.id);
     }
 
-    // because offers aren't actually pharmacies
-    // we'll transform them into things that resemble pharamcy objects
-    const pharmaciesFromOffers = (filteredOffers || []).map((o) => ({
-      id: o.pharmacy.id,
-      name: o.pharmacy.name,
-      fulfillmentTypes: o.pharmacy.fulfillmentTypes,
-      logo: o.pharmacy.logo,
-      price: o.pricing.costAmount ?? 0,
-      retailPrice: o.pricing.retailAmount ?? 0
-    }));
+    const pharmaciesFromOffers = (filteredOffers || []).map(toPharmacyLike);
 
     const selectedPharmacy: EnrichedPharmacy | undefined = [
       ...pickupPharmacies,
@@ -715,7 +742,7 @@ export const Pharmacy = () => {
       ...(patientMailOrderOptions ?? [])
     ].find((p) => p.id === pharmacyId);
 
-    const pickupRankIndex = pickupPharmacies.findIndex((p) => p.id === pharmacyId);
+    const pickupRankIndex = visiblePickupPharmacies.findIndex((p) => p.id === pharmacyId);
     const mailOrderRankIndex = inlineMailOrderOptions.findIndex((p) => p.id === pharmacyId);
     const rankIndex = pickupRankIndex >= 0 ? pickupRankIndex : mailOrderRankIndex;
     // Calculate routingAction locally since
@@ -734,7 +761,11 @@ export const Pharmacy = () => {
       hasInitialRoute: !!order.metadata?.routingHistory.length,
       initialRouteType: getInitialRouteType(order),
       enablePrice: enablePrice,
-      hasPrice: selectedPharmacy?.price !== undefined
+      hasPrice: selectedPharmacy?.price !== undefined,
+      waysToPay: toWaysToPay({
+        pharmacy: selectedPharmacy,
+        offerGroup: filteredOffers.find((o) => o.pharmacy.id === pharmacyId)
+      })
     });
   };
 
@@ -800,7 +831,7 @@ export const Pharmacy = () => {
 
     persistAutoroutedPharmacyConfirmation(selectedPharmacy.id);
 
-    const selectedOffer = filteredOffers?.find((o) => o.pharmacy.id === selectedPharmacy.id);
+    const selectedOfferGroup = filteredOffers?.find((o) => o.pharmacy.id === selectedPharmacy.id);
 
     patientAnalytics.track('Pharmacy Selection Submitted', order, {
       pharmacyId: selectedPharmacy.id,
@@ -811,8 +842,10 @@ export const Pharmacy = () => {
       initialRouteType: getInitialRouteType(order),
       enablePrice,
       hasPrice: selectedPharmacy.price !== undefined,
-      price: selectedPharmacy.price || selectedOffer?.pricing.costAmount,
-      retailPrice: selectedPharmacy.retailPrice || selectedOffer?.pricing.retailAmount
+      price: selectedPharmacy.price || cheapestPricing(selectedOfferGroup)?.costAmount,
+      retailPrice:
+        selectedPharmacy.retailPrice || cheapestPricing(selectedOfferGroup)?.retailAmount,
+      waysToPay: toWaysToPay({ pharmacy: selectedPharmacy, offerGroup: selectedOfferGroup })
     });
 
     if (isDemo) {
@@ -820,16 +853,7 @@ export const Pharmacy = () => {
       return;
     }
 
-    // because offers aren't actually pharmacies
-    // we'll transform them into things that resemble pharamcy objects
-    const pharmaciesFromOffers = (filteredOffers || []).map((o) => ({
-      id: o.pharmacy.id,
-      name: o.pharmacy.name,
-      fulfillmentTypes: o.pharmacy.fulfillmentTypes,
-      logo: o.pharmacy.logo,
-      price: o.pricing.costAmount ?? 0,
-      retailPrice: o.pricing.retailAmount ?? 0
-    }));
+    const pharmaciesFromOffers = (filteredOffers || []).map(toPharmacyLike);
 
     const allPharmaciesIncludingOffers = [...pharmaciesFromOffers, ...pickupPharmacies];
 
@@ -841,12 +865,23 @@ export const Pharmacy = () => {
       ? override.type
       : selectedPharmacy.fulfillmentTypes?.[0];
 
-    handleSubmitSuccessAnalytics({
-      selectedPharmacy: overridePharmacy,
-      allPharmaciesIncludingOffers,
-      selectedFrom,
-      buttonText
-    });
+    // mirrors impressions: each offer on the card is a selection, plus its coupon price if shown
+    const selectedOffers = offers?.filter((o) => o.pharmacy.id === overridePharmacy.id) ?? [];
+    const hasCouponPrice = pickupPharmacies.some(
+      (p) => p.id === overridePharmacy.id && p.price != null
+    );
+    [
+      ...selectedOffers,
+      ...(selectedOffers.length === 0 || hasCouponPrice ? [undefined] : [])
+    ].forEach((selectedOffer) =>
+      handleSubmitSuccessAnalytics({
+        selectedPharmacy: overridePharmacy,
+        selectedOffer,
+        allPharmaciesIncludingOffers,
+        selectedFrom,
+        buttonText
+      })
+    );
 
     // If the patient is simply confirming, navigate back to the status page
     if (routingAction === RoutingAction.Confirmation) {
@@ -950,7 +985,9 @@ export const Pharmacy = () => {
 
     setSavingPreferred(true);
 
-    const selectedPharmacy = pickupPharmacies.find((p) => p.id === pharmacyId);
+    const selectedPharmacy =
+      pickupPharmacies.find((p) => p.id === pharmacyId) ??
+      filteredOffers.find((offer) => offer.pharmacy.id === pharmacyId)?.pharmacy;
 
     patientAnalytics.track('Set Preferred Pharmacy', order, {
       pharmacyId: pharmacyId,
@@ -1021,20 +1058,24 @@ export const Pharmacy = () => {
 
   const handleSubmitSuccessAnalytics = ({
     selectedPharmacy,
+    selectedOffer,
     allPharmaciesIncludingOffers,
     selectedFrom = 'Main List',
     buttonText
   }: {
     selectedPharmacy: { id: string; name: string } | PharmacyType | undefined;
+    selectedOffer?: PharmacyOffer;
     allPharmaciesIncludingOffers: EnrichedPharmacy[];
     selectedFrom: 'Main List' | 'Mail Order List';
     buttonText: string;
   }) => {
     const extraOfferMetadata: Record<string, any> = {};
 
-    const selectedOffer = offers?.find((o) => o.pharmacy.id == selectedPharmacy?.id);
+    // a coupon selection needs the pickup pharmacy's source, which offer-derived pharmacies lack
     const selectedOfferPharmacy =
-      selectedPharmacy && allPharmaciesIncludingOffers.find((p) => p.id === selectedPharmacy.id);
+      selectedPharmacy &&
+      ((!selectedOffer && pickupPharmacies.find((p) => p.id === selectedPharmacy.id)) ||
+        allPharmaciesIncludingOffers.find((p) => p.id === selectedPharmacy.id));
 
     const offerType =
       getOfferType({ offer: selectedOffer, pharmacy: selectedOfferPharmacy }) ?? 'None';
@@ -1058,10 +1099,7 @@ export const Pharmacy = () => {
         id
       }));
 
-      const offersArray =
-        filteredOffers?.map((o) => ({
-          id: o.pharmacy.id
-        })) || [];
+      const offerIds = (groups: PharmacyOfferGroup[]) => groups.map((g) => ({ id: g.pharmacy.id }));
 
       extraOfferMetadata.offerType = offerType;
       extraOfferMetadata.buttonText = t.selectPharmacy;
@@ -1071,10 +1109,16 @@ export const Pharmacy = () => {
       extraOfferMetadata.selectedFrom = selectedFrom;
       extraOfferMetadata.buttonText = buttonText;
 
+      // mirrors what each tab renders, so a pharmacy carrying an offer is counted once
       const visiblePharmacyList =
         activeTab === 'delivery'
-          ? [...offersArray, ...brandedOptionObjects, ...inlineMailOrderOptions]
-          : [...offersArray, ...pickupPharmacies];
+          ? [
+              ...offerIds(aboveFoldOffers),
+              ...offerIds(deliveryOffers),
+              ...brandedOptionObjects,
+              ...inlineMailOrderOptions
+            ]
+          : [...offerIds(aboveFoldOffers), ...visiblePickupPharmacies];
 
       patientAnalytics.track('Offer Selected', order, {
         ...selectedPharmacy,
@@ -1100,13 +1144,10 @@ export const Pharmacy = () => {
   const brandedOptions = _.uniq([
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
     ...(enableMailOrder ? mailOrderPharmacies : [])
-  ]).filter((id) => !filteredOffers.map((offer) => offer.pharmacy.id).includes(id));
+  ]).filter((id) => !offerPharmacyIds.has(id));
   // filter out any branded options that are in the offers list
 
-  const brandedAndOfferIds = new Set<string>([
-    ...brandedOptions,
-    ...(filteredOffers ?? []).map((offer) => offer.pharmacy.id)
-  ]);
+  const brandedAndOfferIds = new Set<string>([...brandedOptions, ...offerPharmacyIds]);
   // The full mail-order list excluding pharmacies already shown as branded options or offers
   const inlineMailOrderOptions = (patientMailOrderOptions ?? []).filter(
     (option) => !brandedAndOfferIds.has(option.id)
@@ -1115,7 +1156,6 @@ export const Pharmacy = () => {
   // Promoted cards sit above the fold; non-promoted route into the tabs by fulfillment type.
   const aboveFoldOffers = placement.aboveFold;
   const deliveryOffers = placement.inTab.filter(isDeliveryOffer);
-  const pickupOffers = placement.inTab.filter((offer) => !isDeliveryOffer(offer));
   // Above-fold cards are visible from either tab, so each tab's ranking starts after these cards
   const optionsAboveTabs = aboveFoldOffers.length;
 
@@ -1168,7 +1208,7 @@ export const Pharmacy = () => {
                 aria-label="Select a pharmacy"
               >
                 <OffersList
-                  offers={aboveFoldOffers}
+                  offerGroups={aboveFoldOffers}
                   shouldTrackOfferImpressionsAndSelections={
                     shouldTrackOfferImpressionsAndSelections
                   }
@@ -1177,6 +1217,8 @@ export const Pharmacy = () => {
                   autoroutedPharmacyId={autoroutedPharmacyId}
                   currentPharmacyId={currentPharmacyId}
                   handleSelect={handleSelect}
+                  handleSetPreferred={handleSetPreferredPharmacy}
+                  savingPreferred={savingPreferred}
                 />
               </VStack>
             </VStack>
@@ -1199,52 +1241,54 @@ export const Pharmacy = () => {
                 sentToMailOrder={orderPharmacyIsMailOrder}
                 activeTab={activeTab}
               />
-              {deliveryOffers.length > 0 && (
-                <OffersList
-                  offers={deliveryOffers}
-                  shouldTrackOfferImpressionsAndSelections={
-                    shouldTrackOfferImpressionsAndSelections
-                  }
-                  selectedPharmacyId={selectedId}
-                  preferredPharmacyId={effectivePreferredPharmacyId}
-                  autoroutedPharmacyId={autoroutedPharmacyId}
-                  currentPharmacyId={currentPharmacyId}
-                  handleSelect={handleSelect}
-                  numberOfPrecedingOptions={optionsAboveTabs}
-                />
-              )}
-              {showBrandedOptions && (
-                <BrandedOptions
-                  numberOfOffers={optionsAboveTabs + deliveryOffers.length}
-                  options={brandedOptions}
-                  location={patientLocation}
-                  selectedId={selectedId}
-                  handleSelect={handleSelect}
-                  autoroutedPharmacyId={autoroutedPharmacyId}
-                  currentPharmacyId={currentPharmacyId}
-                  shouldTrackOfferImpressionsAndSelections={
-                    shouldTrackOfferImpressionsAndSelections
-                  }
-                />
-              )}
-              {inlineMailOrderOptions.length > 0 ? (
-                <MailOrderSelectList
-                  options={inlineMailOrderOptions}
-                  selectedId={selectedId}
-                  autoroutedPharmacyId={autoroutedPharmacyId}
-                  onSelect={(option) => handleSelect(option.id)}
-                  shouldTrackOfferImpressionsAndSelections={
-                    shouldTrackOfferImpressionsAndSelections
-                  }
-                  numberOfPrecedingOptions={
-                    optionsAboveTabs + deliveryOffers.length + brandedOptions.length
-                  }
-                />
-              ) : brandedOptions.length === 0 && deliveryOffers.length === 0 ? (
-                <Text fontSize="sm" color="gray.600" py={4}>
-                  No delivery pharmacies available.
-                </Text>
-              ) : null}
+              <VStack spacing={2} align="stretch" w="full">
+                {deliveryOffers.length > 0 && (
+                  <OffersList
+                    offerGroups={deliveryOffers}
+                    shouldTrackOfferImpressionsAndSelections={
+                      shouldTrackOfferImpressionsAndSelections
+                    }
+                    selectedPharmacyId={selectedId}
+                    preferredPharmacyId={effectivePreferredPharmacyId}
+                    autoroutedPharmacyId={autoroutedPharmacyId}
+                    currentPharmacyId={currentPharmacyId}
+                    handleSelect={handleSelect}
+                    numberOfPrecedingOptions={optionsAboveTabs}
+                  />
+                )}
+                {showBrandedOptions && (
+                  <BrandedOptions
+                    numberOfOffers={optionsAboveTabs + deliveryOffers.length}
+                    options={brandedOptions}
+                    location={patientLocation}
+                    selectedId={selectedId}
+                    handleSelect={handleSelect}
+                    autoroutedPharmacyId={autoroutedPharmacyId}
+                    currentPharmacyId={currentPharmacyId}
+                    shouldTrackOfferImpressionsAndSelections={
+                      shouldTrackOfferImpressionsAndSelections
+                    }
+                  />
+                )}
+                {inlineMailOrderOptions.length > 0 ? (
+                  <MailOrderSelectList
+                    options={inlineMailOrderOptions}
+                    selectedId={selectedId}
+                    autoroutedPharmacyId={autoroutedPharmacyId}
+                    onSelect={(option) => handleSelect(option.id)}
+                    shouldTrackOfferImpressionsAndSelections={
+                      shouldTrackOfferImpressionsAndSelections
+                    }
+                    numberOfPrecedingOptions={
+                      optionsAboveTabs + deliveryOffers.length + brandedOptions.length
+                    }
+                  />
+                ) : brandedOptions.length === 0 && deliveryOffers.length === 0 ? (
+                  <Text fontSize="sm" color="gray.600" py={4}>
+                    No delivery pharmacies available.
+                  </Text>
+                ) : null}
+              </VStack>
             </TabPanel>
           ) : (
             <TabPanel ariaLabel="Select a pickup pharmacy" pb={showFooter ? 32 : 8}>
@@ -1253,52 +1297,42 @@ export const Pharmacy = () => {
                 sentToMailOrder={orderPharmacyIsMailOrder}
                 activeTab={activeTab}
               />
-              {pickupOffers.length > 0 && (
-                <OffersList
-                  offers={pickupOffers}
+              <BenefitsBanner
+                onTooltipClick={() =>
+                  patientAnalytics.track('Benefits Banner Tooltip Clicked', order)
+                }
+              />
+              {/* offers and pharmacy cards are one list of options, so they share the card rhythm
+                  rather than TabPanel's wider section gap */}
+              <VStack spacing={2} align="stretch" w="full">
+                <PickupPharmacyCardList
+                  location={patientLocation}
+                  pharmacies={visiblePickupPharmacies}
+                  offersByPharmacyId={pickupOffersByPharmacyId}
+                  preferredPharmacy={effectivePreferredPharmacyId}
+                  savingPreferred={savingPreferred}
+                  selectedId={selectedId}
+                  handleSelect={handleSelect}
+                  handleShowMore={handleShowMore}
+                  handleSetPreferred={handleSetPreferredPharmacy}
+                  loadingMore={isLoading}
+                  canShowMore={!allPharmaciesLoaded && (pickupPharmacies.length > 0 || isLoading)}
+                  showPrice={isDemo || !orderIsMultiRx}
+                  enableOpenNow={enableOpenNow}
+                  enable24Hr={enable24Hr}
+                  enablePrice={enablePrice}
+                  setEnableOpenNow={setEnableOpenNow}
+                  setEnable24Hr={setEnable24Hr}
+                  showFilters={false}
+                  autoroutedPharmacyId={autoroutedPharmacyId}
+                  currentPharmacyId={currentPharmacyId}
+                  setCouponModalOpen={setCouponModalOpen}
+                  numberOfBrandedOptions={optionsAboveTabs + brandedOptions.length}
                   shouldTrackOfferImpressionsAndSelections={
                     shouldTrackOfferImpressionsAndSelections
                   }
-                  selectedPharmacyId={selectedId}
-                  preferredPharmacyId={effectivePreferredPharmacyId}
-                  autoroutedPharmacyId={autoroutedPharmacyId}
-                  currentPharmacyId={currentPharmacyId}
-                  handleSelect={handleSelect}
-                  numberOfPrecedingOptions={optionsAboveTabs}
                 />
-              )}
-              <PickupPharmacyCardList
-                location={patientLocation}
-                pharmacies={pickupPharmacies}
-                preferredPharmacy={effectivePreferredPharmacyId}
-                savingPreferred={savingPreferred}
-                selectedId={selectedId}
-                handleSelect={handleSelect}
-                handleShowMore={handleShowMore}
-                handleSetPreferred={handleSetPreferredPharmacy}
-                loadingMore={isLoading}
-                showingAllPharmacies={showingAllPharmacies}
-                showPrice={isDemo || !orderIsMultiRx}
-                enableOpenNow={enableOpenNow}
-                enable24Hr={enable24Hr}
-                enablePrice={enablePrice}
-                setEnableOpenNow={setEnableOpenNow}
-                setEnable24Hr={setEnable24Hr}
-                showFilters={false}
-                autoroutedPharmacyId={autoroutedPharmacyId}
-                currentPharmacyId={currentPharmacyId}
-                setCouponModalOpen={setCouponModalOpen}
-                numberOfBrandedOptions={
-                  optionsAboveTabs + pickupOffers.length + brandedOptions.length
-                }
-                shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
-              >
-                <BenefitsBanner
-                  onTooltipClick={() =>
-                    patientAnalytics.track('Benefits Banner Tooltip Clicked', order)
-                  }
-                />
-              </PickupPharmacyCardList>
+              </VStack>
             </TabPanel>
           )}
         </>
@@ -1319,16 +1353,7 @@ export const Pharmacy = () => {
             onClick={async () => {
               if (orderRouted) return;
 
-              // because offers aren't actually pharmacies
-              // we'll transform them into things that resemble pharamcy objects
-              const pharmaciesFromOffers = (filteredOffers || []).map((o) => ({
-                id: o.pharmacy.id,
-                name: o.pharmacy.name,
-                fulfillmentTypes: o.pharmacy.fulfillmentTypes,
-                logo: o.pharmacy.logo,
-                price: o.pricing.costAmount ?? 0,
-                retailPrice: o.pricing.retailAmount ?? 0
-              }));
+              const pharmaciesFromOffers = (filteredOffers || []).map(toPharmacyLike);
 
               const allPharmaciesIncludingOffers = [
                 ...pharmaciesFromOffers,

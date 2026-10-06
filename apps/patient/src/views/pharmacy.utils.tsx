@@ -9,26 +9,24 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 export async function fetchPharmacyOffers(order: Order): Promise<PharmacyOffer[]> {
   const bundles = await getOfferBundles(order.id);
 
-  // Group by pharmacy so all bundles from one source are tied to one pharmacy card
-  const byPharmacy = _.groupBy(
+  // Group by pharmacy and source so each source keeps its own tags and pricing
+  const byPharmacySource = _.groupBy(
     bundles.filter((bundle) => bundle.pharmacy), // a bundle without a pharmacy has nothing to render as a card
-    (bundle) => bundle.pharmacy!.id
+    (bundle) => `${bundle.pharmacy!.id}:${bundle.source}`
   );
 
-  return Object.values(byPharmacy).map((group) => {
+  return Object.values(byPharmacySource).map((group) => {
     const { pharmacy, source, attributeTags } = group[0];
 
     return {
       source,
       isPromoted: group.some((bundle) => bundle.isPromoted),
-      pharmacy: {
-        id: pharmacy!.id,
-        name: pharmacy!.name,
-        fulfillmentTypes: pharmacy!.fulfillmentTypes,
-        logo: pharmacy!.logo
-      },
+      pharmacy: pharmacy!,
       tags: attributeTags ?? [],
-      ...summarizePharmacyOffer(group.flatMap((bundle) => bundle.offers ?? []))
+      ...summarizePharmacyOffer(
+        group.flatMap((bundle) => bundle.offers ?? []),
+        source
+      )
     };
   });
 }

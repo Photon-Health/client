@@ -1,15 +1,28 @@
-import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@chakra-ui/react';
-import { FiInfo, FiStar, FiTag } from 'react-icons/fi';
+import { Box, HStack, Image, Tag, TagLabel, Text, VStack } from '@chakra-ui/react';
+import { FiInfo, FiTag } from 'react-icons/fi';
 import { Tooltip } from '../Tooltip';
+import { DistanceAddress, Hours } from '../PharmacyInfo';
 import { text as t } from '../../utils/text';
-import { PharmacyOffer, OfferPromotionTypes, Promotion } from '../../utils/models';
+import {
+  PharmacyOffer,
+  PharmacyOfferGroup,
+  OfferPromotionTypes,
+  Promotion
+} from '../../utils/models';
 import { formatPrice } from '../../utils/formatters';
-import { SPONSORED_TAG_KIND } from '../../utils/offers';
+import { derivePharmacyOpenState } from '../../utils/general';
+import {
+  SPONSORED_TAG_KIND,
+  buildPaymentOptions,
+  getOfferTags,
+  representativeOffer
+} from '../../utils/offers';
+import { isDeliveryOffer } from '../../utils/offerPlacement';
+import { PaymentOptions } from '../pharmacy-card/PaymentOptions';
 
 const PreferredTag = () => {
   return (
-    <Tag size="sm" colorScheme="blue">
-      <TagLeftIcon boxSize="12px" as={FiStar} />
+    <Tag size="sm" colorScheme="gray">
       <TagLabel>{t.preferred}</TagLabel>
     </Tag>
   );
@@ -77,69 +90,80 @@ const CouponTag = ({
   );
 };
 
+const OfferPharmacyDetails = ({ pharmacy }: { pharmacy: PharmacyOffer['pharmacy'] }) => {
+  const { is24Hr, isClosingSoon, opens, closes } = derivePharmacyOpenState(
+    pharmacy.nextEvents,
+    pharmacy.isOpen
+  );
+
+  return (
+    <VStack w="full" alignItems="start" spacing={0}>
+      <Hours
+        isOpen={pharmacy.isOpen}
+        is24Hr={is24Hr}
+        isClosingSoon={isClosingSoon}
+        opens={opens}
+        closes={closes}
+        hours={pharmacy.hours}
+      />
+      <DistanceAddress address={pharmacy.address} />
+    </VStack>
+  );
+};
+
 interface OfferInfoProps {
-  pharmacy?: Pick<PharmacyOffer['pharmacy'], 'id' | 'name' | 'logo'>;
-  offer: PharmacyOffer;
+  pharmacy?: PharmacyOffer['pharmacy'];
+  offerGroup: PharmacyOfferGroup;
   isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
 }
 
-export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: OfferInfoProps) => {
+export const OfferInfo = ({
+  pharmacy,
+  offerGroup,
+  isCurrentPharmacy,
+  isPreferred
+}: OfferInfoProps) => {
   if (!pharmacy) {
     return null;
   }
 
   // Sponsored is a special type of Promoted offer that we have to display alongside a tooltip (identified by `tag.kind`)
-  const sponsoredTag = offer.tags.find((tag) => tag.kind === SPONSORED_TAG_KIND);
+  const tags = getOfferTags(offerGroup.offers);
+  const sponsoredTag = tags.find((tag) => tag.kind === SPONSORED_TAG_KIND);
 
   const offerTags = [
-    ...offer.tags
+    ...tags
       .filter((tag) => tag.kind !== SPONSORED_TAG_KIND)
       .map((tag) => <AttributeTag key={tag.kind} label={tag.label} />),
-    ...(isPreferred ? [<PreferredTag key="preferred" />] : []),
     ...(isCurrentPharmacy ? [<CurrentPharmacyTag key="current" />] : [])
   ];
 
-  // if we aren't explicitly given the cost amount
-  // we'll expect patients to pay the retail amount
-  const costAmount = offer.pricing.costAmount ?? offer.pricing.retailAmount;
-  const costAmountTitle = offer.pricing.costAmountTitle ?? offer.pricing.retailAmountTitle;
+  const paymentOptions = buildPaymentOptions({ offerGroup });
 
-  // if they cost is higher than the retail amount
-  // there's no point in showing what the strike price because it will be clear they're paying more
-  const retailIsSameOrLower =
-    offer.pricing.retailAmount != null &&
-    costAmount != null &&
-    offer.pricing.retailAmount <= costAmount;
-  const retailAmount = retailIsSameOrLower ? undefined : offer.pricing.retailAmount;
-  const retailAmountTitle = retailIsSameOrLower ? undefined : offer.pricing.retailAmountTitle;
+  const offer = representativeOffer(offerGroup);
 
-  const isMultiRx = (offer.prescriptions?.length ?? 0) > 1;
+  const isMultiRx = (offer?.prescriptions?.length ?? 0) > 1;
 
   const singleMedPromotions = !isMultiRx
-    ? offer.prescriptions?.[0]?.promotions?.filter(
+    ? offer?.prescriptions?.[0]?.promotions?.filter(
         (promo) => promo.type === OfferPromotionTypes.AmazonPharmacyRXCoupon
       )
     : undefined;
 
   return (
     <VStack data-testid="pharmacy-info" align="start" w="full">
-      {offerTags.length > 0 ? (
-        <HStack spacing={2} alignItems="start" w="full">
-          {offerTags}
-        </HStack>
-      ) : null}
-
+      {isPreferred ? <PreferredTag /> : null}
       <HStack w="full" justify="space-between">
         <HStack w="full">
           {pharmacy.logo ? (
-            <Box boxSize="32px" overflow="hidden">
+            <Box boxSize="32px" borderRadius="full" overflow="hidden">
               <Image
                 src={pharmacy.logo}
                 width="auto"
                 height="32px"
                 boxSize="100%"
-                objectFit="contain"
+                objectFit="cover"
               />
             </Box>
           ) : null}
@@ -147,28 +171,21 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
             {pharmacy.name}
           </Text>
         </HStack>
-
-        {costAmount ? ( // only show the price if we have one
-          <VStack spacing={0} align="flex-end" minW="fit-content">
-            <Text fontSize="sm">{costAmountTitle}</Text>
-            <Text fontWeight="bold">${formatPrice(costAmount)}</Text>
-            {retailAmount && retailAmount > costAmount ? (
-              <Text fontSize="sm" color="gray.500">
-                {retailAmountTitle}{' '}
-                <Text as="span" textDecoration="line-through">
-                  ${formatPrice(retailAmount)}
-                </Text>
-              </Text>
-            ) : null}
-          </VStack>
-        ) : null}
       </HStack>
+
+      {offerTags.length > 0 ? (
+        <HStack spacing={2} alignItems="start" w="full">
+          {offerTags}
+        </HStack>
+      ) : null}
+
+      {!isDeliveryOffer(offerGroup) ? <OfferPharmacyDetails pharmacy={pharmacy} /> : null}
 
       {!isMultiRx && <CouponTag size="md" promotions={singleMedPromotions} />}
 
       {isMultiRx && (
         <VStack w="full" bg="gray.50" borderRadius="md" p={3}>
-          {offer.prescriptions?.map((med) => (
+          {offer?.prescriptions?.map((med) => (
             <HStack key={med.name} w="full" justify="space-between" align="start">
               <VStack align="flex-start">
                 <Tooltip
@@ -210,9 +227,9 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
       )}
 
       <VStack w="full" alignItems="start">
-        {offer.deliveryEstimate ? (
+        {offer?.deliveryEstimate ? (
           <Text fontSize="sm" fontWeight="semibold">
-            {offer.deliveryEstimate}
+            {offer?.deliveryEstimate}
           </Text>
         ) : null}
         {sponsoredTag && (
@@ -234,6 +251,8 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
           </Tooltip>
         )}
       </VStack>
+
+      <PaymentOptions options={paymentOptions} />
     </VStack>
   );
 };

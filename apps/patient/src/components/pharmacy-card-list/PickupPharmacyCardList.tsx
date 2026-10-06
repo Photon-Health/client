@@ -1,7 +1,7 @@
 import { Button, SlideFade, VStack } from '@chakra-ui/react';
 import { PropsWithChildren } from 'react';
 
-import { Pharmacy as EnrichedPharmacy } from '../../utils/models';
+import { Pharmacy as EnrichedPharmacy, PharmacyOfferGroup } from '../../utils/models';
 import { text as t } from '../../utils/text';
 import { HolidayAlert } from '../HolidayAlert';
 import { PharmacyCard } from '../PharmacyCard';
@@ -10,6 +10,7 @@ import { OfferImpressionTracker } from '../../utils/tracking/OfferImpressionTrac
 
 interface PickupPharmacyCardListProps {
   pharmacies: EnrichedPharmacy[];
+  offersByPharmacyId?: Map<string, PharmacyOfferGroup>;
   preferredPharmacy: string;
   savingPreferred: boolean;
   selectedId: string;
@@ -17,7 +18,7 @@ interface PickupPharmacyCardListProps {
   handleShowMore: () => void;
   handleSetPreferred: (id: string) => void;
   loadingMore: boolean;
-  showingAllPharmacies: boolean;
+  canShowMore: boolean;
   showPrice?: boolean;
   enableOpenNow: boolean;
   enable24Hr: boolean;
@@ -37,12 +38,13 @@ export const PickupPharmacyCardList = ({
   preferredPharmacy,
   savingPreferred,
   pharmacies,
+  offersByPharmacyId,
   selectedId,
   handleSelect,
   handleShowMore,
   handleSetPreferred,
   loadingMore,
-  showingAllPharmacies,
+  canShowMore,
   showPrice = true,
   enableOpenNow,
   enable24Hr,
@@ -76,32 +78,37 @@ export const PickupPharmacyCardList = ({
         Holiday may affect pharmacy hours. Consider sending to a 24 hour pharmacy.
       </HolidayAlert>
       <VStack align="span" spacing={2}>
-        {pharmacies.map((pharmacy: EnrichedPharmacy, i: number) => (
-          <SlideFade offsetY="60px" in={true} key={`pickup-pharmacy-${pharmacy.id}-${i}`}>
-            <OfferImpressionTracker
-              pharmacy={pharmacy}
-              ordinalPosition={i + numberOfBrandedOptions}
-              isAlreadySelected={selectedId === pharmacy.id}
-              enabled={shouldTrackOfferImpressionsAndSelections}
-              offer={undefined}
-            >
-              <PharmacyCard
+        {pharmacies.map((pharmacy: EnrichedPharmacy, i: number) => {
+          const offerGroup = offersByPharmacyId?.get(pharmacy.id);
+          return (
+            <SlideFade offsetY="60px" in={true} key={`pickup-pharmacy-${pharmacy.id}-${i}`}>
+              <OfferImpressionTracker
                 pharmacy={pharmacy}
-                preferred={pharmacy.id === preferredPharmacy}
-                savingPreferred={savingPreferred}
-                selected={selectedId === pharmacy.id}
-                onSelect={() => handleSelect(pharmacy.id)}
-                onSetPreferred={() => handleSetPreferred(pharmacy.id)}
-                selectable={true}
+                ordinalPosition={i + numberOfBrandedOptions}
+                isAlreadySelected={selectedId === pharmacy.id}
+                enabled={shouldTrackOfferImpressionsAndSelections}
+                offerGroup={offerGroup}
                 showPrice={showPrice}
-                isAutoroutedPharmacy={pharmacy.id === autoroutedPharmacyId}
-                isCurrentPharmacy={pharmacy.id === currentPharmacyId}
-              />
-            </OfferImpressionTracker>
-          </SlideFade>
-        ))}
+              >
+                <PharmacyCard
+                  pharmacy={pharmacy}
+                  preferred={pharmacy.id === preferredPharmacy}
+                  savingPreferred={savingPreferred}
+                  selected={selectedId === pharmacy.id}
+                  onSelect={() => handleSelect(pharmacy.id)}
+                  onSetPreferred={() => handleSetPreferred(pharmacy.id)}
+                  selectable={true}
+                  showPrice={showPrice}
+                  isAutoroutedPharmacy={pharmacy.id === autoroutedPharmacyId}
+                  isCurrentPharmacy={pharmacy.id === currentPharmacyId}
+                  offerGroup={offerGroup}
+                />
+              </OfferImpressionTracker>
+            </SlideFade>
+          );
+        })}
       </VStack>
-      {!showingAllPharmacies && (pharmacies?.length > 0 || loadingMore) ? (
+      {canShowMore ? (
         <Button
           variant="link"
           loadingText=""

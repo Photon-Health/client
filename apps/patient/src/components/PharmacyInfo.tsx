@@ -7,21 +7,22 @@ import {
   Spacer,
   Tag,
   TagLabel,
-  TagLeftIcon,
   Text,
   VStack
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { FiMapPin, FiStar } from 'react-icons/fi';
+import { FiMapPin } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
-import { Address, EnrichedPharmacy, OrderFulfillment } from '../utils/models';
+import { Address, EnrichedPharmacy, OrderFulfillment, PharmacyOfferGroup } from '../utils/models';
 import { text as t } from '../utils/text';
 
 import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
-import { formatAddress, formatPrice, titleCase } from '../utils/formatters';
+import { formatAddress, titleCase } from '../utils/formatters';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
+import { SPONSORED_TAG_KIND, buildPaymentOptions, representativeOffer } from '../utils/offers';
+import { PaymentOptions } from './pharmacy-card/PaymentOptions';
 
 dayjs.extend(customParseFormat);
 
@@ -95,17 +96,24 @@ const HoursRow = ({
   );
 };
 
-const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes, hours, showHours }: HoursProps) => {
+export const Hours = ({
+  is24Hr,
+  isOpen,
+  isClosingSoon,
+  opens,
+  closes,
+  hours,
+  showHours
+}: HoursProps) => {
   const color = isClosingSoon ? 'orange.500' : isOpen ? 'green.500' : 'red.500';
   const text = is24Hr ? t.open24hrs : isClosingSoon ? t.closingSoon : isOpen ? t.open : t.closed;
   const hasHours = isOpen != null;
   const [hoursOpen, setHoursOpen] = useState(false);
 
-  if (!hasHours) return null;
-
   const sortedHours = useMemo(
     () =>
-      hours?.sort((a, b) =>
+      hours &&
+      [...hours].sort((a, b) =>
         a.dayOfWeek === b.dayOfWeek
           ? a.openFrom.localeCompare(b.openFrom)
           : hoursLookup[a.dayOfWeek] - hoursLookup[b.dayOfWeek]
@@ -120,6 +128,8 @@ const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes, hours, showHours 
       ),
     [sortedHours]
   );
+
+  if (!hasHours) return null;
 
   return (
     <VStack w="full">
@@ -193,7 +203,7 @@ const handleGetDirections = (url?: string) => {
   window.open(url);
 };
 
-const DistanceAddress = ({
+export const DistanceAddress = ({
   distance,
   address,
   url,
@@ -235,6 +245,7 @@ interface PharmacyInfoProps {
   showHours?: boolean;
   isCurrentPharmacy?: boolean;
   orderFulfillment?: OrderFulfillment;
+  offerGroup?: PharmacyOfferGroup;
 }
 
 export const PharmacyInfo = ({
@@ -249,7 +260,8 @@ export const PharmacyInfo = ({
   isStatus = false,
   showHours = false,
   isCurrentPharmacy = false,
-  orderFulfillment
+  orderFulfillment,
+  offerGroup
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
@@ -262,23 +274,35 @@ export const PharmacyInfo = ({
   const whiteLabelDeliveryPharmacy =
     pharmacy.name === 'Capsule Pharmacy' && location.pathname === '/pharmacy';
 
+  const paymentOptions = buildPaymentOptions({ pharmacy, offerGroup, showPrice });
+  // one offer's tags rather than a merge across sources — showing them all needs per-offer tag UI.
+  // sponsored offers are never pickup, so the paid-placement tooltip lives only in OfferInfo
+  const offerTags = (representativeOffer(offerGroup)?.tags ?? []).filter(
+    (tag) => tag.kind !== SPONSORED_TAG_KIND
+  );
+
   const trackingLink = orderFulfillment && getFulfillmentTrackingLink(orderFulfillment);
   const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
   const directionsUrl = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
 
   return (
     <VStack data-testid="pharmacy-info" align="start" w="full">
+      {showPreferredTag ? (
+        <Tag size="sm" colorScheme="gray">
+          <TagLabel>{t.preferred}</TagLabel>
+        </Tag>
+      ) : null}
       <HStack w="full" justify="space-between">
         <VStack w="full">
           <HStack w="full" paddingBottom="2">
             {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
-              <Box boxSize="32px" overflow="hidden">
+              <Box boxSize="32px" borderRadius="full" overflow="hidden">
                 <Image
                   src={pharmacy.logo}
                   width="auto"
                   height="32px"
                   boxSize="100%"
-                  objectFit="contain"
+                  objectFit="cover"
                 />
               </Box>
             ) : null}
@@ -291,25 +315,15 @@ export const PharmacyInfo = ({
             </Text>
           </HStack>
         </VStack>
-
-        {showPrice && pharmacy.price != null ? (
-          <VStack spacing={0} align="flex-end" minW="fit-content">
-            <Text fontSize="sm">Coupon Price</Text>
-            <Text fontWeight="bold">${formatPrice(pharmacy.price)}</Text>
-            {pharmacy.retailPrice && pharmacy.retailPrice > pharmacy.price ? (
-              <Text fontSize="sm" color="gray.500">
-                Retail{' '}
-                <Text as="span" textDecoration="line-through">
-                  ${formatPrice(pharmacy.retailPrice)}
-                </Text>
-              </Text>
-            ) : null}
-          </VStack>
-        ) : null}
       </HStack>
 
       {showDetails ? (
-        <VStack direction={isStatus ? 'column-reverse' : 'column'} w="full" alignItems={'start'}>
+        <VStack
+          direction={isStatus ? 'column-reverse' : 'column'}
+          w="full"
+          alignItems={'start'}
+          spacing={0}
+        >
           {tagline ? (
             <Text fontSize="sm" color="gray.500">
               {tagline}
@@ -333,17 +347,17 @@ export const PharmacyInfo = ({
           />
         </VStack>
       ) : null}
-      {showPreferredTag ||
-      showReadyIn30MinTag ||
-      showAvailableInYourAreaTag ||
-      showFreeDeliveryTag ? (
+      {/* offer attributes overwrite pharmacy attributes for now */}
+      {offerTags.length ? (
         <HStack spacing={2} m={0} p={0} alignItems="start" w="full">
-          {showPreferredTag ? (
-            <Tag size="sm" colorScheme="blue">
-              <TagLeftIcon boxSize="12px" as={FiStar} />
-              <TagLabel>{t.preferred}</TagLabel>
+          {offerTags.map((tag) => (
+            <Tag key={tag.kind} size="sm" colorScheme="blue">
+              <TagLabel>{tag.label}</TagLabel>
             </Tag>
-          ) : null}
+          ))}
+        </HStack>
+      ) : showReadyIn30MinTag || showAvailableInYourAreaTag || showFreeDeliveryTag ? (
+        <HStack spacing={2} m={0} p={0} alignItems="start" w="full">
           {showReadyIn30MinTag ? (
             <Tag size="sm" bgColor="yellow.200">
               <TagLabel>Ready in 30 minutes</TagLabel>
@@ -392,6 +406,8 @@ export const PharmacyInfo = ({
           </Link>
         </HStack>
       )}
+
+      <PaymentOptions options={paymentOptions} />
     </VStack>
   );
 };

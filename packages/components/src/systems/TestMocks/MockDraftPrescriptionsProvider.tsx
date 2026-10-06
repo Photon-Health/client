@@ -1,10 +1,17 @@
 import { createContext, JSXElement, untrack } from 'solid-js';
-import { vi } from 'vitest';
+import { vi, type Mock } from 'vitest';
 import { DraftPrescriptionsContextType } from '../DraftPrescriptions';
 
 export const MockDraftPrescriptionsContext = createContext<DraftPrescriptionsContextType>();
 
-export const mockDraftPrescriptionsContextValues = () => {
+interface MockDraftPrescriptionsContextValues extends DraftPrescriptionsContextType {
+  deletePrescription: Mock;
+  tryCreatePrescription: Mock;
+  tryUpdatePrescriptionStates: Mock;
+  setDraftPrescriptions: Mock;
+}
+
+export const mockDraftPrescriptionsContextValues = (): MockDraftPrescriptionsContextValues => {
   return {
     draftPrescriptions: () => [],
     prescriptionIds: () => [],
