@@ -64,6 +64,9 @@ const OfferImpressionTracker = ({
       offerType,
       offerShown: !!price,
       pharmacyFulfillmentType: pharmacy.fulfillmentTypes?.[0] ?? 'None',
+      pharmacyId: pharmacy.id,
+      pharmacyName: pharmacy.name,
+      // legacy keys, kept so existing dashboards keep working
       pharmacy_id: pharmacy.id,
       pharmacy_name: pharmacy.name,
       ordinal_position: ordinalPosition,

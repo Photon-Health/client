@@ -35,7 +35,7 @@ export const BrandedOptions = ({
           <OfferImpressionTracker
             pharmacy={{
               id,
-              name: getPharmacy([], selectedId).selectedPharmacy?.name || 'Unknown Branded Pharmacy'
+              name: getPharmacy([], id).selectedPharmacy?.name || 'Unknown Branded Pharmacy'
             }}
             ordinalPosition={index + numberOfOffers}
             isAlreadySelected={selectedId === id}

@@ -68,8 +68,8 @@ describe('OfferImpressionTracker', () => {
       'Offer Impression',
       mockOrder,
       expect.objectContaining({
-        pharmacy_id: 'phr_test',
-        pharmacy_name: 'Test Pharmacy',
+        pharmacyId: 'phr_test',
+        pharmacyName: 'Test Pharmacy',
         pharmacyFulfillmentType: 'None',
         ordinal_position: 2,
         isAlreadySelected: false

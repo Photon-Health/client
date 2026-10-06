@@ -301,6 +301,12 @@ describe('Pharmacy page', () => {
         expect(impressionTypes).toEqual(expect.arrayContaining(['Arrive', 'GoodRx']));
       });
 
+      const impressionPharmacyNames = vi
+        .mocked(getPatientAnalytics().track)
+        .mock.calls.filter(([event]) => event === 'Offer Impression')
+        .map(([, , properties]) => properties?.pharmacyName);
+      expect(impressionPharmacyNames).toEqual(['Northside Pharmacy', 'Northside Pharmacy']);
+
       getPharmacyMock.mockReturnValue({ type: 'PICK_UP', selectedPharmacy: undefined });
       await userEvent.click(await screen.findByRole('radio', { name: 'Northside Pharmacy' }));
       await userEvent.click(await screen.findByText(text.selectPharmacy));
