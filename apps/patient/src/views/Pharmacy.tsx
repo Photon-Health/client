@@ -1209,8 +1209,9 @@ export const Pharmacy = () => {
               >
                 <OffersList
                   offerGroups={aboveFoldOffers}
-                  // promoted offers show whether or not prices do (e.g. UK orgs), so track them either way
-                  shouldTrackOfferImpressionsAndSelections={!isDemo}
+                  shouldTrackOfferImpressionsAndSelections={
+                    shouldTrackOfferImpressionsAndSelections
+                  }
                   selectedPharmacyId={selectedId}
                   preferredPharmacyId={effectivePreferredPharmacyId}
                   autoroutedPharmacyId={autoroutedPharmacyId}

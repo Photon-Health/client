@@ -102,10 +102,14 @@ const OfferImpressionTracker = ({
     triggerOnce: true,
     rootMargin: '-100px',
     onChange: (inView) => {
-      if (inView && enabled) {
-        // a priceless offer is still shown, via its tags
-        offerGroup?.offers.forEach(trackImpression);
+      if (!inView) {
+        return;
+      }
 
+      // offers show whether or not prices do (e.g. UK orgs), and a priceless one still shows its tags
+      offerGroup?.offers.forEach(trackImpression);
+
+      if (enabled) {
         // asking buildPaymentOptions keeps one answer to whether the coupon row is rendered
         const showsCouponPrice = buildPaymentOptions({ pharmacy, showPrice }).length > 0;
         // a pharmacy with neither is still worth recording as seen

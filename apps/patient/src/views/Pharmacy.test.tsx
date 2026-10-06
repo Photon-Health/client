@@ -442,10 +442,21 @@ describe('Pharmacy page', () => {
       });
     }, 15_000);
 
-    test('shows and tracks a promoted offer when prices are disabled', async () => {
+    // the UK Health strategy builds a static, priceless bundle for its configured pharmacy
+    const promotedUkHealthOffer = (id: string, name: string): PharmacyOffer => ({
+      source: 'UK_HEALTH',
+      isPromoted: true,
+      pricing: {},
+      pharmacy: { id, name, fulfillmentTypes: ['PICK_UP'] },
+      tags: [{ kind: 'ONSITE_PICKUP', label: 'Onsite pickup' }],
+      prescriptions: []
+    });
+
+    // UK org orders get no priced pharmacies, so the page falls back to distance without prices
+    const renderWithPricesDisabled = async (orderId: string, offers: PharmacyOffer[]) => {
       getOrderMock.mockResolvedValue(
         generateOrder({
-          id: 'ord_pricesDisabled',
+          id: orderId,
           state: 'ROUTING',
           patient: generatePatient(),
           fills: [generateFill('test-treatment')],
@@ -459,22 +470,8 @@ describe('Pharmacy page', () => {
           }
         })
       );
-      fetchPharmacyOffersMock.mockResolvedValue([
-        {
-          source: 'UK_HEALTH',
-          isPromoted: true,
-          pricing: {},
-          pharmacy: {
-            id: 'phr_01K7YX6BQ894T8800BZAQSR57S',
-            name: 'UK Fountain Court Clinic Pharmacy',
-            fulfillmentTypes: ['PICK_UP']
-          },
-          tags: [{ kind: 'ONSITE_PICKUP', label: 'Onsite pickup' }],
-          prescriptions: []
-        }
-      ]);
+      fetchPharmacyOffersMock.mockResolvedValue(offers);
       getPharmacyMock.mockReturnValue({ type: 'PICK_UP', selectedPharmacy: undefined });
-      // no priced pharmacies on the first search, so the page falls back to distance without prices
       vi.mocked(getPharmaciesByLocation)
         .mockResolvedValueOnce({ pharmaciesByLocation: [] })
         .mockResolvedValue({
@@ -483,62 +480,18 @@ describe('Pharmacy page', () => {
 
       renderApp();
       await navigateToPharmacyScreen();
+    };
 
-      expect(await screen.findByText('UK Fountain Court Clinic Pharmacy')).toBeInTheDocument();
+    const trackedImpressionPharmacyIds = () =>
+      vi
+        .mocked(getPatientAnalytics().track)
+        .mock.calls.filter(([event]) => event === 'Offer Impression')
+        .map(([, , properties]) => properties?.pharmacy_id);
 
-      await scrollCardsIntoView();
-      await waitFor(() => {
-        expect(getPatientAnalytics().track).toHaveBeenCalledWith(
-          'Offer Impression',
-          expect.anything(),
-          expect.objectContaining({
-            offerType: 'UK Health',
-            pharmacy_name: 'UK Fountain Court Clinic Pharmacy'
-          })
-        );
-      });
-    }, 15_000);
-
-    test('tracks the pharmacy name for a single promoted UK Health offer', async () => {
-      getOrderMock.mockResolvedValue(
-        generateOrder({
-          id: 'ord_testId777',
-          state: 'ROUTING',
-          patient: generatePatient(),
-          fills: [generateFill('test-treatment')],
-          address: {
-            street1: '123 Main St',
-            street2: undefined,
-            city: 'Lexington',
-            state: 'KY',
-            postalCode: '40503',
-            country: 'US'
-          }
-        })
-      );
-      // the UK Health strategy builds a static, priceless bundle for its configured pharmacy
-      fetchPharmacyOffersMock.mockResolvedValue([
-        {
-          source: 'UK_HEALTH',
-          isPromoted: true,
-          pricing: {},
-          pharmacy: {
-            id: 'phr_01K7YX6BQ894T8800BZAQSR57S',
-            name: 'UK Fountain Court Clinic Pharmacy',
-            fulfillmentTypes: ['PICK_UP']
-          },
-          tags: [{ kind: 'ONSITE_PICKUP', label: 'Onsite pickup' }],
-          prescriptions: []
-        }
+    test('tracks a single promoted offer above the tabs when prices are disabled', async () => {
+      await renderWithPricesDisabled('ord_pricesDisabled', [
+        promotedUkHealthOffer('phr_01K7YX6BQ894T8800BZAQSR57S', 'UK Fountain Court Clinic Pharmacy')
       ]);
-      getPharmacyMock.mockReturnValue({ type: 'PICK_UP', selectedPharmacy: undefined });
-      // an empty price search turns price off, which turns impression tracking off too
-      vi.mocked(getPharmaciesByLocation).mockResolvedValue({
-        pharmaciesByLocation: [generatePharmacy({ id: 'phr_nearby', name: 'Nearby Pharmacy' })]
-      });
-
-      renderApp();
-      await navigateToPharmacyScreen();
 
       expect(await screen.findByText('UK Fountain Court Clinic Pharmacy')).toBeInTheDocument();
 
@@ -554,6 +507,32 @@ describe('Pharmacy page', () => {
           })
         );
       });
+    }, 15_000);
+
+    test('tracks promoted offers in the pickup tab, but not plain cards, when prices are disabled', async () => {
+      // more than one promoted UK Health offer sends them all into their tabs
+      await renderWithPricesDisabled('ord_pricesDisabledTabs', [
+        promotedUkHealthOffer(
+          'phr_01K7YX6BQ894T8800BZAQSR57S',
+          'UK Fountain Court Clinic Pharmacy'
+        ),
+        promotedUkHealthOffer('phr_01K7YX6BH8T8EMXQZ5NY69F22V', 'UK The Apothecary')
+      ]);
+
+      expect(await screen.findByText('UK Fountain Court Clinic Pharmacy')).toBeInTheDocument();
+      expect(await screen.findByText('UK The Apothecary')).toBeInTheDocument();
+      expect(await screen.findByText('Nearby Pharmacy')).toBeInTheDocument();
+
+      await scrollCardsIntoView();
+      await waitFor(() => {
+        expect(trackedImpressionPharmacyIds()).toEqual(
+          expect.arrayContaining([
+            'phr_01K7YX6BQ894T8800BZAQSR57S',
+            'phr_01K7YX6BH8T8EMXQZ5NY69F22V'
+          ])
+        );
+      });
+      expect(trackedImpressionPharmacyIds()).not.toContain('phr_nearby');
     }, 15_000);
 
     test('shows offers when they are available and price is enabled - doing the same thing again', async () => {
