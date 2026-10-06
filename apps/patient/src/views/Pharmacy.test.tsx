@@ -72,6 +72,12 @@ const scrollCardsIntoView = () =>
     );
   });
 
+const offerImpressions = () =>
+  vi
+    .mocked(getPatientAnalytics().track)
+    .mock.calls.filter(([event]) => event === 'Offer Impression')
+    .map(([, , properties]) => properties ?? {});
+
 // Mock the settings and pharmacy utils before any imports
 vi.mock('@client/settings', () => ({
   getOrgMailOrderPharms: vi.fn().mockReturnValue({
@@ -300,18 +306,15 @@ describe('Pharmacy page', () => {
 
       await scrollCardsIntoView();
       await waitFor(() => {
-        const impressionTypes = vi
-          .mocked(getPatientAnalytics().track)
-          .mock.calls.filter(([event]) => event === 'Offer Impression')
-          .map(([, , properties]) => properties?.offerType);
-        expect(impressionTypes).toEqual(expect.arrayContaining(['Arrive', 'GoodRx']));
+        expect(offerImpressions().map((properties) => properties.offerType)).toEqual(
+          expect.arrayContaining(['Arrive', 'GoodRx'])
+        );
       });
 
-      const impressionPharmacyNames = vi
-        .mocked(getPatientAnalytics().track)
-        .mock.calls.filter(([event]) => event === 'Offer Impression')
-        .map(([, , properties]) => properties?.pharmacyName);
-      expect(impressionPharmacyNames).toEqual(['Northside Pharmacy', 'Northside Pharmacy']);
+      expect(offerImpressions().map((properties) => properties.pharmacyName)).toEqual([
+        'Northside Pharmacy',
+        'Northside Pharmacy'
+      ]);
 
       getPharmacyMock.mockReturnValue({ type: 'PICK_UP', selectedPharmacy: undefined });
       await userEvent.click(await screen.findByRole('radio', { name: 'Northside Pharmacy' }));
@@ -440,11 +443,9 @@ describe('Pharmacy page', () => {
 
       await scrollCardsIntoView();
       await waitFor(() => {
-        const impressions = vi
-          .mocked(getPatientAnalytics().track)
-          .mock.calls.filter(([event]) => event === 'Offer Impression')
-          .map(([, , properties]) => [properties?.offerType, properties?.offerShown]);
-        expect(impressions).toEqual([['UK Health', false]]);
+        expect(
+          offerImpressions().map((properties) => [properties.offerType, properties.offerShown])
+        ).toEqual([['UK Health', false]]);
       });
     }, 15_000);
 
@@ -494,10 +495,7 @@ describe('Pharmacy page', () => {
     };
 
     const trackedImpressionPharmacyIds = () =>
-      vi
-        .mocked(getPatientAnalytics().track)
-        .mock.calls.filter(([event]) => event === 'Offer Impression')
-        .map(([, , properties]) => properties?.pharmacy_id);
+      offerImpressions().map((properties) => properties.pharmacy_id);
 
     test('tracks a single promoted offer above the tabs when prices are disabled', async () => {
       await renderWithPricesDisabled('ord_pricesDisabled', [
@@ -520,7 +518,7 @@ describe('Pharmacy page', () => {
       });
     }, 15_000);
 
-    test('tracks promoted offers in the pickup tab, but not plain cards, when prices are disabled', async () => {
+    test('tracks promoted offers in the pickup tab when prices are disabled', async () => {
       // more than one promoted UK Health offer sends them all into their tabs
       await renderWithPricesDisabled('ord_pricesDisabledTabs', [
         promotedUkHealthOffer(
@@ -532,7 +530,6 @@ describe('Pharmacy page', () => {
 
       expect(await screen.findByText('UK Fountain Court Clinic Pharmacy')).toBeInTheDocument();
       expect(await screen.findByText('UK The Apothecary')).toBeInTheDocument();
-      expect(await screen.findByText('Nearby Pharmacy')).toBeInTheDocument();
 
       await scrollCardsIntoView();
       await waitFor(() => {
@@ -543,7 +540,6 @@ describe('Pharmacy page', () => {
           ])
         );
       });
-      expect(trackedImpressionPharmacyIds()).not.toContain('phr_nearby');
     }, 15_000);
 
     test('does not track plain pickup pharmacy cards when prices are disabled', async () => {

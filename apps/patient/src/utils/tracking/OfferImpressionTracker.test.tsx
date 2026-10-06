@@ -99,7 +99,7 @@ describe('OfferImpressionTracker', () => {
     );
   });
 
-  test('does not track Offer Impression when tracking is disabled', () => {
+  test('does not track a plain pharmacy when tracking is disabled', () => {
     render(<OfferImpressionTracker {...defaultProps} enabled={false} />);
     triggerInView?.(true);
 
