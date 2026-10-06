@@ -14,10 +14,16 @@ import {
 } from '../test-utils/generators';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
-import { getOrder, getPharmaciesByLocation, rerouteOrder, setOrderPharmacy } from '../api';
+import {
+  getOrder,
+  getPharmacies,
+  getPharmaciesByLocation,
+  rerouteOrder,
+  setOrderPharmacy
+} from '../api';
 import { fetchPharmacyOffers, getPharmacy } from './pharmacy.utils';
 import { FulfillmentType, Pharmacy } from '../__generated__/graphql';
-import { PharmacyOffer } from '../utils/models';
+import { Order, PharmacyOffer } from '../utils/models';
 import {
   hasConfirmedAutoroutedPharmacy,
   markAutoroutedPharmacyConfirmed
@@ -453,9 +459,14 @@ describe('Pharmacy page', () => {
     });
 
     // UK org orders get no priced pharmacies, so the page falls back to distance without prices
-    const renderWithPricesDisabled = async (orderId: string, offers: PharmacyOffer[]) => {
+    const renderWithPricesDisabled = async (
+      orderId: string,
+      offers: PharmacyOffer[],
+      orderOverrides: Partial<Order> = {}
+    ) => {
       getOrderMock.mockResolvedValue(
         generateOrder({
+          ...orderOverrides,
           id: orderId,
           state: 'ROUTING',
           patient: generatePatient(),
@@ -533,6 +544,42 @@ describe('Pharmacy page', () => {
         );
       });
       expect(trackedImpressionPharmacyIds()).not.toContain('phr_nearby');
+    }, 15_000);
+
+    test('does not track plain pickup pharmacy cards when prices are disabled', async () => {
+      await renderWithPricesDisabled('ord_pricesDisabledPlainPickup', []);
+
+      expect(await screen.findByText('Nearby Pharmacy')).toBeInTheDocument();
+
+      await scrollCardsIntoView();
+      expect(trackedImpressionPharmacyIds()).toEqual([]);
+    }, 15_000);
+
+    test('does not track plain delivery pharmacy cards when prices are disabled', async () => {
+      vi.mocked(getPharmacies).mockResolvedValue({
+        pharmacies: [
+          {
+            id: 'test-mail-order-1',
+            name: 'Testpill',
+            logo: 'https://logos.boson.health/pharmacies/capsule-logo.png',
+            fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
+          }
+        ]
+      });
+      // delivery pharmacies only show when the org enables them and prices are disabled
+      await renderWithPricesDisabled('ord_pricesDisabledPlainDelivery', [], {
+        organization: {
+          id: 'org_test_defaultId',
+          name: 'Test Org',
+          settings: { patientUx: { enablePatientDeliveryPharmacies: true } }
+        } as Order['organization']
+      });
+
+      await userEvent.click(screen.getByRole('tab', { name: 'Delivery' }));
+      expect(await screen.findByText('Testpill')).toBeInTheDocument();
+
+      await scrollCardsIntoView();
+      expect(trackedImpressionPharmacyIds()).toEqual([]);
     }, 15_000);
 
     test('shows offers when they are available and price is enabled - doing the same thing again', async () => {
