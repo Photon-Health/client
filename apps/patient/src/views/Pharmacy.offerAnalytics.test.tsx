@@ -12,7 +12,12 @@ import { getPatientAnalytics } from '../configs/analytics';
 import { FulfillmentType, Pharmacy as GQLPharmacy } from '../__generated__/graphql';
 import { Order, PharmacyOffer } from '../utils/models';
 import { text } from '../utils/text';
-import { generateFill, generateOrder, generatePharmacy } from '../test-utils/generators';
+import {
+  generateFill,
+  generateFulfillment,
+  generateOrder,
+  generatePharmacy
+} from '../test-utils/generators';
 import { mockIntersectionObserver, scrollCardsIntoView } from '../test-utils/intersectionObserver';
 
 mockIntersectionObserver();
@@ -91,12 +96,36 @@ interface Scenario {
   nearby?: GQLPharmacy[];
   mailOrder?: GQLPharmacy[];
   order?: Partial<Order>;
+  // a placed order the patient moves from the Status page's "Change pharmacy"
+  reroute?: boolean;
 }
+
+const currentPharmacy = generatePharmacy({
+  id: 'phr_current',
+  name: 'Current Pharmacy',
+  fulfillmentTypes: ['PICK_UP'] as FulfillmentType[],
+  isOpen: true
+});
+
+// a placed order the patient is allowed to move; its unresolved order error lets
+// "Change pharmacy" go straight to the pharmacy page without asking for a reason
+const reroutableOrder = (): Partial<Order> => ({
+  state: 'PLACED',
+  pharmacy: currentPharmacy,
+  isReroutable: true,
+  fulfillments: [generateFulfillment({ state: 'PROCESSING' })],
+  exceptions: [{ exceptionType: 'ORDER_ERROR' }],
+  organization: {
+    id: 'org_test_defaultId',
+    name: 'Test Org',
+    settings: { patientUx: { enablePatientRerouting: true } }
+  } as Order['organization']
+});
 
 // every test needs its own order id: impressions dedupe per order/pharmacy/offerType per page load
 const renderPharmacyPage = async (
   orderId: string,
-  { prices, offers = [], nearby = [], mailOrder = [], order = {} }: Scenario
+  { prices, offers = [], nearby = [], mailOrder = [], order = {}, reroute }: Scenario
 ) => {
   if (prices === 'on' && nearby.length === 0) {
     throw new Error('prices stay on only when the priced search returns a nearby pharmacy');
@@ -105,9 +134,10 @@ const renderPharmacyPage = async (
   vi.mocked(getOrder).mockResolvedValue(
     generateOrder({
       fills: [generateFill('test-treatment')],
+      state: 'ROUTING',
+      ...(reroute ? reroutableOrder() : {}),
       ...order,
-      id: orderId,
-      state: 'ROUTING'
+      id: orderId
     })
   );
   vi.mocked(fetchPharmacyOffers).mockResolvedValue(offers);
@@ -121,6 +151,10 @@ const renderPharmacyPage = async (
     initialEntries: [`/?orderId=${orderId}&token=${mockToken}`]
   });
   render(<RouterProvider router={router} />);
+  if (reroute) {
+    // a placed order opens on Status, which adds openNow when the current pharmacy is closed
+    await userEvent.click(await screen.findByText(/change pharmacy/i));
+  }
   expect(await screen.findByRole('heading', { name: 'Choose a Pharmacy' })).toBeInTheDocument();
 };
 
@@ -473,6 +507,64 @@ describe('Pharmacy page offer analytics', () => {
     await scrollCardsIntoView();
 
     expect(offerEvents()).toEqual([['Offer Impression', 'phr_coupon', 'GoodRx']]);
+  });
+
+  describe('reroute flow (Q16)', () => {
+    const fountainCourtCard = () =>
+      screen.findByRole('radio', { name: 'UK Fountain Court Clinic Pharmacy' });
+
+    test('a promoted offer shows when rerouting with prices on', async () => {
+      await renderPharmacyPage('ord_q16_on', {
+        reroute: true,
+        prices: 'on',
+        nearby: [currentPharmacy, couponPharmacy],
+        offers: [fountainCourt]
+      });
+
+      expect(await fountainCourtCard()).toBeInTheDocument();
+    });
+
+    test('a promoted offer shows when rerouting with prices off', async () => {
+      await renderPharmacyPage('ord_q16_off', {
+        reroute: true,
+        prices: 'off',
+        nearby: [currentPharmacy, plainPharmacy],
+        offers: [fountainCourt]
+      });
+
+      expect(await fountainCourtCard()).toBeInTheDocument();
+    });
+
+    test('a promoted offer shows when rerouting away from a closed pharmacy', async () => {
+      await renderPharmacyPage('ord_q16_open_now', {
+        reroute: true,
+        prices: 'on',
+        nearby: [currentPharmacy, couponPharmacy],
+        offers: [fountainCourt],
+        order: { pharmacy: { ...currentPharmacy, isOpen: false } }
+      });
+
+      expect(await fountainCourtCard()).toBeInTheDocument();
+    });
+
+    test('a promoted offer shows when rerouting away from that same pharmacy', async () => {
+      await renderPharmacyPage('ord_q16_from_offer', {
+        reroute: true,
+        prices: 'on',
+        nearby: [couponPharmacy],
+        offers: [fountainCourt],
+        order: {
+          pharmacy: generatePharmacy({
+            id: 'phr_01K7YX6BQ894T8800BZAQSR57S',
+            name: 'UK Fountain Court Clinic Pharmacy',
+            fulfillmentTypes: ['PICK_UP'] as FulfillmentType[],
+            isOpen: true
+          })
+        }
+      });
+
+      expect(await fountainCourtCard()).toBeInTheDocument();
+    });
   });
 
   describe('selections', () => {
