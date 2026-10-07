@@ -510,10 +510,7 @@ describe('Pharmacy page offer analytics', () => {
   });
 
   describe('reroute flow (Q16)', () => {
-    const fountainCourtCard = () =>
-      screen.findByRole('radio', { name: 'UK Fountain Court Clinic Pharmacy' });
-
-    test('a promoted offer shows when rerouting with prices on', async () => {
+    test('a promoted offer fires an impression when rerouting with prices on', async () => {
       await renderPharmacyPage('ord_q16_on', {
         reroute: true,
         prices: 'on',
@@ -521,21 +518,34 @@ describe('Pharmacy page offer analytics', () => {
         offers: [fountainCourt]
       });
 
-      expect(await fountainCourtCard()).toBeInTheDocument();
+      await scrollCardsIntoView();
+
+      expect(offerEvents()).toEqual([
+        ['Offer Impression', 'phr_01K7YX6BQ894T8800BZAQSR57S', 'UK Health'],
+        // the order's current pharmacy is a plain card (Q1)
+        ['Offer Impression', 'phr_current', 'None'],
+        ['Offer Impression', 'phr_coupon', 'GoodRx']
+      ]);
     });
 
-    test('a promoted offer shows when rerouting with prices off', async () => {
+    // desired: the promoted offer still fires its UK Health impression
+    test('PINNED (Q16): a promoted offer fires nothing when rerouting with prices off', async () => {
       await renderPharmacyPage('ord_q16_off', {
         reroute: true,
         prices: 'off',
         nearby: [currentPharmacy, plainPharmacy],
         offers: [fountainCourt]
       });
+      expect(
+        await screen.findByRole('radio', { name: 'UK Fountain Court Clinic Pharmacy' })
+      ).toBeInTheDocument();
 
-      expect(await fountainCourtCard()).toBeInTheDocument();
+      await scrollCardsIntoView();
+
+      expect(offerEvents()).toEqual([]);
     });
 
-    test('a promoted offer shows when rerouting away from a closed pharmacy', async () => {
+    test('a promoted offer fires an impression when rerouting away from a closed pharmacy', async () => {
       await renderPharmacyPage('ord_q16_open_now', {
         reroute: true,
         prices: 'on',
@@ -544,10 +554,16 @@ describe('Pharmacy page offer analytics', () => {
         order: { pharmacy: { ...currentPharmacy, isOpen: false } }
       });
 
-      expect(await fountainCourtCard()).toBeInTheDocument();
+      await scrollCardsIntoView();
+
+      expect(offerEvents()).toEqual([
+        ['Offer Impression', 'phr_01K7YX6BQ894T8800BZAQSR57S', 'UK Health'],
+        ['Offer Impression', 'phr_current', 'None'],
+        ['Offer Impression', 'phr_coupon', 'GoodRx']
+      ]);
     });
 
-    test('a promoted offer shows when rerouting away from that same pharmacy', async () => {
+    test('a promoted offer fires an impression when rerouting away from that same pharmacy', async () => {
       await renderPharmacyPage('ord_q16_from_offer', {
         reroute: true,
         prices: 'on',
@@ -563,7 +579,12 @@ describe('Pharmacy page offer analytics', () => {
         }
       });
 
-      expect(await fountainCourtCard()).toBeInTheDocument();
+      await scrollCardsIntoView();
+
+      expect(offerEvents()).toEqual([
+        ['Offer Impression', 'phr_01K7YX6BQ894T8800BZAQSR57S', 'UK Health'],
+        ['Offer Impression', 'phr_coupon', 'GoodRx']
+      ]);
     });
   });
 
