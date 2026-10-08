@@ -145,10 +145,6 @@ export class PhotonClientStore {
 
   public autoLogin: boolean;
 
-  // appState recovered from the most recent Auth0 redirect, held so checkSession can
-  // preserve the original returnTo if it triggers a second, org-scoped login.
-  private redirectAppState?: { returnTo?: string };
-
   public constructor(sdk: PhotonClient, autoLogin = false) {
     this.sdk = sdk;
     this.autoLogin = autoLogin;
@@ -236,12 +232,7 @@ export class PhotonClientStore {
         try {
           const result = await this.sdk.authentication.handleRedirect(url);
           defaultOnRedirectCallback(result?.appState);
-          this.redirectAppState = result?.appState;
-          try {
-            await this.authentication.checkSession();
-          } finally {
-            this.redirectAppState = undefined;
-          }
+          await this.authentication.checkSession();
           return true;
         } catch (err: any) {
           const urlParams = new URLSearchParams(window.location.search);
@@ -324,13 +315,6 @@ export class PhotonClientStore {
 
       // @ts-ignore TODO: store will be updated soon, so this will change
       const isUserLoggedIntoAnOrganization = !!user?.org_id;
-      const isOrganizationIdSelectedInPhotonClient = !!this.sdk?.organization;
-
-      // If no org was configured upfront but the user was logged into one,
-      // derive it from the authenticated user.
-      if (!isOrganizationIdSelectedInPhotonClient && isUserLoggedIntoAnOrganization) {
-        this.sdk.setOrganization(user.org_id);
-      }
 
       let permissions: Permission[] = [];
       if (this.autoLogin || authenticated) {
@@ -339,37 +323,13 @@ export class PhotonClientStore {
           const token = await this.sdk.authentication.getAccessToken();
           const decoded: {
             permissions: Permission[];
-            'https://photon.health/assigned_org_id'?: string;
           } = jwtDecode(token);
-          const assignedOrgId = decoded['https://photon.health/assigned_org_id'];
-          if (
-            !isOrganizationIdSelectedInPhotonClient &&
-            !isUserLoggedIntoAnOrganization &&
-            assignedOrgId
-          ) {
-            // No org was configured upfront and the user isn't logged into one, but the
-            // token assigns them an org — re-login scoped to that org. Once the redirect
-            // comes back, user.org_id is set, so this only happens once.
-            this.sdk.setOrganization(assignedOrgId);
-            await this.sdk.authentication.login({
-              appState: {
-                // Preserve the original login's returnTo (recovered by handleRedirect)
-                // so the destination survives the second, org-scoped login.
-                returnTo:
-                  this.redirectAppState?.returnTo ??
-                  `${window.location.pathname}${window.location.search}`
-              }
-            });
-            return;
-          }
           permissions = decoded?.permissions || [];
         } catch (_err) {
           permissions = [];
         }
       }
 
-      // Read the org off the SDK here (rather than isOrganizationIdSelectedInPhotonClient,
-      // captured above) so an org derived from user.org_id during this call counts too.
       // @ts-ignore TODO store will be updated soon, so this will change
       const selectedOrganizationId = this.sdk?.organization;
       const isInOrg =
