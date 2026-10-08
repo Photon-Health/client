@@ -103,8 +103,6 @@ export const AnalyticsEventListener = (props: {
         setContextData(contextData);
       } catch {
         // AnalyticsContextQuery should fail silently
-        // There's also an edge case caused by the double-login scenario where
-        // a redirect cancels the in-flight request, which is acceptable for now
       }
     }
   });

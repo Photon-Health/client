@@ -32,8 +32,7 @@ export const Login = () => {
 
   if (invite && org) {
     login({
-      organizationId: org,
-      invitation: invite
+      organizationId: org
     });
   }
 

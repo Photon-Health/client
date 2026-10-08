@@ -63,7 +63,6 @@ export interface AuthManagerOptions {
  */
 export interface LoginOptions {
   organizationId?: string;
-  invitation?: string;
   connection?: string;
   appState?: object;
 }
@@ -118,20 +117,14 @@ export class AuthManager {
    * @param config - Login configuration
    * @returns
    */
-  public async login({
-    organizationId,
-    invitation,
-    connection,
-    appState
-  }: LoginOptions): Promise<void> {
+  public async login({ organizationId, connection, appState }: LoginOptions): Promise<void> {
     const opts: RedirectLoginOptions<any> = {
       authorizationParams: {
         ...(this.audience ? { audience: this.audience } : {}),
         ...(connection || this.connection ? { connection: connection || this.connection } : {}),
         ...(organizationId || this.organization
           ? { organization: organizationId || this.organization }
-          : {}),
-        ...(invitation ? { invitation } : {})
+          : {})
       },
       ...(appState ? { appState } : {})
     };
