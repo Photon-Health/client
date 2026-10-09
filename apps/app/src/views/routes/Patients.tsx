@@ -24,6 +24,7 @@ import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import PatientView from '../components/PatientView';
 import ContactView from '../components/ContactView';
+import AddressView from '../components/AddressView';
 import { Patient } from 'packages/sdk/dist/types';
 import { compact } from 'lodash';
 
@@ -38,6 +39,13 @@ const GET_PATIENTS = gql`
       dateOfBirth
       name {
         full
+      }
+      address {
+        street1
+        street2
+        city
+        state
+        postalCode
       }
     }
   }
@@ -106,6 +114,7 @@ const renderRow = (patient: any, setDisableScroll: Dispatch<SetStateAction<boole
     name: <PatientView patient={patient} />,
     age: dobToAge(patient.dateOfBirth),
     contact: <ContactView phone={patient.phone} email={patient.email} />,
+    address: <AddressView address={patient.address} />,
     edit: <EditView id={id} setDisableScroll={setDisableScroll} />
   };
 };
@@ -118,6 +127,7 @@ const renderSkeletonRow = () => ({
   ),
   age: <SkeletonText noOfLines={1} width="25px" />,
   contact: <SkeletonText noOfLines={2} width="150px" />,
+  address: <SkeletonText noOfLines={2} width="150px" />,
   externalId: <SkeletonText noOfLines={1} width="100px" />,
   edit: (
     <HStack spacing={5} justifyContent="flex-end" me={2}>
@@ -154,6 +164,10 @@ export const Patients = () => {
     {
       Header: 'Contact',
       accessor: 'contact'
+    },
+    {
+      Header: 'Address',
+      accessor: 'address'
     },
     showExternalIdColumn
       ? {
