@@ -51,44 +51,41 @@ async function openWithPrescriberRole() {
 }
 
 const npiField = () => screen.queryByLabelText(/npi/i);
-const prefillButton = () => screen.queryByRole('button', { name: /prefill prescriber data/i });
-const sparseButton = () =>
-  screen.queryByRole('button', { name: /fill in their personal details/i });
+const detailsCheckbox = () => screen.queryByRole('checkbox', { name: /enter prescriber details/i });
 
 test('flag off: prescriber details are shown and required as before', async () => {
   harness.featureFlags.allow_sparse_invites = false;
   await openWithPrescriberRole();
 
   expect(await screen.findByLabelText(/npi/i)).toBeRequired();
-  expect(prefillButton()).not.toBeInTheDocument();
+  expect(detailsCheckbox()).not.toBeInTheDocument();
 });
 
-test('flag on: only email is required, with a prefill button', async () => {
+test('flag on: only email is required, with an unchecked details checkbox', async () => {
   harness.featureFlags.allow_sparse_invites = true;
   await openWithPrescriberRole();
 
   expect(
-    await screen.findByRole('button', { name: /prefill prescriber data/i })
-  ).toBeInTheDocument();
+    await screen.findByRole('checkbox', { name: /enter prescriber details/i })
+  ).not.toBeChecked();
   expect(npiField()).not.toBeInTheDocument();
   expect(screen.getByLabelText(/email/i)).toBeRequired();
 });
 
-test('flag on: prefill reveals the details; opting out clears and hides them', async () => {
+test('flag on: checking reveals the details; unchecking clears and hides them', async () => {
   harness.featureFlags.allow_sparse_invites = true;
   const user = await openWithPrescriberRole();
 
-  await user.click(await screen.findByRole('button', { name: /prefill prescriber data/i }));
+  await user.click(await screen.findByRole('checkbox', { name: /enter prescriber details/i }));
   expect(await screen.findByLabelText(/npi/i)).toBeRequired();
-  expect(sparseButton()).toBeInTheDocument();
 
   await user.type(screen.getByLabelText(/npi/i), '1234567890');
-  await user.click(sparseButton() as HTMLElement);
+  await user.click(detailsCheckbox() as HTMLElement);
 
+  expect(detailsCheckbox()).not.toBeChecked();
   expect(npiField()).not.toBeInTheDocument();
-  expect(sparseButton()).not.toBeInTheDocument();
 
-  await user.click(prefillButton() as HTMLElement);
+  await user.click(detailsCheckbox() as HTMLElement);
   expect(await screen.findByLabelText(/npi/i)).toHaveValue('');
 });
 

@@ -3,8 +3,10 @@ import {
   Alert,
   AlertIcon,
   Button,
+  Checkbox,
   FormControl,
   FormErrorMessage,
+  FormHelperText,
   FormLabel,
   HStack,
   Input,
@@ -295,20 +297,23 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                       <ErrorMessage name="email" component={FormErrorMessage} />
                     </FormControl>
                     {sparseInvitesEnabled && hasPrescriberRole(values.roles) && (
-                      <Button
-                        variant="outline"
-                        alignSelf="flex-start"
-                        mb="4"
-                        onClick={
-                          values.prefillPrescriberDetails
-                            ? clearPrescriberDetails
-                            : () => setFieldValue('prefillPrescriberDetails', true)
-                        }
-                      >
-                        {values.prefillPrescriberDetails
-                          ? 'Let the user fill in their personal details themselves'
-                          : 'Prefill Prescriber Data?'}
-                      </Button>
+                      <FormControl pb="4">
+                        <FormLabel mb={1}>Prescriber details</FormLabel>
+                        <Checkbox
+                          isChecked={values.prefillPrescriberDetails}
+                          onChange={(e) =>
+                            e.target.checked
+                              ? setFieldValue('prefillPrescriberDetails', true)
+                              : clearPrescriberDetails()
+                          }
+                        >
+                          Enter prescriber details now
+                        </Checkbox>
+                        <FormHelperText>
+                          If left unchecked, the prescriber will be asked for their NPI, phone
+                          number and address when they accept the invite.
+                        </FormHelperText>
+                      </FormControl>
                     )}
                     {showPrescriberDetails && (
                       <>
