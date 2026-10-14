@@ -53,3 +53,7 @@ apps/patient/e2e/.auth/
 apps/patient/e2e/.test-data.json
 apps/patient/playwright-report/
 apps/patient/test-results/
+
+#claude
+.claude/worktrees
+.claude/settings.local.json
