@@ -1,5 +1,6 @@
 import { FulfillmentType } from '../__generated__/graphql';
 import { graphQLClient } from '../configs/graphqlClient';
+import { withoutUnacceptedCouponPrice } from '../utils/discountCards';
 
 export const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
 
@@ -51,7 +52,7 @@ export const getPharmaciesByLocation = async ({
   try {
     const now = new Date();
 
-    return await graphQLClient.GetPharmaciesByLocation({
+    const res = await graphQLClient.GetPharmaciesByLocation({
       location: {
         radius: 100,
         ...searchParams
@@ -63,6 +64,11 @@ export const getPharmaciesByLocation = async ({
       name,
       includePrice: includePrice ?? false
     });
+
+    return {
+      ...res,
+      pharmaciesByLocation: res.pharmaciesByLocation.map(withoutUnacceptedCouponPrice)
+    };
   } catch (e: any) {
     const errorMessage =
       e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on getPharmaciesByLocation.';
