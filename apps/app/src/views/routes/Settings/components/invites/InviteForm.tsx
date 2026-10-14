@@ -26,6 +26,7 @@ import { FormikStateSelect, yupStateSchema } from '../utils/States';
 import { npiRegex, phoneRegex, zipCodeRegex } from '../utils/Validation';
 import { AddressInput } from 'packages/sdk/dist/types';
 import { validateRealPhoneNumber } from 'apps/app/src/utils';
+import { useFeatureFlag } from 'apps/app/src/hooks/useFeatureFlag';
 
 const organizationSettingsQuery = graphql(/* GraphQL */ `
   query FaxPreferenceQuery {
@@ -49,10 +50,26 @@ const inviteUserMutation = graphql(/* GraphQL */ `
   }
 `);
 
-const requiredForPrescribers =
-  (message: string) => (roles: { value: string; label: string }[], schema: yup.BaseSchema) => {
-    return hasPrescriberRole(roles) ? schema.required(message) : schema.notRequired();
-  };
+type Role = { value: string; label: string };
+
+/**
+ * Validation context passed to the schema. `requirePrescriberDetails` is false
+ * when the `allow_sparse_invites` flag is on and the inviter has chosen to let
+ * the prescriber fill in their own details.
+ */
+type InviteValidationContext = {
+  providerFaxPreferred: boolean;
+  requirePrescriberDetails: boolean;
+};
+
+const requiredForPrescribers = (message: string) => ({
+  is: (roles: Role[], requirePrescriberDetails: boolean) =>
+    hasPrescriberRole(roles) && requirePrescriberDetails,
+  then: (schema: yup.StringSchema) => schema.required(message),
+  otherwise: (schema: yup.StringSchema) => schema.notRequired()
+});
+
+const PRESCRIBER_DETAIL_KEYS = ['roles', '$requirePrescriberDetails'];
 
 const isValidUSPhone = (value?: string) => {
   if (!value) return true;
@@ -63,17 +80,21 @@ const inviteSchema = yup
   .object({
     email: yup.string().email('Enter a valid email').required('Email is required'),
     roles: rolesSchema.required().min(1, 'Must have at least one role'),
+    prefillPrescriberDetails: yup.boolean().required(),
     npi: yup
       .string()
       .matches(npiRegex, 'NPI must be a 10-digit number')
-      .when('roles', requiredForPrescribers('NPI is required')),
+      .when(PRESCRIBER_DETAIL_KEYS, requiredForPrescribers('NPI is required')),
     phone: yup
       .string()
       .matches(phoneRegex, {
         message: 'Enter a valid phone number'
       })
       .test('is-valid-phone', 'Enter a valid phone number', isValidUSPhone)
-      .when('roles', requiredForPrescribers('Phone number is required for prescribers')),
+      .when(
+        PRESCRIBER_DETAIL_KEYS,
+        requiredForPrescribers('Phone number is required for prescribers')
+      ),
     fax: yup
       .string()
       .matches(phoneRegex, {
@@ -83,27 +104,33 @@ const inviteSchema = yup
         message: 'Fax number is required for prescribers',
         test: (value, context) => {
           const isPrescriber = hasPrescriberRole(context.parent.roles);
-          const providerFaxPreferred = context.options.context?.providerFaxPreferred;
-          return isPrescriber && providerFaxPreferred ? !!value : true;
+          const { providerFaxPreferred, requirePrescriberDetails } =
+            (context.options.context as InviteValidationContext | undefined) ?? {};
+          return isPrescriber && providerFaxPreferred && requirePrescriberDetails ? !!value : true;
         }
       }),
-    street1: yup.string().when('roles', requiredForPrescribers('Address is required')),
+    street1: yup
+      .string()
+      .when(PRESCRIBER_DETAIL_KEYS, requiredForPrescribers('Address is required')),
     street2: yup.string(),
-    city: yup.string().when('roles', requiredForPrescribers('City is required')),
+    city: yup.string().when(PRESCRIBER_DETAIL_KEYS, requiredForPrescribers('City is required')),
     state: yup.object({
       value: yupStateSchema.test({
         message: 'State is required',
         test: (value, context: any) => {
           // Wish there was a more intuitive way to access roles value
           const isPrescriber = hasPrescriberRole(context.from[1]?.value.roles);
-          return isPrescriber ? !!value : true;
+          const requirePrescriberDetails = (
+            context.options.context as InviteValidationContext | undefined
+          )?.requirePrescriberDetails;
+          return isPrescriber && requirePrescriberDetails ? !!value : true;
         }
       })
     }),
     postalCode: yup
       .string()
       .matches(zipCodeRegex, { message: 'Enter a valid zip code' })
-      .when('roles', requiredForPrescribers('Zip code is required'))
+      .when(PRESCRIBER_DETAIL_KEYS, requiredForPrescribers('Zip code is required'))
   })
   // If not a prescriber, don't validate values required for prescriber
   .transform((value) => {
@@ -125,8 +152,23 @@ const inviteSchema = yup
 
 type InviteYupType = yup.InferType<typeof inviteSchema>;
 
+const EMPTY_PRESCRIBER_DETAILS: Pick<
+  InviteYupType,
+  'npi' | 'phone' | 'fax' | 'street1' | 'street2' | 'city' | 'state' | 'postalCode'
+> = {
+  npi: '',
+  phone: '',
+  fax: '',
+  street1: '',
+  street2: '',
+  city: '',
+  state: { value: '' },
+  postalCode: ''
+};
+
 export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const { clinicalClient } = usePhoton();
+  const { enabled: sparseInvitesEnabled } = useFeatureFlag('allow_sparse_invites');
 
   const { data, loading: loadingFaxPreference } = useQuery(organizationSettingsQuery, {
     client: clinicalClient
@@ -139,18 +181,17 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
     refetchQueries: [InvitesQueryDocument]
   });
 
-  const initialValues: yup.InferType<typeof inviteSchema> = {
+  const initialValues: InviteYupType = {
     email: '',
     roles: [],
-    npi: '',
-    phone: '',
-    fax: '',
-    street1: '',
-    street2: '',
-    city: '',
-    state: { value: '' },
-    postalCode: ''
+    prefillPrescriberDetails: false,
+    ...EMPTY_PRESCRIBER_DETAILS
   };
+
+  // With sparse invites, prescriber details are only collected when the
+  // inviter opts in to prefilling them. Otherwise they're always required.
+  const requiresPrescriberDetails = (values: InviteYupType) =>
+    !sparseInvitesEnabled || values.prefillPrescriberDetails;
 
   const handleSubmit = (values: InviteYupType) => {
     const address: AddressInput = {
@@ -166,7 +207,7 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
       variables: {
         email: values.email,
         roles: values.roles.map(({ value }) => value) ?? [],
-        ...(hasPrescriberRole(values.roles)
+        ...(hasPrescriberRole(values.roles) && requiresPrescriberDetails(values)
           ? {
               provider: {
                 address: address,
@@ -196,7 +237,11 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
             initialValues={initialValues}
             validate={(value) => {
               try {
-                validateYupSchema(value, inviteSchema, true, { providerFaxPreferred });
+                const context: InviteValidationContext = {
+                  providerFaxPreferred,
+                  requirePrescriberDetails: requiresPrescriberDetails(value)
+                };
+                validateYupSchema(value, inviteSchema, true, context);
               } catch (err) {
                 return yupToFormErrors(err);
               }
@@ -211,6 +256,8 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
           >
             {({
               setFieldValue,
+              setValues,
+              setTouched,
               handleSubmit,
               errors,
               touched,
@@ -218,13 +265,23 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
               setFieldTouched,
               isValid
             }) => {
+              const showPrescriberDetails =
+                hasPrescriberRole(values.roles) && requiresPrescriberDetails(values);
+
+              const clearPrescriberDetails = () => {
+                setValues({
+                  ...values,
+                  ...EMPTY_PRESCRIBER_DETAILS,
+                  prefillPrescriberDetails: false
+                });
+                setTouched({ roles: touched.roles, email: touched.email });
+              };
+
               return (
                 <form onSubmit={handleSubmit} noValidate>
                   <VStack spacing={2} align="stretch">
                     <FormControl isInvalid={!!errors.roles && !!touched.roles} pb="4" isRequired>
-                      <FormLabel htmlFor="roles" mb={1}>
-                        Roles
-                      </FormLabel>
+                      <FormLabel mb={1}>Roles</FormLabel>
                       <RolesSelect
                         onChange={(newValue) => setFieldValue('roles', newValue)}
                         onBlur={() => setFieldTouched('roles')}
@@ -233,18 +290,30 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                       <ErrorMessage name="roles" component={FormErrorMessage} />
                     </FormControl>
                     <FormControl isInvalid={!!errors.email && touched.email} pb="4" isRequired>
-                      <FormLabel htmlFor="email" mb={1}>
-                        Email
-                      </FormLabel>
+                      <FormLabel mb={1}>Email</FormLabel>
                       <Field name="email" as={Input} />
                       <ErrorMessage name="email" component={FormErrorMessage} />
                     </FormControl>
-                    {hasPrescriberRole(values.roles) && (
+                    {sparseInvitesEnabled && hasPrescriberRole(values.roles) && (
+                      <Button
+                        variant="outline"
+                        alignSelf="flex-start"
+                        mb="4"
+                        onClick={
+                          values.prefillPrescriberDetails
+                            ? clearPrescriberDetails
+                            : () => setFieldValue('prefillPrescriberDetails', true)
+                        }
+                      >
+                        {values.prefillPrescriberDetails
+                          ? 'Let the user fill in their personal details themselves'
+                          : 'Prefill Prescriber Data?'}
+                      </Button>
+                    )}
+                    {showPrescriberDetails && (
                       <>
                         <FormControl isRequired isInvalid={!!errors?.npi && touched?.npi} pb="4">
-                          <FormLabel htmlFor="npi" mb={1}>
-                            NPI
-                          </FormLabel>
+                          <FormLabel mb={1}>NPI</FormLabel>
                           <Field name="npi" as={Input} />
                           <ErrorMessage name="npi" component={FormErrorMessage} />
                         </FormControl>
@@ -253,9 +322,7 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                           isInvalid={!!errors?.phone && touched?.phone}
                           pb="4"
                         >
-                          <FormLabel htmlFor="phone" mb={1}>
-                            Phone
-                          </FormLabel>
+                          <FormLabel mb={1}>Phone</FormLabel>
                           <Field name="phone" as={Input} />
                           <ErrorMessage name="phone" component={FormErrorMessage} />
                         </FormControl>
@@ -264,9 +331,7 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                           isInvalid={!!errors?.fax && touched?.fax}
                           pb="4"
                         >
-                          <FormLabel htmlFor="fax" mb={1}>
-                            Fax
-                          </FormLabel>
+                          <FormLabel mb={1}>Fax</FormLabel>
                           <Field name="fax" as={Input} />
                           <ErrorMessage name="fax" component={FormErrorMessage} />
                         </FormControl>
@@ -275,23 +340,17 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                           isInvalid={!!errors?.street1 && touched?.street1}
                           pb="4"
                         >
-                          <FormLabel htmlFor="street1" mb={1}>
-                            Address 1
-                          </FormLabel>
+                          <FormLabel mb={1}>Address 1</FormLabel>
                           <Field name="street1" as={Input} />
                           <ErrorMessage name="street1" component={FormErrorMessage} />
                         </FormControl>
                         <FormControl isInvalid={!!errors?.street2 && touched?.street2} pb="4">
-                          <FormLabel htmlFor="street2" mb={1}>
-                            Address 2
-                          </FormLabel>
+                          <FormLabel mb={1}>Address 2</FormLabel>
                           <Field name="street2" as={Input} />
                           <ErrorMessage name="street2" component={FormErrorMessage} />
                         </FormControl>
                         <FormControl isRequired isInvalid={!!errors?.city && touched?.city} pb="4">
-                          <FormLabel htmlFor="city" mb={1}>
-                            City
-                          </FormLabel>
+                          <FormLabel mb={1}>City</FormLabel>
                           <Field name="city" as={Input} />
                           <ErrorMessage name="city" component={FormErrorMessage} />
                         </FormControl>
@@ -300,9 +359,7 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                           isInvalid={(!!errors?.state?.value && touched?.state?.value) ?? false}
                           pb="4"
                         >
-                          <FormLabel htmlFor="state" mb={1}>
-                            State
-                          </FormLabel>
+                          <FormLabel mb={1}>State</FormLabel>
                           <FormikStateSelect
                             value={values.state?.value ? { value: values.state?.value } : undefined}
                             setFieldTouched={setFieldTouched}
@@ -316,9 +373,7 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                           isInvalid={!!errors?.postalCode && touched?.postalCode}
                           pb="4"
                         >
-                          <FormLabel htmlFor="postalCode" mb={1}>
-                            Zip Code
-                          </FormLabel>
+                          <FormLabel mb={1}>Zip Code</FormLabel>
                           <Field name="postalCode" as={Input} />
                           <ErrorMessage name="postalCode" component={FormErrorMessage} />
                         </FormControl>
