@@ -232,8 +232,10 @@ export function InfoPage() {
         isOpen={detailsModalOpen}
         onClose={() => setDetailsModalOpen(false)}
         pharmacyName={pharmacy.name}
+        pharmacyId={pharmacy.id}
         pharmacyLogo={pharmacy.logo}
         prescriptions={prescriptionData}
+        fulfillmentState="SENT"
       />
     </ChakraProvider>
   );

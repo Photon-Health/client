@@ -42,8 +42,22 @@ vi.mock('../components/status/Header', () => ({
 }));
 
 vi.mock('../components/order-details/OrderDetailsModal', () => ({
-  OrderDetailsModal: ({ isOpen }: { isOpen: boolean }) => (
-    <div data-testid="order-details-modal">{isOpen ? 'Modal Open' : 'Modal Closed'}</div>
+  OrderDetailsModal: ({
+    isOpen,
+    pharmacyId,
+    fulfillmentState
+  }: {
+    isOpen: boolean;
+    pharmacyId?: string;
+    fulfillmentState?: string;
+  }) => (
+    <div
+      data-testid="order-details-modal"
+      data-pharmacy-id={pharmacyId}
+      data-fulfillment-state={fulfillmentState}
+    >
+      {isOpen ? 'Modal Open' : 'Modal Closed'}
+    </div>
   )
 }));
 
@@ -189,8 +203,16 @@ describe('InfoPage', () => {
 
     await userEvent.click(viewDetailsButton);
 
-    // Modal should be open
+    // Modal should be open and receive the sent order context needed for next steps.
     expect(screen.getByText('Modal Open')).toBeInTheDocument();
+    expect(screen.getByTestId('order-details-modal')).toHaveAttribute(
+      'data-pharmacy-id',
+      mockPharmacy.id
+    );
+    expect(screen.getByTestId('order-details-modal')).toHaveAttribute(
+      'data-fulfillment-state',
+      'SENT'
+    );
   });
 
   it('displays organization logo when available', async () => {
