@@ -43,6 +43,102 @@ export function stripAuthParams(search: string): string {
 }
 
 /**
+ * Thrown instead of redirecting when the previous login redirect, made moments
+ * ago, came back without a usable session. Redirecting again would only repeat
+ * it: Auth0 has a session, but this browser can't hand it to us (no third-party
+ * cookies for the silent iframe, no cached refresh token), so every round trip
+ * ends the same way. Callers should surface it rather than log in again.
+ */
+export class LoginLoopError extends Error {
+  public constructor() {
+    super('Unable to complete sign in. Allow cookies for the Photon login page, then try again.');
+    this.name = 'LoginLoopError';
+  }
+}
+
+/**
+ * How recent a previous automatic login redirect must be for another one to
+ * count as a loop. A round trip through Auth0 with an existing session takes a
+ * few seconds; a user coming back to an expired session takes far longer.
+ */
+const LOGIN_LOOP_WINDOW_MS = 30_000;
+
+/**
+ * Once a loop is detected, how long automatic redirects stay off. Longer than
+ * the periodic session checks in Elements (every 60s), so they can't restart
+ * the loop at a slower pace; short enough that a later visit to the page in
+ * the same tab logs in normally.
+ */
+const LOGIN_LOOP_BACKOFF_MS = 10 * 60_000;
+
+const LOGIN_ATTEMPT_KEY = 'photon:login-redirect-at';
+const LOGIN_BLOCKED_KEY = 'photon:login-blocked-until';
+
+// sessionStorage can throw (sandboxed iframes, some private modes). Without it
+// the loop breaker is off, which is no worse than before it existed.
+function readTimestamp(key: string): number | undefined {
+  try {
+    const value = Number(window.sessionStorage.getItem(key));
+    return value > 0 ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function writeTimestamp(key: string, value: number): void {
+  try {
+    window.sessionStorage.setItem(key, String(value));
+  } catch {
+    // See readTimestamp.
+  }
+}
+
+/** Whether an automatic login redirect now would repeat a loop. */
+function isLoginLoop(): boolean {
+  const now = Date.now();
+  const blockedUntil = readTimestamp(LOGIN_BLOCKED_KEY);
+  if (blockedUntil && now < blockedUntil) {
+    return true;
+  }
+  const lastAttempt = readTimestamp(LOGIN_ATTEMPT_KEY);
+  if (lastAttempt && now - lastAttempt < LOGIN_LOOP_WINDOW_MS) {
+    writeTimestamp(LOGIN_BLOCKED_KEY, now + LOGIN_LOOP_BACKOFF_MS);
+    return true;
+  }
+  return false;
+}
+
+/** Forgets past attempts: a token was obtained, or the user acted themselves. */
+function clearLoginAttempts(): void {
+  try {
+    window.sessionStorage.removeItem(LOGIN_ATTEMPT_KEY);
+    window.sessionStorage.removeItem(LOGIN_BLOCKED_KEY);
+  } catch {
+    // See readTimestamp.
+  }
+}
+
+/**
+ * The login redirect in flight for each Auth0 client. loginWithRedirect only
+ * starts a navigation; until the page unloads, other callers keep running, and
+ * each extra loginWithRedirect overwrites the stored transaction. The callback
+ * then fails its state check ("Invalid state") and the code is never exchanged.
+ * Keyed by client rather than AuthManager because setOrganization and
+ * clearOrganization create new managers around the same client.
+ */
+let loginRedirects = new WeakMap<Auth0Client, Promise<void>>();
+
+// Pressing Back from the Auth0 page can restore this page from the bfcache with
+// the redirect still recorded as in flight, which would make login a no-op.
+if (typeof window !== 'undefined') {
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+      loginRedirects = new WeakMap();
+    }
+  });
+}
+
+/**
  * Configuration options for AuthManager
  * @param authentication An instaniated Auth0 Client
  * @param organization An id of an organization to login as
@@ -129,7 +225,44 @@ export class AuthManager {
       ...(appState ? { appState } : {})
     };
 
-    return this.authentication.loginWithRedirect(opts);
+    // An explicit login (a button, autoLogin) is never blocked by the loop
+    // breaker, but it still shares the in-flight redirect.
+    return this.redirectToLogin(opts, { breakLoops: false });
+  }
+
+  /**
+   * Starts at most one login redirect per page load and Auth0 client; later
+   * callers get the redirect already under way.
+   *
+   * With `breakLoops`, refuses to redirect (throws LoginLoopError) when the
+   * last redirect was moments ago and nothing since has produced a token.
+   */
+  private redirectToLogin(
+    opts: RedirectLoginOptions,
+    { breakLoops }: { breakLoops: boolean }
+  ): Promise<void> {
+    const inFlight = loginRedirects.get(this.authentication);
+    if (inFlight) {
+      return inFlight;
+    }
+
+    if (breakLoops) {
+      if (isLoginLoop()) {
+        return Promise.reject(new LoginLoopError());
+      }
+    } else {
+      // The user asked to log in, so a loop detected earlier no longer applies.
+      clearLoginAttempts();
+    }
+
+    writeTimestamp(LOGIN_ATTEMPT_KEY, Date.now());
+    const redirect = this.authentication.loginWithRedirect(opts).catch((error) => {
+      // Nothing is navigating, so the next login has to be free to try again.
+      loginRedirects.delete(this.authentication);
+      throw error;
+    });
+    loginRedirects.set(this.authentication, redirect);
+    return redirect;
   }
 
   /**
@@ -145,6 +278,7 @@ export class AuthManager {
       }
     };
 
+    clearLoginAttempts();
     return this.authentication.logout(opts);
   }
 
@@ -161,8 +295,7 @@ export class AuthManager {
   private _getAccessToken = async (
     { audience }: { audience?: string } = {
       audience: this.audience
-    },
-    throwIfFailure = false
+    }
   ): Promise<string> => {
     const opts: GetTokenSilentlyOptions | GetTokenWithPopupOptions = {
       authorizationParams: {
@@ -186,14 +319,13 @@ export class AuthManager {
           returnTo: `${window.location.pathname}${window.location.search}`
         }
       };
-      await this.authentication.loginWithRedirect(redirectOpts);
-      if (throwIfFailure) {
-        throw new Error('Unable to retrieve access token'); // Session likely expired
-      } else {
-        // Retry once
-        return await this._getAccessToken({ audience }, true);
-      }
+      // Throws LoginLoopError instead when the last redirect just came back empty.
+      await this.redirectToLogin(redirectOpts, { breakLoops: true });
+      // The page is navigating away. Retrying here would only start another
+      // silent auth and another redirect, racing the one under way.
+      throw new Error('Unable to retrieve access token'); // Session likely expired
     }
+    clearLoginAttempts();
     return token;
   };
 
@@ -255,7 +387,9 @@ export class AuthManager {
       // Must be awaited inside the try. Returning the promise un-awaited meant
       // a rejected exchange bypassed this catch entirely, so the failure was
       // never logged here and surfaced only as an opaque rejection upstream.
-      return await this.authentication.handleRedirectCallback(url);
+      const result = await this.authentication.handleRedirectCallback(url);
+      clearLoginAttempts();
+      return result;
     } catch (error) {
       console.error('[PhotonClient]: Failed to complete the Auth0 redirect.', error);
       throw error;
