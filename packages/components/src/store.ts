@@ -317,6 +317,7 @@ export class PhotonClientStore {
       const isUserLoggedIntoAnOrganization = !!user?.org_id;
 
       let permissions: Permission[] = [];
+      let error = this.store.authentication.error;
       if (this.autoLogin || authenticated) {
         // getAccessToken is triggering the SSO screen to appear, so for auto-login=false, we don't want to call it
         try {
@@ -325,8 +326,14 @@ export class PhotonClientStore {
             permissions: Permission[];
           } = jwtDecode(token);
           permissions = decoded?.permissions || [];
-        } catch (_err) {
+        } catch (err: any) {
           permissions = [];
+          // The SDK refused to redirect again because the last login just came
+          // back without a session. Published with isLoading below, so autoLogin
+          // consumers see the error and don't start the loop themselves.
+          if (err?.name === 'LoginLoopError') {
+            error = err.message;
+          }
         }
       }
 
@@ -343,7 +350,8 @@ export class PhotonClientStore {
         user: user,
         isLoading: false,
         isInOrg: isInOrg,
-        permissions: permissions || []
+        permissions: permissions || [],
+        error
       });
     } catch (_e) {
       this.setStore('authentication', {
@@ -354,8 +362,10 @@ export class PhotonClientStore {
   }
 
   private async login(args = {}) {
+    // Starts a redirect. Checking the session here ran while the page was still
+    // unloading, and its silent-auth failure started a second redirect that
+    // overwrote this one's transaction, so the callback failed "Invalid state".
     await this.sdk.authentication.login(args);
-    await this.checkSession();
   }
 
   private async logout(args = {}) {

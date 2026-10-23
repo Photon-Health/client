@@ -190,3 +190,49 @@ describe('handleRedirect — successful code exchange', () => {
     expect(window.history.length).toBe(historyLength);
   });
 });
+
+describe('login', () => {
+  test('does not check the session while the page is redirecting', async () => {
+    // That check's silent-auth failure started a second redirect, overwriting
+    // this one's transaction, so the callback failed "Invalid state".
+    const sdk = makeSdk();
+    const store = new PhotonClientStore(sdk, true);
+
+    await store.authentication.login();
+
+    expect(sdk.authentication.login).toHaveBeenCalledTimes(1);
+    expect(sdk.authentication.checkSession).not.toHaveBeenCalled();
+    expect(sdk.authentication.getAccessToken).not.toHaveBeenCalled();
+  });
+});
+
+describe('checkSession — login loop', () => {
+  const loginLoop = () =>
+    Object.assign(new Error('Unable to complete sign in.'), { name: 'LoginLoopError' });
+
+  test('surfaces the loop so autoLogin does not restart it', async () => {
+    const sdk = makeSdk({ isAuthenticated: vi.fn().mockResolvedValue(false) });
+    sdk.authentication.getAccessToken.mockRejectedValue(loginLoop());
+    const store = new PhotonClientStore(sdk, true);
+
+    await store.authentication.checkSession();
+
+    expect(store.authentication.state.error).toBe('Unable to complete sign in.');
+    expect(store.authentication.state.isLoading).toBe(false);
+    expect(store.authentication.state.isAuthenticated).toBe(false);
+  });
+
+  test('ignores an ordinary token failure, as before', async () => {
+    // e.g. the SDK has just started a redirect: the page is going away.
+    const sdk = makeSdk({ isAuthenticated: vi.fn().mockResolvedValue(false) });
+    sdk.authentication.getAccessToken.mockRejectedValue(
+      new Error('Unable to retrieve access token')
+    );
+    const store = new PhotonClientStore(sdk, true);
+
+    await store.authentication.checkSession();
+
+    expect(store.authentication.state.error).toBeUndefined();
+    expect(store.authentication.state.isLoading).toBe(false);
+  });
+});
