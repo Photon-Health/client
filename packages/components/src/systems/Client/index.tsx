@@ -59,7 +59,11 @@ export default function Client(props: ClientProps) {
 
   createEffect(async () => {
     if (!store?.authentication.state.isLoading) {
-      if (!store?.authentication.state.isAuthenticated && props.autoLogin) {
+      if (
+        !store?.authentication.state.isAuthenticated &&
+        !store?.authentication.state.error &&
+        props.autoLogin
+      ) {
         const args: any = { appState: {} };
         if (props.redirectPath) {
           args.appState.returnTo = props.redirectPath;

@@ -93,7 +93,9 @@ export const PhotonClientComponent = (props: PhotonClientProps) => {
   });
 
   createEffect(() => {
-    if (!store()?.authentication.state.isLoading) {
+    // A failed login (e.g. the SDK broke a login loop) stays failed until the
+    // user acts: both branches below would redirect again.
+    if (!store()?.authentication.state.isLoading && !store()?.authentication.state.error) {
       // If autoLogin, then automatically log in
       if (!store()?.authentication.state.isAuthenticated && props.autoLogin) {
         const args: any = { appState: {} };

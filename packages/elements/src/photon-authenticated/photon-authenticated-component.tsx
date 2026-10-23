@@ -30,7 +30,11 @@ const Component = (props: { autoLogin: boolean; hideLoader: boolean; redirectPat
   createEffect(() => {
     if (!client?.authentication.state.isLoading) {
       setIsLoading(false);
-      if (!client?.authentication.state.isAuthenticated && props.autoLogin) {
+      if (
+        !client?.authentication.state.isAuthenticated &&
+        !client?.authentication.state.error &&
+        props.autoLogin
+      ) {
         const args: any = { appState: {} };
         if (props.redirectPath) {
           args.appState.returnTo = props.redirectPath;
