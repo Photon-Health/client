@@ -23,6 +23,7 @@ import { formatAddress, titleCase } from '../utils/formatters';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
 import { SPONSORED_TAG_KIND, buildPaymentOptions, representativeOffer } from '../utils/offers';
 import { PaymentOptions } from './pharmacy-card/PaymentOptions';
+import { AttributeTag } from './offers/AttributeTag';
 
 dayjs.extend(customParseFormat);
 
@@ -351,9 +352,7 @@ export const PharmacyInfo = ({
       {offerTags.length ? (
         <HStack spacing={2} m={0} p={0} alignItems="start" w="full">
           {offerTags.map((tag) => (
-            <Tag key={tag.kind} size="sm" colorScheme="blue">
-              <TagLabel>{tag.label}</TagLabel>
-            </Tag>
+            <AttributeTag key={tag.kind} kind={tag.kind} label={tag.label} />
           ))}
         </HStack>
       ) : showReadyIn30MinTag || showAvailableInYourAreaTag || showFreeDeliveryTag ? (
