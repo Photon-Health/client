@@ -24,6 +24,9 @@ export const OFFER_SOURCE = {
 // attributeTag kind marking a paid-placement (sponsored) offer
 export const SPONSORED_TAG_KIND = 'SPONSORED';
 
+// attributeTag kind for the UK "Voted best in Lexington" badge experiment
+export const BEST_IN_LEXINGTON_TAG_KIND = 'BEST_IN_LEXINGTON';
+
 // promoted offers don't have rank (yet) so we enforce that here for now
 export const CLIENT_SOURCE_PRIORITY: string[] = [
   OFFER_SOURCE.AMAZON_PHARMACY,
