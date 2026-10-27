@@ -1,8 +1,10 @@
+import { ChakraProvider } from '@chakra-ui/react';
 import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { OfferInfo } from './OfferInfo';
 import { PharmacyOffer } from '../../utils/models';
 import { groupOffersByPharmacy } from '../../utils/offers';
+import theme from '../../configs/theme';
 
 // one offer's card
 const toGroup = (offer: PharmacyOffer) => groupOffersByPharmacy([offer])[0];
@@ -181,6 +183,39 @@ describe('OfferInfo', () => {
     const rendered = screen.getAllByText(/^(In Stock|Delivers in 2-3 days)$/);
 
     expect(rendered.map((el) => el.textContent)).toEqual(['In Stock', 'Delivers in 2-3 days']);
+  });
+
+  describe('Best in Lexington badge', () => {
+    const renderWithTags = (tags: PharmacyOffer['tags']) =>
+      render(
+        <ChakraProvider theme={theme()}>
+          <OfferInfo
+            pharmacy={baseOffer.pharmacy}
+            offerGroup={toGroup({ ...baseOffer, tags })}
+            isCurrentPharmacy={false}
+            isPreferred={false}
+          />
+        </ChakraProvider>
+      );
+
+    test('renders a BEST_IN_LEXINGTON tag green with a star', () => {
+      renderWithTags([{ kind: 'BEST_IN_LEXINGTON', label: 'Voted best in Lexington' }]);
+
+      expect(screen.getByTestId('best-in-lexington-star')).toBeInTheDocument();
+      expect(screen.getByText('Voted best in Lexington').parentElement).toHaveStyle({
+        backgroundColor: 'var(--chakra-colors-green-100)',
+        color: 'var(--chakra-colors-green-600)'
+      });
+    });
+
+    test('renders other tag kinds blue without a star', () => {
+      renderWithTags([{ kind: 'ONSITE_PICKUP', label: 'On-site pick up' }]);
+
+      expect(screen.queryByTestId('best-in-lexington-star')).not.toBeInTheDocument();
+      expect(screen.getByText('On-site pick up').parentElement).not.toHaveStyle({
+        backgroundColor: 'var(--chakra-colors-green-100)'
+      });
+    });
   });
 
   test('shows preferred tag when isPreferred is true', () => {
