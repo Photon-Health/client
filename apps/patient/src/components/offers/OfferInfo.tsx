@@ -19,19 +19,12 @@ import {
 } from '../../utils/offers';
 import { isDeliveryOffer } from '../../utils/offerPlacement';
 import { PaymentOptions } from '../pharmacy-card/PaymentOptions';
+import { AttributeTag } from './AttributeTag';
 
 const PreferredTag = () => {
   return (
     <Tag size="sm" colorScheme="gray">
       <TagLabel>{t.preferred}</TagLabel>
-    </Tag>
-  );
-};
-
-const AttributeTag = ({ label }: { label: string }) => {
-  return (
-    <Tag size="sm" colorScheme="blue">
-      <TagLabel>{label}</TagLabel>
     </Tag>
   );
 };
@@ -135,7 +128,7 @@ export const OfferInfo = ({
   const offerTags = [
     ...tags
       .filter((tag) => tag.kind !== SPONSORED_TAG_KIND)
-      .map((tag) => <AttributeTag key={tag.kind} label={tag.label} />),
+      .map((tag) => <AttributeTag key={tag.kind} kind={tag.kind} label={tag.label} />),
     ...(isCurrentPharmacy ? [<CurrentPharmacyTag key="current" />] : [])
   ];
 

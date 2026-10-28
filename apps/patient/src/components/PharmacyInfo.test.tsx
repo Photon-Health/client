@@ -1,9 +1,11 @@
+import { ChakraProvider } from '@chakra-ui/react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, test } from 'vitest';
 import { DistanceAddress, Hours, PharmacyInfo } from './PharmacyInfo';
 import { EnrichedPharmacy, PharmacyOffer } from '../utils/models';
 import { groupOffersByPharmacy } from '../utils/offers';
+import theme from '../configs/theme';
 
 const hours: NonNullable<EnrichedPharmacy['hours']> = [
   {
@@ -76,5 +78,42 @@ describe('PharmacyInfo', () => {
 
     expect(screen.getByText('In network')).toBeInTheDocument();
     expect(screen.queryByText('Ready in 30 minutes')).not.toBeInTheDocument();
+  });
+
+  test('renders a BEST_IN_LEXINGTON offer tag green with a star', () => {
+    const [offerGroup] = groupOffersByPharmacy([
+      offer({ tags: [{ kind: 'BEST_IN_LEXINGTON', label: 'Voted best in Lexington' }] })
+    ]);
+    render(
+      <ChakraProvider theme={theme()}>
+        <MemoryRouter>
+          <PharmacyInfo pharmacy={pharmacy} offerGroup={offerGroup} />
+        </MemoryRouter>
+      </ChakraProvider>
+    );
+
+    expect(screen.getByTestId('best-in-lexington-star')).toBeInTheDocument();
+    expect(screen.getByText('Voted best in Lexington').parentElement).toHaveStyle({
+      backgroundColor: 'var(--chakra-colors-green-100)',
+      color: 'var(--chakra-colors-green-600)'
+    });
+  });
+
+  test('renders other offer tag kinds blue without a star', () => {
+    const [offerGroup] = groupOffersByPharmacy([
+      offer({ tags: [{ kind: 'IN_NETWORK', label: 'In network' }] })
+    ]);
+    render(
+      <ChakraProvider theme={theme()}>
+        <MemoryRouter>
+          <PharmacyInfo pharmacy={pharmacy} offerGroup={offerGroup} />
+        </MemoryRouter>
+      </ChakraProvider>
+    );
+
+    expect(screen.queryByTestId('best-in-lexington-star')).not.toBeInTheDocument();
+    expect(screen.getByText('In network').parentElement).not.toHaveStyle({
+      backgroundColor: 'var(--chakra-colors-green-100)'
+    });
   });
 });
