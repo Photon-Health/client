@@ -1,4 +1,8 @@
-export const AUTOMATED_OPS_SUPPORT_SMS_NUMBER = '3158608762';
-
-export const getSupportSmsNumber = (enableAutomatedOps?: boolean | null): string =>
-  enableAutomatedOps ? AUTOMATED_OPS_SUPPORT_SMS_NUMBER : import.meta.env.VITE_TWILIO_SMS_NUMBER;
+export const getSupportSmsNumber = (enableAutomatedOps?: boolean | null): string => {
+  const automatedOpsSmsNumber = import.meta.env.VITE_AUTOMATED_OPS_SMS_NUMBER;
+  // Local .env files pulled before this variable existed lack it; keep the button working.
+  if (enableAutomatedOps && automatedOpsSmsNumber) {
+    return automatedOpsSmsNumber;
+  }
+  return import.meta.env.VITE_TWILIO_SMS_NUMBER;
+};
