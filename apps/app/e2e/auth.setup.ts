@@ -11,10 +11,14 @@ setup('authenticate', async ({ page }) => {
   await page.getByRole('button', { name: 'Log in' }).click();
   await expect(page.getByText('Log in to continue to Photon Clinical App')).toBeVisible();
   await page.getByLabel('Username').fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_USERNAME);
-  await page
-    .getByRole('textbox', { name: 'Password' })
-    .fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD);
-  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+  const passwordInput = page.getByRole('textbox', { name: 'Password' });
+  const continueButton = page.getByRole('button', { name: 'Continue', exact: true });
+  // Auth0 identifier-first login asks for the password on a second screen
+  if (!(await passwordInput.isVisible())) {
+    await continueButton.click();
+  }
+  await passwordInput.fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD);
+  await continueButton.click();
   await page.waitForURL(process.env.PLAYWRIGHT_BASE_URL, { timeout: 180_000 });
   await expect(page.getByRole('heading', { name: 'Prescriptions' })).toBeVisible();
 
