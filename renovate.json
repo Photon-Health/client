@@ -1,0 +1,67 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Copy of Photon-Health/renovate-config default.json. This repo is public, so Renovate cannot extend that private preset. Keep the two in sync.",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    ":timezone(America/New_York)",
+    "helpers:pinGitHubActionDigests",
+    "docker:pinDigests"
+  ],
+  "schedule": ["before 9am on monday"],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "labels": ["dependencies"],
+  "minimumReleaseAge": "3 days",
+  "dependencyDashboardOSVVulnerabilitySummary": "unresolved",
+  "npm": {
+    "enabled": false
+  },
+  "github-actions": {
+    "enabled": false
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 9am on monday"]
+  },
+  "packageRules": [
+    {
+      "description": "Group non-major updates into one weekly PR",
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "non-major dependencies",
+      "groupSlug": "all-minor-patch"
+    },
+    {
+      "description": "Majors wait for a tick on the Dependency Dashboard so they don't flood repos with PRs",
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Keep every Node runtime pin (.nvmrc, engines, mise, Docker, setup-node) and @types/node on the same version",
+      "matchDepNames": ["node", "nodejs/node", "@types/node"],
+      "groupName": "node runtime",
+      "groupSlug": "node-runtime"
+    },
+    {
+      "description": "Batch Docker digest refreshes",
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["digest", "pinDigest"],
+      "groupName": "docker digests",
+      "groupSlug": "docker-digests"
+    },
+    {
+      "description": "Batch GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "digest", "pinDigest"],
+      "groupName": "github actions",
+      "groupSlug": "github-actions"
+    },
+    {
+      "description": "Internal packages ship fast and skip the release-age wait",
+      "matchPackageNames": ["@photon-health/**", "@photonhealth/**"],
+      "minimumReleaseAge": null,
+      "groupName": "photon packages",
+      "groupSlug": "photon-packages"
+    }
+  ]
+}
