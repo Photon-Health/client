@@ -5,6 +5,7 @@ import * as path from 'path';
 const testDataPath = path.join(__dirname, '.test-data.json');
 
 test('create test patient and order via clinical app', async ({ page }) => {
+  test.setTimeout(120_000);
   await loginViaAuth0(page);
   await createPatientAndStartPrescription(page);
   await createDraftPrescription(page, 'Amoxicillin');
@@ -18,7 +19,7 @@ test('create test patient and order via clinical app', async ({ page }) => {
   // Write to testDataPath, so patient app specs can load this fresh order
   fs.writeFileSync(testDataPath, JSON.stringify({ orderId }, null, 2));
   console.log(`Test data written: orderId=${orderId}`);
-}, 120_000);
+});
 
 async function loginViaAuth0(page: Page) {
   await page.goto('/login?connection=e2e-test-users');
@@ -26,10 +27,14 @@ async function loginViaAuth0(page: Page) {
   await page.getByRole('button', { name: 'Log in' }).click();
   await expect(page.getByText('Log in to continue to Photon Clinical App')).toBeVisible();
   await page.getByLabel('Username').fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_USERNAME!);
-  await page
-    .getByRole('textbox', { name: 'Password' })
-    .fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD!);
-  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+  const passwordInput = page.getByRole('textbox', { name: 'Password' });
+  const continueButton = page.getByRole('button', { name: 'Continue', exact: true });
+  // Auth0 identifier-first login asks for the password on a second screen
+  if (!(await passwordInput.isVisible())) {
+    await continueButton.click();
+  }
+  await passwordInput.fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD!);
+  await continueButton.click();
   await page.waitForURL('**/prescriptions', { timeout: 60_000 });
   await expect(page.getByRole('heading', { name: 'Prescriptions' })).toBeVisible();
 }
