@@ -21,6 +21,7 @@ import { FAQContents, FAQEntry } from './FAQ';
 import { useOrderContext } from '../views/Main';
 import { usePatientAnalytics } from '../hooks/usePatientAnalytics';
 import { getFaqs } from '../api';
+import { getSupportSmsNumber } from '../utils/supportSmsNumber';
 
 export const FAQModal = ({
   isOpen,
@@ -110,7 +111,9 @@ export const FAQModal = ({
                           as="a"
                           variant="outline"
                           color="blue.500"
-                          href={`sms:${import.meta.env.VITE_TWILIO_SMS_NUMBER}`}
+                          href={`sms:${getSupportSmsNumber(
+                            order?.organization.settings?.patientUx.enableAutomatedOps
+                          )}`}
                           w="full"
                           onClick={handleMessageSupport}
                         >
