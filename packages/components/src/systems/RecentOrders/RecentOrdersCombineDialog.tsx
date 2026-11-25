@@ -268,13 +268,18 @@ export default function RecentOrdersCombineDialog() {
           <Button
             variant="secondary"
             size="xl"
-            onClick={() => {
+            onClick={async () => {
               dispatchAnalyticsTrackEvent('ctaClicked', {
                 name: 'Combine Orders Rejected',
                 buttonText: 'No, send new order'
               });
-              state.createOrder?.();
               setIsCreatingOrder(true);
+              try {
+                await state.createOrder?.();
+              } finally {
+                setIsCreatingOrder(false);
+                actions.setIsCombineDialogOpen(false);
+              }
             }}
             disabled={isCreatingOrder() || isCombiningOrders()}
             loading={isCreatingOrder()}
