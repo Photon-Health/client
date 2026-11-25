@@ -92,7 +92,7 @@ type RecentOrdersState = {
   addressId?: string;
   address?: Address;
   // if provider chooses not to combine the order, call this to create a new order
-  createOrder?: () => void;
+  createOrder?: () => Promise<unknown> | void;
   // if the user clicks "continue" on the duplicate dialog, we need to call the callback to add to draft prescriptions
   duplicateDialogContinueCb: () => void;
   duplicateDialogCancelCb: () => void;
@@ -105,7 +105,7 @@ type RecentOrdersState = {
 type RecentOrdersActions = {
   setIsCombineDialogOpen: (
     isOpen: boolean,
-    createOrder?: () => void,
+    createOrder?: () => Promise<unknown> | void,
     addressId?: string,
     address?: Address
   ) => void;
