@@ -172,7 +172,8 @@
     "immutable": "5.1.8",
     "esbuild": "^0.28.1",
     "nx": {
-      "smol-toml": "1.7.1"
+      "smol-toml": "1.7.1",
+      "axios": "^1.20.0"
     },
     "@microsoft/api-extractor": "^7.57.5",
     "babel-plugin-jsx-dom-expressions": "0.39.8",
